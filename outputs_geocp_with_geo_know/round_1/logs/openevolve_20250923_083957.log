@@ -1,0 +1,34 @@
+2025-09-23 08:39:57,704 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_1/logs/openevolve_20250923_083957.log
+2025-09-23 08:39:57,733 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 08:39:57,769 - openevolve.llm.openai - INFO - Initialized OpenAI LLM with model: gpt-4o
+2025-09-23 08:39:57,800 - openevolve.llm.openai - INFO - Initialized OpenAI LLM with model: gpt-4.1
+2025-09-23 08:39:57,801 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:39:57,863 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:39:57,865 - openevolve.prompt.sampler - INFO - Initialized prompt sampler
+2025-09-23 08:39:57,865 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 08:39:57,865 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 08:39:57,866 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 08:39:57,866 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 08:39:57,866 - openevolve.controller - INFO - Initialized OpenEvolve with ../examples/geocp/initial_program.py
+2025-09-23 08:39:57,866 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 08:39:57,995 - numexpr.utils - INFO - NumExpr defaulting to 12 threads.
+2025-09-23 08:39:59,690 - openevolve.evaluator - INFO - Evaluated program 8d11122b-64f6-483f-ad5f-c4823fb9f851 in 1.82s: interval_score=55.3692, coverage=0.9400, avg_interval_length=19.9471, combined_score=-55.3692
+2025-09-23 08:39:59,690 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 08:39:59,691 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 08:39:59,691 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 08:39:59,692 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 08:39:59,692 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 08:39:59,692 - openevolve.database - INFO - Island Status:
+2025-09-23 08:39:59,692 - openevolve.database - INFO -  * Island 0: 1 programs, best=-55.3692, avg=-55.3692, diversity=0.00, gen=0 (best: 8d11122b-64f6-483f-ad5f-c4823fb9f851)
+2025-09-23 08:39:59,692 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:39:59,692 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:39:59,692 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:39:59,692 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:39:59,692 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 08:39:59,761 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 08:40:19,062 - openevolve.controller - INFO - Received signal 2, initiating graceful shutdown...
+2025-09-23 08:40:19,063 - openevolve.process_parallel - INFO - Graceful shutdown requested...
+2025-09-23 08:40:19,070 - openevolve.process_parallel - INFO - Shutdown requested, canceling remaining evaluations...
+2025-09-23 08:40:19,070 - openevolve.process_parallel - INFO - ✅ Evolution completed - Shutdown requested
+2025-09-23 08:40:19,070 - openevolve.controller - INFO - Evolution stopped due to shutdown request
+2025-09-23 08:40:37,798 - openevolve.controller - INFO - Force exit requested - terminating immediately

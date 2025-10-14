@@ -13,7 +13,7 @@ class GeoEvolve:
     GeoEvolve: Automatic GeoAI Modeling with Multi-Agent Large Language Models.
     """
     def __init__(self, initial_program_file: str, evaluator_file: str, config_path: str, output_path: str,
-                 rag_working_dir: str = './geoevolve_storage', rag_log_dir: str = '../geoevolve_logs',
+                 rag_working_dir: str = './geoevolve_storage', rag_log_dir: str = './geoevolve_logs',
                  log_name: str = 'geocp', is_compressed: bool = False):
         self.initial_program_file = initial_program_file
         self.evaluator_file = evaluator_file

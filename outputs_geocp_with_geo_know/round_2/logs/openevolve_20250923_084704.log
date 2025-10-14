@@ -1,0 +1,1326 @@
+2025-09-23 08:47:04,621 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_2/logs/openevolve_20250923_084704.log
+2025-09-23 08:47:04,621 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 08:47:04,694 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:47:04,756 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:47:04,761 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 08:47:04,762 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 08:47:04,763 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 08:47:04,763 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 08:47:04,763 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_1/best/best_program.py
+2025-09-23 08:47:04,763 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 08:47:04,921 - openevolve.evaluator - INFO - Evaluated program fd6fec1b-a33d-4b98-957a-02a2ab57e3a1 in 0.16s: interval_score=54.8807, coverage=0.9367, avg_interval_length=19.4521, combined_score=-54.8807
+2025-09-23 08:47:04,921 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 08:47:04,922 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 08:47:04,922 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 08:47:04,929 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 08:47:04,929 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 08:47:04,929 - openevolve.database - INFO - Island Status:
+2025-09-23 08:47:04,929 - openevolve.database - INFO -  * Island 0: 1 programs, best=-54.8807, avg=-54.8807, diversity=0.00, gen=0 (best: fd6fec1b-a33d-4b98-957a-02a2ab57e3a1)
+2025-09-23 08:47:04,929 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:47:04,929 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:47:04,930 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:47:04,930 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:47:04,930 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 08:47:05,019 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 08:47:25,433 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 9, 'complexity': 9}
+2025-09-23 08:47:25,434 - openevolve.database - INFO - New best program 12bd8670-9535-4369-afcf-1a0ad2e160a1 replaces fd6fec1b-a33d-4b98-957a-02a2ab57e3a1 (combined_score: -54.8807 → -53.2999, +1.5808)
+2025-09-23 08:47:25,434 - openevolve.process_parallel - INFO - Iteration 4: Program 12bd8670-9535-4369-afcf-1a0ad2e160a1 (parent: fd6fec1b-a33d-4b98-957a-02a2ab57e3a1) completed in 17.20s
+2025-09-23 08:47:25,434 - openevolve.process_parallel - INFO - Metrics: interval_score=53.2999, coverage=0.9333, avg_interval_length=18.5859, combined_score=-53.2999
+2025-09-23 08:47:25,434 - openevolve.process_parallel - INFO - 🌟 New best solution found at iteration 4: 12bd8670-9535-4369-afcf-1a0ad2e160a1
+2025-09-23 08:47:38,725 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 9}
+2025-09-23 08:47:38,726 - openevolve.process_parallel - INFO - Iteration 2: Program dcfc06ec-6a32-44ed-9598-524742f0ef1c (parent: fd6fec1b-a33d-4b98-957a-02a2ab57e3a1) completed in 30.50s
+2025-09-23 08:47:38,727 - openevolve.process_parallel - INFO - Metrics: interval_score=55.4608, coverage=0.9333, avg_interval_length=19.4464, combined_score=-55.4608
+2025-09-23 08:47:39,776 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 2, 'complexity': 9}
+2025-09-23 08:47:39,777 - openevolve.process_parallel - INFO - Iteration 3: Program 08df6b40-9ce2-4f32-b9ac-01086523fc29 (parent: fd6fec1b-a33d-4b98-957a-02a2ab57e3a1) completed in 31.55s
+2025-09-23 08:47:39,777 - openevolve.process_parallel - INFO - Metrics: interval_score=54.8807, coverage=0.9367, avg_interval_length=19.4521, combined_score=-54.8807
+2025-09-23 08:47:50,886 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (12230 > 12000)
+2025-09-23 08:47:54,676 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 9, 'complexity': 4}
+2025-09-23 08:47:54,677 - openevolve.database - INFO - New best program e450dec1-4b89-4b5b-9a3f-df0b516d1efb replaces 12bd8670-9535-4369-afcf-1a0ad2e160a1 (combined_score: -53.2999 → -52.2204, +1.0795)
+2025-09-23 08:47:54,677 - openevolve.process_parallel - INFO - Iteration 1: Program e450dec1-4b89-4b5b-9a3f-df0b516d1efb (parent: fd6fec1b-a33d-4b98-957a-02a2ab57e3a1) completed in 46.45s
+2025-09-23 08:47:54,677 - openevolve.process_parallel - INFO - Metrics: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:47:54,677 - openevolve.process_parallel - INFO - 🌟 New best solution found at iteration 1: e450dec1-4b89-4b5b-9a3f-df0b516d1efb
+2025-09-23 08:48:15,773 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 6, 'complexity': 3}
+2025-09-23 08:48:15,773 - openevolve.process_parallel - INFO - Iteration 6: Program 2b695205-1345-4a14-8c9a-451f76792e5a (parent: fd6fec1b-a33d-4b98-957a-02a2ab57e3a1) completed in 37.05s
+2025-09-23 08:48:15,773 - openevolve.process_parallel - INFO - Metrics: interval_score=53.2717, coverage=0.9333, avg_interval_length=18.5887, combined_score=-53.2717
+2025-09-23 08:48:36,279 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 8}
+2025-09-23 08:48:36,279 - openevolve.process_parallel - INFO - Iteration 8: Program 4cffd6a1-bd64-48e4-aa2f-8f34e3c20122 (parent: dcfc06ec-6a32-44ed-9598-524742f0ef1c) completed in 45.39s
+2025-09-23 08:48:36,280 - openevolve.process_parallel - INFO - Metrics: interval_score=0.0000, coverage=0.0000, avg_interval_length=0.0000, combined_score=-1000.0000, error=name 'bandwidth' is not defined
+2025-09-23 08:48:52,054 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 7}
+2025-09-23 08:48:52,054 - openevolve.process_parallel - INFO - Iteration 10: Program c741d708-61b1-4353-8b14-4eec8a1773f4 (parent: dcfc06ec-6a32-44ed-9598-524742f0ef1c) completed in 36.28s
+2025-09-23 08:48:52,054 - openevolve.process_parallel - INFO - Metrics: interval_score=0.0000, coverage=0.0000, avg_interval_length=0.0000, combined_score=-1000.0000, error=index 1 is out of bounds for axis 0 with size 1
+2025-09-23 08:48:52,054 - openevolve.process_parallel - INFO - Checkpoint interval reached at iteration 10
+2025-09-23 08:48:52,056 - openevolve.database - INFO - Island Status:
+2025-09-23 08:48:52,056 - openevolve.database - INFO -  * Island 0: 8 programs, best=-52.2204, avg=-290.5018, diversity=344.07, gen=2 (best: e450dec1-4b89-4b5b-9a3f-df0b516d1efb)
+2025-09-23 08:48:52,056 - openevolve.database - INFO -    Island 1: 1 programs, best=-53.2999, avg=-53.2999, diversity=0.00, gen=1
+2025-09-23 08:48:52,056 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=2
+2025-09-23 08:48:52,056 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=1
+2025-09-23 08:48:52,056 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=1
+2025-09-23 08:48:52,065 - openevolve.database - INFO - Saved database with 9 programs to ../outputs_geocp_with_geo_know/round_2/checkpoints/checkpoint_10
+2025-09-23 08:48:52,065 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:48:52,065 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_2/checkpoints/checkpoint_10
+2025-09-23 08:49:26,695 - openevolve.process_parallel - WARNING - Iteration 7 error: Generated code exceeds maximum length (12626 > 12000)
+2025-09-23 08:52:08,632 - openevolve.process_parallel - WARNING - Iteration 9 error: Generated code exceeds maximum length (12234 > 12000)
+2025-09-23 08:52:08,632 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 08:52:08,639 - openevolve.database - INFO - Saved database with 9 programs to ../outputs_geocp_with_geo_know/round_2/checkpoints/checkpoint_10
+2025-09-23 08:52:08,640 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:52:08,640 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_2/checkpoints/checkpoint_10
+2025-09-23 08:52:09,383 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 08:52:09,383 - openevolve.controller - INFO - Using tracked best program: e450dec1-4b89-4b5b-9a3f-df0b516d1efb
+2025-09-23 08:52:09,383 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:52:09,384 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_2/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_2/best/best_program_info.json
+2025-09-23 08:52:11,987 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:13,191 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:13,513 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:13,541 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:13,558 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:13,594 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:13,611 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:14,633 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:17,466 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:17,700 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:17,819 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:18,161 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:18,290 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:18,386 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:18,845 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:18,846 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:18,872 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:19,009 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:19,597 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:19,631 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:19,963 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:20,199 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:20,232 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:20,593 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:21,769 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:22,393 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:23,617 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:29,238 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:31,330 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:31,942 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:31,959 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:31,997 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:32,021 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:32,070 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:35,436 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:35,951 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:36,495 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:36,823 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:37,220 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:38,024 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:38,632 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:39,428 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:39,837 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:41,593 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:41,991 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:42,184 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:42,685 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:42,719 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:44,244 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:44,587 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:46,033 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:46,602 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:48,889 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:49,259 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:54,539 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:55,805 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,138 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,154 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,172 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,174 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,214 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,691 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,899 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,903 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:56,919 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:57,282 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:57,285 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:57,905 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:57,905 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:58,383 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:52:58,462 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:00,176 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:00,618 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:01,059 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:01,157 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:01,695 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:02,267 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:04,012 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:04,826 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:05,316 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:05,879 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:10,351 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:15,266 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:53:15,296 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_3/logs/openevolve_20250923_085315.log
+2025-09-23 08:53:15,296 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 08:53:15,368 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:53:15,433 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:53:15,439 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 08:53:15,439 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 08:53:15,440 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 08:53:15,440 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 08:53:15,440 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_2/best/best_program.py
+2025-09-23 08:53:15,440 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 08:53:15,784 - openevolve.evaluator - INFO - Evaluated program bd8a7ea3-31a2-4299-bb93-5ae75576e542 in 0.34s: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:53:15,784 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 08:53:15,785 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 08:53:15,785 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 08:53:15,792 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 08:53:15,792 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 08:53:15,792 - openevolve.database - INFO - Island Status:
+2025-09-23 08:53:15,792 - openevolve.database - INFO -  * Island 0: 1 programs, best=-52.2204, avg=-52.2204, diversity=0.00, gen=0 (best: bd8a7ea3-31a2-4299-bb93-5ae75576e542)
+2025-09-23 08:53:15,792 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:53:15,793 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:53:15,793 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:53:15,793 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:53:15,793 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 08:53:15,882 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 08:53:40,199 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (12670 > 12000)
+2025-09-23 08:54:05,786 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (12705 > 12000)
+2025-09-23 08:54:09,986 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 9}
+2025-09-23 08:54:09,987 - openevolve.process_parallel - INFO - Iteration 5: Program c5789ca9-5ed8-48fa-91d2-9ceec1b8a94b (parent: bd8a7ea3-31a2-4299-bb93-5ae75576e542) completed in 29.78s
+2025-09-23 08:54:09,987 - openevolve.process_parallel - INFO - Metrics: interval_score=54.9391, coverage=0.9400, avg_interval_length=19.6908, combined_score=-54.9391
+2025-09-23 08:54:17,467 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (13192 > 12000)
+2025-09-23 08:54:17,875 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 8, 'complexity': 7}
+2025-09-23 08:54:17,875 - openevolve.process_parallel - INFO - Iteration 6: Program 4c770cc8-b81f-42ac-bc06-faaa96c6c17d (parent: bd8a7ea3-31a2-4299-bb93-5ae75576e542) completed in 12.09s
+2025-09-23 08:54:17,875 - openevolve.process_parallel - INFO - Metrics: interval_score=52.6334, coverage=0.9367, avg_interval_length=18.3476, combined_score=-52.6334
+2025-09-23 08:54:28,788 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 0}
+2025-09-23 08:54:28,788 - openevolve.process_parallel - INFO - Iteration 7: Program a0222704-63f9-4cb7-be85-8196133b6371 (parent: bd8a7ea3-31a2-4299-bb93-5ae75576e542) completed in 18.81s
+2025-09-23 08:54:28,789 - openevolve.process_parallel - INFO - Metrics: interval_score=54.9431, coverage=0.9200, avg_interval_length=18.3079, combined_score=-54.9431
+2025-09-23 08:54:33,826 - openevolve.process_parallel - WARNING - Iteration 9 error: Generated code exceeds maximum length (13122 > 12000)
+2025-09-23 08:55:09,876 - openevolve.process_parallel - WARNING - Iteration 3 error: Generated code exceeds maximum length (13525 > 12000)
+2025-09-23 08:56:08,080 - openevolve.process_parallel - WARNING - Iteration 8 error: Generated code exceeds maximum length (13254 > 12000)
+2025-09-23 08:57:24,150 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 9, 'complexity': 9}
+2025-09-23 08:57:24,151 - openevolve.process_parallel - INFO - Iteration 10: Program 7047b0d1-d529-42ea-ad8a-964b1ea8fc3a (parent: c5789ca9-5ed8-48fa-91d2-9ceec1b8a94b) completed in 175.36s
+2025-09-23 08:57:24,152 - openevolve.process_parallel - INFO - Metrics: interval_score=52.3556, coverage=0.9300, avg_interval_length=17.5457, combined_score=-52.3556
+2025-09-23 08:57:24,152 - openevolve.process_parallel - INFO - Checkpoint interval reached at iteration 10
+2025-09-23 08:57:24,154 - openevolve.database - INFO - Island Status:
+2025-09-23 08:57:24,154 - openevolve.database - INFO -    Island 0: 5 programs, best=-52.2204, avg=-53.4183, diversity=389.63, gen=1 (best: bd8a7ea3-31a2-4299-bb93-5ae75576e542)
+2025-09-23 08:57:24,155 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=1
+2025-09-23 08:57:24,155 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=1
+2025-09-23 08:57:24,155 - openevolve.database - INFO -  * Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=1
+2025-09-23 08:57:24,155 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:57:24,161 - openevolve.database - INFO - Saved database with 5 programs to ../outputs_geocp_with_geo_know/round_3/checkpoints/checkpoint_10
+2025-09-23 08:57:24,162 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:57:24,162 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_3/checkpoints/checkpoint_10
+2025-09-23 08:57:24,163 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 08:57:24,169 - openevolve.database - INFO - Saved database with 5 programs to ../outputs_geocp_with_geo_know/round_3/checkpoints/checkpoint_10
+2025-09-23 08:57:24,170 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:57:24,170 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_3/checkpoints/checkpoint_10
+2025-09-23 08:57:24,805 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 08:57:24,806 - openevolve.controller - INFO - Using tracked best program: bd8a7ea3-31a2-4299-bb93-5ae75576e542
+2025-09-23 08:57:24,806 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:57:24,807 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_3/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_3/best/best_program_info.json
+2025-09-23 08:57:26,943 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:31,566 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:31,917 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:31,990 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:32,024 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:32,280 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:33,614 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:36,485 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:37,200 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:37,246 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:37,998 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:38,354 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:39,540 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:39,739 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:40,416 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:40,783 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:40,831 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:41,611 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:42,012 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:42,319 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:43,190 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:43,230 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:43,769 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:45,082 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:45,083 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:46,904 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:47,891 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:52,638 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:53,787 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:54,188 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:54,243 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:54,261 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:54,352 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:54,479 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:57:54,866 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:55,164 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:55,172 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:55,295 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:55,487 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:55,653 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:56,114 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:56,287 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:56,630 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:56,967 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:59,045 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:59,183 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:59,623 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:59,756 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:57:59,992 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:00,058 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:00,504 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:00,509 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:01,026 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:01,532 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:06,324 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:07,710 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,041 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,054 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,072 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,194 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,228 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,633 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,774 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:08,957 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:09,179 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:09,211 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:09,767 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:09,792 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:10,122 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:10,132 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:10,405 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:10,519 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:10,535 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:10,632 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:11,099 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:11,223 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:11,338 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:13,576 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:13,890 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:14,135 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:14,645 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:18,060 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:22,830 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 08:58:22,856 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_4/logs/openevolve_20250923_085822.log
+2025-09-23 08:58:22,857 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 08:58:22,930 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:58:22,992 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 08:58:22,996 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 08:58:22,996 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 08:58:22,997 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 08:58:22,997 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 08:58:22,997 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_3/best/best_program.py
+2025-09-23 08:58:22,997 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 08:58:23,156 - openevolve.evaluator - INFO - Evaluated program 82073bbd-28f2-48a0-8470-87fb1e5b32c6 in 0.16s: interval_score=52.2204, coverage=0.9233, avg_interval_length=17.5804, combined_score=-52.2204
+2025-09-23 08:58:23,156 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 08:58:23,157 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 08:58:23,157 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 08:58:23,163 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 08:58:23,163 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 08:58:23,164 - openevolve.database - INFO - Island Status:
+2025-09-23 08:58:23,164 - openevolve.database - INFO -  * Island 0: 1 programs, best=-52.2204, avg=-52.2204, diversity=0.00, gen=0 (best: 82073bbd-28f2-48a0-8470-87fb1e5b32c6)
+2025-09-23 08:58:23,164 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:58:23,164 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:58:23,164 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:58:23,165 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 08:58:23,165 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 08:58:23,257 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 08:58:42,039 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 9, 'complexity': 9}
+2025-09-23 08:58:42,040 - openevolve.database - INFO - New best program 69cd359f-86b6-42ac-9cbb-bbd8c9d36764 replaces 82073bbd-28f2-48a0-8470-87fb1e5b32c6 (combined_score: -52.2204 → -51.2770, +0.9434)
+2025-09-23 08:58:42,041 - openevolve.process_parallel - INFO - Iteration 3: Program 69cd359f-86b6-42ac-9cbb-bbd8c9d36764 (parent: 82073bbd-28f2-48a0-8470-87fb1e5b32c6) completed in 16.33s
+2025-09-23 08:58:42,041 - openevolve.process_parallel - INFO - Metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 08:58:42,041 - openevolve.process_parallel - INFO - 🌟 New best solution found at iteration 3: 69cd359f-86b6-42ac-9cbb-bbd8c9d36764
+2025-09-23 08:58:52,034 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (13103 > 12000)
+2025-09-23 08:59:07,709 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (12982 > 12000)
+2025-09-23 08:59:30,474 - openevolve.process_parallel - WARNING - Iteration 6 error: Generated code exceeds maximum length (12238 > 12000)
+2025-09-23 08:59:52,364 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 9}
+2025-09-23 08:59:52,366 - openevolve.process_parallel - INFO - Iteration 7: Program 505d9e42-32ca-49d6-aece-934e7b116dce (parent: 69cd359f-86b6-42ac-9cbb-bbd8c9d36764) completed in 44.66s
+2025-09-23 08:59:52,366 - openevolve.process_parallel - INFO - Metrics: interval_score=0.0000, coverage=0.0000, avg_interval_length=0.0000, combined_score=-1000.0000, error=name 'q_level' is not defined
+2025-09-23 08:59:54,402 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (12592 > 12000)
+2025-09-23 09:00:06,250 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (12786 > 12000)
+2025-09-23 09:00:09,400 - openevolve.process_parallel - INFO - Iteration 8: Program 540bdece-3efb-4700-ac89-13da4173146b (parent: 69cd359f-86b6-42ac-9cbb-bbd8c9d36764) completed in 38.93s
+2025-09-23 09:00:09,401 - openevolve.process_parallel - INFO - Metrics: interval_score=54.9894, coverage=0.9167, avg_interval_length=17.5754, combined_score=-54.9894
+2025-09-23 09:01:19,474 - openevolve.process_parallel - WARNING - Iteration 9 error: Generated code exceeds maximum length (12049 > 12000)
+2025-09-23 09:02:34,492 - openevolve.process_parallel - WARNING - Iteration 10 error: Generated code exceeds maximum length (12073 > 12000)
+2025-09-23 09:02:34,492 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 09:02:34,502 - openevolve.database - INFO - Saved database with 4 programs to ../outputs_geocp_with_geo_know/round_4/checkpoints/checkpoint_10
+2025-09-23 09:02:34,503 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:02:34,503 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_4/checkpoints/checkpoint_10
+2025-09-23 09:02:35,138 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 09:02:35,138 - openevolve.controller - INFO - Using tracked best program: 69cd359f-86b6-42ac-9cbb-bbd8c9d36764
+2025-09-23 09:02:35,139 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:02:35,140 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_4/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_4/best/best_program_info.json
+2025-09-23 09:02:38,058 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:39,453 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:39,877 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:39,918 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:39,927 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,002 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,007 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,061 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,120 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,126 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,325 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,403 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,461 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,675 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,749 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:40,926 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,008 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,031 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,084 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,436 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,515 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,576 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,638 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:41,801 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:42,051 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:42,052 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:42,053 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:42,358 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:42,398 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:42,664 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:44,914 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:45,429 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:45,461 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:45,606 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:46,000 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:46,118 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:46,470 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:46,591 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:46,968 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:46,968 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:47,074 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:47,415 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:47,510 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:48,058 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:48,147 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:48,209 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:48,810 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:55,156 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:56,589 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:56,927 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:56,943 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:57,014 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:57,026 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:57,371 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:02:59,661 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:59,663 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:02:59,826 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:02,117 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:02,973 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:05,188 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:05,197 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:05,909 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:05,910 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:06,216 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:06,787 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:07,545 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:07,654 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:07,785 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:09,402 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:09,708 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:10,519 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:10,894 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:11,950 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:14,098 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:18,548 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:20,245 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:20,730 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:03:20,794 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:03:20,915 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:03:20,976 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:03:21,064 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:03:21,475 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:21,693 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:22,932 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:24,504 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:24,511 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:24,927 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:25,495 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:25,815 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:25,969 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:26,396 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:26,905 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:29,047 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:29,780 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:29,934 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:30,792 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:30,952 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:31,340 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:31,529 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:32,019 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:32,732 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:39,290 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:47,290 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:03:47,323 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_5/logs/openevolve_20250923_090347.log
+2025-09-23 09:03:47,323 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 09:03:47,394 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:03:47,458 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:03:47,465 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 09:03:47,466 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 09:03:47,467 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 09:03:47,467 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 09:03:47,467 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_4/best/best_program.py
+2025-09-23 09:03:47,468 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 09:03:47,657 - openevolve.evaluator - INFO - Evaluated program c0e210c9-41fb-4473-ab89-5c9753358f88 in 0.19s: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:03:47,658 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 09:03:47,659 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 09:03:47,659 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 09:03:47,665 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 09:03:47,665 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 09:03:47,665 - openevolve.database - INFO - Island Status:
+2025-09-23 09:03:47,666 - openevolve.database - INFO -  * Island 0: 1 programs, best=-51.2770, avg=-51.2770, diversity=0.00, gen=0 (best: c0e210c9-41fb-4473-ab89-5c9753358f88)
+2025-09-23 09:03:47,666 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:03:47,666 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:03:47,666 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:03:47,667 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:03:47,667 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 09:03:47,761 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 09:04:08,493 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (12440 > 12000)
+2025-09-23 09:04:08,722 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (12588 > 12000)
+2025-09-23 09:04:22,475 - openevolve.process_parallel - WARNING - Iteration 3 error: Generated code exceeds maximum length (13723 > 12000)
+2025-09-23 09:04:25,364 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (12179 > 12000)
+2025-09-23 09:04:26,205 - openevolve.process_parallel - WARNING - Iteration 6 error: Generated code exceeds maximum length (12425 > 12000)
+2025-09-23 09:05:07,313 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 9}
+2025-09-23 09:05:07,313 - openevolve.process_parallel - INFO - Iteration 8: Program b81196ed-b61c-45de-b01d-1663e397129a (parent: c0e210c9-41fb-4473-ab89-5c9753358f88) completed in 41.95s
+2025-09-23 09:05:07,314 - openevolve.process_parallel - INFO - Metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:05:10,760 - openevolve.process_parallel - WARNING - Iteration 7 error: Generated code exceeds maximum length (13471 > 12000)
+2025-09-23 09:05:18,728 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (12943 > 12000)
+2025-09-23 09:05:19,747 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 3}
+2025-09-23 09:05:19,747 - openevolve.process_parallel - INFO - Iteration 9: Program e9f732e7-1c5e-4fb8-9c93-d5edb1c04ec7 (parent: c0e210c9-41fb-4473-ab89-5c9753358f88) completed in 53.54s
+2025-09-23 09:05:19,747 - openevolve.process_parallel - INFO - Metrics: interval_score=0.0000, coverage=0.0000, avg_interval_length=0.0000, combined_score=-1000.0000, error=index 240 is out of bounds for axis 0 with size 240
+2025-09-23 09:06:00,812 - openevolve.process_parallel - WARNING - Iteration 10 error: Generated code exceeds maximum length (12777 > 12000)
+2025-09-23 09:06:00,816 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 09:06:00,821 - openevolve.database - INFO - Saved database with 3 programs to ../outputs_geocp_with_geo_know/round_5/checkpoints/checkpoint_10
+2025-09-23 09:06:00,822 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:06:00,823 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_5/checkpoints/checkpoint_10
+2025-09-23 09:06:01,465 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 09:06:01,465 - openevolve.controller - INFO - Using tracked best program: c0e210c9-41fb-4473-ab89-5c9753358f88
+2025-09-23 09:06:01,466 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:06:01,467 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_5/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_5/best/best_program_info.json
+2025-09-23 09:06:04,783 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:06,438 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:06,776 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:06,857 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:06,864 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:06,867 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:06,956 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:08,490 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:09,207 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:09,246 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:09,722 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:09,835 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:10,027 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:10,331 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:10,369 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:10,743 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:12,431 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:14,227 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:14,840 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:15,189 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:16,780 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:18,319 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:18,332 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:19,038 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:19,876 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:20,472 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:20,678 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:27,643 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:30,405 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:30,730 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:30,761 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:30,786 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:30,809 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:30,852 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:31,324 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:31,370 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:31,469 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:31,961 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:32,086 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:32,449 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:32,500 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:32,690 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:32,787 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:33,124 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:33,191 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:33,681 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:33,801 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:34,338 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:34,393 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:34,502 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:35,203 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:35,255 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:35,866 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:35,968 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:49,040 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:51,016 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:51,457 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:51,488 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:51,564 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:51,684 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:51,687 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:06:51,982 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:52,092 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:52,391 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:52,495 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:52,787 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:52,913 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:52,996 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:53,190 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:53,996 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:54,061 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:54,611 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:55,484 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:55,485 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:56,071 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:56,078 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:56,730 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:06:57,061 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:07:01,362 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:07:04,812 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:07:05,528 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:07:09,214 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:07:16,491 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:07:16,516 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_6/logs/openevolve_20250923_090716.log
+2025-09-23 09:07:16,516 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 09:07:16,582 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:07:16,645 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:07:16,647 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 09:07:16,647 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 09:07:16,648 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 09:07:16,648 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 09:07:16,648 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_5/best/best_program.py
+2025-09-23 09:07:16,648 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 09:07:16,931 - openevolve.evaluator - INFO - Evaluated program c2e207b5-5d1f-43c2-832c-e5316cd69c64 in 0.28s: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:07:16,932 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 09:07:16,932 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 09:07:16,933 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 09:07:16,939 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 09:07:16,939 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 09:07:16,940 - openevolve.database - INFO - Island Status:
+2025-09-23 09:07:16,940 - openevolve.database - INFO -  * Island 0: 1 programs, best=-51.2770, avg=-51.2770, diversity=0.00, gen=0 (best: c2e207b5-5d1f-43c2-832c-e5316cd69c64)
+2025-09-23 09:07:16,940 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:07:16,940 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:07:16,941 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:07:16,941 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:07:16,941 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 09:07:17,044 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 09:07:40,154 - openevolve.process_parallel - WARNING - Iteration 3 error: Generated code exceeds maximum length (12890 > 12000)
+2025-09-23 09:07:42,697 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (13070 > 12000)
+2025-09-23 09:07:46,304 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (13692 > 12000)
+2025-09-23 09:08:06,889 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (13633 > 12000)
+2025-09-23 09:08:19,649 - openevolve.process_parallel - WARNING - Iteration 7 error: Generated code exceeds maximum length (12609 > 12000)
+2025-09-23 09:08:24,476 - openevolve.process_parallel - WARNING - Iteration 6 error: Generated code exceeds maximum length (13408 > 12000)
+2025-09-23 09:08:38,318 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 9}
+2025-09-23 09:08:38,319 - openevolve.process_parallel - INFO - Iteration 9: Program f28d5a46-ae22-4b4a-886b-850b14218fe7 (parent: c2e207b5-5d1f-43c2-832c-e5316cd69c64) completed in 18.66s
+2025-09-23 09:08:38,319 - openevolve.process_parallel - INFO - Metrics: interval_score=53.9054, coverage=0.8967, avg_interval_length=17.0825, combined_score=-53.9054
+2025-09-23 09:08:45,796 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 9, 'complexity': 0}
+2025-09-23 09:08:45,798 - openevolve.process_parallel - INFO - Iteration 10: Program ed38de36-1bbd-47e6-af0f-20339de136cb (parent: c2e207b5-5d1f-43c2-832c-e5316cd69c64) completed in 21.32s
+2025-09-23 09:08:45,799 - openevolve.process_parallel - INFO - Metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:08:45,799 - openevolve.process_parallel - INFO - Checkpoint interval reached at iteration 10
+2025-09-23 09:08:45,800 - openevolve.database - INFO - Island Status:
+2025-09-23 09:08:45,801 - openevolve.database - INFO -    Island 0: 3 programs, best=-51.2770, avg=-52.1531, diversity=61.93, gen=1 (best: c2e207b5-5d1f-43c2-832c-e5316cd69c64)
+2025-09-23 09:08:45,801 - openevolve.database - INFO -  * Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=1
+2025-09-23 09:08:45,801 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:08:45,802 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:08:45,802 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:08:45,805 - openevolve.database - INFO - Saved database with 3 programs to ../outputs_geocp_with_geo_know/round_6/checkpoints/checkpoint_10
+2025-09-23 09:08:45,806 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:08:45,807 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_6/checkpoints/checkpoint_10
+2025-09-23 09:09:06,835 - openevolve.process_parallel - INFO - Iteration 8: Program 9d8d4671-7789-4255-b16b-a0fab2ca8187 (parent: c2e207b5-5d1f-43c2-832c-e5316cd69c64) completed in 59.95s
+2025-09-23 09:09:06,837 - openevolve.process_parallel - INFO - Metrics: interval_score=0.0000, coverage=0.0000, avg_interval_length=0.0000, combined_score=-1000.0000, error=index 249 is out of bounds for axis 0 with size 240
+2025-09-23 09:09:15,606 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (13749 > 12000)
+2025-09-23 09:09:15,611 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 09:09:15,616 - openevolve.database - INFO - Saved database with 4 programs to ../outputs_geocp_with_geo_know/round_6/checkpoints/checkpoint_10
+2025-09-23 09:09:15,617 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:09:15,617 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_6/checkpoints/checkpoint_10
+2025-09-23 09:09:16,278 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 09:09:16,279 - openevolve.controller - INFO - Using tracked best program: c2e207b5-5d1f-43c2-832c-e5316cd69c64
+2025-09-23 09:09:16,279 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:09:16,280 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_6/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_6/best/best_program_info.json
+2025-09-23 09:09:19,438 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:21,105 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:21,436 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:21,504 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:21,521 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:21,534 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:21,562 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:22,061 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:22,119 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:22,173 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:22,187 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:22,715 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:23,270 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:25,512 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:25,951 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:26,164 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:26,475 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:26,840 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:27,043 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:27,625 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:27,665 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:28,304 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:28,650 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:29,682 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:30,215 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:31,091 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:31,726 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:39,822 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:41,534 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:41,988 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:41,988 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:41,994 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:42,088 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:42,366 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:09:42,724 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:43,350 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:43,789 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:43,973 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:44,499 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:44,857 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:45,288 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:46,043 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:46,371 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:46,918 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:48,395 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:50,523 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:50,684 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:51,396 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:51,413 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:52,566 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:53,506 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:53,517 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:55,864 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:09:57,461 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:03,177 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:04,866 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:05,204 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:10:05,214 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:10:05,332 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:10:05,335 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:10:05,454 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:10:06,018 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:06,493 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:06,983 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:07,678 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:08,411 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:08,427 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:08,530 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:10,454 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:11,415 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:12,365 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:13,255 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:14,795 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:15,714 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:16,196 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:17,655 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:17,897 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:18,943 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:19,204 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:21,875 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:23,662 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:28,834 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:33,025 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:10:33,053 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_7/logs/openevolve_20250923_091033.log
+2025-09-23 09:10:33,054 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 09:10:33,119 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:10:33,182 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:10:33,187 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 09:10:33,188 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 09:10:33,189 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 09:10:33,189 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 09:10:33,189 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_6/best/best_program.py
+2025-09-23 09:10:33,190 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 09:10:33,685 - openevolve.evaluator - INFO - Evaluated program 90c6ef3a-d349-4bd1-849e-79fb89e4a578 in 0.49s: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:10:33,685 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 09:10:33,686 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 09:10:33,687 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 09:10:33,693 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 09:10:33,694 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 09:10:33,694 - openevolve.database - INFO - Island Status:
+2025-09-23 09:10:33,694 - openevolve.database - INFO -  * Island 0: 1 programs, best=-51.2770, avg=-51.2770, diversity=0.00, gen=0 (best: 90c6ef3a-d349-4bd1-849e-79fb89e4a578)
+2025-09-23 09:10:33,695 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:10:33,695 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:10:33,695 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:10:33,696 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:10:33,696 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 09:10:33,795 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 09:10:52,330 - openevolve.process_parallel - WARNING - Iteration 3 error: Generated code exceeds maximum length (13061 > 12000)
+2025-09-23 09:10:52,571 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (13175 > 12000)
+2025-09-23 09:11:07,998 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (13729 > 12000)
+2025-09-23 09:11:19,670 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (12617 > 12000)
+2025-09-23 09:11:20,365 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (12702 > 12000)
+2025-09-23 09:11:25,840 - openevolve.process_parallel - WARNING - Iteration 6 error: Generated code exceeds maximum length (12782 > 12000)
+2025-09-23 09:11:48,257 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 9}
+2025-09-23 09:11:48,259 - openevolve.process_parallel - INFO - Iteration 10: Program 8ffa4286-8a30-4c36-b801-e291f1fd289e (parent: 90c6ef3a-d349-4bd1-849e-79fb89e4a578) completed in 22.42s
+2025-09-23 09:11:48,259 - openevolve.process_parallel - INFO - Metrics: interval_score=55.4966, coverage=0.9200, avg_interval_length=18.2724, combined_score=-55.4966
+2025-09-23 09:11:48,260 - openevolve.process_parallel - INFO - Checkpoint interval reached at iteration 10
+2025-09-23 09:11:48,260 - openevolve.database - INFO - Island Status:
+2025-09-23 09:11:48,261 - openevolve.database - INFO -  * Island 0: 2 programs, best=-51.2770, avg=-53.3868, diversity=36.50, gen=1 (best: 90c6ef3a-d349-4bd1-849e-79fb89e4a578)
+2025-09-23 09:11:48,261 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:11:48,261 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:11:48,262 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:11:48,262 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:11:48,265 - openevolve.database - INFO - Saved database with 2 programs to ../outputs_geocp_with_geo_know/round_7/checkpoints/checkpoint_10
+2025-09-23 09:11:48,266 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:11:48,266 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_7/checkpoints/checkpoint_10
+2025-09-23 09:11:56,466 - openevolve.process_parallel - WARNING - Iteration 9 error: Generated code exceeds maximum length (13794 > 12000)
+2025-09-23 09:11:57,458 - openevolve.process_parallel - WARNING - Iteration 8 error: Generated code exceeds maximum length (14375 > 12000)
+2025-09-23 09:12:05,309 - openevolve.process_parallel - INFO - Iteration 7: Program 90f13bb2-cba4-4823-9b52-89902304c208 (parent: 90c6ef3a-d349-4bd1-849e-79fb89e4a578) completed in 57.31s
+2025-09-23 09:12:05,310 - openevolve.process_parallel - INFO - Metrics: interval_score=0.0000, coverage=0.0000, avg_interval_length=0.0000, combined_score=-1000.0000, error=name 'q_level' is not defined
+2025-09-23 09:12:05,310 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 09:12:05,313 - openevolve.database - INFO - Saved database with 3 programs to ../outputs_geocp_with_geo_know/round_7/checkpoints/checkpoint_10
+2025-09-23 09:12:05,314 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:12:05,315 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_7/checkpoints/checkpoint_10
+2025-09-23 09:12:05,943 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 09:12:05,944 - openevolve.controller - INFO - Using tracked best program: 90c6ef3a-d349-4bd1-849e-79fb89e4a578
+2025-09-23 09:12:05,944 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:12:05,945 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_7/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_7/best/best_program_info.json
+2025-09-23 09:12:09,446 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:11,573 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:11,888 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:11,913 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:11,927 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:11,964 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:12,056 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:13,467 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:14,215 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:14,714 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:15,135 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:15,409 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:15,665 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:16,269 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:17,487 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:18,275 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:18,903 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:19,119 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:19,224 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:19,632 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:19,745 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:20,515 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:20,656 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:20,695 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:20,802 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:22,857 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:26,104 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:36,246 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:37,952 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,292 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,350 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,406 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,484 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,500 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,600 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,670 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,909 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,924 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:38,985 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:39,514 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:39,825 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:39,834 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:39,927 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:40,253 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:40,355 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:40,389 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:40,452 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:40,833 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:40,893 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:40,995 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:41,245 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:41,515 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:41,736 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:42,020 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:42,157 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:42,637 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:43,040 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:43,091 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:43,615 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:43,747 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:43,867 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:44,134 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:44,274 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:44,283 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:44,646 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:44,803 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:44,872 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:45,375 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:45,530 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:45,579 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:45,782 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:46,327 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:46,566 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:47,277 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:50,162 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:51,852 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:52,287 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:52,291 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:52,309 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:52,313 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:52,379 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:12:52,922 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:53,110 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:53,489 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:53,545 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:53,619 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:54,556 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:55,337 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:55,343 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:57,735 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:57,804 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:57,936 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:59,056 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:59,057 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:12:59,189 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:01,390 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:02,000 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:02,101 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:02,905 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:03,381 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:05,542 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:11,511 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:15,668 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:13:15,704 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_8/logs/openevolve_20250923_091315.log
+2025-09-23 09:13:15,704 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 09:13:15,775 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:13:15,837 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:13:15,842 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 09:13:15,843 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 09:13:15,844 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 09:13:15,844 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 09:13:15,844 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_7/best/best_program.py
+2025-09-23 09:13:15,845 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 09:13:16,027 - openevolve.evaluator - INFO - Evaluated program 07d85753-e75f-4de6-af6f-1063d4d816df in 0.18s: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:13:16,028 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 09:13:16,029 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 09:13:16,029 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 09:13:16,035 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 09:13:16,036 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 09:13:16,036 - openevolve.database - INFO - Island Status:
+2025-09-23 09:13:16,036 - openevolve.database - INFO -  * Island 0: 1 programs, best=-51.2770, avg=-51.2770, diversity=0.00, gen=0 (best: 07d85753-e75f-4de6-af6f-1063d4d816df)
+2025-09-23 09:13:16,037 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:13:16,037 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:13:16,038 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:13:16,038 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:13:16,039 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 09:13:16,141 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 09:13:33,944 - openevolve.process_parallel - WARNING - Iteration 3 error: Generated code exceeds maximum length (12233 > 12000)
+2025-09-23 09:13:34,317 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (13015 > 12000)
+2025-09-23 09:13:36,739 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (13069 > 12000)
+2025-09-23 09:13:48,964 - openevolve.process_parallel - WARNING - Iteration 6 error: Generated code exceeds maximum length (13339 > 12000)
+2025-09-23 09:13:54,541 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (14023 > 12000)
+2025-09-23 09:14:04,692 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (13802 > 12000)
+2025-09-23 09:14:08,529 - openevolve.process_parallel - WARNING - Iteration 9 error: Generated code exceeds maximum length (12727 > 12000)
+2025-09-23 09:14:20,824 - openevolve.process_parallel - INFO - Iteration 8: Program cb65b71b-5e62-47c5-b2c7-12b684ee10fb (parent: 07d85753-e75f-4de6-af6f-1063d4d816df) completed in 31.87s
+2025-09-23 09:14:20,824 - openevolve.process_parallel - INFO - Metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:14:36,843 - openevolve.process_parallel - WARNING - Iteration 7 error: Generated code exceeds maximum length (13176 > 12000)
+2025-09-23 09:14:41,465 - openevolve.process_parallel - WARNING - Iteration 10 error: Generated code exceeds maximum length (13290 > 12000)
+2025-09-23 09:14:41,466 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 09:14:41,470 - openevolve.database - INFO - Saved database with 2 programs to ../outputs_geocp_with_geo_know/round_8/checkpoints/checkpoint_10
+2025-09-23 09:14:41,471 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:14:41,471 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_8/checkpoints/checkpoint_10
+2025-09-23 09:14:42,088 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 09:14:42,088 - openevolve.controller - INFO - Using tracked best program: 07d85753-e75f-4de6-af6f-1063d4d816df
+2025-09-23 09:14:42,089 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:14:42,090 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_8/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_8/best/best_program_info.json
+2025-09-23 09:14:44,696 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:46,291 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:46,661 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:14:46,673 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:14:46,747 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:14:46,863 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:14:46,885 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:14:48,883 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:49,578 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:49,752 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:50,987 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:51,354 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:52,224 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:52,258 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:53,773 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:53,866 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:54,731 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:54,732 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:55,244 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:55,653 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:56,353 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:56,780 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:57,597 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:57,897 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:58,626 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:14:59,238 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:00,196 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:09,482 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:11,087 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:11,421 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:11,443 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:11,456 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:11,493 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:11,504 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:12,085 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:12,552 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:12,686 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:13,165 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:13,296 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:13,779 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:14,044 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:14,628 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:15,107 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:15,108 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:15,656 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:17,259 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:17,437 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:17,979 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:17,993 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:18,592 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:20,227 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:20,637 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:20,794 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:21,511 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:26,682 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,074 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,458 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,465 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,465 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,483 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,491 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,535 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,559 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,560 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:29,750 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:15:30,160 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:30,194 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:30,198 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:30,676 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:30,677 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:30,794 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:31,187 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:31,251 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:31,293 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:31,570 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:31,681 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:31,752 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:32,213 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:32,232 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:32,310 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:32,312 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:32,354 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:32,835 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:33,411 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:33,607 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:34,180 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:34,194 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:34,610 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:36,304 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:36,612 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:36,691 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:36,828 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:36,985 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:37,209 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:38,051 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:38,949 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:39,319 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:39,344 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:39,419 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:39,772 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:42,774 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:51,030 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:55,046 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:15:55,072 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_9/logs/openevolve_20250923_091555.log
+2025-09-23 09:15:55,073 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 09:15:55,146 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:15:55,209 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:15:55,215 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 09:15:55,216 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 09:15:55,218 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 09:15:55,218 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 09:15:55,218 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_8/best/best_program.py
+2025-09-23 09:15:55,219 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 09:15:55,393 - openevolve.evaluator - INFO - Evaluated program 8d83c860-9fb1-40c1-a0cc-58b8f4d96d44 in 0.17s: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:15:55,394 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 09:15:55,394 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 09:15:55,395 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 09:15:55,401 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 09:15:55,401 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 09:15:55,402 - openevolve.database - INFO - Island Status:
+2025-09-23 09:15:55,402 - openevolve.database - INFO -  * Island 0: 1 programs, best=-51.2770, avg=-51.2770, diversity=0.00, gen=0 (best: 8d83c860-9fb1-40c1-a0cc-58b8f4d96d44)
+2025-09-23 09:15:55,403 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:15:55,403 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:15:55,404 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:15:55,404 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:15:55,405 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 09:15:55,504 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 09:16:47,910 - openevolve.process_parallel - WARNING - Iteration 3 error: Generated code exceeds maximum length (12378 > 12000)
+2025-09-23 09:16:48,064 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (13459 > 12000)
+2025-09-23 09:17:07,267 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (12625 > 12000)
+2025-09-23 09:17:15,711 - openevolve.process_parallel - WARNING - Iteration 6 error: Generated code exceeds maximum length (13106 > 12000)
+2025-09-23 09:17:27,026 - openevolve.process_parallel - WARNING - Iteration 8 error: Generated code exceeds maximum length (12432 > 12000)
+2025-09-23 09:17:31,102 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (13909 > 12000)
+2025-09-23 09:17:31,367 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (13758 > 12000)
+2025-09-23 09:17:42,547 - openevolve.process_parallel - INFO - Iteration 7: Program 5336ce1a-0a02-4eaf-9826-95b9fd31b9ec (parent: 8d83c860-9fb1-40c1-a0cc-58b8f4d96d44) completed in 35.28s
+2025-09-23 09:17:42,550 - openevolve.process_parallel - INFO - Metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:18:22,410 - openevolve.process_parallel - WARNING - Iteration 9 error: Generated code exceeds maximum length (12799 > 12000)
+2025-09-23 09:18:23,475 - openevolve.process_parallel - WARNING - Iteration 10 error: Generated code exceeds maximum length (13241 > 12000)
+2025-09-23 09:18:23,476 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 09:18:23,480 - openevolve.database - INFO - Saved database with 2 programs to ../outputs_geocp_with_geo_know/round_9/checkpoints/checkpoint_10
+2025-09-23 09:18:23,481 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:18:23,482 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_9/checkpoints/checkpoint_10
+2025-09-23 09:18:24,093 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 09:18:24,094 - openevolve.controller - INFO - Using tracked best program: 8d83c860-9fb1-40c1-a0cc-58b8f4d96d44
+2025-09-23 09:18:24,095 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:18:24,096 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_9/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_9/best/best_program_info.json
+2025-09-23 09:18:27,148 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:28,850 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:29,465 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:29,466 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:29,468 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:29,469 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:30,682 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:33,266 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:33,765 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:34,474 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:34,614 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:35,611 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:36,124 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:36,689 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:37,084 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:37,679 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:38,174 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:38,434 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:38,987 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:39,400 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:39,952 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:40,008 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:40,932 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:43,905 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:44,080 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:45,746 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:46,464 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:52,692 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:53,872 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,196 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,210 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,212 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,267 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,276 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,327 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,413 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,603 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,641 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:18:54,962 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:55,100 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:55,231 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:55,252 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:55,578 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:55,679 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:55,777 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,036 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,102 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,147 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,359 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,518 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,710 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,731 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:56,938 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:57,126 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:57,411 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:58,041 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:58,597 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:58,612 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:58,771 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:58,797 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:59,080 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:59,156 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:59,271 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:59,553 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:18:59,765 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:00,025 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:00,239 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:00,790 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:01,063 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:01,251 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:03,014 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:03,583 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:04,199 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:05,152 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:10,563 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:12,292 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:12,638 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:19:12,641 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:19:12,670 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:19:12,735 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:19:12,764 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:19:13,355 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:13,901 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:14,416 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:15,443 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:15,679 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:16,130 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:16,267 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:16,290 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:16,603 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:16,956 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:16,978 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:18,198 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:18,230 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:18,436 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:18,900 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:19,566 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:19,647 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:20,049 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:20,061 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:21,225 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:28,650 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:32,849 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:19:32,900 - openevolve.controller - INFO - Logging to ../outputs_geocp_with_geo_know/round_10/logs/openevolve_20250923_091932.log
+2025-09-23 09:19:32,901 - openevolve.controller - INFO - Set random seed to 42 for reproducibility
+2025-09-23 09:19:32,969 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:19:33,033 - openevolve.llm.ensemble - INFO - Initialized LLM ensemble with models: gpt-4o (weight: 0.80), gpt-4.1 (weight: 0.20)
+2025-09-23 09:19:33,035 - openevolve.prompt.sampler - INFO - Set custom templates: system=evaluator_system_message, user=None
+2025-09-23 09:19:33,035 - openevolve.database - INFO - Initialized program database with 0 programs
+2025-09-23 09:19:33,036 - openevolve.evaluator - INFO - Successfully loaded evaluation function from ../examples/geocp/evaluator.py
+2025-09-23 09:19:33,036 - openevolve.evaluator - INFO - Initialized evaluator with ../examples/geocp/evaluator.py
+2025-09-23 09:19:33,037 - openevolve.controller - INFO - Initialized OpenEvolve with ../outputs_geocp_with_geo_know/round_9/best/best_program.py
+2025-09-23 09:19:33,037 - openevolve.controller - INFO - Adding initial program to database
+2025-09-23 09:19:33,213 - openevolve.evaluator - INFO - Evaluated program f1dc6210-4f80-45f7-b860-8f4a8f8911fb in 0.18s: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:19:33,214 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 5, 'complexity': 5}
+2025-09-23 09:19:33,215 - openevolve.process_parallel - INFO - Initialized process parallel controller with 4 workers
+2025-09-23 09:19:33,215 - openevolve.process_parallel - INFO - Worker-to-island mapping: {0: 0, 1: 1, 2: 2, 3: 3}
+2025-09-23 09:19:33,221 - openevolve.process_parallel - INFO - Started process pool with 4 processes
+2025-09-23 09:19:33,221 - openevolve.controller - INFO - Using island-based evolution with 5 islands
+2025-09-23 09:19:33,222 - openevolve.database - INFO - Island Status:
+2025-09-23 09:19:33,222 - openevolve.database - INFO -  * Island 0: 1 programs, best=-51.2770, avg=-51.2770, diversity=0.00, gen=0 (best: f1dc6210-4f80-45f7-b860-8f4a8f8911fb)
+2025-09-23 09:19:33,223 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:19:33,223 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:19:33,224 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:19:33,224 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:19:33,225 - openevolve.process_parallel - INFO - Starting process-based evolution from iteration 1 for 10 iterations (total: 11)
+2025-09-23 09:19:33,325 - openevolve.process_parallel - INFO - Early stopping disabled
+2025-09-23 09:19:54,452 - openevolve.process_parallel - WARNING - Iteration 4 error: Generated code exceeds maximum length (12406 > 12000)
+2025-09-23 09:19:58,132 - openevolve.process_parallel - WARNING - Iteration 3 error: Generated code exceeds maximum length (13738 > 12000)
+2025-09-23 09:20:02,460 - openevolve.process_parallel - WARNING - Iteration 1 error: Generated code exceeds maximum length (13230 > 12000)
+2025-09-23 09:20:15,251 - openevolve.process_parallel - WARNING - Iteration 5 error: Generated code exceeds maximum length (13015 > 12000)
+2025-09-23 09:20:24,377 - openevolve.process_parallel - WARNING - Iteration 2 error: Generated code exceeds maximum length (13059 > 12000)
+2025-09-23 09:20:26,053 - openevolve.process_parallel - WARNING - Iteration 7 error: Generated code exceeds maximum length (12580 > 12000)
+2025-09-23 09:20:38,102 - openevolve.process_parallel - WARNING - Iteration 6 error: Generated code exceeds maximum length (14263 > 12000)
+2025-09-23 09:20:54,341 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 9}
+2025-09-23 09:20:54,342 - openevolve.process_parallel - INFO - Iteration 10: Program 966980c9-73f1-415a-adf7-846cac861954 (parent: f1dc6210-4f80-45f7-b860-8f4a8f8911fb) completed in 28.29s
+2025-09-23 09:20:54,342 - openevolve.process_parallel - INFO - Metrics: interval_score=52.0992, coverage=0.9300, avg_interval_length=17.3061, combined_score=-52.0992
+2025-09-23 09:20:54,343 - openevolve.process_parallel - INFO - Checkpoint interval reached at iteration 10
+2025-09-23 09:20:54,344 - openevolve.database - INFO - Island Status:
+2025-09-23 09:20:54,344 - openevolve.database - INFO -  * Island 0: 2 programs, best=-51.2770, avg=-51.6881, diversity=16.40, gen=1 (best: f1dc6210-4f80-45f7-b860-8f4a8f8911fb)
+2025-09-23 09:20:54,345 - openevolve.database - INFO -    Island 1: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:20:54,345 - openevolve.database - INFO -    Island 2: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:20:54,345 - openevolve.database - INFO -    Island 3: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:20:54,346 - openevolve.database - INFO -    Island 4: 0 programs, best=0.0000, avg=0.0000, diversity=0.00, gen=0
+2025-09-23 09:20:54,349 - openevolve.database - INFO - Saved database with 2 programs to ../outputs_geocp_with_geo_know/round_10/checkpoints/checkpoint_10
+2025-09-23 09:20:54,350 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:20:54,350 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_10/checkpoints/checkpoint_10
+2025-09-23 09:21:03,906 - openevolve.database - INFO - New MAP-Elites cell occupied in island 0: {'score': 0, 'complexity': 0}
+2025-09-23 09:21:03,906 - openevolve.process_parallel - INFO - Iteration 8: Program 8f44fc6d-a9ba-4e7b-92e7-cf8c4a596e47 (parent: f1dc6210-4f80-45f7-b860-8f4a8f8911fb) completed in 48.66s
+2025-09-23 09:21:03,907 - openevolve.process_parallel - INFO - Metrics: interval_score=0.0000, coverage=0.0000, avg_interval_length=0.0000, combined_score=-1000.0000, error=index 240 is out of bounds for axis 0 with size 240
+2025-09-23 09:22:06,235 - openevolve.process_parallel - WARNING - Iteration 9 error: Generated code exceeds maximum length (14307 > 12000)
+2025-09-23 09:22:06,243 - openevolve.process_parallel - INFO - ✅ Evolution completed - Maximum iterations reached
+2025-09-23 09:22:06,248 - openevolve.database - INFO - Saved database with 3 programs to ../outputs_geocp_with_geo_know/round_10/checkpoints/checkpoint_10
+2025-09-23 09:22:06,249 - openevolve.controller - INFO - Saved best program at checkpoint 10 with metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:22:06,249 - openevolve.controller - INFO - Saved checkpoint at iteration 10 to ../outputs_geocp_with_geo_know/round_10/checkpoints/checkpoint_10
+2025-09-23 09:22:06,893 - openevolve.process_parallel - INFO - Stopped process pool
+2025-09-23 09:22:06,894 - openevolve.controller - INFO - Using tracked best program: f1dc6210-4f80-45f7-b860-8f4a8f8911fb
+2025-09-23 09:22:06,894 - openevolve.controller - INFO - Evolution complete. Best program has metrics: interval_score=51.2770, coverage=0.9233, avg_interval_length=16.8828, combined_score=-51.2770
+2025-09-23 09:22:06,896 - openevolve.controller - INFO - Saved best program to ../outputs_geocp_with_geo_know/round_10/best/best_program.py with program info to ../outputs_geocp_with_geo_know/round_10/best/best_program_info.json
+2025-09-23 09:22:09,733 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:11,273 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:11,600 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:11,699 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:11,705 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:11,711 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:11,714 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:13,714 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:14,647 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:14,648 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:15,467 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:15,879 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:16,417 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:16,546 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:16,706 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:18,577 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:18,763 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:19,095 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:19,369 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:20,584 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:21,099 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:21,715 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:22,733 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:22,734 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:23,523 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:24,069 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:25,537 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:31,339 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:33,485 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:33,779 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:33,816 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:33,835 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:33,876 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:33,905 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:35,022 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:35,947 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:36,460 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:36,462 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:37,277 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:37,650 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:37,935 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:38,335 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:38,387 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:38,932 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:39,942 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:40,256 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:40,440 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:42,190 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:42,768 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:42,871 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:43,318 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:43,623 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:44,445 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:45,726 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:51,410 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:52,842 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,192 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,208 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,220 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,288 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,302 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,304 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,316 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,364 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,492 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,773 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:53,801 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,024 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,039 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,049 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,131 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,273 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,432 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,478 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,657 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,685 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,755 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,783 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:54,920 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,058 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,067 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,167 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,210 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,335 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,430 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,461 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,520 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,636 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,741 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:55,753 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:56,119 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:57,250 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:57,351 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:57,697 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:58,474 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:59,032 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:22:59,539 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:23:00,008 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:23:00,203 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:23:00,831 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:23:01,349 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:23:04,822 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-09-23 09:23:09,431 - httpx - INFO - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
