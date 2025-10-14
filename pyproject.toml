@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "geoevolve"
+dynamic = ["version"]
+description = 'A Geographical Knowledge Informed Code Evolver'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+keywords = []
+authors = [
+  { name = "Xiayin Lou", email = "xiayin.lou@tum.de" },
+]
+dependencies = [
+    'langchain',
+    'langchain_core',
+    'langchain-text-splitters',
+    'langchain-openai',
+    'langgraph',
+    'openai',
+    'wikipedia-api',
+    'arxiv',
+    'pymupdf',
+    'gitpython',
+    'more-itertools',
+    'openevolve'
+]
+
+[tool.setuptools.packages.find]
+include = ["geoevolve*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "geoevolve._version.__version__"}

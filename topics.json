@@ -1,0 +1,41 @@
+{
+  "spatial_theory": [
+    "Tobler's First Law of Geography",
+    "Spatial dependence",
+    "Spatial heterogeneity",
+    "Modifiable Areal Unit Problem",
+    "Ecological fallacy in geography",
+    "Uncertainty in spatial analysis",
+    "Scale effects in geography",
+    "Fractal geometry in geography",
+    "Geographic information as social construction"
+  ],
+  "spatial_statistics": [
+    "Spatial autocorrelation",
+    "Local Indicators of Spatial Association",
+    "Spatial clustering theory",
+    "Spatial regression models",
+    "Error propagation in spatial models"
+  ],
+  "geostatistics": [
+    "Kriging theory",
+    "Semivariogram concept",
+    "Stationarity assumptions in geostatistics",
+    "Nugget effect interpretation",
+    "Kriging vs deterministic interpolation",
+    "Spatial prediction uncertainty",
+    "Conditional simulation in geostatistics"
+  ],
+  "giscience_theory": [
+    "Absolute vs relative vs relational space",
+    "Cognitive geography",
+    "Representation of scale in GIS"
+  ],
+  "spatial_modeling": [
+    "Agent-based models in geography",
+    "Spatial interaction models",
+    "Gravity model in geography",
+    "Entropy maximization models",
+    "Complexity theory in geography"
+  ]
+}
