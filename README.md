@@ -53,3 +53,8 @@ run_geo_evolution(initial_program_file='your-initial-program-path',
 
 ```
 
+This repository hosts the code base for the paper
+
+**GeoXCP: uncertainty quantification of spatial explanations in explainable AI** <br>
+Xiayin Lou, Peng Luo, Ziqi Li, Song Gao, Liqiu Meng <br>
+International Journal of Geographical Information Science <br>
