@@ -6,11 +6,16 @@ import importlib.util
 from numpy.typing import NDArray
 
 
-def interval_score(y_true, lower_bound, upper_bound, alpha=0.1, epsilon=1e-6):
+def interval_score(y_true, lower_bound, upper_bound, alpha=0.1, epsilon=1e-6, normalize=True, lambda_penalty=1.0):
     width = np.maximum(upper_bound - lower_bound, epsilon)
     below = (lower_bound - y_true) * (y_true < lower_bound)
     above = (y_true - upper_bound) * (y_true > upper_bound)
-    score = width + (2 / alpha) * (below + above)
+    if normalize:
+        scale = np.maximum(np.abs(y_true), 1.0)
+        width = width / scale
+        below = below / scale
+        above = above / scale
+    score = width + lambda_penalty * (2 / alpha) * (below + above)
     score = np.where(np.isnan(score), 0.0, score)
     return np.mean(score)
 

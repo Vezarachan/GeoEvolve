@@ -79,7 +79,6 @@ class GeoConformalRegressor(GeoConformalBase):
     ----------
     predict_f: spatial prediction function (regression or interpolation)
     """
-
     def __init__(self, predict_f: Callable, x_calib: NDArray, y_calib: NDArray, coord_calib: NDArray,
                  bandwidth: Union[float, int], miscoverage_level: float = 0.1):
         super().__init__(predict_f, x_calib, y_calib, coord_calib, bandwidth, miscoverage_level)
@@ -103,9 +102,9 @@ class GeoConformalRegressor(GeoConformalBase):
 # EVOLVE-BLOCK-END
 
 def run_geocp():
-    train = pd.read_csv(f'/Users/louxiayin/PycharmProjects/GeoEvolve/examples/geocp/data/train.csv')
-    calib = pd.read_csv(f'/Users/louxiayin/PycharmProjects/GeoEvolve/examples/geocp/data/calib.csv')
-    test = pd.read_csv(f'/Users/louxiayin/PycharmProjects/GeoEvolve/examples/geocp/data/test.csv')
+    train = pd.read_csv(f'C:\\Users\\Xiayin\\PycharmProjects\\GeoEvolve\\examples\\geocp\\data\\train.csv')
+    calib = pd.read_csv(f'C:\\Users\\Xiayin\\PycharmProjects\\GeoEvolve\\examples\\geocp\\data\\calib.csv')
+    test = pd.read_csv(f'C:\\Users\\Xiayin\\PycharmProjects\\GeoEvolve\\examples\\geocp\\data\\test.csv')
     variables = ['bathrooms', 'sqft_living', 'sqft_lot', 'grade', 'condition', 'waterfront', 'view', 'age', 'UTM_X',
                  'UTM_Y']
     X_train, y_train = train[variables], train['price']

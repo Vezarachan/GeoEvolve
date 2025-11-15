@@ -3,42 +3,33 @@
 # You can use this as a template for your own configuration
 
 # General settings
-max_iterations: 12                  # Maximum number of evolution iterations
-checkpoint_interval: 12             # Save checkpoints every N iterations
+max_iterations: 100                  # Maximum number of evolution iterations
+checkpoint_interval: 10             # Save checkpoints every N iterations
 log_level: "INFO"                     # Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 #log_dir: null                         # Custom directory for logs (default: output_dir/logs)
 #random_seed: null                     # Random seed for reproducibility (null = random)
 
 # Evolution settings
 diff_based_evolution: true            # Use diff-based evolution (true) or full rewrites (false)
-allow_full_rewrites: false            # Allow occasional full rewrites even in diff-based mode
+#allow_full_rewrites: true            # Allow occasional full rewrites even in diff-based mode
 max_code_length: 12000                # Maximum allowed code length in characters
 
 # LLM configuration
 llm:
-  primary_model: "gpt-4o"
+  primary_model: "gemini-2.5-flash"
   primary_model_weight: 0.8
-  secondary_model: "gpt-5"
+  secondary_model: "gemini-2.0-flash"
   secondary_model_weight: 0.2
-  api_base: "https://api.openai.com/v1/"
-  api_key: "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"
-#  primary_model: "openai/gpt-4o"
-#  primary_model_weight: 0.8
-#  secondary_model: "openai/gpt-5.1"
-#  secondary_model_weight: 0.2
-#  api_base: "https://openrouter.ai/api/v1"
-#  api_key: "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"
-#  api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
-#  api_key: "AIzaSyBMvXWuhFbOhGWJrJ5-qmazAKByFI20eZw"
+  api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
+  api_key: "AIzaSyBMvXWuhFbOhGWJrJ5-qmazAKByFI20eZw"
   temperature: 0.7
   top_p: 0.95
-  max_tokens: 12000
-  timeout: 300
+  max_tokens: 4096
 
 # Prompt configuration
 prompt:
   template_dir: null                  # Custom directory for prompt templates
-  system_message: "You are an expert in GIS and an experienced coder. Your task is to improve and refine the Ordinary Kriging algorithm in Python. The target is to minimize root mean square error in all three datasets (Cu, Pb, Zn) compared with the original version of Kriging. Be careful there may be some problem in the fitting the variogram model, you should correct it."
+  system_message: "You are an expert in GIS and an experienced coder. Your task is to improve and refine the Ordinary Kriging algorithm in Python. The target is to minimize root mean square error in all three datasets (Cu, Pb, Zn). Be careful there may be some problem in the fitting the variogram model, you should correct it. Plus, you should not change the data preprocess in the run_kfold()."
   evaluator_system_message: "You are an expert code reviewer."
 
   # Number of examples to include in the prompt
@@ -58,13 +49,13 @@ prompt:
 # Database configuration
 database:
   # General settings
-  db_path: ./outputs/kriging_evolution # Path to persist database (null = in-memory only)
-  in_memory: true                      # Keep database in memory for faster access
+  db_path: null                       # Path to persist database (null = in-memory only)
+  in_memory: true                     # Keep database in memory for faster access
 
   # Evolutionary parameters
   population_size: 50               # Maximum number of programs to keep in memory
   archive_size: 20                   # Size of elite archive
-  num_islands: 3                      # Number of islands for island model (separate populations)
+  num_islands: 5                      # Number of islands for island model (separate populations)
 
   # Island-based evolution parameters
   # Islands provide diversity by maintaining separate populations that evolve independently.
@@ -74,15 +65,15 @@ database:
 
   # Selection parameters
   elite_selection_ratio: 0.2          # Ratio of elite programs to select
-  exploration_ratio: 0.35              # Ratio of exploration vs exploitation
-  exploitation_ratio: 0.65             # Ratio of exploitation vs random selection
+  exploration_ratio: 0.2              # Ratio of exploration vs exploitation
+  exploitation_ratio: 0.7             # Ratio of exploitation vs random selection
   # Note: diversity_metric is fixed to "edit_distance" (feature_based not implemented)
 
   # Feature map dimensions for MAP-Elites
   feature_dimensions:                 # Dimensions for MAP-Elites feature map
     - "score"                         # Performance score
     - "complexity"                    # Code complexity (length)
-#  feature_bins: 10                    # Number of bins per dimension
+  feature_bins: 10                    # Number of bins per dimension
 
 # Evaluator configuration
 evaluator:

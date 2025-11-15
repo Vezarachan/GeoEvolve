@@ -22,7 +22,7 @@ def dump_config(config_path: str, config: dict):
     :param config:
     :return:
     """
-    with open(config_path, 'w') as f:
+    with open(config_path, 'w', encoding='utf-8') as f:
         yaml.dump(config, f)
 
 def save_round_level_logs(log_path: str, round_i: int, knowledge_needed: Dict, knowledge_retrieved: List[str], prompt_updated: str, metrics: Dict[str, float], name: str):
@@ -45,7 +45,8 @@ def save_round_level_logs(log_path: str, round_i: int, knowledge_needed: Dict, k
         f.write(f'metric: {metrics}\n')
         f.write(f'knowledge needed:\n {knowledge_needed}\n')
         f.write(f'knowledge retrieved:\n {knowledge_str}\n')
-        f.write(f'prompt updated: {prompt_updated}\n\n')
+        f.write(f'prompt updated:\n {prompt_updated}\n\n')
+        f.write('====================================================================================================')
 
 def clean_markdown_labels_in_prompt(text: str) -> str:
     """

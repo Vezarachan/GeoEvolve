@@ -10,13 +10,23 @@ if __name__ == '__main__':
     parser.add_argument(
         '--working_dir',
         type=str,
-        default='../geoevolve_storage',
+        default='./geoevolve_storage',
         help='Geographical knowledge RAG working directory'
     )
     parser.add_argument(
         '--geo_knowledge_dir',
         type=str,
-        default='../geo_knowledge',
+        default='./geo_knowledge',
+    )
+    parser.add_argument(
+        '--embedding_model',
+        type=str,
+        default='gemini-embedding-001',
+    )
+    parser.add_argument(
+        '--extractor_model',
+        type=str,
+        default='gemini-2.5-flash',
     )
     parser.add_argument(
         '--chunk_size',
@@ -80,6 +90,9 @@ if __name__ == '__main__':
     chunk_size = config.chunk_size
     chunk_overlap = config.chunk_overlap
 
+    extractor_model = config.extractor_model
+    embedding_model = config.embedding_model
+
     geo_knowledge_dir = config.geo_knowledge_dir
 
     github_token = config.github_token
@@ -91,22 +104,20 @@ if __name__ == '__main__':
     collect_knowledge = config.collect_knowledge
     add_knowledge = config.add_knowledge
 
-    geokg_rag = GeoKnowledgeRAG(persist_dir=working_dir, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
+    geokg_rag = GeoKnowledgeRAG(persist_dir=working_dir, chunk_size=chunk_size, chunk_overlap=chunk_overlap, embedding_model=embedding_model, llm_model=extractor_model)
 
-    knowledge_db = {}
-
-    if collect_knowledge:
-        print('Collecting Geo Knowledge ...')
-        print(topics)
-        for category, queries in topics.items():
-            if not os.path.exists(f'{geo_knowledge_dir}/{category}'):
-                os.mkdir(f'{geo_knowledge_dir}/{category}')
-            print(f'Category: {category}')
-            for query in queries:
-                save_wiki_pages(query, db_path=geo_knowledge_dir, category=category)
-                save_arxiv_papers(query, max_results=max_arxiv_papers, db_path=geo_knowledge_dir, category=category)
-                save_github_codes(query, max_repos=max_repos, token=github_token, db_path=geo_knowledge_dir,
-                                  category=category)
+    # if collect_knowledge:
+    #     print('Collecting Geo Knowledge ...')
+    #     print(topics)
+    #     for category, queries in topics.items():
+    #         if not os.path.exists(f'{geo_knowledge_dir}/{category}'):
+    #             os.mkdir(f'{geo_knowledge_dir}/{category}')
+    #         print(f'Category: {category}')
+    #         for query in queries:
+    #             save_wiki_pages(query, db_path=geo_knowledge_dir, category=category)
+    #             save_arxiv_papers(query, max_results=max_arxiv_papers, db_path=geo_knowledge_dir, category=category)
+    #             save_github_codes(query, max_repos=max_repos, token=github_token, db_path=geo_knowledge_dir,
+    #                               category=category)
 
     if add_knowledge:
         print('Adding knowledge into RAG ...')

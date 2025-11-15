@@ -27,7 +27,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--output',
         type=str,
-        default='../outputs',
+        default='./outputs',
         help='The path of the evolved results'
     )
     parser.add_argument(
@@ -39,7 +39,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '--rag_log_dir',
         type=str,
-        default='../geoevolve_logs',
+        default='./geoevolve_logs',
         help='The path of the rag log file'
     )
     parser.add_argument(
@@ -66,10 +66,21 @@ if __name__ == '__main__':
         help='The API key for OpenAI'
     )
     parser.add_argument(
+        '--gemini_api_key',
+        type=str,
+        help='The API key for Gemini'
+    )
+    parser.add_argument(
         '--log_name',
         type=str,
         default='',
         help='The log file name'
+    )
+    parser.add_argument(
+        '--github_token',
+        type=str,
+        help='GitHub token',
+        default='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'
     )
 
     config = parser.parse_args()
@@ -92,6 +103,9 @@ if __name__ == '__main__':
     openai_api_key = config.openai_api_key
     if openai_api_key:
         os.environ['OPENAI_API_KEY'] = openai_api_key
+    gemini_api_key = config.gemini_api_key
+    if gemini_api_key:
+        os.environ['GEMINI_API_KEY'] = gemini_api_key
     log_name = config.log_name
 
     evolver = GeoEvolve(
