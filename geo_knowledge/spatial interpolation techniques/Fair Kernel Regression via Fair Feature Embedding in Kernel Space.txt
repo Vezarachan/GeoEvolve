@@ -1,717 +1,0 @@
-Fair Kernel Regression via Fair Feature Embedding
-in Kernel Space
-Austin Okray
-Department of Computer Science
-University of Wyoming
-Laramie, Wyoming
-Email: aokray@uwyo.edu
-Hui Hu
-Department of Computer Science
-University of Wyoming
-Laramie, Wyoming
-Email: hhu1@uwyo.edu
-Chao Lan
-Department of Computer Science
-University of Wyoming
-Laramie, Wyoming
-Email: clan@uwyo.edu
-Abstract—In recent years, there have been signiﬁcant efforts
-on mitigating unethical demographic biases in machine learning
-methods. However, very little work is done for kernel methods.
-In this paper, we propose a novel fair kernel regression method
-via fair feature embedding (FKR-F2E) in kernel space. Motivated
-by prior works feature processing for fair learning and feature
-selection for kernel methods, we propose to learn fair feature
-embeddings in kernel space, where the demographic discrepancy
-of feature distributions is minimized. Through experiments on
-three public real-world data sets, we show the proposed FKR-
-F2E achieves signiﬁcantly lower prediction disparity compared
-with the state-of-the-art fair kernel regression method and several
-other baseline methods.
-I. INTRODUCTION
-In recent years, we’ve witnessed a tremendous growth of
-machine learning applications in real-world problems that have
-immediate impacts on peoples’ lives. However, standardly
-learned models can have unethical predictive biases against mi-
-nority peoples; e.g., in recidivism prediction, a commercialized
-model has signiﬁcant bias against innocent black defendants
-[1]; other biases are found in hiring [2], facial veriﬁcation [3],
-violence risk assessment in prison [4], etc.
-How to learn fair models has become a signiﬁcant research
-topic [5], and many methods have been proposed [6]–[12]. They
-typically sacriﬁce certain prediction accuracy for improving
-prediction fairness, bound to the accuracy-fairness tradeoff.
-A promising direction is fair kernel learning [13], [14]. By
-constructing sufﬁciently complex hypothesis spaces, they are
-more likely to learn a model that can achieve an efﬁcient
-accuracy-fairness trade-off. However, this direction is sparsely
-explored so far. A notable work is fair kernel regression [13],
-which penalizes a model’s predictive bias in kernel space.
-In this paper, we propose a novel fair kernel regression
-method that learns fair feature embeddings (FKR-F2E) in the
-kernel space. It is motivated by the work of Feldman et al [7],
-which shows that in a properly transformed data space where
-different demographic groups have similar feature distributions,
-a standardly learned prediction model will be naturally fair.
-We thus seek for such a fair transformation in the kernel space.
-A major challenge is that kernel space is often implicit,
-making it hard to ﬁnd explicit fair transformations therein.
-To tackle the problem, we borrow ideas from Cao et al
-[15], which learns feature embeddings in the kernel space for
-feature selection. Speciﬁcally, we propose to learn fair feature
-embeddings in the kernel space, such that different demographic
-groups have similar embedded feature distributions. We propose
-to measure similarity using mean discrepancy [16].
-Through experiments on three real-world data sets, we show
-the proposed FKR-F2E achieves signiﬁcantly lower prediction
-bias than the existing fair kernel regression method as well as
-several non-kernel fair learning methods, without sacriﬁcing a
-signiﬁcant amount of prediction accuracy.
-The rest of the paper is organized as follows: in Section II,
-we revisit related works; in Section III, we present the proposed
-method; in Section IV, experimental results are presented and
-discussed; our conclusion is in Section V.
-A. Notations and Assumptions
-To facilitate discussions in related work, we introduce some
-notations here. We describe an instance using a triple (x, s, y),
-where x is a feature vector, s is a protected demographic (e.g.
-gender, race) and y is label. Assume s is contained in x.
-Similar to prior studies, we assume s is binary. Let there be
-n instances in the training set, among which nu belong to the
-unprotected group (s = 0) and np belong to the protected group
-(s = 1). Without loss of generality, we assume the instances are
-ordered such that the ﬁrst nu ones x1, . . ., xnu are unprotected
-and the rest xnu+1, . . ., xn are protected.
-For kernel methods, let φ(·) be the feature mapping function,
-and f be a prediction model mapping from φ(x) to y.
-II. RELATED WORK
-A. Fair Kernel Regression
-Perez-Suay et al [13] propose a fair kernel regression method,
-which directly extends the linear fair learning method [9]
-to kernel space. Speciﬁcally, it minimizes prediction loss
-while additionally penalizing the correlation between model
-prediction and demographic feature in the kernel space as:
-min
-f
-n
-Õ
-i=1
-[ f (φ(xi)) −yi]2 + µ
-n
-Õ
-i=1
-( ¯f (xi) · ¯si) + λΩ( f ),
-(1)
-where the second term measures predictive bias as the correla-
-tion between model prediction and the demographic feature,
-and ¯f (x) and ¯s are centered variables; the last term measures
-model complexity; µ and λ are hyper-parameters. Based on the
-arXiv:1907.02242v2  [cs.LG]  20 Sep 2019
-
-Representer Theorem that f is a linear combination of φ(xi)’s,
-task (1) admits an analytic solution for the linear coefﬁcients.
-Perez et al’s method adopts the regularization approach in
-fair learning, which penalizes predictive bias during learning
-(e.g., [8], [9]). In this paper, we adopt another popular approach
-which ﬁrst constructs a fair feature space and then builds a
-standard model in it (e.g., [6], [7], [12]). In experiments, we
-show our method can achieve higher prediction fairness.
-B. Fair Feature Learning and Mean Discrepancy
-An effective approach to learn fair models is to ﬁrst construct
-a fair feature space and then learn a standard model in it
-(e.g., [6], [7]). A fair feature space is one where feature
-distributions of different demographic groups are similar, e.g.,
-different groups have similar CDF’s of the new features [7],
-or the statistical dependence between the new features and the
-demographic feature is low [6].
-In this paper, we develop a new fair kernel regression based
-on the idea of fair feature learning. Unlike previous studies, we
-measure feature similarity using mean discrepancy [16]. MD
-measures distance between distributions and is widely used in
-machine learning [17]–[19]. Let x1, . . ., xn and z1, . . ., zm be
-two sets generated from distributions Px and Pz respectively.
-MD estimates the distance between Px and Pz as
-MD(Px, Pz) =
-
-
-1
-n
-n
-Õ
-i=1
-φ(xi) −1
-m
-m
-Õ
-j=1
-φ(zj)
-
-
-2
-.
-(2)
-A technical challenge is that previous fair feature learning
-approaches assume the feature space is explicit and then modify
-it to obtain a fairer space. In kernel methods, however, the
-feature space of φ(x) is implicit. To tackle this issue, we
-propose to construct an explicit fair feature space for φ(x), by
-learning fair feature embedding functions in the kernel space.
-This approach is motivated by the literature of feature selection
-in kernel methods (e.g., [15], [20]).
-C. Feature Selection in Kernel Space
-Feature selection is a common practice for improving the
-robustness and interpretability of machine learning models [21].
-However, its practice in kernel methods is not easy, since there
-is not an explicit feature representation in kernel space. Only
-a few approaches are proposed, e.g. [15], [20], [22].
-Our study is motivated by Cao et al [15]. They propose to
-learn explicit feature representation in the kernel space, by
-learning feature embedding function η. They show the optimal
-function is a linear combination of training instances, and learn
-such functions by standard methods such as KPCA [23]. After
-that, instance φ(x) is mapped onto η to obtain an explicit
-feature representation on which feature selection is performed.
-Motivated by Cao et al’s approach, we propose to learn
-feature embedding functions that are fair, e.g.., different
-demographic groups have similar distributions in the embedded
-space. As explained in the previous subsection, similarity is
-measured by mean discrepancy.
-III. FAIR KERNEL REGRESSION VIA LEARNING FAIR
-FEATURE EMBEDDINGS IN KERNEL SPACE (FKR-F2E)
-In this section, we present the proposed fair kernel regression
-via learning fair feature embeddings in kernel space (FKR-F2E).
-Recall an individual is (x, s, y), where x is feature vector, s is
-binary demographic feature and y is label. There are n training
-instances, where x1, . . ., xnu are from the unprotected group
-and xnu+1, . . ., xn are from the protected group.
-Our proposed method works in two steps: (i) learn fair feature
-embeddings in kernel space; (ii) build a standard regression
-model based on the embedded features.
-Step 1. Learn Fair Feature Embeddings in Kernel Space
-Our goal is to learn an explicit and fair feature representation
-for φ(x). To that end, we propose to learn a fair feature
-embedding function η, such that in the embedded space, the
-mean discrepancy between the protected group and unprotected
-group is minimized:
-min
-η
-
-
-1
-nu
-nu
-Õ
-i=1
-⟨φ(xi), η⟩−1
-np
-n
-Õ
-i=nu+1
-⟨φ(xi), η⟩
-
-
-2
-.
-(3)
-Problem (3) cannot be directly solved since there is no explicit
-representation of φ(x). Motivated by Cao et al [15], we assume
-the optimal η is a linear combination of training instances:
-η =
-Õn
-i=1αiφ(xi).
-(4)
-To avoid overﬁtting, we further assume η has a unit norm:
-||η||2 = 1.
-(5)
-Solving (3) under constraints (4) and (5), we have that1
- 
-1
-n2u
-KT
-u Ku −
-2
-nunp
-KT
-u 1u1T
-pKp + 1
-n2p
-KT
-p Kp
-!
-α = λKα,
-(6)
-where α = [α1, . . ., αn]T is the vector of unknown parameters
-and λ is an eigenvalue; K is a standard n-by-n Gram matrix
-of all instances; Ku is nu-by-n and Kp is np-by-n satisfying
-K =
-Ku
-Kp
-
-(7)
-Formula (6) is a generalized eigenproblem, and α is the
-least generalized eigenvector. After α is solved, we obtain the
-ﬁrst explicit and fair feature of φ(x) in the kernel space as
-⟨φ(x), η⟩=
-Õn
-i=1αik(x, xi).
-(8)
-The above analysis gives the ﬁrst fair feature embedding
-function η in the kernel space. Now we present how to obtain
-the second η′, and the rest can be derived in similar fashions.
-The second optimal embedding η′ is obtained in a similar
-fashion as η, with an additional constraint that it should be
-orthogonal to the previously obtained embeddings:
-min
-η′
-
-
-1
-nu
-nu
-Õ
-i=1
-⟨φ(xi), η′⟩−1
-np
-n
-Õ
-i=nu+1
-⟨φ(xi), η′⟩
-
-
-2
-s.t. η′ =
-Õn
-i=1α′
-iφ(xi),
-||η′||2 = 1,
-ηTη′ = 0.
-(9)
-1Detailed arguments are in Appendix A.
-
-Solving (9) shows that α′ = [α′
-1, . . ., α′
-n]T is the second least
-generalized eigenvector of the same eigenproblem (6)2 .
-By similar arguments, we can show the linear coefﬁcients of
-k optimal fair embeddings η1, . . ., ηk are the least k generalized
-eigenvectors of the eigenproblem (6).
-After that, we obtain a k-dimensional explicit fair feature
-representation of φ in the kernel space, i.e.,
-φFS(x) = [⟨φ(x), η1⟩, . . ., ⟨φ(x), ηk⟩]T .
-(10)
-Step 2. Learn a Standard Regression Model on φFS(x)
-Given an explicit fair feature representation φFS(x), we learn
-a standard regression model based on it. Let x1, . . ., xn be n
-training instances. One can easily verify that
-φFS(xi) = [⟨φ(xi), η1⟩, . . ., ⟨φ(xi), ηk⟩]T = (KT
-:i A)T
-(11)
-where K:i is the ith column Gram matrix K, and A is an n-by-k
-matrix with column j being the linear coefﬁcient vector of ηj
-(e.g., the ﬁrst column is α and the second column is α′).
-Then, one can obtain an n-by-k training sample matrix
-XFS =
-
-(φFS(x1))T
-...
-(φFS(xn))T
-
-=
-
-KT
-:1 A
-...
-KT
-:nA
-
-= KT A = K A.
-(12)
-Now, we learn a regression model β ∈Rk on XFS by
-min
-β
-||XFS · β −Y||2 + γ||β||2,
-(13)
-where γ is a regularization coefﬁcient.
-For any testing instance z, we ﬁrst compute its explicit fair
-feature representation
-φFS(z) = [⟨φ(z), η1⟩, . . ., ⟨φ(z), ηk⟩]T,
-(14)
-and then compute its prediction as
-ˆy = φFS(z)T β.
-(15)
-For classiﬁcation tasks, one can simply threshold ˆy.
-IV. EXPERIMENT
-A. Data Sets
-We experimented on three public data sets, namely, the
-Credit Default data set3, the Community Crime data set4, and
-the COMPAS data set5.
-The original Credit Default data set contains 30,000 individ-
-uals described by 23 attributes. We treated ‘education level’ as
-the sensitive variable, and binarized it into higher education
-and lower education as in [12]; ‘default payment’ is treated as
-the binary label. We removed individuals with missing values
-and down-sampled the data set from 30,000 to 20,000. Our
-preprocessed data sets are published at 6.
-2Detailed arguments are in Appendix B.
-3https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients
-4http://archive.ics.uci.edu/ml/datasets/communities+and+crime
-5https://github.com/propublica/compas-analysis
-6https://uwyomachinelearning.github.io/
-The Communities Crime data set contains 1,993 communities
-described by 101 informative attributes. We treated the ‘fraction
-of African-American residents’ as the sensitive feature, and
-binarized it so that a community is ’minority’ if the fraction is
-above 0.5 and ’majority’ otherwise. Label is the ‘community
-crime rate’, and we binarized it into high if the rate is above
-0.5 and low otherwise.
-The COMPAS data set contains 18,317 individuals with 40
-features (e.g., name, sex, race). We down-sampled the data set
-to 16,000 instances and 15 numerical features (e.g. name is
-removed). Similar to [24], we treated ‘race’ as the sensitive
-feature and ‘risk of recidivism’ as the binary label.
-B. Experiment Design
-On each data set, we randomly chose 75% of the instances for
-training and used the rest for testing. We evaluated each method
-over 50 random trials and reported its average performance
-and standard deviation.
-We compared the proposed FKR-F2E with the existing fair
-kernel regression [13], and several other non-kernel methods.
-For each compared method, we set its hyper-parameters as
-described in the original paper.
-For FKR-F2E, we used polynomial kernel on both Credit
-and Community Crime data sets and sigmoid kernel on the
-COMPAS data set. For polynomial kernel, we grid-searched its
-optimal degree in {3, 4, 5, 6} and optimal additive coefﬁcient
-in [10−3, 10−2, 10−1, 100, 101]. For sigmoid kernel, we grid-
-searched its optimal c among 5 values in the logarithmic range
-of [10−4, 101], and we used the default γ in Scikit-Learn [25]
-(i.e., inverse of feature dimension). For the ridge regression
-regularization coefﬁcient λ, we grid-searched an optimal value
-among 6 values in the logarithmic range [10−3, 102].
-Finally, an important hyper-parameter is the number of
-feature embeddings k. We experimented with 4 values, namely,
-n
-250,
-n
-200,
-n
-150 and
-n
-100. In experiment these values yielded good
-generalization performance on all data sets.
-We evaluated model accuracy using the standard classiﬁca-
-tion error (Error), and evaluated model fairness using a popular
-measure called statistical disparity (SD) [11], deﬁned as:
-SD( f, S) = |p( f (x) = 1 | s = 1) −p( f (x) = 1 | s = 0)|. (16)
-Finally, all experiments were run on the Teton Computing En-
-vironment at the University of Wyoming’s Advanced Research
-Computing Center (https://doi.org/10.15786/M2FY47), and our
-FFE implementation is at https://github.com/aokray/FFE.
-C. Classiﬁcation Results and Discussions
-Our classiﬁcation results are summarized in Table I.
-Our ﬁrst observation is that FKR-F2E consistently achieves
-lower statistical disparity than the existing fair kernel regression
-method (and other baselines) across the three data sets. This
-implies that fair feature embedding is an effective approach
-for learning fair models in kernel space.
-We notice the superior fairness of FKR-F2E is not achieved
-without any cost. In general, it has slightly higher prediction
-error than the existing fair kernel regression and other baselines.
-
-Method
-Credit Default
-Communities Crime
-COMPAS
-SD
-Error
-SD
-Error
-SD
-Error
-FKR-F2E
-.0021±.0017
-.2277±.0050
-.0392±.0267
-.1384±.0125
-.0025±.0018
-.2307±.0057
-FKRR [13]
-.0079±.0011
-.2001±.0054
-.0968±.0722
-.1208 ±.0054
-.0041±.0013
-.2190±.0089
-FLR [9]
-.0779±.0571
-.2412±.0469
-.0898±.0971
-.1166±.0189
-.0408±.0162
-.2428±.0917
-FRR [11]
-.0186±.0016
-.2914±.0186
-.3062±.0452
-.1102 ±.0128
-.0182±.0042
-.2276±.0040
-FPCA [12]
-.1716±.0149
-.4025±.0382
-.0859±.0479
-.1731±.0089
-.2806±.0182
-.3204±.1032
-TABLE I: Classiﬁcation Performance of Different Methods across Different Data Sets. For polynomial kernel, we set degree as
-4 and additive coefﬁcient as 0.1. For sigmoid kernel, we used c = 0.01 and γ as the inverse of feature dimension. k is set to
-n
-250.
-However, we argue the loss of accuracy is small compared with
-the increase of fairness. For example, on the Credit Default
-data set, FKR-F2E lowers prediction disparity by at least 75%
-= (0.0079-0.0021)/0.0079 but only increases prediction error
-by at most 13% = (0.2277-0.2001)/0.2001. We thus argue this
-method has a more efﬁcient accuracy-fairness trade-off.
-Finally, we see fair kernel methods generally achieve lower
-statistical disparity than other fair learning methods, suggesting
-their promisingness for fair machine learning.
-D. Sensitivity Analysis
-In this section, we examined the performance of FKR-F2E on
-the Communities Crime data set under different conﬁgurations.
-We ﬁrst examined its performance with different choices of
-kernel. Results on testing samples averaged over 50 random
-trials are reported in Figure 1. We see that polynomial kernel
-achieves the highest prediction fairness, with slightly higher
-prediction error. Sigmoid kernel is the second best, and linear
-kernel does not give low disparity. This supports our hypothesis
-that why fair kernel methods are promising – they construct a
-complex hypothesis space that is more likely to include models
-with efﬁcient fairness-accuracy trade-off.
-Next, we examined performance with polynomial kernel
-under different k (number of feature embeddings). Results are
-shown in Figure 2. We see that smaller k generally leads to
-higher prediction fairness and slightly higher prediction error.
-The former phenomenon implies that only the least eigenvectors
-of problem (6) can effectively minimize the mean discrepancy
-between two groups. The latter is easy to understand – higher
-feature dimension provides more information for building
-an accurate prediction model. However, the variation versus
-k seems quite limited, suggesting our method has robust
-classiﬁcation performance.
-V. CONCLUSION
-In this paper, we propose a novel fair kernel regression
-method FKR-F2E. It ﬁrst learns a set of fair feature embeddings
-in the kernel space, and then standardly learns a prediction
-model in the embedded space. Through experiments across
-three real-world data sets, we show it achieves signiﬁcantly
-lower bias in prediction compared with the state-of-the-art fair
-kernel regression method as well as several non-kernel fair
-Fig. 1: Sensitivity analysis for varying kernels with their
-approximately optimal number of features selected.
-Fig. 2: Performance versus k.
-learning methods, while sacriﬁcing only a small amount of
-prediction accuracy.
-REFERENCES
-[1] J. Angwin, J. Larson, S. Mattu, and L. Kirchner, “Machine bias: Theres
-software used across the country to predict future criminals. and its
-biased against blacks,” ProPublica, 2016.
-[2] M. Hoffman, L. B. Kahn, and D. Li, “Discretion in Hiring*,” The
-Quarterly Journal of Economics, 2017.
-[3] B. F. Klare, M. J. Burge, J. C. Klontz, R. W. V. Bruegge, and A. K. Jain,
-“Face recognition performance: Role of demographic information,” IEEE
-Transactions on Information Forensics and Security, 2012.
-[4] M. D. Cunningham and J. R. Sorensen, “Actuarial models for assessing
-prison violence risk: Revisions and extensions of the risk assessment
-scale for prison (rasp),” Assessment, 2006.
-[5] Press et al., “Preparing for the future of artiﬁcial intelligence,” 2016.
-[6] R. Zemel, Y. Wu, K. Swersky, T. Pitassi, and C. Dwork, “Learning fair
-representations,” in ICML, 2013.
-
-[7] M. Feldman, S. A. Friedler, J. Moeller, C. Scheidegger, and S. Venkata-
-subramanian, “Certifying and removing disparate impact,” in KDD, 2015.
-[8] T. Calders, A. Karim, F. Kamiran, W. Ali, and X. Zhang, “Controlling
-attribute effect in linear regression,” ICDM, 2013.
-[9] Kamishima, A. Akaho, and Sakuma, “Fairness-aware classiﬁer with
-prejudice remover regularizer,” in ECML-PKDD, 2012.
-[10] C. Dwork, M. Hardt, T. Pitassi, O. Reingold, and R. Zemel, “Fairness
-through awareness,” in Innovations in Theoretical Computer Science
-Conference.
-ACM, 2012.
-[11] D. McNamara, C. S. Ong, and R. C. Williamson, “Provably fair
-representations,” CoRR, vol. abs/1710.04394, 2017.
-[12] S. Samadi, U. Tantipongpipat, J. Morgenstern, M. Singh, and S. Vempala,
-“The price of fair pca: One extra dimension,” in NIPS, 2018.
-[13] A. P´erez-Suay, V. Laparra, G. Mateo-Garc´ıa, J. Mu˜noz-Mar´ı, L. G´omez-
-Chova, and G. Camps-Valls, “Fair kernel learning,” in Joint European
-Conf. Machine Learning and Knowledge Discovery in Databases, 2017.
-[14] M. Olfat and A. Aswani, “Convex formulations for fair principal
-component analysis,” CoRR, vol. abs/1802.03765, 2019.
-[15] B. Cao, D. Shen, J.-T. Sun, Q. Yang, and Z. Chen, “Feature selection in
-a kernel space,” in ICML, 2007.
-[16] A. Gretton, K. M. Borgwardt, M. J. Rasch, B. Sch¨olkopf, and A. Smola,
-“A kernel two-sample test,” JMLR, 2012.
-[17] J. Huang, A. Gretton, K. Borgwardt, B. Sch¨olkopf, and A. J. Smola,
-“Correcting sample selection bias by unlabeled data,” in NIPS, 2007.
-[18] S. J. Pan, J. T. Kwok, Q. Yang et al., “Transfer learning via dimensionality
-reduction.” in AAAI, 2008.
-[19] A. Gretton, A. J. Smola, J. Huang, M. Schmittfull, K. M. Borgwardt,
-and B. Sch¨olkopf, “Covariate shift by kernel mean matching,” 2009.
-[20] Y. Grandvalet and S. Canu, “Adaptive scaling for feature selection in
-svms,” in NIPS, 2002.
-[21] J. Tang, S. Alelyani, and H. Liu, “Feature selection for classiﬁcation: A
-review,” in Data Classiﬁcation: Algorithms and Applications, 2014.
-[22] L. Yang, S. Lv, and J. Wang, “Model-free variable selection in reproducing
-kernel hilbert space,” JMLR, 2016.
-[23] B. Sch¨olkopf, A. Smola, and K.-R. M¨uller, “Kernel principal component
-analysis,” in International Conf. Artiﬁcial Neural Networks, 1997.
-[24] A. Chouldechova, “Fair prediction with disparate impact: A study of
-bias in recidivism prediction instruments,” Big data, 2017.
-[25] F. Pedregosa, G. Varoquaux, A. Gramfort, V. Michel, B. Thirion, O. Grisel,
-M. Blondel, P. Prettenhofer, R. Weiss, V. Dubourg, J. Vanderplas,
-A. Passos, D. Cournapeau, M. Brucher, M. Perrot, and E. Duchesnay,
-“Scikit-learn: Machine learning in Python,” JMLR, 2011.
-VI. APPENDIX
-A. Derivation of Eigen-Problem (6)
-We will show how to derive (6) by solving (3) under
-constraints (4) and (5). Recall that η = Ín
-i=1 αiφ(xi) where
-αi’s are unknown parameters. Rewrite the objective in (3) as
-J(η) =
-
-
-1
-nu
-nu
-Õ
-i=1
-⟨φ(xi), η⟩−1
-np
-n
-Õ
-i=nu+1
-⟨φ(xi), η⟩
-
-
-2
-= 1
-n2u
- nu
-Õ
-i=1
-⟨φ(xi), η⟩
-!2
-+ 1
-n2p
- 
-n
-Õ
-i=nu+1
-⟨φ(xi), η⟩
-!2
-−
-2
-nunp
- nu
-Õ
-i=1
-⟨φ(xi), η⟩
-!  
-n
-Õ
-i=nu+1
-⟨φ(xi, η⟩
-!
-= αT KT
-u Kuα
-n2u
-+
-αT KT
-p Kpα
-n2p
-−
-2αT KT
-u 1u1T
-pKpα
-nunp
-= αT Mα = J(α),
-(17)
-where M is a symmetric matrix deﬁned as
-M = 1
-n2u
-KT
-u Ku −
-2
-nunp
-KT
-u 1u1T
-pKp + 1
-n2p
-KT
-p Kp,
-(18)
-matrix Ku ∈Rnu×n has k(xi, xj) at row i column j and matrix
-Kp ∈Rnp×n has k(xnu+i, xj) at row i column j; 1u ∈Rnu and
-1p ∈Rnp are vectors of ones, and α = [α1, . . ., αn].
-Next, it is easy to verify that constraint (4) staisﬁes
-ηTη = αT Kα = 1,
-(19)
-where K ∈Rn×n is the standard Gram matrix.
-Thus we need to solve
-min
-α J(α)
-s.t. αT Kα = 1.
-(20)
-The Lagrange function is
-L(α, λ) = J(α) + λ(αT Kα −1).
-(21)
-Setting ∂L(α,λ)
-∂α
-= 0 and solving for α gives (6).
-B. Derivation of the Solution to (9)
-Here, we show why solution to (9) is also a solution to the
-eigen-problem (6). Let α be the coefﬁcient vector for the ﬁrst
-feature embedding η (known), and α′ be the coefﬁcient vector
-of the second embedding η′ (unknown). The new constraint
-when learning η′ can be written as
-ηTη′ =
- n
-Õ
-i=1
-αiφ(xi)
-!  n
-Õ
-i=1
-α′
-iφ(xi)
-!
-= αT Kα′ = 0.
-(22)
-Thus we need to solve
-min
-α′
-J(α′)
-s.t. (α′)T Kα′ = 1,
-(23)
-and
-(α′)T Kα = 0.
-(24)
-The Lagrange function is
-L(α′, λ1, λ2) = J(α′) + λ1((α′)T Kα′ −1) + λ2αT Kα′.
-(25)
-Setting ∂L(α′,λ1,λ2)
-∂α′
-= 0 and left-multiplying both sides by αT,
-αT Mα′ −2λ1αT Kα′ −λ2αT Kα = 0.
-(26)
-Since αT Kα′ = 0 and α′T Kα′ = 1, we have
-(α′)T Mα = λ2.
-(27)
-Further, from (6) we know α is a generalized eigenvector of
-M satisfying Mα = λKα. Thus (27) becomes
-(α′)T Mα = (α′)TλKα = λ(α′)T Kα = 0 = λ2,
-(28)
-where the second equality is due to the new constraint (22).
-Comparing (21) and (25), with λ2 = 0, we see α and α′
-have the same Lagrange function. Thus it is easy to show they
-are solution to the same generalized eignproblem (6).
