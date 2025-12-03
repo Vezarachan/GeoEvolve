@@ -1,3 +1,5 @@
+from unicodedata import category
+
 # GeoEvolve
 > GeoEvolve aims to accelerate geospatial model discovery by the power of large language models.
 
@@ -5,7 +7,7 @@
 ```shell
 pip install geoevolve
 
-export OPENAI_API_KEY='your-openai-api-key'
+export OPENAI_API_KEY='your-openai-api-key' && source ~/.zshrc
 
 # Optional If you already have a GeoKnowRAG
 # Build GeoKnowRAG
@@ -18,40 +20,13 @@ python ./run_geoevolve.py --initial_program_path path-to-initial_program --evalu
 ## Library Usage
 ```python
 import os
-from geoevolve import save_wiki_pages, save_arxiv_papers, save_github_codes, make_geo_know_db, run_geo_evolution
+from geoevolve import save_wiki_pages, save_arxiv_papers, save_github_codes, initialize_or_get_geo_know_db, import_knowledge_into_geo_know_db, run_geo_evolution
 
-# Collect GeoKnowledge
-topics = {
-    'giscience_theory': [
-    'Absolute vs relative vs relational space',
-    'Cognitive geography',
-    'Representation of scale in GIS'
-  ],
-  'spatial_modeling': [
-    'Agent-based models in geography',
-    'Spatial interaction models',
-    'Gravity model in geography',
-    'Entropy maximization models',
-    'Complexity theory in geography'
-  ]
-}
-
-for category, queries in topics.items():
-    if not os.path.exists(f'./geo_knowledge/{category}'):
-        os.mkdir(f'./geo_knowledge/{category}')
-    print(f'Category: {category}')
-    for query in queries:
-        save_wiki_pages(query, db_path='./geo_knowledge', category=category)
-        save_arxiv_papers(query, max_results=3, db_path='./geo_knowledge', category=category)
-        save_github_codes(query, max_repos=3, token='token', db_path='./geo_knowledge',
-                                  category=category)
-        
-# Build GeoKnowRAG with Chroma
-make_geo_know_db(geo_knowledge_dir='./geo_knowledge', 
-                 persist_dir='./geoevolve_storage',
-                 embedding_model_name='text-embedding-3-large',
-                 llm_model_name='gpt-4.1',)
-
+os.environ['OPENAI_API_KEY'] = 'your-openai-api-key'
+# Initialize an Empty GeoKnowRAG with Chroma
+geokg_rag = initialize_or_get_geo_know_db(persist_dir='your_geoevolve_storage',
+                                   embedding_model_name='text-embedding-3-large',
+                                   llm_model_name='gpt-4.1')
 
 # Run GeoEvolve
 run_geo_evolution(initial_program_file='your-initial-program-path',
@@ -64,6 +39,46 @@ run_geo_evolution(initial_program_file='your-initial-program-path',
                   embedding_model_name='text-embedding-3-large',
                   llm_model_name='gpt-4.1')
 
+```
+
+## Import Knowledge into GeoKnowRAG
+```python
+from geoevolve import initialize_or_get_geo_know_db, import_knowledge_into_geo_know_db
+from langchain_core.documents import Document
+
+# You can import knowledge from a well-structured geographical knowledge directory
+# The structure like geo_knowledge/{category}/{knowledge}.txt
+
+import_knowledge_into_geo_know_db(geo_knowledge_dir='your_geo_knowledge_dir',
+                                  persist_dir='your_geoevolve_storage',
+                                  collection_name='your_collection_name',
+                                  embedding_model_name='text-embedding-3-large',
+                                  llm_model_name='gpt-4.1')
+
+# You can also just import a document into the GeoKnowRAG
+rag = initialize_or_get_geo_know_db(persist_dir='your_geoevolve_storage',
+                                   embedding_model_name='text-embedding-3-large',
+                                   llm_model_name='gpt-4.1')
+
+knowledge = '...'
+category = '...'
+title = '...'
+
+max_length = 1000
+docs = []
+if knowledge != '':
+    if len(knowledge) > max_length:
+        chunks = [knowledge[i:i + max_length] for i in
+                  range(0, len(knowledge), max_length)]
+        chunked_docs = [Document(page_content=chunk,
+                                 metadata={'category': category, 'name': title})
+                        for chunk in chunks]
+        docs.extend(chunked_docs)
+    else:
+        doc = Document(page_content=knowledge,
+                       metadata={'category': category, 'name': title})
+        docs.append(doc)
+rag.add_document_to_db(docs)
 ```
 
 **GeoEvolve: Automating Geospatial Model Discovery via Multi-Agent Large Language Models** <br>
