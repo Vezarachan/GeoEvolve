@@ -149,8 +149,3 @@ if __name__ == '__main__':
                                                metadata={'category': category, 'name': file.split('.')[0]})
                                 docs.append(doc)
         geokg_rag.add_document_to_db(docs)
-
-
-
-
-# python build_geo_knowledge_db.py --embedding_model openrouter-qwen/qwen3-embedding-8b --llm_model openrouter-qwen/qwen3-32b --working_dir ./geoevolve_storage_qwen --collect_knowledge False --add_knowledge True

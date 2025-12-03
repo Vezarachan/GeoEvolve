@@ -30,7 +30,7 @@ llm:
 # Prompt configuration
 prompt:
   template_dir: null                  # Custom directory for prompt templates
-  system_message: "You are an expert in GIS and an experienced coder. Your task is to improve and refine the Ordinary Kriging algorithm in Python. The target is to minimize root mean square error in all three datasets (Cu, Pb, Zn) compared with the original version of Kriging. Be careful there may be some problem in the fitting the variogram model, you should correct it."
+  system_message: "You are an expert in GIS and an experienced coder. Your task is to improve and refine the Ordinary Kriging algorithm in Python. The target is to minimize root mean square error (RMSE) in all three datasets (Cu, Pb, Zn) compared with the original version of Kriging. Be careful there may be some problem in the fitting the variogram model, you should correct it."
   evaluator_system_message: "You are an expert code reviewer."
 
   # Number of examples to include in the prompt
