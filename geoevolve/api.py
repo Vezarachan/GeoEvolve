@@ -25,12 +25,12 @@ def initialize_or_get_geo_know_db(persist_dir: str,
 def import_knowledge_into_geo_know_db(geo_knowledge_dir: str,
                      persist_dir: str,
                      max_length: int = 1000,
-
+                     collection_name: str = 'geo_knowledge_db',
                      chunk_size: int = 300,
                      chunk_overlap: int = 50,
                      embedding_model_name: str = 'text-embedding-3-large',
                      llm_model_name: str = 'gpt-4.1', ):
-    '''
+    """
 
     :param geo_knowledge_dir: GeoKnowledge directory
     :param persist_dir: GeoKnowledge Dataset Persist directory
@@ -41,7 +41,7 @@ def import_knowledge_into_geo_know_db(geo_knowledge_dir: str,
     :param embedding_model_name: Embedding Model Name
     :param llm_model_name: LLM Model Name
     :return:
-    '''
+    """
     if not os.path.exists(persist_dir):
         os.makedirs(persist_dir)
     geokg_rag = GeoKnowledgeRAG(persist_dir=persist_dir,
@@ -90,7 +90,7 @@ def run_geo_evolution(
         max_arxiv_papers: int = 3,
         chunk_overlap: int = 50,
 ):
-    '''
+    """
     :param initial_program_file: Initial Program File
     :param evaluator_file: Evaluator File
     :param config_path: Config Path
@@ -105,7 +105,7 @@ def run_geo_evolution(
     :param max_arxiv_papers: Max ArXiv papers
     :param chunk_overlap: Chunk Overlap
     :return:
-    '''
+    """
 
     if not(os.path.isdir(rag_working_dir)):
         os.makedirs(rag_working_dir)
@@ -128,11 +128,3 @@ def run_geo_evolution(
         chunk_overlap=chunk_overlap
     )
     asyncio.run(evolver.evolve(rounds=rounds, iterations_per_round=iterations_per_round))
-
-if __name__ == '__main__':
-    import os
-    os.environ['OPENROUTER_API_KEY'] = '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'
-    initialize_or_get_geo_know_db('./geoevolve_storage_new',
-                           embedding_model_name='openrouter-openai/text-embedding-3-large',
-                           llm_model_name='openrouter-openai/gpt-4.1')
-

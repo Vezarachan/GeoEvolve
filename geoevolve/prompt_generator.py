@@ -137,14 +137,14 @@ def generate_geo_knowledge_informed_prompt(llm: BaseChatModel, current_prompt: s
 
 def generate_prompt_without_geo_knowledge(llm: BaseChatModel, current_prompt: str, current_code: str,
                                           max_tokens: int = 400) -> str:
-    '''
+    """
     Generate a prompt without geographical knowledge.
     :param llm:
     :param current_prompt:
     :param current_code:
     :param max_tokens:
     :return:
-    '''
+    """
     no_geo_informed_template = '''
     You are a Geography and Computer Science expert guiding OpenEvolve in evolving geospatial algorithms.
 
