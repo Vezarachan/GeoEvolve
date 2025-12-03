@@ -7,7 +7,6 @@ import wikipediaapi
 import arxiv
 import pymupdf
 from git import Repo
-from langchain.retrievers.document_compressors import LLMChainExtractor
 from langchain_core.documents import Document
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.checkpoint.memory import MemorySaver
@@ -15,42 +14,46 @@ from langchain_chroma import Chroma
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
-from langchain.retrievers import ContextualCompressionRetriever
 from wikipediaapi import WikipediaPage
 from tqdm import tqdm
 from more_itertools import batched
-from geoevolve.llm import get_llm, get_embeddings
+from geoevolve.llm import get_embeddings, get_llm
 
 
 class GeoKnowledgeRAG:
     """
     Geographical Knowledge Retrival Augmented Generation
     """
-    def __init__(self, persist_dir: str, collection_name: str = 'geo_knowledge_db', embedding_model: str = 'gemini-embedding-001', llm_model: str = 'gemini-2.5-flash', chunk_size: int = 300, chunk_overlap: int = 50, is_compressed: bool = False, max_size: int = 10000):
-        self.llm = get_llm(llm_model)
-        self.splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
-        self.embeddings = get_embeddings(embedding_model)
-        self.db = Chroma(collection_name=collection_name, embedding_function=self.embeddings, persist_directory=persist_dir)
-        self.memory = MemorySaver()
-        compressor = LLMChainExtractor.from_llm(self.llm)
-        self.retriever = self.db.as_retriever(search_kwargs={'k': 4})
-        self.compression_retriever = ContextualCompressionRetriever(
-            base_compressor=compressor, base_retriever=self.retriever
-        )
-        self.is_compressed = is_compressed
-        self.max_size = max_size
 
-    def add_document_to_db(self, doc: Document, max_batch_size: int = 5461):
+    def __init__(self,
+                 persist_dir: str,
+                 rag_embedding_model_name: str = 'text-embedding-3-large',
+                 rag_llm_model_name: str = 'gpt-4.1',
+                 collection_name: str = 'geo_knowledge_db',
+                 chunk_size: int = 300,
+                 chunk_overlap: int = 50):
+        self.llm = get_llm(rag_llm_model_name)
+        self.embeddings = get_embeddings(rag_embedding_model_name)
+        self.splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(chunk_size=chunk_size,
+                                                                             chunk_overlap=chunk_overlap)
+        self.embeddings = get_embeddings(rag_embedding_model_name)
+        self.db = Chroma(collection_name=collection_name,
+                         embedding_function=self.embeddings,
+                         persist_directory=persist_dir)
+        self.memory = MemorySaver()
+        self.retriever = self.db.as_retriever(search_kwargs={'k': 4})
+
+    def add_document_to_db(self, docs: List[Document], max_batch_size: int = 5461):
         """
         Add document to database
-        :param doc:
+        :param docs:
         :param max_batch_size:
         :return:
         """
-        chunks = self.splitter.split_documents(doc)
+        chunks = self.splitter.split_documents(docs)
         for batched_chunk in tqdm(batched(chunks, max_batch_size), desc='Saving to Chroma'):
-            self.db.add_documents(batched_chunk)
-
+            list_batched_chunk = [*batched_chunk]
+            self.db.add_documents(list_batched_chunk)
 
     def add_text_to_db(self, text: str, max_batch_size: int = 5461):
         """
@@ -74,10 +77,10 @@ class GeoKnowledgeRAG:
         prompt_perspectives = ChatPromptTemplate.from_template(template=template)
 
         queries = (
-            prompt_perspectives
-            | self.llm
-            | StrOutputParser()
-            | (lambda x: x.split('\n'))
+                prompt_perspectives
+                | self.llm
+                | StrOutputParser()
+                | (lambda x: x.split('\n'))
         )
         return queries
 
@@ -101,7 +104,6 @@ class GeoKnowledgeRAG:
         fused_docs = sorted(fused_scores.items(), key=lambda x: x[1], reverse=True)
         return [(doc_contents[doc_id], fused_scores[doc_id]) for doc_id, _ in fused_docs]
 
-
     def make_rag_chain(self) -> RunnableSerializable:
         """
         Construct a chain of consecutive steps in a Retrieval-Augmented Generation (RAG) system that are executed
@@ -113,35 +115,45 @@ class GeoKnowledgeRAG:
                  -> Query 3             -> Document 3
         :return:
         """
-        if self.is_compressed:
-            retrieval_chain_rag_fusion = self.generate_queries() | self.compression_retriever.map() | self.reciprocal_rank_fusion
-        else:
-            retrieval_chain_rag_fusion = self.generate_queries() | self.retriever.map() | self.reciprocal_rank_fusion
+        retrieval_chain_rag_fusion = self.generate_queries() | self.retriever.map() | self.reciprocal_rank_fusion
         template = '''Answer the following question based on this context:
-        
+
         {context}
-        
+
         Question: {question}
         '''
         prompt = ChatPromptTemplate.from_template(template)
         geokg_rag_chain = (
-            {'context': retrieval_chain_rag_fusion, 'question': RunnablePassthrough()}
-            | prompt
-            | self.llm
-            | StrOutputParser()
+                {'context': retrieval_chain_rag_fusion, 'question': RunnablePassthrough()}
+                | prompt
+                | self.llm
+                | StrOutputParser()
         )
         return geokg_rag_chain
 
 
-def fetch_wikipedia_page(title: str) -> WikipediaPage:
+def fetch_wikipedia_page(title: str) -> None | WikipediaPage:
     """
     Fetch wikipedia page
     :param title:
     :return:
     """
-    wiki = wikipediaapi.Wikipedia(user_agent='geoevolve', language='en', extract_format=wikipediaapi.ExtractFormat.WIKI)
-    wiki_page = wiki.page(title)
-    return wiki_page
+    wiki = wikipediaapi.Wikipedia(
+        user_agent='geoevolve',
+        language='en',
+        extract_format=wikipediaapi.ExtractFormat.WIKI
+    )
+
+    try:
+        page = wiki.page(title)
+        return page
+    except requests.exceptions.Timeout:
+        # 超时了 → 返回 None，而不是让程序崩溃
+        return None
+    except Exception:
+        # 其他异常也返回 None
+        return None
+
 
 def fetch_arxiv_papers(query: str, max_results: int) -> List[Dict[str, Any]]:
     """
@@ -179,7 +191,10 @@ def fetch_arxiv_papers(query: str, max_results: int) -> List[Dict[str, Any]]:
             results.append(meta)
     except arxiv.UnexpectedEmptyPageError:
         print('Arxiv paper not found')
+    except arxiv.HTTPError:
+        print('Page request error')
     return results
+
 
 def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
     """
@@ -192,6 +207,7 @@ def extract_text_from_pdf_bytes(pdf_bytes: bytes) -> str:
     with pymupdf.Document(stream=pdf_bytes) as doc:
         text = '\n'.join([page.get_text() for page in doc])
     return text
+
 
 def search_github_repos(query: str, max_repos: int = 3, token: str = None) -> List[Dict[str, Any]]:
     """
@@ -211,8 +227,10 @@ def search_github_repos(query: str, max_repos: int = 3, token: str = None) -> Li
     data = r.json()
     code_repos = []
     for item in data.get('items', []):
-        code_repos.append({'full_name': item['full_name'], 'html_url': item['html_url'], 'clone_url': item['clone_url']})
+        code_repos.append(
+            {'full_name': item['full_name'], 'html_url': item['html_url'], 'clone_url': item['clone_url']})
     return code_repos
+
 
 def clone_repo(repo_url: str, dest_dir: str):
     """
@@ -224,6 +242,7 @@ def clone_repo(repo_url: str, dest_dir: str):
     if os.path.exists(dest_dir):
         shutil.rmtree(dest_dir)
     Repo.clone_from(repo_url, dest_dir)
+
 
 def gather_code_text(repo_path: str) -> str:
     """
@@ -244,6 +263,7 @@ def gather_code_text(repo_path: str) -> str:
                     continue
     return '\n\n'.join(texts)
 
+
 def safe_filename(s: str) -> str:
     """
     Change filename so that the file can be saved safely
@@ -251,6 +271,7 @@ def safe_filename(s: str) -> str:
     :return:
     """
     return re.sub(r"[^\w\-_. ]", "_", s)[:200]
+
 
 def save_wiki_pages(topic: str, db_path: str, category: str):
     """
@@ -266,6 +287,7 @@ def save_wiki_pages(topic: str, db_path: str, category: str):
         wiki_doc = wiki_page.text
         with open(f'{db_path}/{category}/{wiki_title}.txt', 'w', encoding='utf-8', errors='ignore') as f:
             f.write(wiki_doc)
+
 
 def save_arxiv_papers(query: str, max_results: int, db_path: str, category: str):
     """
@@ -288,6 +310,7 @@ def save_arxiv_papers(query: str, max_results: int, db_path: str, category: str)
                 text = pdf_text
         with open(f'{db_path}/{category}/{safe_filename(title)}.txt', 'w', encoding='utf-8', errors='ignore') as f:
             f.write(text)
+
 
 def save_github_codes(query: str, max_repos: int, token: str = None, db_path: str = None, category: str = None):
     """
@@ -313,6 +336,7 @@ def save_github_codes(query: str, max_repos: int, token: str = None, db_path: st
             shutil.rmtree(dest)
         except Exception as e:
             print(f"[GITHUB] clone failed {r['full_name']}: {e}")
+
 
 def direct_add_document_to_db(rag: GeoKnowledgeRAG, knowledge: str, title: str, category: str, max_length: int = 1000):
     """
@@ -340,6 +364,7 @@ def direct_add_document_to_db(rag: GeoKnowledgeRAG, knowledge: str, title: str, 
         docs.append(doc)
     rag.add_document_to_db(docs)
 
+
 def add_wiki_pages(topic: str, category: str, rag: GeoKnowledgeRAG, geo_knowledge_dir: str = None):
     """
     Add wiki pages to geographical knowledge database
@@ -351,6 +376,8 @@ def add_wiki_pages(topic: str, category: str, rag: GeoKnowledgeRAG, geo_knowledg
     :return:
     """
     wiki_page = fetch_wikipedia_page(topic)
+    if wiki_page is None:
+        return
     if wiki_page.exists():
         wiki_title = wiki_page.title
         wiki_doc = wiki_page.text
@@ -360,6 +387,7 @@ def add_wiki_pages(topic: str, category: str, rag: GeoKnowledgeRAG, geo_knowledg
             with open(f'{geo_knowledge_dir}/{category}/{wiki_title}.txt', 'w', encoding='utf-8', errors='ignore') as f:
                 f.write(wiki_doc)
         direct_add_document_to_db(rag=rag, knowledge=wiki_doc, category=category, title=wiki_title)
+
 
 def add_arxiv_papers(query: str, max_results: int, category: str, rag: GeoKnowledgeRAG, geo_knowledge_dir: str = None):
     """
@@ -385,9 +413,11 @@ def add_arxiv_papers(query: str, max_results: int, category: str, rag: GeoKnowle
         if geo_knowledge_dir is not None:
             if not os.path.exists(f'{geo_knowledge_dir}/{category}'):
                 os.mkdir(f'{geo_knowledge_dir}/{category}')
-            with open(f'{geo_knowledge_dir}/{category}/{safe_filename(title)}.txt', 'w', encoding='utf-8', errors='ignore') as f:
+            with open(f'{geo_knowledge_dir}/{category}/{safe_filename(title)}.txt', 'w', encoding='utf-8',
+                      errors='ignore') as f:
                 f.write(text)
         # direct_add_document_to_db(rag=rag, knowledge=text, category=category, title=title)
+
 
 def add_github_codes(query: str, max_repos: int, rag: GeoKnowledgeRAG, token: str = None, category: str = None):
     """
@@ -412,20 +442,28 @@ def add_github_codes(query: str, max_repos: int, rag: GeoKnowledgeRAG, token: st
         except Exception as e:
             print(f"[GITHUB] add failed {r['full_name']}: {e}")
 
-def obtain_new_geo_knowledge(rag: GeoKnowledgeRAG, is_new_code_examples_needed: bool, is_new_geographical_theory_needed: bool, keyword: str, category: str, geo_knowledge_dir: str, github_token: str, max_repos: int = 3, max_arxiv_papers: int = 3):
+
+def obtain_new_geo_knowledge(rag: GeoKnowledgeRAG, is_new_code_examples_needed: bool,
+                             is_new_geographical_theory_needed: bool, keyword: str, category: str,
+                             geo_knowledge_dir: str, github_token: str, max_repos: int = 3, max_arxiv_papers: int = 3):
     if is_new_code_examples_needed and github_token:
         add_github_codes(query=keyword, max_repos=max_repos, token=github_token, category=category, rag=rag)
     if is_new_geographical_theory_needed:
-        add_wiki_pages(topic=keyword, category=category, rag=rag)
-        add_arxiv_papers(query=keyword, max_results=max_arxiv_papers, category=category, rag=rag)
+        add_wiki_pages(topic=keyword, category=category, rag=rag, geo_knowledge_dir=geo_knowledge_dir)
+        add_arxiv_papers(query=keyword, max_results=max_arxiv_papers, category=category, rag=rag, geo_knowledge_dir=geo_knowledge_dir)
 
-def obtain_new_geo_knowledge_from_outside(rag: GeoKnowledgeRAG, keyword: str, category: str, geo_knowledge_dir: str, max_arxiv_papers: int = 5):
+
+def obtain_new_geo_knowledge_from_outside(rag: GeoKnowledgeRAG, keyword: str, category: str, geo_knowledge_dir: str,
+                                          max_arxiv_papers: int = 3):
     add_wiki_pages(topic=keyword, category=category, rag=rag, geo_knowledge_dir=geo_knowledge_dir)
-    add_arxiv_papers(query=keyword, max_results=max_arxiv_papers, category=category, rag=rag, geo_knowledge_dir=geo_knowledge_dir)
+    add_arxiv_papers(query=keyword, max_results=max_arxiv_papers, category=category, rag=rag,
+                     geo_knowledge_dir=geo_knowledge_dir)
 
 
 if __name__ == '__main__':
-    rag = GeoKnowledgeRAG(persist_dir='../geoevolve_storage_re_geocp', embedding_model='gemini-embedding-001', llm_model='gemini-2.5-flash')
+    embedding_model = get_embeddings('gemini-embedding-001')
+    llm_model = get_llm('gemini-2.5-flash')
+    rag = GeoKnowledgeRAG(persist_dir='./geoevolve_storage_re', rag_embedding_model_name=embedding_model, rag_llm_model_name=llm_model)
     # papers = fetch_arxiv_papers('kriging', max_results=10)
     #
     # print(papers[0]['title'])

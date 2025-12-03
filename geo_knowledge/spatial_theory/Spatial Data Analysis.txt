@@ -1,0 +1,1607 @@
+Spatial Data Analysis
+Tobias Rüttenauer∗
+UCL Social Research Institute, University College London
+March 18, 2025
+Abstract
+This handbook chapter provides an essential introduction to the field of spatial
+econometrics, offering a comprehensive overview of techniques and methodologies for
+analysing spatial data in the social sciences. Spatial econometrics addresses the unique
+challenges posed by spatially dependent observations, where spatial relationships
+among data points can be of substantive interest or can significantly impact statistical
+analyses. The chapter begins by exploring the fundamental concepts of spatial depen-
+dence and spatial autocorrelation, and highlighting their implications for traditional
+econometric models. It then introduces a range of spatial econometric models, particu-
+larly spatial lag, spatial error, spatial lag of X, and spatial Durbin models, illustrating
+how these models accommodate spatial relationships and yield accurate and insightful
+results about the underlying spatial processes. The chapter provides an intuitive guide
+on how to interpret those different models. A practical example on London house
+prices demonstrates the application of spatial econometrics, emphasising its relevance
+in uncovering hidden spatial patterns, addressing endogeneity, and providing robust
+estimates in the presence of spatial dependence.
+Keywords: Spatial Econometrics, Spatial Data Analysis, Spatial Dependence, Spatial
+Spillovers, London House Prices, Handbook
+∗I would like to thank Robert Vief for valuable comments on an earlier version of this manuscript. I am
+also grateful to workshop participants for their comments on the respective teaching materials.
+1
+arXiv:2402.09895v2  [econ.EM]  19 Mar 2025
+
+1
+Introduction
+The availability of spatial data for social sciences has rapidly increased over the past
+decade. Various spatial packages have been implemented in standard statistical software
+and have steadily been updated (Bivand 2022) in addition to already existing software
+in Geo-Information Systems (GIS) such as ArcGIS or QGIS. At the same time, many
+empirical social science papers investigate research questions with an explicit spatial focus.
+Examples of spatial topics in the social sciences include labour market dynamics (Martén
+et al. 2019, Nisic 2017, Zoch 2021), processes of residential segregation (Roberto 2018,
+Tóth et al. 2021) and gentrification (Fransham 2020, Zapatka & Beck 2021), the spatial
+distribution of environmental goods or bads (Boillat et al. 2022, Jünger 2022, Rüttenauer
+2018), the consequences of extreme weather events (Ogunbode et al. 2019, Hoffmann et al.
+2022, Rüttenauer 2023) or the access to infrastructural conditions (Moreno-Monroy et al.
+2018, Liao et al. 2020, Wiedner et al. 2022).
+In general, spatial data is structured like conventional data (e.g. a dataset with variables),
+but has one additional dimension: every observation is linked to some geo-spatial information.
+Most common types of spatial information are points, lines, or polygons (vector data) or
+raster data. Similar to the time dimension in panel data, this adds an additional layer of
+information and connectivity between units. As with panel data, we could thus proceed
+as if we had conventional data and ignore the spatial dimension. This comes however
+with two distinct problems. First, we waste potentially interesting information, that may
+help us to understand the underlying social processes. Second, we will end up with biased
+inferential statistics and biased point estimates in some cases if we ignore the underlying
+spatial dependence.
+There are various techniques to model spatial dependence and spatial processes (LeSage &
+Pace 2009). Here, we will cover the most common spatial econometric models. Generally,
+spatial regression models make some assumptions about the source of spatial dependence
+observed in the data and then account for this dependence in the specified model. What
+makes spatial regression models more complicated than panel models is the ambiguous
+direction and circular nature of the dependence. I may influence my neighbour, but my
+neighbour may also influence me (interdependence). Moreover, if someone influences a third
+neighbour, they may be neighbours of my neighbour – 2nd order neighbour of me – which
+will then influence me as well (diffusion). However, we may also not influence each other
+at all but just be affected by the same exogenous shock, thus making our observed values
+more similar (common confounding).
+The chapter proceeds as follows. First, we will briefly introduce the concept of spatial
+2
+
+connectivity W and spatial dependence and clarify why conventional regression techniques
+may fail with spatial dependence. We will then provide an overview of the most common
+spatial regression models. In a further step, we will demonstrate how to interpret summary
+measures of the coefficients of these models, which becomes more complicated in the case of
+spatial interdependence. Lastly, we use the relation between neighbourhood characteristics
+and house prices in London as an applied example.
+2
+Spatial weights
+Given the geographical information of spatial data (i.e. the location of each unit), we can
+form relationships between units: which units are closer or further away from each other.
+Similar to network analysis, we have to set up a measure that defines which units are
+connected to each other and how they are connected (e.g. the magnitude of connectivity).
+There are some obvious measures that can be used to define these relations with spatial
+data: adjacency and proximity.
+The connectivity between units is usually represented in a matrix denoted W. The spatial
+weights matrix W is an N × N dimensional matrix, where each element wij of this matrix
+specifies the relation or connectivity between each pair of units i and j.
+W =
+
+
+w11
+w12
+w13
+. . .
+w1n
+w21
+w22
+w23
+. . .
+w2n
+w31
+w32
+w33
+. . .
+...
+...
+...
+...
+...
+...
+wn1
+wn2
+wn3
+. . .
+wnn
+
+
+(1)
+In the example above, w31 describes the relationship between unit 3 and unit 1, while w2n de-
+scribes how unit 2 and unit n are connected. The diagonal elements wi,i = w1,1, w2,2, . . . , wn,n
+of W are always zero: no unit is a neighbour of itself. This is not true for spatial multiplier
+matrices (as we will see later). Contiguity weights are a very common type of spatial weights.
+This is a binary specification, taking the value 1 for neighbouring units (queens: sharing a
+common edge; rook: sharing a common border), and 0 otherwise. See for instance Pebesma
+& Bivand (2023) for more detailed information about spatial relations.
+Contiguity weights matrices are usually sparse matrices and keep relations relatively simple
+and easy to interpret. However, they often create island, i.e. units without any neighbours,
+which can be problematic for spatial regression models. Another common type of connectivity
+measures is distance based weights. For instance, inverse distance weights assign higher
+3
+
+weights to more proximate units wi,j =
+1
+dα
+ij , where distance is usually discounted by a spatial
+decay factor α. It is often recommended to specify a distance threshold (e.g. 100km) to
+get rid of very small non-zero weights for very distant units. There is an ongoing debate
+about the importance of spatial weights for spatial econometrics and about the right way of
+specifying weights matrices (LeSage & Pace 2014, Neumayer & Plümper 2016).
+2.1
+Normalization
+Normalizing ensures that the parameter space of the spatial multiplier in regression models
+is restricted to −1 < ρ > 1, and the multiplier matrix is non-singular (more on this later).
+The important message is: normalizing the weights matrix is always a good idea. Otherwise,
+the spatial parameters may blow up – if they can be estimated at all. Normalising also
+ensures an easy interpretation of spillover effects (as we see later). Again, how to normalize
+a weights matrix is subject of debate (LeSage & Pace 2014, Neumayer & Plümper 2016).
+Row-normalization divides each non-zero weight by the sum of all weights of unit i, which
+is the sum of the row i:
+wij
+Pn
+j wij . With contiguity weights and row-normalisation, spatially
+lagged variables contain the mean of the respective variable among the neighbours of i.
+However, proportions between units such as distances get lost due to row-normalisation,
+which can be problematic if one is theoretically interested in using inverse-distance based
+weights. It also induces asymmetries, as different units have different numbers of neighbours:
+wij ̸= wji.
+Another common way of standardization is maximum eigenvalues normalization. Maximum
+eigenvalues normalization divides each non-zero weight by the overall maximum eigenvalue of
+the entire matrix λmax:
+W
+λmax. Each element of W is divided by the same scalar value, which
+preserves the relations. It keeps proportions of connectivity strengths across rows, which is
+relevant for distance based W. I thus recommend maximum eigenvalues normalization for
+distance based neighbours weights. However, interpretation may become more complicated.
+2.2
+Spatial dependence
+‘Everything is related to everything else, but near things are more related than distant
+things’ (Tobler 1970). Tobler’s first law of geography has been used extensively (13,690
+citation in 2025-03) to describe spatial dependence. In practical term, this means that close
+observations are more likely to exhibit similar values on some of their characteristics, and
+we cannot handle observations as if they were independent.
+There is a very easy and intuitive way of detecting spatial autocorrelation: look at the
+map. Below we can see three distinct patterns. Figure Figure 1 a) has perfect negative
+4
+
+auto-correlation. Every black unit is surrounded by white units, and every white unit is
+surrounded by black units. Figure Figure 1 b) has very strong positive autocorrelation.
+Most white units are surrounded only by white units, and most black units are surrounded
+by only black units. Figure Figure 1 c), by contrast, is generated by a random process,
+although even here one is inclined to observe some degree of clustering.
+Figure 1: Forms of spatial dependence: a) perfect negative autocorrelation, b) nearly perfect
+positive autocorrelation, c) random.
+Would our interpretation be the same if we aggregate the data to four larger areas / districts
+using the average within each of the four districts? We would actually draw very different
+conclusions. It is thus important to keep in mind that spatial dependence is a also a result
+of spatial boundaries and potential higher-level processes generating an outcome (Wong
+2009). If a variable was measured on the district level and we assign those district-level
+measures to the lower neighbourhood level, we will artificially introduce spatial dependence
+/ clustering in our data.
+Given our spatial data, we can use various statistical measures to test whether there is
+spatial dependence. The most common statistic for spatial dependence or autocorrelation is
+Moran’s I, which goes back to Moran (1950) and Cliff & Ord (1972). For more extensive
+materials on Moran’s I, see for instance Kelejian & Piras (2017), Chapter 11. We first define
+a neighbours weights matrix W, and the Global Moran’s I test statistic is calculated as
+I = N
+S0
+P
+i
+P
+j wij(yi −¯y)(yj −¯y)
+P
+i(yi −¯y)2
+, where S0 =
+N
+X
+i=1
+N
+X
+j=1
+wij
+(2)
+In the case of row-standardized weights, S0 = N. Moran’s I measures the correlation
+between neighbouring values: how does my yi correlate with the average yj of my neighbours?
+Negative values indicate negative autocorrelation, values around zero (not zero exactly)
+indicate no autocorrelation, and positive values indicate positive autocorrelation. Moran’s
+I can also be calculated for the residuals from an estimated model (e.g. non-spatial OLS),
+5
+
+which allows to test for remaining autocorrelation after accounting for potential confounders.
+Note that local indicators of spatial autoccorelation (LISA) and clustering – such as local
+Moran’s I or Geary’s C – can be a relevant method of analysis by itself (Anselin 1995,
+Pebesma & Bivand 2023).
+3
+Bias in non-spatial OLS
+So, why should we care about spatial dependence? First, spatial dependence violates
+standard assumptions of common non-spatial estimators. Second, spatial dependence itself
+can provide important information about the social processes that generated the data we
+observe.
+Let us start with a linear model in the non-spatial setting. Here, y is the outcome or
+dependent variable (N × 1), X are various exogenous covariates (N × k), and ε (N × 1) is
+the error term. We are usually interested in an estimate for the k × 1 coefficient vector β.
+y = Xβ + ε
+The work-horse for estimating β in the social science is the OLS estimator (Wooldridge
+2010), which is given by the form:
+ˆβ = (X⊺X)−1X⊺y.
+This OLS estimator hinges on a few assumptions, among them that the underlying sample
+observations are independent and identically distributed (i.i.d). This assumption is often
+violated with spatial data. Another (more important) assumptions is the absence of any
+omitted (residual) variables that are related to Y and X: E(ϵi|Xi) = 0. This assumption is
+violated when our neighbours’ characteristics influence our covariates and our outcome.
+So, does spatial dependence allways induce bias in non-spatial estimators? No, the best
+answer is: it depends (Betz et al. 2020, Cook et al. 2020, Pace & LeSage 2010, Rüttenauer
+2022). The easiest way to think of it is analogous to the well-kown omitted variable bias
+(Betz et al. 2020, Cook et al. 2020):
+plim ˆβOLS = β + γ Cov(x, z)
+Var(x) ,
+where z is some omitted variable, and γ is the conditional effect of z on y. Now imagine
+6
+
+that the neighbouring values of the dependent variable Wy are autocorrelated to the focal
+unit’s outcome. We denote this correlation with ρ > 0. Imagine further that the covariance
+between the focal unit’s exogenous covariate x and my neighbour’s outcome Wy is not zero
+(my covariate affects my neighbours’ outcome). Then we will have an omitted variable bias
+due to spatial dependence:
+plim ˆβOLS = β + ρCov(x, Wy)
+Var(x)
+̸= β,
+4
+Spatial Regression Models
+Spatial regression models do not only overcome the potential bias, they also help us
+to understand the spatial processes happening in the underlying data. Broadly, spatial
+dependence in some characteristics can be the result of three different processes: a) Spatial
+interdependence, b) Clustering in unobservables, and c) Spillovers from covariates. As
+shown in Figure Figure 2, there are three basic ways of incorporating spatial dependence:
+the Spatial Autoregressive Model (SAR) accounts for spatial interdependence, the Spatial
+Error Model (SEM) for clustering on unobservables, and the Spatially lagged X Model
+(SLX) for spillovers from covariates. Moreover, they can be further combined. As before,
+the N × N spatial weights matrix W defines the spatial relationship between units.
+Figure 2: Spatial regression models and their assumptions about spatial dependence.
+4.1
+Spatial Autoregressive Model (SAR)
+The Spatial Autoregressive Model (SAR) model is by far the most prominent spatial
+specification. It assumes spatial interdependence in the outcome Y and incorporates this
+interdependence in the model:
+7
+
+y = αι + ρWy + Xβ + ε
+(3)
+Here, ρ denotes the strength of the spatial correlation in the dependent variable (spatial
+autocorrelation): your outcome influences my outcome (> 0: positive spatial dependence,
+< 0: negative spatial dependence, = 0: traditional OLS model). Given that we have
+normalised the weights matrix, ρ is defined in the range of [−1, +1].
+4.2
+Spatial Error Model (SEM)
+A second, also very common spatial model is the Spatial Error Model (SEM). It assumes
+Clustering on unobservables, and thus models spatial interdependence in the error term:
+y = αι + Xβ + u,
+u = λWu + ε
+(4)
+In this case, λ denotes the strength of the spatial correlation in the errors of the model: your
+error influences my errors (> 0: positive error dependence, < 0: negative error dependence,
+= 0: traditional OLS model). Again, λ is defined in the range of [−1, +1].
+4.3
+Spatially lagged X Model (SLX)
+A third spatial model is called Spatially lagged X Model (SLX). It assumes spillovers in the
+covariates. It specifies a relationship between the covariate values of neighbours and the
+outcome of the focal unit:
+y = αι + Xβ + WXθ + ε
+(5)
+In the SLX, θ denotes the strength of the spatial spillover effects from covariate(s) on the
+dependent variable: your covariates influence my outcome. In contrast to the previous two
+specifications, θ is defined like any other coefficient from a conventional covariate. It is thus
+not bound to any range, and its scale depends on the scale of the covariates in X.
+The dependence structure assumed in SAR and SEM has a circular element (see Figure
+Figure 2). In A SAR model, my outcome influences my neighbours’ outcome, which then
+again influences my outcome. In A SEM model, my error term influences my neighbours’
+error term, which then again influences my error term. This also means that SAR and SEM
+8
+
+models cannot be estimated by conventional OLS estimators, as they would suffer from
+simultaneity bias in the spatial autoregressive term:
+ˆρOLS = ρ +
+h
+(Wy)⊤(Wy)
+i−1 (Wy)⊤ε
+= ρ +
+ n
+X
+i=1
+y2
+Li
+!−1  n
+X
+i=1
+yLiϵi
+!
+,
+(6)
+with yLi defined as the ith element of the spatial lag operator Wy = yL. It can further
+be shown that the second part of the equation ̸= 0, which demonstrates that OLS would
+provide a biased estimate of ρ (Franzese & Hays 2007, Sarrias 2023).
+A potential way of estimating SAR-like models is an instrumental variable ap-
+proach with 2SLS, where the autoregressive term is instrumented by spatial lags of
+H = X, WX, W2X, ..., WlX, (Kelejian & Prucha 1998). SEM-like models can be estimated
+using Generalized Method of Moments (Kelejian & Prucha 1999). However, given the
+improvements in computational power, it is now common to rely on Maximum Likelihood
+estimation of spatial models (Ord 1975, Anselin 1988). They start with some auxiliary
+regression to obtain initial estimates, and then update them in further steps. For more
+details see Bivand & Piras (2015), LeSage & Pace (2009), and Sarrias (2023). The R
+package spatialreg (Bivand & Piras 2015, Bivand et al. 2021, Pebesma & Bivand 2023)
+provides a series of functions to calculate the ML estimators for all spatial models considered
+here.
+Moreover, there are models combining two sets of the above specifications.
+4.4
+Spatial Durbin Model (SDM)
+The spatial Spatial Durbin Model (SDM) integrates spatial interdependence in the outcome
+and spatial spillovers in covariates by combining SAR and SLX:
+y = αι + ρWy + Xβ + WXθ + ε
+(7)
+4.5
+Spatial Durbin Error Model (SDEM)
+The Spatial Durbin Error Model (SDEM) model integrates clustering on unobservables and
+spillovers in covariates by combining SEM and SLX:
+9
+
+y = αι + Xβ + WXθ + u,
+u = λWu + ε
+(8)
+4.6
+Combined Spatial Autocorrelation Model (SAC)
+The Combined Spatial Autocorrelation Model (SAC) assumes spatial interdependence in
+the outcome and clustering on unobservables to be present at the same time. It combines
+SAR and SEM:
+y = αι + ρWy + Xβ + u,
+u = λWu + ε
+(9)
+The SAC specification has demonstrated a rather poor performance in Monte Carlo simula-
+tions (Rüttenauer 2022). Moreover, it has been argued that the SAC specification has severe
+theoretical drawbacks in applied research, and that its popularity (among econometricians)
+mainly stems from the fact that it constitutes an interesting estimation problem (LeSage
+2014).
+4.7
+General Nesting Spatial Model (GNS)
+Finally, the General Nesting Spatial Model (GNS) nests all three processes: spatial interde-
+pendence, clustering on unobservables, and spillovers in covariates. It can be written as a
+full combination of SAR, SEM, and SLX:
+y = αι + ρWy + Xβ + WXθ + u,
+u = λWu + ε
+(10)
+One could be inclined to think that the General Nesting Spatial Model is superior compared
+to the more restricted models with two or one source of spatial dependence. However, in
+practice the GNS is rather useless as an estimation model, as it is only weakly identifiable
+at best (Gibbons & Overman 2012). This is analogous to Manski’s reflection problem on
+neighbourhood effects (Manski 1993): if people in the same group behave similarly, this
+can be because a) imitating behaviour of the group (WY), b) members of the same group
+are exposed to the same external circumstances (Wε), and c) exogenous characteristics
+10
+
+of the group members (WX) influence the behaviour. We just cannot separate those in
+observational data.
+All of the models above assume different data generating processes (DGP) leading to the
+observed spatial pattern. Although there are specifications tests, it is generally not possible
+to let the data decide which one is the true underlying DGP (Cook et al. 2020, Rüttenauer
+2022). There may however be theoretical reasons to guide the model specification (Cook
+et al. 2020). SAR is the most commonly used model, but it is definitely not the best choice
+in many applications. Various studies (Halleck Vega & Elhorst 2015, Rüttenauer 2022,
+Wimpy et al. 2021) highlight the advantages of the relative simple SLX model. Moreover,
+this specification can be incorporated in any other statistical method, such as non-linear
+estimators or machine learning algorithms.
+Note that missing values create a problem in spatial data analysis. For instance, in a local
+spillover model with an average of 10 neighbours, two initial observations with missing
+values will lead to 20 missing values in the spatially lagged variable. For global spillover
+models, one initial observation with missing values is connect to many other observations
+as a higher order neighbour, and thus creates an excess amount of missings. Depending on
+the data, units with missings can either be dropped and omitted from the initial weights
+creation, or we need to impute the data first, e.g. using interpolation or Kriging. Similarly,
+islands (i.e units without neighbours) create problems in the estimation procedure. If this is
+a very small number of observations, they can be dropped. Otherwise, distance or k-nearest
+neighbours may be alternative options for W that circumvent this problem.
+5
+Spatial Impacts
+As shown in Figure Figure 2, models withe a SAR-like process have a feedback loop in the
+outcome: if my x influences my y, this change in my y will influence my neighbour’s y, which
+will influence their neighbours’ y and also my own y again (I am second order neighbour
+of my neighbour). We thus cannot interpret coefficients as marginal or partial effects in
+SAR, SAC, and SDM (Anselin 2003, LeSage & Pace 2009, Kelejian & Piras 2017). This is
+similar to auto-regressive time-series models where we have long-term effects due to a one
+unit change in xit. We thus differentiate between the effects in SAR-like models and those
+in models without an auto-regressive (endogenous) outcome term: while SAR, SAC, and
+SDM assume global spatial dependence, SLX and SDEM assume local spatial dependence
+(Anselin 2003, Halleck Vega & Elhorst 2015, LeSage & Pace 2009).1 Consequently, also
+interpretation of the coefficients differs between models with endogenous feedback loops
+1Note that SEM assumes no spatial effects, as all the spatial dependences comes from nuisance
+11
+
+and those with only local spillovers.
+5.1
+Global spillovers
+To see the meaning of marginal effects in SAR-like models, we have to consider its reduced
+form:
+y = (IN −ρW)−1(Xβ + ε),
+(11)
+where IN is an N × N diagonal matrix (diagonal elements equal 1, 0 otherwise).
+If
+interpreting regression results, we are usually interested in marginal or partial effects (the
+association between a unit change in X and Y ). We obtain these effects by looking at the
+first derivative. When taking the first derivative of the explanatory variable xk from the
+reduced form in (11) to interpret the partial effect of a unit change in variable xk on y, we
+receive
+∂y
+∂xk
+= (IN −ρW)−1
+|
+{z
+}
+N×N
+βk,
+for each covariate k = {1, 2, ..., K}. The partial derivative with respect to xk produces an
+N × N matrix, thereby representing the partial effect of each unit i onto the focal unit
+i itself and all other units j = {1, 2, ..., i −1, i + 1, ..., N}. The N × N dimensional term
+(IN −ρW)−1 is also called spatial multiplier matrix. Intuitively, this multiplier matrix
+equals a power series:2
+(IN −ρW)−1βk = (IN + ρW + ρ2W2 + ρ3W3 + ...)βk = (IN +
+∞
+X
+h=1
+ρhWh)βk,
+(12)
+where the identity matrix contains the direct effects and the sum over ρhWh represents
+the first and higher order indirect effects, including the feedback loops. It implies that a
+change in one unit i does not only affect the direct neighbours but passes through the whole
+system towards higher-order neighbours, where the impact declines with distance within
+the neighbouring system. Global indirect impacts thus are ‘multiplied’ by influencing a)
+2A power series of P∞
+k=0 Wk converges to (I −W)−1 if the maximum absolute eigenvalue of W < 1,
+which is ensured by standardizing W.
+12
+
+direct neighbours as specified in W and b) indirect neighbours not connected according to
+W, with c) additional feedback loops between those neighbours.
+Consider a minimal example with 5 observations, and assume the weights matrix ˜
+W and
+its row-normalised version W look as follows:
+˜
+W =
+
+
+
+
+
+
+
+
+
+
+
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+1
+0
+
+
+
+
+
+
+
+
+
+
+
+, W =
+
+
+
+
+
+
+
+
+
+
+
+0
+0.5
+0
+0.5
+0
+0.33
+0
+0.33
+0
+0.33
+0
+0.5
+0
+0.5
+0
+0.33
+0
+0.33
+0
+0.33
+0
+0.5
+0
+0.5
+0
+
+
+
+
+
+
+
+
+
+
+
+.
+(13)
+Assume that we have relatively strong spatial interdependence with ρ = 0.6. If we want to
+get the total effect of X on Y , we need to combine the direct effects on the diagonal and
+the indirect effects on the off-diagonal.
+IN
+|{z}
+N×N
+−ρW
+|{z}
+N×N
+=
+
+
+
+
+
+
+
+
+
+
+
+1
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+1
+0
+0
+0
+0
+0
+1
+
+
+
+
+
+
+
+
+
+
+
+−
+
+
+
+
+
+
+
+
+
+
+
+0
+0.3
+0
+0.3
+0
+0.2
+0
+0.2
+0
+0.2
+0
+0.3
+0
+0.3
+0
+0.2
+0
+0.2
+0
+0.2
+0
+0.3
+0
+0.3
+0
+
+
+
+
+
+
+
+
+
+
+
+=
+
+
+
+
+
+
+
+
+
+
+
+1
+−0.3
+0
+−0.3
+0
+−0.2
+1
+−0.2
+0
+−0.2
+0
+0.3
+1
+0.3
+0
+−0.2
+0
+−0.2
+1
+−0.2
+0
+−0.3
+0
+−0.3
+1
+
+
+
+
+
+
+
+
+
+
+
+.
+(14)
+Finally, we take the inverse and calculate the spatial multiplier matrix
+(IN −ρW)−1
+|
+{z
+}
+N×N
+=
+
+
+
+
+
+
+
+
+
+
+
+1.1875
+0.46875
+0.1875
+0.46875
+0.1875
+0.3125
+1.28125
+0.3125
+0.28125
+0.3125
+0.1875
+0.46875
+1.1875
+0.46875
+0.1875
+0.3125
+0.28125
+0.3125
+1.28125
+0.3125
+0.1875
+0.46875
+0.1875
+0.46875
+1.1875
+
+
+
+
+
+
+
+
+
+
+
+.
+(15)
+13
+
+The N × N multiplier matrix (IN −ρW)−1 has diagonal elements > 1: these include direct
+effects and also feedback loops, which amplify the direct impact: my x influences my y
+directly, but my y then influences my neighbour’s y, which then influences my y again (and
+other neighbour’s ys). The influence of my x on my y includes a spatial multiplier effect.
+To get the partial effect of a change in x1, we need to multiply the coefficient estimate ˆβ1
+from the SAR model with the spatial multiplier matrix. Assume we have ˆβ1 = 0.1, then the
+partial effect is given by N × N matrix
+∂y
+∂x1
+= (IN −ρW)−1
+|
+{z
+}
+N×N
+ˆβ1 =
+
+
+
+
+
+
+
+
+
+
+
+0.11875
+0.046875
+0.01875
+0.046875
+0.01875
+0.03125
+0.128125
+0.03125
+0.028125
+0.03125
+0.01875
+0.046875
+0.11875
+0.046875
+0.01875
+0.03125
+0.028125
+0.03125
+0.128125
+0.03125
+0.01875
+0.046875
+0.01875
+0.046875
+0.11875
+
+
+
+
+
+
+
+
+
+
+
+= Ω. (16)
+The partial effects matrix Ωcontains the effect of each unit i on itself on the diagonal
+(including feedback loops) and the effect on each other unit j on the off-diagonal. In theory,
+m31 = 0.01875 tells us that a one-unit change of x1 in observation 1 correlates with a 0.01875
+unit change in the outcome of observation 3. The ith row of the matrix Ωrepresent the
+impacts on individual observation i, whereas the jth column contains the impacts from an
+individual observation j (Anselin 2003, LeSage & Pace 2009, LeSage 2014). However, the
+variation across these individual effects depends foremost on the weights matrix W. They
+are not individual estimates, and it is advisable to not interpret these individual effects, but
+rather refer to their summary measures (see below).
+Substantively Interpreting these global spillover effects can be a bit tricky. The global
+spillover effects can be understood as a diffusion process. For example, an exogenous event
+may increase the house prices in one district of a city, thus leading to an adaptation of
+house prices in neighbouring districts, which then leads to further adaptations in other units
+(the neighbours of the neighbours), thereby globally diffusing the effect of the exogenous
+event due to the endogenous lag of y term. Yet, those processes happen over time. In
+a cross-sectional framework, Anselin (2003) proposes an interpretation as an equilibrium
+outcome, where the partial impact represents an estimate of how this long-run equilibrium
+would change due to a change in xk (LeSage 2014).
+14
+
+5.2
+Local spillovers
+In contrast, the spatial spillover effects of SLX and SDEM are local spillover effects. They can
+be interpreted as the effect of a one unit change of xk in the spatially weighted neighbouring
+observations on the dependent variable of the focal unit. It is the effect of the weighted
+average value among neighbours. When using a row-normalised contiguity weights matrix,
+Wxk is the simple mean of xk in the neighbouring units.
+Assume we have k = 2 covariates, then
+W
+|{z}
+N×N
+X
+|{z}
+N×2
+θ
+|{z}
+2×1
+=
+
+
+
+
+
+
+
+
+
+
+
+0
+0.5
+0
+0.5
+0
+0.33
+0
+0.33
+0
+0.33
+0
+0.5
+0
+0.5
+0
+0.33
+0
+0.33
+0
+0.33
+0
+0.5
+0
+0.5
+0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3
+120
+4
+140
+1
+200
+8
+70
+5
+250
+
+
+
+
+
+
+
+
+
+
+
+
+θ1
+θ2
+
+
+=
+
+
+
+
+
+
+
+
+
+
+
+6
+105
+3
+190
+6
+105
+3
+190
+6
+105
+
+
+
+
+
+
+
+
+
+
+
+
+θ1
+θ2
+
+
+(17)
+Only direct neighbours – as defined in W – contribute to those local spillover effects. The
+ˆθ coefficients only estimate how my direct neighbour’s X values influence my own outcome
+y. There are no higher order neighbours involved as long as we do not explicitly specify
+such higher order processes, nor are there any feedback loops due to interdependence.
+In consequence, local and global spillover effects represent two distinct kinds of spatial
+spillover effects (LeSage 2014). The interpretation of local spillover effects is straightforward:
+it is the effect of a change in xj among local neighbours on the outcome of the focal unit yi.
+Global spillover effects are a bit more complicated: it is the effect that a change in one unit
+xj has on the entire system of neighbours, bringing y on a new equilibrium outcome.
+5.3
+Summary measures
+Marginal or partial effects in SAR-like models are given by an N × N matrix of effects.
+However, since reporting the individual partial effects is usually not of interest, LeSage &
+Pace (2009) proposed to average over these effect matrices. While the average diagonal
+elements of the effects matrix (IN −ρW)−1 represent the so called direct impacts of variable
+15
+
+xk, the average column-sums of the off-diagonal elements represent the so called indirect
+impacts (or spatial spillover effects).
+Model
+Direct Impacts
+Indirect Impacts
+type
+OLS/SEM
+βk
+–
+–
+SAR/SAC
+Diagonal elements of
+(I −ρW)−1βk
+Off-diagonal elements of
+(I −ρW)−1βk
+global
+SLX/SDEM
+βk
+θk
+local
+SDM
+Diagonal elements of
+(I −ρW)−1 [βk + Wθk]
+Off-diagonal elements of
+(I −ρW)−1 [βk + Wθk]
+global
+Note that impacts in SAR and SAC are bound to a common ratio between direct and
+indirect impacts. SAR and SAC models only estimate one single spatial multiplier coefficient.
+Thus direct and indirect impacts have a common ratio (say ϕ) across all covariates: if
+βdirect
+1
+= ϕβindirect
+1
+, then βdirect
+2
+= ϕβindirect
+2
+, βdirect
+k
+= ϕβindirect
+k
+. For specifications including
+a lagged version of X, in contrast, we estimate a local spatial effect for each unique covariate,
+plus an additional spatial multiplier in case of an SDM. SLX-like specification are thus much
+more flexible. Usually, impact measures come with simulation based inferential statistics
+(Bivand & Piras 2015).
+6
+Model selection
+Various spatial model specifications can be used to account for the spatial structure of the
+data. Selecting the correct model specification remains a crucial task in applied research.
+There are two empirical strategies for model selection: a specific-to-general or a general-
+to-specific approach (Florax et al. 2003, Mur & Angulo 2009). However, both come with
+severe drawbacks.
+The specific-to-general approach is more common in spatial econometrics. This approach
+starts with the most basic non-spatial model and tests for possible misspecification due to
+omitted autocorrelation in the error term or the dependent variable. Anselin et al. (1996)
+has proposed to use Lagrange multiplier (LM) tests for the hypotheses H0: λ = 0 and
+H0: ρ = 0, which are robust against the alternative source of spatial dependence. The
+specific-to-general approach based on the robust LM test offers a good performance in
+distinguishing between SAR, SEM, and non-spatial OLS (Florax et al. 2003). Still, the test
+disregards the presence of spatial dependence from local spillover effects (θ is assumed to be
+zero), as resulting from an SLX-like process. Cook et al. (2020) show theoretically that an
+16
+
+SLX-like dependence structure leads to the rejection of both hypotheses H0: λ = 0 and H0:
+ρ = 0, although no autocorrelation is present (Elhorst & Halleck Vega 2017, Rüttenauer
+2022).
+The general-to-specific approach follows the opposite direction. It starts with the most
+general model and stepwise imposes restrictions on the parameters of this general model. In
+theory, we would 1) start with a GNS specification and 2) subsequently restrict the model to
+simplified specifications based on the significance of parameters in the GNS (Halleck Vega
+& Elhorst 2015). The problem with this strategy is that the GNS is only weakly identified
+and, thus, is of little help in selecting the correct restrictions (Burridge et al. 2016). The
+most intuitive alternative would be to start with one of the two-source models SDM, SDEM,
+or SAC. This, however, bears the risk of imposing the wrong restriction in the first place
+(Cook et al. 2020). Furthermore, Cook et al. (2020) show that more complicated restrictions
+are necessary to derive all single-source models from SDEM or SAC specifications.
+Some argue that the best way of choosing the appropriate model specification is to exclude
+one or more sources of spatial dependence – autocorrelation in the dependent variable,
+autocorrelation in the disturbances, or spatial spillover effects of the covariates – by design
+(Gibbons & Overman 2012, Gibbons et al. (2015)). Natural experiments would be the
+best way of making one or more sources of spatial dependence unlikely, thereby restricting
+the model alternatives to a subset of all available models. However, the opportunities
+to use natural experiments are restricted in social sciences, making it a favourable but
+often impractical way of model selection. Cook et al. (2020) and Rüttenauer (2022) argue
+that theoretical considerations should guide the model selection. 1) Rule out some sources
+of spatial dependence by theory, and thus restrict the specifications to a subset, and 2)
+theoretical mechanisms may guide the choice of either global or local spillover effects.
+A recent simulation study (Rüttenauer 2022) has shown that SLX, SDM, and SDEM are
+preferable if all sources of dependence may be present. Besides that, the SLX is the most
+simple specification, as it can easily be estimated by OLS. Given that WX is just another
+variable, SLX can easily be combined with non-linear models or other more complicated
+model specifications, such as panel estimators or machine learning algorithms. Similar
+conclusions are supported by Wimpy et al. (2021), and also Jeffrey Wooldridge argued for
+SLX as the only reasonable spatial specification in a Tweet from 2021 called “I will use
+spatial lags of X, not spatial lags of Y” 3.
+3Tweet on using SLX by J. Wooldridge on Twitter: https://twitter.com/jmwooldridge/status/13694605
+26770753537
+17
+
+7
+House prices in London
+As an example to compare the different spatial model specifications, we estimate the effect
+of local characteristics such as green space and public transport connectivity on the median
+house price. The relation between environmental characteristics and housing choice and
+prices has been investigated in several studies (Anselin & Lozano-Gracia 2008, Kley &
+Dovbishchuk 2021, Liebe et al. 2023). The data for the current example was retrieved
+from the London Datastore4, the 2011 Census5 and OpenStreetMaps and combined at the
+Middle Layer Super Output Areas (MSOA). There are 983 MSOAs in London with an
+average population size of around 8,000 residents. The script for compiling and preparing
+the data can be found in the Supplementary Materials. All data preparation and analysis
+were performed with the statistical software R. For a comprehensive overview of spatial
+software see Bivand et al. (2021) or Pebesma & Bivand (2023).
+Figure 3: Spatial distribution of log-transformed median house prices and transport accessi-
+bility across London.
+Figure Figure 3 shows an unclassified choropleth map of house prices and public transport
+access across London, both log-scaled for mapping. As we would expect, both indicators
+follow a relatively strong spatial of positive autocorrelation: house prices first decrease
+with increasing distance to the centre, and then seem to increase again in suburban areas.
+Moreover, there seems to be a pattern of higher prices towards the west and particularly high
+prices around Hyde Park. Public transport accessibility steadily decreases with distance to
+the city centre. Spatial regression models thus seem to be important here for two reasons:
+a) observations are not independent of each other but follow clear spatial patterns, and
+4For house prices, see: https://data.london.gov.uk/dataset/average-house-prices. For London
+accessibility scores see: https://data.london.gov.uk/dataset/public-transport-accessibility-levels
+5For UK demographics, see: https://www.nomisweb.co.uk/sources/census_2011
+18
+
+Table 2: Spatial regression models. Outcome variable: median house price.
+OLS
+SAR
+SEM
+SLX
+SDM
+SDEM
+(Intercept)
+0.000
+−0.012
+0.022
+0.007
+0.002
+0.007
+(0.027)
+(0.017)
+(0.139)
+(0.024)
+(0.015)
+(0.103)
+Green space
+0.204∗∗∗
+0.133∗∗∗
+0.100∗∗∗
+0.136∗∗∗
+0.106∗∗∗
+0.111∗∗∗
+(0.029)
+(0.018)
+(0.015)
+(0.026)
+(0.016)
+(0.020)
+Public transport access
+0.366∗∗∗
+0.097∗∗∗
+−0.054
+−0.152∗∗
+−0.100∗∗
+−0.042
+(0.033)
+(0.021)
+(0.033)
+(0.054)
+(0.034)
+(0.033)
+Population density
+0.189∗∗∗
+0.055∗
+−0.094∗∗∗
+−0.112∗
+−0.111∗∗∗
+−0.099∗∗∗
+(0.037)
+(0.023)
+(0.027)
+(0.044)
+(0.028)
+(0.029)
+Percent non-UK
+−0.033
+−0.050∗
+−0.250∗∗∗
+−0.235∗∗∗
+−0.262∗∗∗
+−0.232∗∗∗
+(0.033)
+(0.020)
+(0.033)
+(0.053)
+(0.033)
+(0.032)
+Percent social housing
+−0.402∗∗∗
+−0.202∗∗∗
+−0.260∗∗∗
+−0.306∗∗∗
+−0.266∗∗∗
+−0.282∗∗∗
+(0.032)
+(0.020)
+(0.022)
+(0.035)
+(0.022)
+(0.024)
+W Green space
+0.249∗∗∗
+−0.029
+0.050
+(0.040)
+(0.026)
+(0.043)
+W Public transport access
+0.696∗∗∗
+0.239∗∗∗
+0.273∗∗∗
+(0.069)
+(0.045)
+(0.073)
+W Population density
+0.455∗∗∗
+0.136∗∗∗
+−0.043
+(0.065)
+(0.041)
+(0.075)
+W Percent non-UK
+0.304∗∗∗
+0.300∗∗∗
+0.242∗∗∗
+(0.066)
+(0.042)
+(0.070)
+W Percent social housing
+−0.352∗∗∗
+0.119∗∗∗
+−0.135∗
+(0.053)
+(0.035)
+(0.063)
+Num. obs.
+983
+983
+983
+983
+983
+983
+R2
+0.263
+0.439
+Adj. R2
+0.259
+0.433
+LR test: statistic
+789.480
+934.291
+732.684
+695.097
+LR test: p-value
+0.000
+0.000
+0.000
+0.000
+AIC
+2502.492
+1715.012
+1570.201
+2244.135
+1513.451
+1551.038
+∗∗∗p < 0.001; ∗∗p < 0.01; ∗p < 0.05
+b) surrounding / adjacent urban characteristics likely play a role for housing demand and
+prices in the focal unit as well.
+In Table 1, we regress the median house price in 2011 on the area (in kmˆ2) covered by
+green space according to OpenStreetMaps, an index of public transport access (ranging from
+0-low accessibility to 100-high accessibility), and several population characteristics from the
+2011 census such as population density, the percent of non-UK residents and the percent of
+social housing. Reported are results form (1) non-spatial OLS, (2) Spatial Autoregressive
+(SAR), (3) Spatial Error Model (SEM), (4) Spatial Lag of X (SLX), (5) Spatial Durbin
+Model (SDM), (6) and Spatial Durbin Error Model (SDEM). All variables were standardized
+before estimation, and we thus interpret coefficients in standard deviations. Note that we
+do not estimate results for Spatial Autoregressive Combined (SAC) models because of its
+severe drawbacks for applied research (LeSage 2014).
+Compared to results from conventional non-spatial models, Table 1 comes with several
+additions: First, variables starting with a “W” (or “lag”) indicate the spatially lagged
+variable or in the case of row-normalized weights matrices the average value of the respective
+variable across the local neighbours. Moreover, there are two auto-regressive parameters:
+“rho” for the estimated auto-correlation in the dependent variable and “lambda” for the
+estimated auto-correlation in the error term. In case of the SAR, a highly significant ˆρ
+19
+
+coefficient of 0.786 indicates strong positive spatial auto-correlation in the median house
+price: the house price in adjacent areas positively impacts the focal house prices. A ˆλ of
+0.89 in the SEM however indicates that there is very strong spatial auto-correlation among
+the (remaining) error variance. The likelihood ratio test in the goodness-of-fit statistics are
+highly significant in both cases, rejecting the NULL of no spatial auto-correlation.
+Given the strong positive auto-correlation in the dependent variable in SAR and SDM,
+we cannot directly interpret the coefficients as marginal effects. Similar to auto-regressive
+temporal models, we need to account for the spatial multiplier effect. For SEM, SLX and
+SDEM, we could directly interpret the coefficients of Table 1. However, we plot the impacts
+of all five models in Figure Figure 4 for reasons of comparison. Note that SEM only has
+direct and no indirect impacts.
+Figure 4: Direct and indirect impacts from spatial regression models. Dependent variable:
+mean house prices. All vairables are standardised.
+We start with the results of the SAR model in Figure Figure 4. A one standard-deviation
+increase of green space in the focal unit is associated with a 0.161 standard deviation increase
+in house prices within the same spatial unit. However, there are also highly significant
+20
+
+diffusion processes. This increase in green space in the focal unit will also increase house
+prices in neighbouring units and the neighbours of these neighbours. This indirect impact
+will add up to a 0.458 standard deviation increase in house prices across neighbouring units
+connected through the spatial weights system. Similarly, an increase in public transport
+accessibility is associated with a 0.118 standard-deviation higher median house price in the
+unit itself and an additional 0.334 deviation increase diffusing though the neighbouring
+regions. Note that direct and indirect effects are bound to a common ration, as SAR
+only estimates one single spatial parameter ˆρ. In our case, every indirect impact equals
+approximately 2.83 times the direct impact. This is a very restrictive conditions and a
+severe drawback of the SAR model.
+The SLX - similar to SAR - estimates a positive impact of green space in the focal and also in
+adjacent neighbourhoods on house prices in the focal unit. A one standard deviation in the
+focal unit is associated with 0.136 standard-deviations higher house price in the focal unit.
+If green spaces in adjacent neighbourhoods increase on average by one standard deviation,
+this would increase house prices in the focal unit by 0.249 standard deviations. Note that
+the SLX tells a different story about the effect of public transport access than SAR: there
+is a negative direct and a very strong and positive indirect effect. A one standard deviation
+increase in public transport access in the focal unit is associated with -0.152 standard
+deviations lower house prices. In contrast, more public transport in the local surrounding
+(the average neighbours) is associated with 0.696 standard deviations higher prices. This is
+in line with the idea that public transport facilities are usually not particularly attractive:
+it is good to have them close but not too close. The same is true for population density: it
+is good to live in a broader area with high population density as indicated by the indirect
+impacts (likely indicating high centrality), but the local neighbourhood should have a low
+population density as indicated by the negative direct impact.
+We could go further with the other models. However, interpretation in SDM follows the
+same logic as SAR, and interpretation in SDEM aligns to SLX. Interpretation in SEM is
+analogous to non-spatial OLS, as there are no indirect impacts. Moreover, it is important to
+keep in mind that the indirect impacts are summary measures which sum over all impacts
+from or onto neighbouring regions. The indirect public transport effect of 0.696 in SLX
+would occur if the average public transport access across neighbours would increase by one
+standard deviation. This only occurs if all neighbours would simultaneously increase public
+transport access by one standard deviation.
+21
+
+8
+Conclusions
+Interest in spatial research topics has witnessed a surge within the social sciences, and it is
+paralleled by the increasing availability of geo-referenced data. This growing availability
+carries immense potential for delving into the analysis of spatial phenomena, such as
+spillovers and diffusions. However, it also presents challenges for statistical estimators.
+Notably, utilizing non-spatial techniques with spatial data results in the loss of valuable
+information. This chapter offers an extensive overview of common spatial econometrics
+models that permit the explicit testing of spatial relationships. For those keen on exploring
+spatial panel data, consider the works of Elhorst (2014) and Cook et al. (2023). Meanwhile,
+those intrigued by non-linear spatial models should delve into LeSage & Pace (2009) and
+Franzese et al. (2016).
+In the regression framework of this chapter, spatial dependence can be integrated as three
+distinct processes: a) Spatial interdependence in the outcome, b) Clustering of unobservable
+factors, and c) Spillovers originating from covariates. In any practical application, it is
+crucial to first contemplate potential theoretical underpinnings for spatial dependence. In
+the case outlined above, it is plausible to anticipate dependence in the outcome, as house
+prices in adjacent neighbourhoods directly influence prices in the focal units, given that
+agents or home-owners rely on price information from surrounding areas. Clustering of
+unobservable factors is also evident; attributes like distance to the city centre or housing
+age are spatially clustered and likely exert an influence on house prices and other covariates,
+potentially causing an omitted variable bias. Moreover, there are likely spillover effects from
+the covariates, where factors like parks, population density, and public transport access in
+surrounding neighbourhoods have a direct impact across neighbourhood borders. Thus, all
+the models discussed here are theoretically plausible.
+The choice of the correct model specification is often arbitrary, especially in cases like house
+price modelling. It is advisable to steer clear of the Spatial Autoregressive (SAR) and
+Autoregressive Conditional (SAC) models, as they come with drawbacks in applied research
+as highlighted by LeSage (2014) and Rüttenauer (2022). Models with only one estimated
+spatial parameter across all covariates, like SAR and SAC, impose heavy restrictions on
+indirect impacts, potentially leading to biased estimates when multiple covariates are
+involved. Consequently, it is generally sensible to consider more flexible specifications such
+as SLX, Spatial Durbin Model (SDM), and Spatial Durbin Error Model (SDEM). In our
+example above, the conclusions derived from SLX, SDM, and SDEM are fairly consistent,
+with SDEM being the most conservative regarding indirect spatial impacts. This aligns with
+the model’s accounting for spatial clustering among errors, which encompasses potential
+22
+
+confounders. For instance, the indirect impact of population density diminishes significantly
+when controlling for the distance to the city center, explaining why the indirect positive
+effect of population density vanishes in SDEM—it is largely confounded by distance to the
+city center. Note that controlling for the distance to the city center would already account
+for some proportion of the auto-correlation.
+The Spatial Lag Model (SLX) stands out for several reasons: 1) It is straightforward in
+its simplicity; 2) Estimation can be performed using least squares; 3) It can be seamlessly
+integrated into panel data models, non-linear models, and machine learning techniques,
+treating WX as just another set of covariates; 4) SLX can be globalised by incorporating
+higher-order neighbours such as W2X and so forth, allowing for a broader assessment of
+spatial impacts.
+A topic deserving more attention is the necessity for spatial econometric models when
+working with individual-level survey data merged with geographic context information. Do
+we need to account for spatial structure when adding neighbourhood information to survey
+data? A common approach involves multi-level models, which address error dependence.
+However, this approach assumes that units living very close to each other but separated
+by an arbitrary spatial border are independent —- a strong assumption. An alternative
+approach is a spatial error model, which accommodates spatially clustered errors. For
+instance, Diekmann et al. (2023) presents a compelling example in the field of environmental
+inequality, where error models seem more plausible since it is unlikely that randomly
+sampled survey respondents directly influence each other (as assumed in SLX and SAR),
+but very likely that neighbouring respondents are exposed to similar unobservable factors.
+Nevertheless, one may still wish to investigate the influence of context effects and their
+spatial patterns. In such cases, SLX-like specifications for the context appear reasonable, as
+demonstrated by Haußmann & Rüttenauer (2023), who employed spatial SLX specifications
+to explore the impact of regional deprivation on right-wing votes at various spatial scales.
+For further exploration in spatial data analysis, I recommend Pebesma & Bivand (2023)
+as an open-science book on Spatial Data Science, offering a comprehensive overview of
+handling and processing spatial data. LeSage & Pace (2009) and Kelejian & Piras (2017)
+provide comprehensive introductions to spatial econometrics, complete with the necessary
+mathematical foundations. Ward & Gleditsch (2008) offers an intuitive introduction to
+spatial regression models, while Elhorst (2012), Halleck Vega & Elhorst (2015), LeSage
+(2014), and Rüttenauer (2022) present article-length introductions to spatial econometrics.
+23
+
+References
+Anselin, L. (1988), Spatial Econometrics: Methods and Models, Studies in Operational
+Regional Science, Kluwer, Dordrecht.
+Anselin, L. (1995), ‘Local Indicators of Spatial Association-LISA’, Geographical Analysis
+27(2), 93–115.
+Anselin, L. (2003), ‘Spatial Externalities, Spatial Multipliers, and Spatial Econometrics’,
+International Regional Science Review 26(2), 153–166.
+Anselin, L., Bera, A. K., Florax, R. & Yoon, M. J. (1996), ‘Simple Diagnostic Tests for
+Spatial Dependence’, Regional Science and Urban Economics 26(1), 77–104.
+Anselin, L. & Lozano-Gracia, N. (2008), ‘Errors in Variables and Spatial Effects in Hedonic
+House Price Models of Ambient Air Quality’, Empirical Economics 34(1), 5–34.
+Betz, T., Cook, S. J. & Hollenbach, F. M. (2020), ‘Spatial interdependence and instrumental
+variable models’, Political Science Research and Methods 8(4), 646–661.
+Bivand, R. (2022), ‘R Packages for Analyzing Spatial Data: A Comparative Case Study
+with Areal Data’, Geographical Analysis 54(3), 488–518.
+Bivand, R., Millo, G. & Piras, G. (2021), ‘A Review of Software for Spatial Econometrics in
+R’, Mathematics 9(11), 1276.
+Bivand, R. & Piras, G. (2015), ‘Comparing Implementations of Estimation Methods for
+Spatial Econometrics’, Journal of Statistical Software 63(18), 1–36.
+Boillat, S., Ceddia, M. G. & Bottazzi, P. (2022), ‘The role of protected areas and land tenure
+regimes on forest loss in Bolivia: Accounting for spatial spillovers’, Global Environmental
+Change 76, 102571.
+Burridge, P., Elhorst, J. P. & Zigova, K. (2016), Group Interaction in Research and the
+Use of General Nesting Spatial Models, in B. H. Baltagi, J. P. LeSage & R. K. Pace,
+eds, ‘Spatial Econometrics: Qualitative and Limited Dependent Variables’, Vol. 37 of
+Advances in Econometrics, Emerald Group Publishing Limited, pp. 223–258.
+Cliff, A. & Ord, K. (1972), ‘Testing for Spatial Autocorrelation Among Regression Residuals’,
+Geographical Analysis 4(3), 267–284.
+Cook, S. J., Hays, J. C. & Franzese, R. J. (2020), Model Specification and Spatial Interde-
+pendence, in L. Curini & R. Franzese, eds, ‘The Sage Handbook of Research Methods in
+Political Science and International Relations’, 1st ed edn, SAGE Inc, Thousand Oaks,
+pp. 730–747.
+24
+
+Cook, S. J., Hays, J. C. & Franzese, R. J. (2023), ‘STADL Up! The Spatiotemporal
+Autoregressive Distributed Lag Model for TSCS Data Analysis’, American Political
+Science Review 117(1), 59–79.
+Diekmann, A., Bruderer Enzler, H., Hartmann, J., Kurz, K., Liebe, U. & Preisendörfer,
+P. (2023), ‘Environmental Inequality in Four European Cities: A Study Combining
+Household Survey and Geo-Referenced Data’, European Sociological Review 39(1), 44–66.
+Elhorst, J. P. (2012), ‘Dynamic spatial panels: Models, methods, and inferences’, Journal
+of Geographical Systems 14(1), 5–28.
+Elhorst, J. P. (2014), Spatial Econometrics: From Cross-Sectional Data to Spatial Panels,
+SpringerBriefs in Regional Science, Springer, Berlin and Heidelberg.
+Elhorst, J. P. & Halleck Vega, S. (2017), ‘The SLX Model: Extensions and the Sensitivity
+of Spatial Spillovers to W’, Papeles de Economía Española 152, 34–50.
+Florax, R., Folmer, H. & Rey, S. J. (2003), ‘Specification Searches in Spatial Economet-
+rics: The Relevance of Hendry’s Methodology’, Regional Science and Urban Economics
+33(5), 557–579.
+Fransham, M. (2020), ‘Neighbourhood gentrification, displacement, and poverty dynamics
+in post–recession England’, Population, Space and Place 26(5), 255.
+Franzese, R. J. & Hays, J. C. (2007), ‘Spatial Econometric Models of Cross-Sectional
+Interdependence in Political Science Panel and Time-Series-Cross-Section Data’, Political
+Analysis 15(2), 140–164.
+Franzese, R. J., Hays, J. C. & Cook, S. J. (2016), ‘Spatial- and Spatiotemporal-Autoregressive
+Probit Models of Interdependent Binary Outcomes’, Political Science Research and
+Methods 4(01), 151–173.
+Gibbons, S. & Overman, H. G. (2012), ‘Mostly Pointless Spatial Econometrics?’, Journal
+of Regional Science 52(2), 172–191.
+Gibbons, S., Overman, H. G. & Patacchini, E. (2015), Spatial Methods, in G. Duranton,
+J. V. Henderson & W. C. Strange, eds, ‘Handbook of Regional and Urban Economics’,
+Vol. 5, Elsevier, Amsterdam, pp. 115–168.
+Halleck Vega, S. & Elhorst, J. P. (2015), ‘The SLX Model’, Journal of Regional Science
+55(3), 339–363.
+Haußmann, C. & Rüttenauer, T. (2023), ‘Material deprivation and the Brexit referendum:
+25
+
+A spatial multilevel analysis of the interplay between individual and regional deprivation’,
+European Sociological Review p. jcad057.
+Hoffmann, R., Muttarak, R., Peisker, J. & Stanig, P. (2022), ‘Climate change experi-
+ences raise environmental concerns and promote Green voting’, Nature Climate Change
+12(2), 148–155.
+Jünger, S. (2022), ‘Land use disadvantages in Germany: A matter of ethnic income
+inequalities?’, Urban Studies 59(9), 1819–1836.
+Kelejian, H. H. & Piras, G. (2017), Spatial Econometrics, Elsevier.
+Kelejian, H. H. & Prucha, I. R. (1998), ‘A Generalized Spatial Two-Stage Least Squares Pro-
+cedure for Estimating a Spatial Autoregressive Model with Autoregressive Disturbances’,
+The Journal of Real Estate Finance and Economics 17(1), 99–121.
+Kelejian, H. H. & Prucha, I. R. (1999), ‘A Generalized Moments Estimator for the Autore-
+gressive Parameter in a Spatial Model’, International Economic Review 40(2), 509–533.
+Kley, S. & Dovbishchuk, T. (2021), ‘How a Lack of Green in the Residential Environment
+Lowers the Life Satisfaction of City Dwellers and Increases Their Willingness to Relocate’,
+Sustainability 13(7), 3984.
+LeSage, J. P. (2014), ‘What Regional Scientists Need to Know about Spatial Econometrics’,
+The Review of Regional Studies 44(1), 13–32.
+LeSage, J. P. & Pace, R. K. (2009), Introduction to Spatial Econometrics, Statistics,
+Textbooks and Monographs, CRC Press, Boca Raton.
+LeSage, J. P. & Pace, R. K. (2014), ‘The Biggest Myth in Spatial Econometrics’, Econo-
+metrics 2(4), 217–249.
+Liao, Y., Gil, J., Pereira, R. H. M., Yeh, S. & Verendel, V. (2020), ‘Disparities in travel
+times between car and transit: Spatiotemporal patterns in cities’, Scientific Reports
+10(1), 4056.
+Liebe, U., van Cranenburgh, S. & Chorus, C. (2023), ‘Maximizing Utility or Avoiding Losses?
+Uncovering Decision Rule-Heterogeneity in Sociological Research with an Application to
+Neighbourhood Choice’, Sociological Methods & Research p. 00491241231186657.
+Manski, C. F. (1993), ‘Identification of endogenous social effects: The reflection problem’,
+The Review of Economic Studies 60(3), 531–542.
+Martén, L., Hainmueller, J. & Hangartner, D. (2019), ‘Ethnic Networks Can Foster the
+26
+
+Economic Integration of Refugees’, Proceedings of the National Academy of Sciences of
+the United States of America 116(33), 16280–16285.
+Moran, P. A. P. (1950), ‘Notes on Continuous Stochastic Phenomena’, Biometrika
+37(1/2), 17.
+Moreno-Monroy, A. I., Lovelace, R. & Ramos, F. R. (2018), ‘Public transport and school
+location impacts on educational inequalities: Insights from São Paulo’, Journal of
+Transport Geography 67, 110–118.
+Mur, J. & Angulo, A. (2009), ‘Model Selection Strategies in a Spatial Setting: Some
+Additional Results’, Regional Science and Urban Economics 39(2), 200–213.
+Neumayer, E. & Plümper, T. (2016), ‘W’, Political Science Research and Methods 4(01), 175–
+193.
+Nisic, N. (2017), ‘Smaller Differences in Bigger Cities? Assessing the Regional Dimension of
+the Gender Wage Gap’, European Sociological Review 33(2), 292–3044.
+Ogunbode, C. A., Demski, C., Capstick, S. B. & Sposato, R. G. (2019), ‘Attribution matters:
+Revisiting the link between extreme weather experience and climate change mitigation
+responses’, Global Environmental Change 54, 31–39.
+Ord, J. K. (1975), ‘Estimation Methods for Models of Spatial Interaction’, Journal of the
+American Statistical Association 70(349), 120–126.
+Pace, R. K. & LeSage, J. P. (2010), Omitted Variable Biases of OLS and Spatial Lag Models,
+in A. Páez, J. Gallo, R. N. Buliung & S. Dall’erba, eds, ‘Progress in Spatial Analysis’,
+Springer, Berlin and Heidelberg, pp. 17–28.
+Pebesma, E. & Bivand, R. (2023), Spatial Data Science: With Applications in R, first edn,
+Chapman and Hall/CRC, Boca Raton.
+Roberto, E. (2018), ‘The Spatial Proximity and Connectivity Method for Measuring and
+Analyzing Residential Segregation’, Sociological Methodology 48(1), 182–224.
+Rüttenauer, T. (2018), ‘Neighbours Matter: A Nation-wide Small-area Assessment of
+Environmental Inequality in Germany’, Social Science Research 70, 198–211.
+Rüttenauer, T. (2022), ‘Spatial Regression Models: A Systematic Comparison of Different
+Model Specifications Using Monte Carlo Experiments’, Sociological Methods & Research
+51(2), 728–759.
+Rüttenauer, T. (2023), ‘More Talk, No Action?
+The Effect of Exposure to Extreme
+27
+
+Weather Events on Climate Change Concern and Pro-Environmental Behaviour’, European
+Societies Forthcoming.
+Sarrias, M. (2023), Intermediate Spatial Econometrics with Applications in R.
+Tobler, W. R. (1970), ‘A Computer Movie Simulating Urban Growth in the Detroit Region’,
+Economic Geography 46, 234–240.
+Tóth, G., Wachs, J., Di Clemente, R., Jakobi, Á., Ságvári, B., Kertész, J. & Lengyel,
+B. (2021), ‘Inequality is rising where social network segregation interacts with urban
+topology’, Nature communications 12(1), 1143.
+Ward, M. D. & Gleditsch, K. S. (2008), Spatial Regression Models, Vol. 155 of Quantitative
+Applications in the Social Sciences, Sage, Thousand Oaks.
+Wiedner, J., Schaeffer, M. & Carol, S. (2022), ‘Ethno-religious neighbourhood infrastructures
+and the life satisfaction of immigrants and their descendants in Germany’, Urban Studies
+p. 004209802110664.
+Wimpy, C., Whitten, G. D. & Williams, L. K. (2021), ‘X Marks the Spot: Unlocking the
+Treasure of Spatial-X Models’, The Journal of Politics 83(2), 722–739.
+Wong, D. (2009), The Modifiable Areal Unit Problem (MAUP), in A. S. Fotheringham
+& P. Rogerson, eds, ‘The Sage Handbook of Spatial Analysis’, Sage, Los Angeles and
+London, pp. 105–124.
+Wooldridge, J. M. (2010), Econometric Analysis of Cross Section and Panel Data, MIT
+Press, Cambridge, Mass.
+Zapatka, K. & Beck, B. (2021), ‘Does demand lead supply? Gentrifiers and developers in the
+sequence of gentrification, New York City 2009–2016’, Urban Studies 58(11), 2348–2368.
+Zoch, G. (2021), ‘Thirty Years after the Fall of the Berlin Wall—Do East and West Germans
+Still Differ in Their Attitudes to Female Employment and the Division of Housework?’,
+European Sociological Review 37(5), 731–750.
+28

@@ -1,0 +1,3179 @@
+KubeAdaptor: A Docking Framework for Workﬂow Containerization
+on Kubernetes
+Chenggang Shana,b, Guan Wanga,c, Yuanqing Xiaa, Yufeng Zhana and Jinhui Zhanga,∗
+aSchool of Automation, Beijing Institute of Technology, Beijing 100081, China
+bSchool of Artiﬁcial Intelligence, Zaozhuang University, Zaozhuang 277100, China
+cSchool of Information Science and Engineering, Zaozhuang University, Zaozhuang 277100, China
+A R T I C L E I N F O
+Keywords:
+Workﬂow System
+Containerization
+Task Scheduling
+Event Trigger
+Kubernetes
+A B S T R A C T
+As Kubernetes becomes the infrastructure of the cloud-native era, the integration of workﬂow systems
+with Kubernetes is gaining more and more popularity. To our knowledge, workﬂow systems employ
+scheduling algorithms that optimize task execution order of workﬂow to improve performance and
+execution eﬃciency. However, due to its inherent scheduling mechanism, Kubernetes does not execute
+containerized scheduling following the optimized task execution order of workﬂow amid migrating
+workﬂow systems to the Kubernetes platform. This inconsistency in task scheduling order seriously
+degrades the eﬃciency of workﬂow execution and brings numerous challenges to the containerized
+process of workﬂow systems on Kubernetes. In this paper, we propose a cloud-native workﬂow engine,
+also known as KubeAdaptor, a docking framework able to implement workﬂow containerization on
+Kubernetes, integrate workﬂow systems with Kubernetes, ensuring the consistency of task scheduling
+order. We introduce the design and architecture of the KubeAdaptor, elaborate the functionality
+implementation and the event-trigger mechanism within the KubeAdaptor. Experimental results about
+four real-world workﬂows show that the KubeAdaptor ensures the consistency of the workﬂow
+systems and Kubernetes in the task scheduling order. Compared with the baseline Argo workﬂow
+engine, the KubeAdaptor achieves better performance in terms of the average execution time of task
+pod, average workﬂow lifecycle, and resource usage rate.
+1. Introduction
+Cloud-native is considered the next future of cloud com-
+puting. Its presence has accelerated the technological rev-
+olution in the ﬁeld of cloud computing [1]. As Kuber-
+netes continues to win out in the container orchestration
+framework, the whole industry is embracing Kubernetes.
+The cloud-native technologies represented by containers,
+micro-services, DevOps (Development and Operations), and
+Kubernetes (K8s) reconstruct the IT operation, maintenance,
+and development mode, and also bring new opportunities for
+the rapid development of all industries in the cloud era [2].
+Presently, container technology and K8s have become main-
+stream tools for cloud resource management [3] and domi-
+nated the whole cloud-native technology ecosystem.
+Containers solve the problems of dependence and the op-
+erating environment’s compatibility for software and provide
+a lightweight software packaging and distribution mecha-
+nism suitable for most cloud computing platforms [4]. As an
+excellent container orchestrator, the ﬁrst hosted project by
+Cloud Native Computing Foundation (CNCF) [5], K8s [6]
+has become the de-facto standard container orchestration
+system. Nowadays, most production practice environments
+have migrated to the K8s platform with the prevalence of
+cloud-native technology. K8s and containers have become
+established standards for all cloud vendors, and the idea of
+cloud-based software development gradually takes shape.
+∗Corresponding author
+uzz_scg@163.com (C. Shan); netspecters@126.com (G. Wang);
+xia_yuanqing@bit.edu.cn (Y. Xia); yu-feng.zhan@bit.edu.cn (Y. Zhan);
+zhangjinh@bit.edu.cn (J. Zhang)
+ORCID(s):
+Traditional IT applications are speeding up the transition
+to cloud-native, and workﬂow system is no exception. Con-
+tainer technology and K8s provide a ﬂexible mechanism for
+containerized execution of workﬂow systems [7].
+Workﬂow systems often employ scheduling algorithms
+that optimize task execution order in a workﬂow to improve
+performance and execution eﬃciency [8]. Correspondingly,
+workﬂow scheduling algorithms implement workﬂow schedul-
+ing by adopting the optimal mapping method of tasks
+and resources. The cloud workﬂow instance obtains the
+mapping sequence of tasks and resources through scheduling
+algorithms, allocates the resources in the cloud to the work-
+ﬂow tasks, and ﬁnally completes the workﬂow execution
+process. Workﬂow scheduling algorithms are core compo-
+nents of workﬂow systems. Recently, some researchers on
+workﬂow scheduling algorithms have focused on heuristic
+methods [9][10], multi-objective optimization [11], deadline
+constraints [12], and other aspects [13, 14, 15], aiming to
+ﬁnd the best match of resources and tasks. However, the
+mapping method of tasks and resources in the workﬂow
+scheduling algorithms aforementioned does not apply to
+the K8s production environment because it ignores the
+inherent scheduler algorithm of the K8s. The integration of
+workﬂow systems and K8s follows a two-level scheduling
+scheme (4.1). It should be noted that the K8s scheduler
+has the characteristics of disordered scheduling, scattered
+scheduling, and unpredictability [16]. These features resist
+workﬂow execution following the optimized task scheduling
+order obtained from the workﬂow scheduling algorithms,
+which fails to extend the eﬃcacy of workﬂow schedul-
+ing algorithms to workﬂow containerized running on K8s
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 1 of 18
+arXiv:2207.01222v1  [cs.DC]  4 Jul 2022
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+and degrades the performance of the two-level scheduling
+scheme.
+Many workﬂow systems are container-based and ap-
+plied in specialized scientiﬁc areas, such as Pagasus [17],
+Galaxy [18], Taverna [19], BioDepot [20], Nextﬂow [21],
+Pachyderm [22], Luigi [23], SciPipe [24], Kubeﬂow [25] and
+Argo workﬂows engine (Argo) [26]. Most of them require
+the existence of the K8s cluster in cloud environments [7],
+which increases the research costs to some extent and limits
+the enthusiasm of researchers [27]. It would be more con-
+venient for researchers to have a docking framework that
+could shield from the underlying K8s environment, go out
+of the box and allow users to run workﬂows in an engine-
+agnostic way. So far, there is little work done in combin-
+ing the workﬂow scheduling algorithms and K8s scheduler
+algorithm, and there is a lack of a docking speciﬁcation
+and connection framework between both algorithms [8].
+Furthermore, most works on workﬂow scheduling algo-
+rithms keep silent on workﬂow systems, stay away from
+the production environment, and only care about the sim-
+ulation experiment environment CloudSim. Therefore, we
+require a docking framework that bridges workﬂow systems
+or workﬂow scheduling algorithms to the K8s platform.
+It is meaningful and challenging work. It implements the
+eﬀective fusion between workﬂow scheduling algorithms
+and K8s and enables users to carry out a ﬂexible operation
+in K8s-based workﬂow systems.
+In this paper, we propose KubeAdaptor for workﬂow
+systems on K8s. This docking framework addresses the in-
+consistent task scheduling order between workﬂow schedul-
+ing algorithms and K8s scheduler, enables workﬂows sys-
+tems to be seamlessly migrated to K8s, and implements
+containerization of workﬂows. This framework redesigns the
+container creation functionality, utilizes the Informer com-
+ponent to monitor the underlying resource objects of K8s,
+and implements the logical structure of the whole framework
+using the Client-go package. In addition, this framework
+achieves data sharing between task containers through the
+dynamic volume mechanism of StorageClass. This execution
+link completely integrates the workﬂow systems with the
+K8s scheduler. Experimental results about four real-world
+workﬂows show that our proposed KubeAdaptor achieves
+better performance in average task pod execution time, aver-
+age workﬂow lifecycle, and resource usage rate. Compared
+with the baseline Argo workﬂow engine, KubeAdaptor re-
+duces average task pod execution time by up to 24.45%
+(Montage), 47.57% (Epigenomics), 23.72% (CyberShake),
+and 24.65%( LIGO), average workﬂow lifecycle by up to
+43.44% (Montage), 43.65% (Epigenomics), 44.86% (Cyber-
+Shake) and 48.98% (LIGO), respectively. Our contributions
+are summarized as follows:
+• Design a cloud-native workﬂow engine, which works
+as a docking framework to integrate workﬂow systems
+with K8s. This docking framework implements work-
+ﬂow containerization on K8s platform while ensuring
+the consistency of task scheduling under the two-level
+scheduling scheme (4.1).
+• Implement a workﬂow injection module, the resource
+gathering module for experimental evaluation, and
+an event trigger mechanism. The workﬂow injection
+module is responsible for injecting workﬂow tasks
+into KubeAdaptor. The resource gathering module
+is in charge of monitoring resource ﬂuctuations and
+presents resource usage rates. The event trigger mech-
+anism optimizes the execution eﬃciency of each mod-
+ule within the KubeAdaptor through event invocation.
+• Provide a containerized solution with resource loads
+for workﬂow tasks to run four real-world workﬂow ap-
+plications and present the detailed performance anal-
+ysis of KubeAdaptor compared to other workﬂow
+submission methods.
+The rest of the paper is organized as follows. Section
+2 introduces related work related to the topics in this in-
+troduction. Section 3 presents the motivation, technological
+foundation, and implementation tools. Section 4 elaborates
+the KubeAdaptor design and shows its modular description,
+while section 5 further fulﬁlls the experimental setup and
+evaluates the eﬀectiveness of the KubeAdaptor. Finally, we
+summarize the paper in section 6. We have open-sourced
+the KubeAdaptor. The source code is publicly available on
+GitHub at [28].
+2. Related Work
+As a mainstream container orchestrator in the cloud-
+native era, K8s has won out over Mesos [29] and Docker
+Swarm [30] with ecology and technology advantages, el-
+egantly decoupling application containers from the details
+of the system they run on. Before K8s as a mainstream
+container orchestrator, many researchers have attempted to
+harness container runtime for large-scale scientiﬁc compu-
+tation.
+Pegasus is a workﬂow management system for sci-
+ence automation, with scientiﬁc workﬂow portability and
+platform-agnostic descriptions of workﬂows. Recent work [31]
+incorporates a variety of container technologies in Pegasus
+to be suitable for varied execution environments. Galaxy
+is a data-analysis workﬂow platform that has gained more
+popularity by the development community in Bioinfor-
+matics. Through eﬀorts from the development community,
+Galaxy supports oﬄoading jobs in a variety of systems,
+ranging from Docker containers to other batch scheduler
+systems [32]. Hung et al. [20] develop an open-source
+graphical workﬂow constructor, BioDepot, oriented to the
+ﬁeld of bioinformatics engineering. It uses the Docker
+container to perform modular tasks while building workﬂow
+by dragging and dropping graphically. Nextﬂow is a data-
+driven computational pipeline for bioinformatics research
+developed by Barcelona Center for Genomic Regulation
+(CRG). It has been capable of using Docker and Singularity
+for multi-scale handling of containerized computation [33].
+Airﬂow [34], born in Airbnb and sponsored by Apache
+Incubator, is an open-source and distributed task scheduling
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 2 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+framework based on Python programming. It is responsible
+for scheduling, monitoring, and managing workﬂows in a
+Docker container manner through DAG topology. Based
+on Makeﬂow, a tool for expressing and running scien-
+tiﬁc workﬂows across clustered environments, Albrecht et
+al. [35] implement a batch system interface on Sun Grid
+Engine (SGE) for scientiﬁc workﬂow. Afterward, Zheng et
+al. [36] integrate Docker container runtime into Makeﬂow
+and Work Queue [37] for workﬂow scheduling.
+These workﬂow systems using container technology sig-
+niﬁcantly reduce the overhead of deploying custom com-
+puting environments and enable scientiﬁc workﬂow execu-
+tion with scalability and reproducibility. However, intricate
+task dependencies within the workﬂow, data transmission
+and high concurrency among tasks, and coarse-granularity
+resource requirements, seriously degrade the performance
+of container-based workﬂow systems, resulting in task state
+detection delay, accessing bottleneck of shared data among
+tasks, garbage collection delay, ineﬃcient resource detec-
+tion, as well as poor fault-tolerant of containers [38]. Instead,
+K8s elegantly addresses these issues mentioned above for
+diﬀerent workﬂow systems by its inherent core concepts
+of Service, Pod, Volume, Namespace, and Deployment. These
+concepts and methods make the K8s like a ﬁsh in water in
+terms of scheduling, automatic recovery, horizontal scala-
+bility, resource monitoring, and other aspects and go beyond
+the capabilities of container-based workﬂow systems.
+On a diﬀerent track, some workﬂow engines are con-
+tinuously evolving with the prevalence of K8s. Through
+eﬀorts within the PhenoMeNal H2020 Project [39], Galaxy
+recently has gained the ability to deploy inside K8s via
+Helm Charts [40]. With the help of the K8s community,
+Nextﬂow provides built-in support for K8s, simplifying the
+execution of the K8s cluster containerized workﬂow [21].
+Nextﬂow may deploy the workﬂow execution as a K8s pod
+through the K8s executor. Presently, beneﬁting from the K8s
+ecosystem, the K8s Airﬂow Operator is released still under
+active development [41]. The K8s Airﬂow Operator uses the
+K8s Python client to generate requests to the K8s apiserver
+and requires k8s to ﬁnish a series of operations related to
+workﬂow tasks in commercial clouds. Pachyderm [22] is a
+large-scale data processing tool natively built for running
+workﬂows on Docker and Kubernetes. It has also similarly
+enabled support for Kubernetes like Nextﬂow. Argo [26],
+an open-source project launched by Applatix and hosted
+by CNCF, provides a cloud-native workﬂow for K8s and
+implements each task in the workﬂow as a container. As the
+most popular workﬂow engine for K8s, Argo implements
+workﬂow functions for K8s through CRD (Custom Resource
+Deﬁnition). Kubeﬂow [25], developed by Google, is an-
+other open-source platform for K8s, speciﬁcally dedicated
+to building and running machine learning workﬂows. Kube-
+ﬂow provides a workﬂow tool called Kubeﬂow Pipelines
+based on the Argo workﬂow engine.
+These workﬂow engines always work with containers
+instead of command-line tools and use K8s as the orches-
+tration framework in cloud environments. The integration
+between workﬂow systems and K8s improves the perfor-
+mance and eﬃciency of workﬂow execution, except for
+Pachyderm, Argo, and Kubeﬂow that are K8s-native and
+only support containers as means of processing. To our
+knowledge, apart from specialized techniques and built-in
+tools, the Galaxy, Nextﬂow, Airﬂow are all limited to the
+K8s scheduler and cannot determine the order in which task
+pods run. Additionally, these workﬂow systems require some
+service deployment before running workﬂows, which adds
+operational complexity. For K8s-native workﬂow systems
+like Argo, Pachyderm, and Kubeﬂow, the shortcoming is fre-
+quent access to the K8s cluster, posing excessive accessing
+pressure on the K8s cluster [42]. So we design and develop
+a cloud-native docking framework to eﬃciently implement
+workﬂow containerization. It only requires a few tweaks
+to the conﬁguration ﬁle on deployment, greatly mitigates
+the pressure of accessing K8s apiserver with the help of
+Informer component, and enables users to run workﬂows on
+K8s without mental burden while ensuring the consistency
+of workﬂow scheduling algorithms and K8s scheduler. In
+addition, the Galaxy, Nextﬂow, Airﬂow are not native work-
+ﬂow systems supporting K8s but have just transitioned to the
+K8s and are still working on features. Presently, the Argo is a
+cloud-native workﬂow engine designed for K8s, which has
+evolved into a generalized workﬂow engine. Furthermore,
+the core components of Kubeﬂow workﬂow processing are
+also based on Argo. Therefore, the experimental evaluation
+in this paper is only compared with Argo and the Batch Job
+submission approaches.
+3. Background
+In this section, we describe the motivation behind the
+proposed KubeAdaptor and introduce the technological
+foundation and tools that complement the implementation
+of this work very well.
+3.1. Motivation
+K8s, as you can see on its website, is an industrial-
+grade container orchestration platform. Its core functions
+are scheduling, auto-repair, horizontal scaling, service dis-
+covery, and load balance. A Pod is a minimum scheduling
+and resource unit of K8s. In workﬂow scheduling, tasks
+are encapsulated into pods and scheduled to run by K8s.
+K8s only cares about the scheduling and management of
+task pods rather than the context among task pods, which
+is the original intention of designing K8s. That is to say, the
+scheduling of task pods is doomed to be random scheduling
+and disorderly scheduling. As shown in Figure. 1, task order
+⟨푇1, 푇2, 푇4, 푇3, 푇5, 푇6⟩is the scheduling results of the
+workﬂow scheduling algorithm under the two-level frame-
+work, followed by injection into the K8s cluster. The exe-
+cution order of task pods scheduled by the K8s scheduler
+is ⟨푇2, 푇1, 푇3, 푇4, 푇6, 푇5⟩, which is inconsistent with this
+workﬂow scheduling algorithm, leading to the failure to
+obtain the superior performance of the workﬂow scheduling
+algorithm.
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 3 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+…
+* Scattered scheduling
+* Unpredictability
+* Disorderly scheduling
+Node 1
+conta
+iner
+conta
+iner
+conta
+iner
+Pod
+T1
+T2
+T3
+T4
+Workflow
+T5
+T6
+T1
+T2
+T3
+T4
+Workflow
+T5
+T6
+T1
+T2
+T3
+T4
+Workflow
+T5
+T6
+Workflow scheduling algorithm
+Task order
+T1
+T2
+T4
+T3
+T5
+T6
+Task order
+T1
+T2
+T4
+T3
+T5
+T6
+Task order
+T1
+T2
+T4
+T3
+T5
+T6
+K8s Master
+kube-scheduler
+kube-controller-
+manager
+kube-apiserver
+K8s Master
+kube-scheduler
+kube-controller-
+manager
+kube-apiserver
+K8s Master
+kube-scheduler
+kube-controller-
+manager
+kube-apiserver
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+. . .
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+Node 2
+cont
+ainer
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+. . .
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+Node n
+cont
+ainer
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+. . .
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+K8s cluster
+(1) T2
+(2) T1
+(3) T3 (4) T4
+(5) T6
+(6) T5
+Etcd
+…
+* Scattered scheduling
+* Unpredictability
+* Disorderly scheduling
+Node 1
+conta
+iner
+conta
+iner
+Pod
+T1
+T2
+T3
+T4
+Workflow
+T5
+T6
+T1
+T2
+T3
+T4
+Workflow
+T5
+T6
+Workflow scheduling algorithm
+Task order
+T1
+T2
+T4
+T3
+T5
+T6
+Task order
+T1
+T2
+T4
+T3
+T5
+T6
+K8s Master
+kube-scheduler
+kube-controller-
+manager
+kube-apiserver
+K8s Master
+kube-scheduler
+kube-controller-
+manager
+kube-apiserver
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+. . .
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+Node 2
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+. . .
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+Node n
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+. . .
+cont
+ainer
+cont
+ainer
+Pod
+cont
+ainer
+Pod
+K8s cluster
+(1) T2
+(2) T1
+(3) T3 (4) T4
+(5) T6
+(6) T5
+Etcd
+Figure 1: Task scheduling process graph in workﬂow container-
+ization. The serial numbers from (1) to (6) represent the execu-
+tion order of task pods scheduled by the K8s scheduler, which
+is inconsistent with the scheduling results of the workﬂow
+scheduling algorithm and reﬂects the characteristics of K8s
+scheduler scheduling strategy, such as scattered scheduling,
+disorderly scheduling, and unpredictability.
+From this perspective, the K8s scheduler is unaware
+of the interdependencies among the tasks inside scheduled
+pods [8]. Due to the inconsistency between the task submis-
+sion order and the K8s scheduling order, the K8s scheduler
+becomes an unpredictable and unreliable task scheduling
+method. In addition, as mentioned in (2), the existing popular
+K8s-based workﬂow systems have complex deployment on
+various services and the excessive pressure of accessing K8s
+apiserver incurred by the frequent creation and destruction
+of Pod, Namespace, and PVC, all of which weaken the perfor-
+mance of these workﬂow systems. To enable workﬂow sys-
+tems to integrate the K8s platform smoothly and energize the
+two-level scheduling scheme, the KubeAdaptor is proposed
+to deal with these problems.
+3.2. Technological Foundation and Tools
+In this subsection, we will introduce the technical foun-
+dation and tools. K8s resources related to the KubeAdaptor’s
+implementation include Pod, Service, Namespace, StorageClass,
+etc.
+Scientiﬁc Workﬂow. Workﬂow is an abstraction and au-
+tomation of part or whole of a business process that de-
+ﬁnes tasks with interconnected dependencies and executes
+tasks by leveraging computing resources. A workﬂow, often
+described by a directed acyclic graph (DAG), represents a
+whole business process for user application. Accordingly,
+the dependencies between tasks are similar to the edges in
+a DAG diagram [38][43]. Moreover, the task dependency is
+usually in the form of a shared ﬁle, created by one task and
+consumed by another.
+Workﬂow Containerization. Container technologies, such
+as Docker, a lightweight virtualization solution, encapsu-
+late the workﬂow task running environment and required
+resources into a container [44]. Moreover, the container
+possesses the characteristics of repeatability, reliability, and
+portability. These features allow users to focus on the task
+dependencies rather than the environment in which work-
+ﬂow tasks should run. In addition, containers have limited
+resource requirements, fast spin-up time, and low system
+overhead compared to virtual machines, so more containers
+can be accommodated in the same infrastructure as expected.
+Containers seem to be an ideal carrier for workﬂow tasks.
+These technological advantages of containers further
+foster workﬂow containerization. During the workﬂow con-
+tainerization process, workﬂow tasks are packaged into con-
+tainers through the Docker engine and built in the form of
+an Image ﬁle stored in local Harbor [45] or remote Docker
+Hub repository [46]. The task dependencies are essentially
+data dependencies that share data ﬁles among tasks through
+the storage volume of containers.
+Informer. Informer is the core toolkit in Client-go [47],
+responsible for synchronizing resource objects and events
+between K8s core components and Informer local cache. In
+brief, Informer uses a List-Watch mechanism to watch some
+resources, obtains the changes of these resources from the
+K8s apiserver, handles the changes of resources by the call-
+back function registered by the user, and stores the change
+objects into the local cache persistently. In KubeAdaptor,
+we use the Informer toolkit to create monitoring objects
+podInformer, nodeInformer, and namespaceInformer for the
+Pod, Node, and Namespace, respectively. By watching the state
+changes of the task pod and workﬂow namespace, combined
+with the event trigger mechanism, this framework triggers
+the next task or workﬂow in real-time. The self-synchronized
+function between the local cache and the K8s apiserver
+ensures real-time updates of resource events. Through the
+Informer component, this framework can monitor the un-
+derlying resources of the K8s cluster, relieve the pressure
+of frequent access to the K8s apiserver, and improve its
+performance while ensuring the healthy operation on the
+K8s.
+gRPC. The gRPC is a high-performance open-source Re-
+mote Process Call (RPC) framework that can run in any
+environment. It wraps a service call in a local method,
+allowing the caller to invoke the service as if it were a
+local method, shielding it from implementation details. It
+can be applied in the data center, service scenarios within
+or across K8s clusters, and supports load balance, tracing,
+health checking, and authentication [48]. The gRPC ser-
+vice requires a Protocol Buﬀer deﬁnition composed of a
+binary serialization toolset and language. This toolset can
+help the communication parties create a Proto ﬁle with the
+communication data interface and generate the remote call
+functions required by the communication parties. Using the
+gRPC framework, bi-directional streaming, and integrated
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 4 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+authentication, we can quickly launch and scale to millions
+of RPCs per second. In this paper, We realize the infor-
+mation exchange between KubeAdaptor and the workﬂow
+injection module through gRPC communication. In this way,
+the workﬂows are injected into this framework from the
+workﬂow injection module.
+Kubernetes Resource Objects. With K8s apiserver as
+the core, the user interacts with the K8s system through
+the whole API set to perform CRUD operations on cluster
+resources. End-users can often create, retrieve, update, and
+delete resources from the Kubectl command line or directly
+from the RESTful API. The key K8s resources used in this
+work are as follows:
+• Pod is the atomic scheduling unit of K8s, a logical de-
+ployable unit, and a combination of multiple contain-
+ers or many processes [49]. A pod is also a resource
+unit that deﬁnes how the container operates, such as
+command, environment variables, etc., and provides it
+with a shared operating environment, such as network
+and process space. For simplicity, the container where
+the workﬂow task resided is packed into a pod to
+participate in scheduling.
+• Service is an abstract way to expose an application
+running on a set of pods as a network service. It imple-
+ments service discovery and load balance among K8s
+clusters. In K8s, the Service deploys the backend pods
+through Deployment, and this set of pods captured
+by a Service is usually determined by a selector in a
+deployable Yaml ﬁle. In this paper, the KubeAdaptor
+and the workﬂow injection module are deployed via
+Service. The backend behind Service runs the busi-
+ness pods of both modules, communicating via gRPC.
+• Namespace is a way to divide cluster resources among
+multiple users. It provides scope for a namespace.
+Names of resources need to be unique within a names-
+pace, but not across namespaces. Therefore, each
+workﬂow has its namespace with resource isolation
+in mind. Tasks in the same workﬂow can access
+resources in this workﬂow namespace, not across
+namespaces, which ensures the operational security of
+the workﬂow. The workﬂow containerization process
+in KubeAdaptor ﬁrstly builds a namespace for the
+workﬂow, creates resources attached to this names-
+pace, such as PersistentVolumeClaim (PVC), and then
+generates task pods. The activity domain of all task
+pods for this workﬂow is limited to this namespace.
+• StorageClass works with PVC and external storage
+provisioner to provide dynamic storage for workﬂow
+namespaces. Each StorageClass contains the ﬁelds
+provisioner, parameters, and reclaimPolicy. These
+ﬁelds work when dynamically providing a Persis-
+tentVolume (PV) belonging to the StorageClass. Stor-
+ageClass needs to be deployed in the Master node
+via the Yaml ﬁle in advance. We provide dynamic
+NFS storage StorageClass template through the ﬁeld
+fuseim.pri/ifs and deploy the NFS business mounting
+pod in a Deployment manner. When creating PVC
+in this workﬂow namespace code block, we set the
+ﬁeld storageClassName to the name of StorageClass.
+When creating workﬂow task pods in the code block
+of KubeAdaptor, we set the ﬁeld VolumeSource to the
+PVC’s name. Next, the NFS business mounting pod
+will mount the persistent volume for each task pod
+with the RBAC (Role-Based Access Control) permis-
+sions. In this framework, multiple task pods within the
+same namespace share PV in a dynamic storage way
+through StorageClass and NFS provisioner.
+4. Design
+The main functionality of KubeAdaptor is to create the
+workﬂow namespaces and task pods, as well as the persistent
+storage volumes of pods, monitor the workﬂow namespaces
+and pod states through the Informer package, and trigger
+the following workﬂow or subsequent task in real-time in
+combination with the event trigger mechanism. In this sec-
+tion, we present a two-level scheduling scheme, elaborate
+workﬂow deﬁnition and the architecture of KubeAdaptor,
+and then introduce the workﬂow injection module, fault
+tolerance management, and event trigger mechanism.
+. . .
+Task order
+. . .
+Task order
+. . .
+Task order
+                                 
+KubeAdaptor
+kube-scheduler
+K8s cluster
+Workflow 
+systems
+Workflow scheduling 
+algorithm
+Workflow task pods
+Workflow task pods
+Workflow task pods
+kube-controller-
+manager
+kube-apiserver
+Etcd
+pod
+Command Line Interface (CLI)
+config.yaml
+wf.yaml
+...
+config.yaml
+wf.yaml
+...
+config.yaml
+wf.yaml
+...
+. . .
+Task order
+. . .
+Task order
+                                 
+KubeAdaptor
+kube-scheduler
+K8s cluster
+Workflow 
+systems
+Workflow scheduling 
+algorithm
+Workflow task pods
+Workflow task pods
+kube-controller-
+manager
+kube-apiserver
+Etcd
+pod
+Command Line Interface (CLI)
+config.yaml
+wf.yaml
+...
+config.yaml
+wf.yaml
+...
+Figure 2: Two-level scheduling scheme.
+4.1. Two-level Scheduling Scheme
+The two-level scheduling scheme spans task schedul-
+ing of scheduling algorithms in workﬂow systems and pod
+scheduling of K8s. The integration of workﬂow systems and
+K8s follows the two-level scheduling scheme. As shown in
+Figure. 2, as soon as we deploy systematic conﬁguration ﬁles
+and launch workﬂow systems through the command-line
+interface, the KubeAdaptor works as a logic interface and
+connects workﬂow scheduling algorithms to K8s. The task
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 5 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+scheduling sequence optimized by the workﬂow scheduling
+algorithm is injected into KubeAdaptor by the workﬂow
+injection module (4.4). The KubeAdaptor is responsible for
+ﬁnishing the containerization of injected workﬂow tasks on
+K8s. Meanwhile, the KubeAdaptor also ensures the con-
+sistency of task scheduling execution under the two-level
+scheduling scheme.
+4.2. Workﬂow Deﬁnition
+We use one-key deployment to run the KubeAdaptor
+and the workﬂow injection module to give users a good
+experience. Before deploying the workﬂow injection module
+and KubeAdaptor in containerized manner, we edit work-
+ﬂow deﬁnition and environmental deployment information
+one time via the Yaml ﬁle. ConﬁgMap decouples container
+images from variable conﬁgurations to ensure portability of
+workload pods. Variable conﬁgurations are deﬁned in JSON
+format and describe the data deﬁnition of the workﬂow.
+ConﬁgMap uses the pod’s volume to mount the conﬁgu-
+ration ﬁle to a speciﬁed directory in the container of the
+workﬂow injection module. This module deserializes the
+conﬁguration ﬁle to obtain workﬂow information. Note that
+the ConﬁgMap and the workﬂow injection module container
+are deﬁned in the same namespace.
+Listing 1: The ConﬁgMap ﬁle for workﬂow injection module
+pod
+apiVersion: v1
+kind: ConfigMap
+metadata:
+labels:
+app: config
+name: dependency -inject
+namespace: default
+data:
+dependency.json: |
+{
+"0": {
+"input ": [],
+"output ": ["1" ,"2"] ,
+"image ": [" shanchenggang/task -emulator:
+latest"],
+"cpuNum ": ["1200"] ,
+"memNum ": ["1200"] ,
+"args": ["-c","1","-m","100","-t","5"]
+},
+"1": {
+"input ": ["0"],
+"output ": ["3" ,"4" ,"5" ,"6"] ,
+"image ": [" shanchenggang/task -emulator:
+latest"],
+"cpuNum ": ["1200"] ,
+"memNum ": ["1200"] ,
+"args": ["-c","1","-m","100","-t","5"]
+},
+. . .
+Listing 1 shows the deﬁnition of workﬂow information in
+ConﬁgMap by the Key-Value method. The Key and the Value
+refer to the name and content of the variable conﬁguration
+ﬁle, respectively. The variable conﬁguration ﬁle is deﬁned
+in JSON format and contains the deﬁnition of workﬂow
+task nodes. Each task node works as a step of a workﬂow
+and contains input attribute, output attribute, image attribute,
+cpuNum attribute, memNum attribute, and args attribute. Six
+attributes of the task node represent input dependencies,
+output dependencies, task image address, CPU requirement,
+memory requirement, and running parameters for this task
+pod, respectively. The steps in a workﬂow are executed
+following the order deﬁned as DAG. As shown in Listing 1,
+workﬂow deﬁnition in KubeAdaptor is human-readable and
+extremely simple to use with a negligible learning burden.
+                                 
+State Tracking and 
+Resource 
+Monitoring Module
+Resource Gathering and 
+Allocation Module
+KubeAdaptor
+Workflow Namespace 
+Creator
+Task Container Creator
+K8s Cluster Resource Pool
+Create
+ Pvc/Pv        
+Task resource request Resource response
+Watch
+Pod
+Deleting state message
+(task pod and workflow namespace)
+     Delete pod
+ watch
+Watch k8s 
+resource objects 
+Gather cluster 
+remaining
+ resource
+Workflow 
+sending request
+Workflow 
+Container 
+Destruction 
+Module
+Task pod creating 
+request
+Watch deleting 
+state
+R/W
+Workflow namespace creating request
+Delete container
+Request of getting 
+next workflow
+Workflow task decomposition
+Workflow Input Interface   (gRPC)
+Shared Memory Module
+Shared Memory Module
+. . .
+Task order
+. . .
+Task order
+. . .
+Task order
+                                 
+Workflow 
+systems
+Workflow scheduling 
+algorithm
+Workflow Injection Module
+                                 
+State Tracking and 
+Resource 
+Monitoring Module
+Resource Gathering and 
+Allocation Module
+KubeAdaptor
+Workflow Namespace 
+Creator
+Task Container Creator
+K8s Cluster Resource Pool
+Create
+ Pvc/Pv        
+Task resource request Resource response
+Watch
+Pod
+Deleting state message
+(task pod and workflow namespace)
+     Delete pod
+ watch
+Watch k8s 
+resource objects 
+Gather cluster 
+remaining
+ resource
+Workflow 
+sending request
+Workflow 
+Container 
+Destruction 
+Module
+Task pod creating 
+request
+Watch deleting 
+state
+R/W
+Workflow namespace creating request
+Delete container
+Request of getting 
+next workflow
+Workflow task decomposition
+Workflow Input Interface   (gRPC)
+Shared Memory Module
+. . .
+Task order
+. . .
+Task order
+                                 
+Workflow 
+systems
+Workflow scheduling 
+algorithm
+Workflow Injection Module
+Figure 3: Architecture diagram of the KubeAdaptor. This
+diagram illustrates the internals of KubeAdaptor in detail. The
+workﬂow injection module is independent of KubeAdaptor and
+responsible for injecting the workﬂow task sequence into the
+KubeAdaptor.
+4.3. The Architecture of KubeAdaptor
+The KubeAdaptor consists of several components that
+talk to each other during workﬂow containerization. The
+key components of KubeAdaptor are elaborated in detail
+throughout this section. The architecture of KubeAdaptor is
+shown in Figure. 3.
+Workﬂow Input Interface. As soon as the KubeAdap-
+tor and the workﬂow injection module are deployed and
+launched, this module starts to receive the workﬂow genera-
+tion request from the workﬂow injection module via gRPC,
+decomposes the workﬂow tasks, and turns to the workﬂow
+namespace creator module. Meanwhile, this module watches
+the state changes of the task pods or workﬂows just created
+and triggers the subsequent execution steps at any time.
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 6 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+If the state of the current task pod is Failed, the system
+is abnormal, and this module turns to fault tolerance man-
+agement (4.5) to repair. If the state of the current task pod is
+Succeeded, this module invokes an event triggering scheme
+and triggers the workﬂow container destruction module to
+remove the completed task pod. Next, when detecting a
+successful return ﬂag of the removed task pod, the event
+trigger scheme immediately sends the generation request of
+the subsequent task pod to the workﬂow namespace creator
+module. In addition, if the current workﬂow is completed,
+as soon as this module captures a successful removal ﬂag of
+the completed workﬂow, it uses the event callback function
+to send a request of acquiring the subsequent workﬂow to
+the workﬂow injection module.
+Workﬂow Namespace Creator. This module creates the
+workﬂow namespaces against requests of generating work-
+ﬂows to realize resource isolation between diﬀerent work-
+ﬂows. This module ﬁrst obtains a list of NamespaceLister
+resources by state tracking and resource monitoring module
+and checks whether or not the namespace to be created ex-
+ists. If this namespace does not exist, this module creates this
+namespace, uses the StorageClass to dynamically generate
+the PVC that meets the capacity requirements of PV for
+diﬀerent workﬂows. Instead, This module proceeds to the
+task container creator module.
+Task Container Creator. This module is responsible for
+generating task pods under namespace of the speciﬁed work-
+ﬂow. This module ﬁrst obtains the list of PodLister resources
+under the namespace by invoking the state tracking and
+resource monitoring module and checks whether or not the
+requested pod under the namespace exists. If the requested
+task pod exists, this module turns to fault tolerance man-
+agement (4.5). Instead, this module allocates the resource
+to create the task pod and sets the volume source of this task
+pod to PVC’s name in this namespace. Next, the task pod
+can operate on the PV to read and write data when mounting
+NFS shared directory successfully. This module uses the
+Goroutine mechanism to create concurrent task pods against
+parallel oﬀspring tasks.
+Resource Gathering and Allocation Module. This
+module is in charge of requesting the resource allocation
+of the building task pods. First, this module obtains the
+resource list of NodeLister and PodLister in the K8s cluster
+by invoking the state tracking and resource monitoring
+module. Second, this module acquires the resource amount
+occupied by all pods through the ﬁeld Requests of the pods in
+PodLister and gets the total allocatable resource amount of
+the cluster by the ﬁeld Allocatable of all NodeLister nodes
+except for the Master node. The diﬀerence between the
+above two is the number of remaining resources available for
+allocation in the K8s cluster. Finally, this module allocates
+the requiring resources to the task container generation
+module with the overall resource requirements of the global
+workﬂows and resource allocation algorithm in mind.
+State Tracking and Resource Monitoring Module.
+This module is essentially a monitor program based on the
+List-Watch mechanism running in the backend. It provides
+PodLister, NodeLister, and NamespaceLister resource lists for
+other modules, and responds to resource monitoring requests
+of each module at any time. This module mainly monitors the
+execution states of the workﬂow task pods and workﬂows,
+and feeds back to the workﬂow input interface module.
+Workﬂow Container Destruction Module. This mod-
+ule responds to the workﬂow input interface module and
+performs the pod deleting operation invoked by event trigger
+mechanism. In addition to deleting the Succeeded or Failed
+pods, the namespace of the completed workﬂow is also
+included. This module uses the API deletion method of the
+Client-go package [47] to implement the deletion operation.
+Shared Memory Module. The shared memory approach
+is a solution to implement data dependence between work-
+ﬂow tasks. This module works with NFS sharing between
+cluster nodes and requires deploying the NFS business
+mounting pod and StorageClass service in advance. First, the
+KubeAdaptor creates PVC according to user requirements
+combined with StorageClass service. Then the KubeAdaptor
+generates PV through an external NFS business mounting
+pod and the PVC. The created task pod binds PV and
+PVC and implements data sharing via a mounted sharing
+directory. Multiple task pods within the same namespace use
+this shared directory to exchange data, which implements
+the data dependence of task nodes described in the DAG
+diagram.
+4.4. Workﬂow Injection Module
+The workﬂow injection module is an auxiliary module
+independent of KubeAdaptor, which facilitates the imple-
+mentation of our framework. It is responsible for reading
+variable conﬁguration information of workﬂow deﬁnition,
+parsing and generating workﬂows, responding to input re-
+quests of the subsequent workﬂow, and injecting workﬂow
+information into KubeAdaptor via gRPC. The following
+components are key parts of the workﬂow injection module.
+Workﬂow Parser. This module takes care of reading vari-
+able conﬁguration ﬁles from the mounted directory inside
+the pod of the workﬂow injection module, deserializes the
+JSON ﬁle composed of workﬂow deﬁnition, and encapsu-
+lates workﬂow information.
+Workﬂow Sending Module. When the KubeAdaptor
+starts to work, this module ﬁnishes the initialization of the
+workﬂow, obtains the Service IP address and port number
+of KubeAdaptor’s pod through the environment variable,
+remotely accesses the KubeAdaptor, and sends the workﬂow.
+All the subsequent sending operations of this module are
+performed under the trigger of KubeAdaptor’s pod.
+Next Workﬂow Trigger Module. This module enables
+launching the gRPC server locally, responds to the request
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 7 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+from KubeAdaptor’s pod, and invokes the workﬂow sending
+module to send the subsequent workﬂow.
+4.5. Fault Tolerance Management
+This module deals with the exceptions of the workﬂow
+input interface modules and the task container creation mod-
+ule. The failure of task pod creation is mainly due to the
+unsuccessful mounting of the NFS service for the task pod.
+Once the task pod creation fails, this module will enable the
+event trigger mechanism to call back the task pod creation
+function. It sends the failed task pod generation request to
+the workﬂow namespace creator module again till this task
+pod is successfully created. Generally, as long as the K8s
+cluster remains healthy and stable and the NFS business pod
+is up and running, the KubeAdaptor has no multiple task
+failure cases. In addition, if the task pod to be created already
+exists in its namespace, this module will enable the task
+container creation module to throw an exception and call
+back the workﬂow container destruction module to remove
+it via an event trigger scheme. Then this module invokes the
+task container creator module to request the generation of
+the exception pod again.
+4.6. Event Trigger Mechanism
+The event triggering mechanism embodies the interac-
+tion process of KubeAdaptor internal components. It uses
+the Informer component and the Event package to implement
+the event callbacks and respond to the state changes of var-
+ious resources in K8s. When launching the event triggering
+mechanism, the KubeAdaptor utilizes the event package to
+register key events and responds to state changes of resources
+in real-time through the callback function. For example,
+when a task pod is done, the KubeAdaptor fetches the state
+changes of this task pod through the Informer component in
+real-time, invokes the deleting operation of this task pod and
+triggers the generation of the subsequent task pod.
+This mechanism enables a quick switch between the cre-
+ation and destruction of workﬂow task pods and restricts the
+out-of-order pod scheduling of the K8s scheduler. Through
+the event triggering mechanism and the KubeAdaptor’s core
+function, the K8s scheduler can schedule the workﬂow task
+pods as the workﬂow scheduling algorithms expected while
+being aware of the state changes of various resources in K8s.
+This mechanism ties the components within KubeAdaptor
+together and speeds up the execution eﬃciency of its internal
+modules. As shown in Figure. 4, the event registry is in
+charge of registering key events by Event package and ﬁn-
+ishing event callback. The registered event callback behavior
+function runs in the backend. First, the workﬂow injection
+module injects workﬂow information into the KubeAdaptor.
+Then, the workﬂow input interface receives the requests of
+sending workﬂow and outputs requests of creating task pods
+and workﬂow namespace. Next, the workﬂow namespace
+creator module generates workﬂow namespace, and the task
+container creator creates task pods. Once the state tracking
+and resource monitoring module watches task pods with
+Failed or Succeeded state, this module enables the event
+callback function to invoke workﬂow container destruction
+module to do relevant deletion operations. It should be noted
+that the fault tolerance management function is also incorpo-
+rated. In addition, the state tracking and resource monitoring
+module monitors resource state changes by interacting with
+the Informer component. Accordingly, under the action of
+event triggering mechanism, the workﬂow container de-
+struction module coordinates the state tracking and resource
+monitoring module with the workﬂow input interface to
+respond to the corresponding operations described in the
+KubeAdaptor architecture (4.3).
+5. Experimental Evaluation
+5.1. Experimental Setup
+To evaluate the eﬃcacy of the KubeAdaptor, we de-
+sign the workﬂow injection module. This module and the
+KubeAdaptor are containerized and deployed into the k8s
+cluster through Service and Deployment. Both modules com-
+municate with each other through the gRPC mechanism.
+The Image extraction policy of the workﬂow task is set to
+the PullifNotPresent ﬁeld. The KubeAdaptor starts the state
+tracking and resource monitoring module at runtime, which
+monitors the Namespace, Pod, and Node resources of the K8s
+cluster in real-time and invokes the event trigger module at
+any time. We explore the performance of three workﬂow
+submission approaches by running four real-world workﬂow
+applications on the K8s. The K8s cluster consists of one
+master node and six nodes. Each node possesses an 8-core
+AMD EPYC 7742 2.2GHz CPU and 16GB of RAM, running
+Ubuntu 20.4 and K8s v1.19.6 and Docker version 18.09.6.
+5.2. Workﬂow Example
+To verify the application scalability of the KubeAdap-
+tor, we employ four classes of scientiﬁc workﬂow applica-
+tions, such as Montage (astronomy), Epigenomics (genome
+sequence), CyberShake (earthquake science), LIGO Inspi-
+ral (gravitational physics) [50]. We add virtual task nodes
+at the entrance and exit of workﬂows to facilitate the con-
+struction of the DAG workﬂow structure. These four types of
+workﬂows cover all the elementary structural characteristics
+concerning composition and components (in-tree, out-Tree,
+fork-join, and Pipeline) that can validate the scalability of
+KubeAdaptor. For each class of workﬂow, the workﬂow
+structure with a smaller task size (about 20) is selected in the
+experiment, as shown in Figure 5, extracted from the Pegasus
+Workﬂow repository [51]. We assume that four classes of
+scientiﬁc workﬂows have the same task and the workﬂow
+task program uses resource loads to simulate workﬂow tasks
+in the experiments. In each workﬂow topology, a node
+represents a workﬂow task. A directed edge between nodes
+represents a task dependency. According to the relationship
+among task nodes, the scheduling algorithm of these work-
+ﬂow schedules tasks topologically in a top-down fashion.
+Workﬂow Instantiation. We design a Python application
+as the main program of a workﬂow task. This Python appli-
+cation uses the Stress tool [52] to emulate CPU and memory
+usage in a given time [8]. We pack the Python application
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 8 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+Event 
+Registry
+Event 
+Registry
+Workflow 
+Injection Module
+Workflow 
+Injection Module
+Worklfow Namespace 
+Creator&&
+Task Container Creator
+Worklfow Namespace 
+Creator&&
+Task Container Creator
+Workflow Input 
+Interface
+Workflow Input 
+Interface
+State Tracking and 
+Resource Monitoring 
+Module
+State Tracking and 
+Resource Monitoring 
+Module
+Workflow Container 
+Destruction Module
+Workflow Container 
+Destruction Module
+Informer
+Informer
+Register events
+Sending 
+workflow
+Reply
+Create task 
+pod
+Reply
+Event callback
+Delete task pod 
+or workflow 
+namespace
+Request of the 
+next workflow
+Reply
+Watching resource 
+objects
+Deleted 
+successfully
+Checking the     state of task pod
+Watching task pod object
+Succeeded or Failed of the task pod's state
+Reply
+Workflow parsing
+Watching namespace object
+Inexistence
+Create workflow 
+namspace
+Create workflow namespace and PVC
+Create task pod
+Reply
+Checking for 
+presence
+Reply
+Watching task pod object
+Inexistence
+Checking for 
+presence
+Reply
+Trigger the next task pod or workflow
+.  .  .
+Event 
+Registry
+Workflow 
+Injection Module
+Worklfow Namespace 
+Creator&&
+Task Container Creator
+Workflow Input 
+Interface
+State Tracking and 
+Resource Monitoring 
+Module
+Workflow Container 
+Destruction Module
+Informer
+Register events
+Sending 
+workflow
+Reply
+Create task 
+pod
+Reply
+Event callback
+Delete task pod 
+or workflow 
+namespace
+Request of the 
+next workflow
+Reply
+Watching resource 
+objects
+Deleted 
+successfully
+Checking the     state of task pod
+Watching task pod object
+Succeeded or Failed of the task pod's state
+Reply
+Workflow parsing
+Watching namespace object
+Inexistence
+Create workflow 
+namspace
+Create workflow namespace and PVC
+Create task pod
+Reply
+Checking for 
+presence
+Reply
+Watching task pod object
+Inexistence
+Checking for 
+presence
+Reply
+Trigger the next task pod or workflow
+.  .  .
+Figure 4: Sequence diagram of the event trigger mechanism. The execution sequence of the workﬂow task, obtained from the
+workﬂow scheduling algorithm, is injected into the workﬂow input interface of KubeAdaptor. This ﬁgure depicts the interactions
+between the components within the KubeAdaptor to implement the event triggering mechanism.
+T3
+T4
+T5
+T6
+T1
+T12
+T13
+T14
+T15
+T7
+T8
+T9
+T10
+T2
+T16
+T17
+T18
+T19
+T11
+T20
+T0
+T21
+T3
+T4
+T5
+T6
+T1
+T12
+T13
+T14
+T15
+T7
+T8
+T9
+T10
+T2
+T16
+T17
+T18
+T19
+T11
+T20
+T0
+T21
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T20
+Data Aggregation
+Data Partitioning
+Data Aggregation
+Pipeline
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T20
+Data Aggregation
+Data Partitioning
+Data Aggregation
+Pipeline
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T17
+T18
+T19
+T0
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T17
+T18
+T19
+T0
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T1
+T2
+T3
+T4
+T6
+T7
+T8
+T9
+T22
+T12
+T13
+T14
+T15
+T17
+T18
+T19
+T20
+T5
+T10
+T16
+T21
+T11
+T0
+T1
+T2
+T3
+T4
+T6
+T7
+T8
+T9
+T22
+T12
+T13
+T14
+T15
+T17
+T18
+T19
+T20
+T5
+T10
+T16
+T21
+T11
+T0
+(a) Montage
+(b) Epigenomics
+(c) CyberShake
+(d) LIGO
+T3
+T4
+T5
+T6
+T1
+T12
+T13
+T14
+T15
+T7
+T8
+T9
+T10
+T2
+T16
+T17
+T18
+T19
+T11
+T20
+T0
+T21
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T20
+Data Aggregation
+Data Partitioning
+Data Aggregation
+Pipeline
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T17
+T18
+T19
+T0
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T1
+T2
+T3
+T4
+T6
+T7
+T8
+T9
+T22
+T12
+T13
+T14
+T15
+T17
+T18
+T19
+T20
+T5
+T10
+T16
+T21
+T11
+T0
+(a) Montage
+(b) Epigenomics
+(c) CyberShake
+(d) LIGO
+Figure 5: The topology diagram of four real-world workﬂow applications.
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 9 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T20
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T20
+(a) Montage
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+(b) Epigenomics
+T9
+T11
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T5
+T6
+T7
+T8
+T10
+T19
+T4
+T16
+T12
+T13
+T14
+T15
+T17
+  T18
+T3
+T20
+T21
+T9
+T11
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T5
+T6
+T7
+T8
+T10
+T19
+T4
+T16
+T12
+T13
+T14
+T15
+T17
+  T18
+T3
+T20
+T21
+(c) CyberShake
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T20
+T21
+T22
+(S)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+90
+100
+110
+120
+130
+Node1
+Node2
+Node3
+Node4
+Node5
+Node6
+T0
+T1
+T2
+T3
+T4
+T5
+T6
+T7
+T8
+T9
+T10
+T11
+T12
+T13
+T14
+T15
+T16
+T17
+T18
+T19
+T20
+T21
+T22
+(d) LIGO
+Figure 6: Schedules of four real-world workﬂows in Figure 5 with (a) Montage (workﬂow lifecycle = 127.129s), (b) Epigenomics
+(workﬂow lifecycle = 99.182s), (c) CyberShake (workﬂow lifecycle = 78.939s), and (d) LIGO (workﬂow lifecycle = 92.361s).
+into a task Image ﬁle by Docker engine [53], store the
+task Image ﬁle in local Harbor [45] or remote Docker Hub
+repository [46], and initialize the task Image address in
+the ConﬁgMap ﬁle of the workﬂow injection module. We
+use the ConﬁgMap method to inject container parameters
+into the task container. Task container parameters include
+CPU cycles, memory allocation, and the duration of the task
+pod (4.2).
+In the main program of the task pod, we use several
+resource parameters to instruct Stress to work. Each task uses
+the Stress tool to set 1 CPU fork, a memory of 100푀퐵, and a
+duration of 5 seconds. CPU forking and memory allocation
+operations in the task pod last 10 seconds in total. In the
+deployment Yaml ﬁle of KubeAdaptor, we set the resource
+requests and resource limits parameters for the task pod to
+1200 Milli cores (i.e.,1200푚) CPU and 1200푀푖memory.
+Note that the requests ﬁeld has the same parameters as the
+limits ﬁeld.
+5.3. Results and Analysis
+In this subsection, we ﬁrst verify the consistency of task
+scheduling order between the workﬂow scheduling algo-
+rithms and the K8s scheduler through KubeAdaptor. Then
+we compare the proposed KubeAdaptor with Batch Job
+submission, Argo, in terms of workﬂow execution eﬃciency,
+CPU usage rate, and memory usage rate. Since Argo is a
+general cloud-native workﬂow engine in the industry, we
+use it as a baseline workﬂow engine in our experiments. The
+following is a description of the three workﬂow submission
+methods.
+• KubeAdaptor: We employ the containerized method
+to deploy the KubeAdaptor, as mentioned in (5.1).
+• Batch Job: We use a customized Shell script to sub-
+mit workﬂow tasks with Job type in batches via the
+Kubectl command.
+• Argo: We deﬁne the workﬂow task dependency rela-
+tionship as DAG, described via Yaml ﬁle, and submit
+the Yaml ﬁle to Argo workﬂow engine through the
+Argo binary tool [26].
+Scheduling Order Consistency Analysis. We set the
+Master node not to participate in pod scheduling so that
+the Master node can bear less resource load and keep K8s
+as healthy as possible, which is in line with the strategy of
+excluding the Master node in the resource gathering module
+(4.3). To verify the performance of KubeAdaptor, we set the
+image pull policy to the ifNotPresent ﬁeld in the deployment
+Yaml ﬁle and pull task images from local Harbor. After
+we deploy Yaml ﬁles in the K8s cluster, KubeAdaptor and
+workﬂow injection module are scattered and scheduled to
+the cluster nodes in the form of a pod, and both of them
+communicate via gRPC. Once the deployment is success-
+ful, the workﬂow injection module sends workﬂows to the
+KubeAdaptor via gRPC. When receiving workﬂows, the
+KubeAdaptor starts the workﬂow containerization process.
+As shown in Figure. 6, we run four real-world workﬂows
+to obtain its scheduling sequences. Task scheduling orders
+in each subﬁgure are strictly consistent with its respective
+scheduling sequence of topology diagrams in a top-down
+fashion. Each workﬂow lifecycle includes creating workﬂow
+namespace, PVC, task pod, and deleting task pod and work-
+ﬂow namespace throughout scheduling timelines. When the
+number of concurrent tasks in the workﬂow is greater than
+the node number in the K8s cluster, some nodes in the K8s
+cluster will host multiple task pods simultaneously within
+resource capacity. Instead, some nodes in K8s cluster will be
+idle, as shown in Figure. 6(c) and Figure. 6(b), respectively.
+Each task program uses the Stress tool to last 10푠through
+forking CPU and allocating memory. We use a set of work-
+ﬂow lifecycle sample data from the experiment to depict the
+entire workﬂow lifecycle timeline. The workﬂow lifecycles
+of four real-world workﬂows in Figure. 6 from creation
+to death are 127.129푠(Montage), 99.182푠(Epigenomics),
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 10 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+78.939푠(CyberShake), and 92.361푠(LIGO), respectively.
+We can observe that each workﬂow task is completed sepa-
+rately throughout the respective workﬂow lifecycle. In ad-
+dition, the concurrent execution of multiple tasks signiﬁ-
+cantly improves the workﬂow execution eﬃciency of the
+KubeAdaptor. It veriﬁes that KubeAdaptor is instrumental
+in integrating workﬂow systems with the K8s.
+Workﬂow Lifecycle Comparison. We adopt four real-
+world workﬂows shown in Figure. 5 and run it 100 times
+through KubeAdaptor, Batch Job, and Argo, respectively.
+We can obtain the average execution time of each task
+pod and the whole workﬂow lifecycle in each real-world
+workﬂow on K8s for three workﬂow submission approaches.
+Montage
+Epigenomics
+CyberShake
+LIGO
+5
+10
+15
+20
+25
+30
+Average task pod execution time (Seconds)
+12.82
+12.49
+12.67
+12.84
+14.38
+15.98
+16.04
+15.2
+16.97
+23.82
+16.61
+17.04
+KubeAdaptor
+Batch Job
+Argo
+Figure 7: Average execution time of task pod. The execution
+time of the task pod is the elapsed time from creation to
+deletion.
+Figure. 7 shows the average execution time of task pod
+in four real-world workﬂows for three distinct workﬂow
+submission approaches. We select a workﬂow lifecycle with
+an average workﬂow execution time from 100 experiments
+and obtain the average execution time of the task pod in
+this workﬂow. As shown in Figure. 7, in four real-world
+workﬂows, the KubeAdaptor obtains 12.82푠, 12.49푠, 12.67푠,
+and 12.84푠in terms of the average execution time of the task
+pod, respectively, and signiﬁcantly outperforms Batch Job
+and Argo. In terms of the average execution time of the task
+pod, the KubeAdaptor reduces by 24.45%, 47.57%, 23.72%,
+and 24.65% in four real-world workﬂows, respectively, com-
+pared with the baseline Argo workﬂow engine.
+Further analysis shows that Argo does not perform well
+in average task pod execution time due to its greater focus
+on the depth of the workﬂow topology and the number of
+workﬂow tasks. For the Batch Job approach, the Kubectl
+command deployment pattern spends too much time during
+the interacting process with the K8s apiserver. Compared to
+the Argo and Batch Job, for each task pod in workﬂow, the
+KubeAdaptor saves some time by reconstructing container
+generating functionality.
+Under three distinct workﬂow submission approaches,
+Figure. 8 shows the workﬂow lifecycle ﬂuctuations and
+average workﬂow lifecycle of the four real-world workﬂows,
+respectively. We can observe that the KubeAdaptor is better
+than the other two approaches. As expected, the Batch Job
+approach can not start the next batch until the current task
+batch is fully completed. This approach ignores the fact that
+some tasks in the next task batch have met the execution con-
+ditions in advance, which prolongs the workﬂow lifecycle. In
+addition, continuous deployment and cleanup of workﬂow
+tasks via Kubectl command require continual checking of
+the status of the task pod, which increases the number of
+interactions with K8s apiserver and lengthens the workﬂow
+lifecycle to some extent. Due to the unique internal logic
+processing of the Argo, the average workﬂow lifecycle of
+the Argo is higher than that of the other two approaches.
+Similar to Batch Job, continuous deployment and cleanup
+of workﬂows via the Argo binary tool also require continual
+checking of the status of the task pod, which also increases
+the number of interactions with K8s apiserver and prolongs
+the workﬂow life cycle to some extent. Understandably,
+the overall execution time of 100 consecutive workﬂows
+captured by Batch Job and Argo in this way is slightly
+larger than the overall execution time of 100 consecutive
+workﬂows obtained by watching resource changes shown in
+Figure 9 and Figure 10. It is due to the overall workﬂow
+execution time obtained by watching resource changes does
+not include the time of the ﬁrst workﬂow deployment and
+the last workﬂow cleanup. Compared to the Batch Job and
+Argo, KubeAdaptor always obtains superior performance in
+terms of average workﬂow lifecycle despite including the
+creation time and the binding time of PVC, which beneﬁts
+from the unique container construction function and event
+trigger mechanism within the KubeAdaptor. Compared to
+the baseline Argo, the KubeAdaptor reduces the average
+workﬂow lifecycle by 43.44% (Montage), 43.65% (Epige-
+nomics), 44.86% (CyberShake) and 48.98% (LIGO) for the
+four real-world workﬂows, respectively.
+Resource Usage Comparison. In this subsection, we
+develop a separate resource gathering module for K8s. This
+module aims to capture the state changes of underlying
+resources in the K8s cluster under each workﬂow submission
+approach and present the superior resource utilization char-
+acteristics of the KubeAdaptor through resource changes.
+This resource gathering module needs to be containerized
+and deployed on the K8s cluster in advance. We present the
+resource usage of each real-world workﬂow in consecutive
+100 experiments under three submission approaches and an-
+alyze the resource changes under each submission approach
+in the ﬁrst 250 seconds.
+The eight subﬁgures in Figure. 9 and Figure. 10 show the
+resource usage curve of CPU and memory corresponding to
+four real-world workﬂows under three workﬂow submission
+approaches, respectively. For ease of comparison of three
+workﬂow submission approaches, the K8s cluster only ac-
+cepts the experimental workﬂow load imposed by us. By
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 11 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+0
+20
+40
+60
+80
+100
+100
+150
+200
+250
+300
+The overall workflow lifecycle (Seconds)
+Montage
+Argo
+Argo-Average
+Batch Job
+Btach Job-Average
+KubeAdaptor
+KubeAdaptor-Average
+0
+20
+40
+60
+80
+100
+50
+100
+150
+200
+250
+300
+Epigenomics
+Argo
+Argo-Average
+Batch Job
+Btach Job-Average
+KubeAdaptor
+KubeAdaptor-Average
+0
+20
+40
+60
+80
+100
+The Experiments Number
+50
+100
+150
+200
+250
+300
+The overall workflow lifecycle (Seconds)
+CyberShake
+Argo
+Argo-Average
+Batch Job
+Batch Job-Average
+KubeAdaptor
+KubeAdaptor-Average
+0
+20
+40
+60
+80
+100
+The Experiments Number
+50
+100
+150
+200
+250
+300
+LIGO
+Argo
+Argo-Average
+Batch Job
+Batch Job-Average
+KubeAdaptor
+KubeAdaptor-Average
+Figure 8: Average workﬂow lifecycle. Workﬂow lifecycle refers to the entire process from creation to death of workﬂow namespace.
+On the aspect of average workﬂow lifecycle, this ﬁgure contains four subgraphs, such as Montage (129.85푠of KubeAdaptor,
+169.83푠of Batch Job, and 229.57푠of Argo), Epigenomics (111.12푠of KubeAdaptor, 162.34푠of Batch Job, and 197.18푠of Argo),
+CyberShake (83.36푠of KubeAdaptor, 125.44푠of Batch Job, and 151.19푠of Argo), and LIGO (92.46푠of KubeAdaptor, 143.8푠of
+Batch Job, and 181.22푠of Argo).
+continuously executing each workﬂow 100 times under each
+submission method, we can obtain the overall consumed
+time of each workﬂow under each submission method,
+such as Montage (14081.86푠of KubeAdaptor, 16976.73푠of
+Batch Job, and 22942.3푠of Argo), Epigenomics (12282.02푠
+of KubeAdaptor, 16222.06푠of Batch Job, and 19712.66푠of
+Argo), CyberShake(9472.07푠of KubeAdaptor, 12532.18푠
+of Batch Job, and 15108.25푠of Argo), and LIGO (10356.19푠
+of KubeAdaptor, 14373.86푠of Batch Job, and 18117.57푠
+of Argo). KubeAdaptor takes the least time, and Argo
+takes the most. The reason for this is consistent with the
+average workﬂow lifecycle shown in Figure 8. In terms of
+CPU resource usage, four workﬂows with concurrent tasks
+can consume up to 8050푚, 5650푚, 11650푚, and 6850푚,
+respectively. For memory resource usage, four workﬂows
+with concurrent tasks can consume up to 7600푀푖, 5200푀푖,
+11200푀푖, and 6400푀푖, respectively. In Figure. 11 and
+Figure. 12, we will zoom in the resource usage of the ﬁrst
+250푠for each workﬂow in Figure. 9 and Figure. 10 under
+three workﬂow submission methods.
+Figure. 11 and Figure. 12 show the usage of CPU and
+memory of four real-world workﬂows under three workﬂow
+submission approaches in the ﬁrst 250 seconds, respectively.
+Four subﬁgures in Figure. 11 correspond to the four sub-
+ﬁgures in Figure. 9 respectively, and the four subﬁgures in
+Figure. 12 correspond to the four subﬁgures in Figure. 10
+respectively. Across the complete timeline of CPU usage and
+memory usage in Figure. 11 and Figure. 12, the resource us-
+age curve of each workﬂow submission method reﬂects the
+workﬂow lifecycle in the ﬁrst 250푠, and both are consistent in
+curve shape. For each subﬁgure in Figure. 11 and Figure. 12,
+the resource usage curves in task scheduling of a workﬂow
+under three workﬂow submission approaches are consistent
+in the curve shape. And the diﬀerences lie in the switching
+time between tasks in each workﬂow, the average execution
+time of the task pod, and workﬂow lifecycle. In the K8s
+cluster, the allocatable CPU is 48000푚, and the allocatable
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 12 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch
+used cpu in Batch
+allocated cpu in Argo
+used cpu in Argo
+0
+5000
+10000
+15000
+20000
+Time (Seconds)
+0
+5000
+10000
+#Milli Cores
+(14081.86s)
+(16976.73s)
+(22942.3s)
+(a) Montage
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch Job
+used cpu in Batch Job
+allocated cpu in Argo
+used cpu in Argo
+0
+5000
+10000
+15000
+20000
+Time (Seconds)
+0
+5000
+10000
+#Milli Cores
+(12282.02s)
+(16222.06s)
+(19712.66s)
+(b) Epigenomics
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch Job
+used cpu in Batch Job
+allocated cpu in Argo
+used cpu in Argo
+0
+5000
+10000
+15000
+Time (Seconds)
+0
+5000
+10000
+12000
+#Milli Cores
+(9472.07s)
+(12532.18s)
+(15108.25s)
+(c) CyberShake
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch Job
+used cpu in Batch Job
+allocated cpu in Argo
+used cpu in Argo
+0
+5000
+10000
+15000
+Time (Seconds)
+0
+5000
+10000
+#Milli Cores
+(10356.19s)
+(14373.86s)
+(18117.57s)
+(d) LIGO
+Figure 9: The CPU usage rate of four real-world workﬂows in 100 consecutive experiments. The four subﬁgures show the curve of
+CPU resource usage of four real-world workﬂows under three workﬂow submission approaches, respectively. Except for the Master
+node, the other nodes participate in resource load and have 48000푚of CPU in all. The orange curve in each subﬁgure depicts the
+number of allocatable CPU in the K8s cluster. The blue, cyan, and red curves depict the number of CPU used in KubeAdaptor,
+Batch Job, and Argo, respectively.
+memory is 91872푀푖. In each subﬁgure of Figure. 11 and
+Figure. 12, each protruding time of the curve represents the
+execution time of task pod. In addition, the requests ﬁeld of
+task pod includes 1200푚CPU and 1200푀푖memory, and the
+limits ﬁeld have the same parameter as the requests ﬁeld.
+We focus only on the resource usage changes of each
+workﬂow during the ﬁrst workﬂow lifecycle under the cor-
+responding workﬂow submission method. From Figure. 11
+and Figure. 12, we can obtain the ﬁrst workﬂow lifecycle
+of each workﬂow under each submission method, such as
+Montage (137.72푠of KubeAdaptor, 161.28푠of Batch Job,
+and 222.33푠of Argo), Epigenomics (103.6푠of KubeAdap-
+tor, 156.22푠of Batch Job, and 208.26푠of Argo), CyberShake
+(79.11푠of KubeAdaptor, 125.64푠of Batch Job, and 158.17푠
+of Argo), and LIGO (89.7푠of KubeAdaptor, 142.2푠of
+Batch Job, and 167.18푠of Argo). Across the ﬁrst workﬂow
+lifecycle of each workﬂow under each workﬂow submission
+approach, we can observe that the switching process of the
+task pod in KubeAdaptor is too fast to capture the resource
+changes within the sampling period of 0.5푠. Nevertheless,
+the switching process of the task pod in Batch Job and Argo
+is relatively long. Compared to Batch Job and Argo, the
+KubeAdaptor has a shorter switching time of task pod. It is
+due to that the event trigger mechanism makes KubeAdaptor
+respond to the state changes of underlying resources of K8s
+in real-time and rapidly invoke the creation or destruction
+of the task pod. For the performance of switching time of
+task pod, batch submission and deletion modes via Kubectl
+command line in Batch Job, and unique triggering logic of
+task pod in Argo, consume too much time, far inferior to the
+event trigger mechanism in KubeAdaptor.
+According to resource usage data of three workﬂow
+submission methods in each subﬁgure of Figure. 11 and
+Figure. 12, across the ﬁrst lifecycle of workﬂow, we can
+obtain average CPU usage rate and average memory usage
+rate shown in Figure. 13 and Figure. 14. In the average
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 13 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Bacth Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+5000
+10000
+15000
+20000
+Time (Seconds)
+0
+5000
+10000
+#Mi
+(14081.86s)
+(16976.73s)
+(22942.3s)
+(a) Montage
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Batch Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+5000
+10000
+15000
+20000
+Time (Seconds)
+0
+4000
+8000
+#Mi
+(12282.02s)
+(16222.06s)
+(19712.66s)
+(b) Epigenomics
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Batch Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+5000
+10000
+15000
+Time (Seconds)
+0
+4000
+8000
+12000
+#Mi
+(9472.07s)
+(12532.18s)
+(15108.25s)
+(c) CyberShake
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Batch Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+5000
+10000
+15000
+Time (Seconds)
+0
+5000
+10000
+#Mi
+(10356.19s)
+(14373.86s)
+(18117.57s)
+(d) LIGO
+Figure 10: The memory usage rate of four real-world workﬂows in 100 consecutive experiments. The four subﬁgures show the
+curve of memory resource usage of four real-world workﬂows under three workﬂow submission approaches, respectively. Except
+for the Master node, the other nodes participate in resource load and have 91872푀푖of memory in all. The orange curve in each
+subﬁgure depicts the number of allocatable memory in K8s cluster. The blue, cyan, and red curves depict the number of memory
+used in KubeAdaptor, Batch Job, and Argo, respectively.
+CPU usage rate and memory usage rate of the ﬁrst workﬂow
+lifecycle, we can observe that the KubeAdaptor is the best,
+followed by Batch Job, and Argo is the worst. KubeAdaptor
+obtains a shorter switching time of the task pod through the
+event trigger mechanism. The shorter the switching time of
+the task pod, the higher the resource usage. As the number of
+workﬂow tasks increases, the shorter switching time of the
+task pod ensures the KubeAdaptor maintains an advantage
+in resource usage.
+6. Conclusion and Future Work
+In this paper, our proposed KubeAdaptor for K8s im-
+plements workﬂow containerization following the optimized
+task order of workﬂow scheduling algorithms and integrates
+workﬂow systems with the K8s. The construction and run-
+ning of task pods in workﬂow depend on the Informer-based
+resource object monitoring scheme and the event triggering
+mechanism. Beneﬁting from the event triggering mechanism
+and its superior logic design, KubeAdaptor ensures the rapid
+response to the underlying resource state changes of K8s and
+restricts the out-of-order scheduling, scattered scheduling,
+and unpredictability of native K8s scheduler. On the aspects
+of average workﬂow lifecycle, average task pod execution
+time, and resource usage rate, our customized KubeAdaptor
+outperforms the Batch Job and Argo.
+The work presented in this paper, KubeAdaptor, as a
+logic interface for docking K8s, provides a practical frame-
+work for the engineering practice of containerized workﬂow
+systems on K8s. In the future, we will investigate the case
+study of cloud workﬂow scheduling with KubeAdaptor en-
+abled in cloud control systems, develop a workﬂow descrip-
+tion tool compatible with KubeAdaptor, and further imple-
+ment a graphical user interface to input workﬂow through
+drag and drop widgets. In addition, the KubeAdaptor’s core
+functions, event triggering mechanism, and gRPC commu-
+nication mechanism also provide a practical solution for
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 14 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch
+used cpu in Batch
+allocated cpu in Argo
+used cpu in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+5000
+10000
+#Milli Cores
+(137.72s)
+(161.28s)
+(222.33s)
+(a) Montage
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch Job
+used cpu in Batch Job
+allocated cpu in Argo
+used cpu in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+5000
+10000
+#Milli Cores
+(103.6s)
+(156.22s)
+(208.26s)
+(b) Epigenomics
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch Job
+used cpu in Batch Job
+allocated cpu in Argo
+used cpu in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+5000
+10000
+12000
+#Milli Cores
+(79.11s)
+(125.64s)
+(158.17s)
+(c) CyberShake
+47000
+48000
+49000
+50000
+allocated cpu in KubeAdaptor
+used cpu in KubeAdaptor
+allocated cpu in Batch Job
+used cpu in Batch Job
+allocated cpu in Argo
+used cpu in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+5000
+10000
+#Milli Cores
+(89.7s)
+(142.2s)
+(167.18s)
+(d) LIGO
+Figure 11: The CPU usage rate of four real-world workﬂows in the ﬁrst 250 seconds.
+cloud-edge task migration under the cloud-edge cooperation
+framework.
+7. Acknowledgments
+This work is supported by the National Key Research and
+Development Program of China (Grant No. 2018YFB1003700).
+References
+[1] D. Gannon, R. Barga, N. Sundaresan,
+Cloud-native applications,
+IEEE Cloud Computing 4 (2017) 16–21. doi:10.1109/MCC.2017.
+4250939.
+[2] Y. Mao, Y. Fu, S. Gu, S. Vhaduri, L. Cheng, Q. Liu,
+Resource
+management schemes for cloud-native platforms with computing
+containers of docker and kubernetes, CoRR abs/2010.10350 (2020).
+arXiv:2010.10350.
+[3] D. Bernstein, Containers and cloud: From lxc to docker to kubernetes,
+IEEE Cloud Computing 1 (2014) 81–84.
+[4] A. Silver, Software simpliﬁed, Nature News 546 (2017) 173.
+[5] CNCF, Cloud native computing foundation, 2021. URL: https://www.
+cncf.io/.
+[6] Kubernetes, Production-grade container orchestration, 2021. URL:
+https://kubernetes.io/.
+[7] D. K. Rensin, Kubernetes - Scheduling the Future at Cloud Scale,
+1005 Gravenstein Highway North Sebastopol, CA 95472, 2015. URL:
+http://www.oreilly.com/webops-perf/free/kubernetes.csp.
+[8] I. Klop, Containerized workﬂow scheduling (2018).
+[9] A. R. Kenari, M. Shamsi,
+A hyper-heuristic selector algo-
+rithm for cloud computing scheduling based on workﬂow features,
+OPSEARCH (2021) 1–17.
+[10] K.-R. Escott, H. Ma, G. Chen, Genetic programming based hyper
+heuristic approach for dynamic workﬂow scheduling in the cloud,
+in: Proceedings of International Conference on Database and Expert
+Systems Applications, volume 12392 of Lecture Notes in Computer
+Science, Springer, 2020, pp. 76–90.
+[11] Z.-G. Chen, Z.-H. Zhan, Y. Lin, Y.-J. Gong, T.-L. Gu, F. Zhao, H.-
+Q. Yuan, X. Chen, Q. Li, J. Zhang, Multiobjective cloud workﬂow
+scheduling: A multiple populations ant colony system approach, IEEE
+transactions on cybernetics 49 (2018) 2912–2926.
+[12] V. Arabnejad, K. Bubendorfer, B. Ng,
+Scheduling deadline con-
+strained scientiﬁc workﬂows on dynamically provisioned cloud re-
+sources, Future Generation Computer Systems 75 (2017) 348–364.
+[13] V. Singh, I. Gupta, P. K. Jana, A novel cost-eﬃcient approach for
+deadline-constrained workﬂow scheduling by dynamic provisioning
+of resources, Future Generation Computer Systems 79 (2018) 95–
+110.
+[14] H. Chen, J. Zhu, Z. Zhang, M. Ma, X. Shen, Real-time workﬂows
+oriented online scheduling in uncertain cloud environment,
+The
+Journal of Supercomputing 73 (2017) 4906–4922.
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 15 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Bacth Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+5000
+10000
+#Mi
+(137.72s)
+(161.28s)
+(222.33s)
+(a) Montage
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Batch Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+4000
+8000
+#Mi
+(103.6s)
+(156.22s)
+(208.26s)
+(b) Epigenomics
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Batch Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+4000
+8000
+12000
+#Mi
+(79.11s)
+(125.64s)
+(158.17s)
+(c) CyberShake
+90000
+95000
+100000
+allocated memory in KubeAdaptor
+used memory in KubeAdaptor
+allocated memory in Batch Job
+used memory in Batch Job
+allocated memory in Argo
+used memory in Argo
+0
+50
+100
+150
+200
+250
+Time (Seconds)
+0
+5000
+10000
+#Mi
+(89.7s)
+(142.2s)
+(167.18s)
+(d) LIGO
+Figure 12: The memory usage rate of four real-world workﬂows in the ﬁrst 250 seconds.
+Montage
+Epigenomics
+CyberShake
+LIGO
+2
+4
+6
+8
+10
+12
+Average CPU usage rate (%)
+6.81
+7.74
+10.34
+9.5
+6
+6.6
+8.62
+7.77
+4.94
+5.73
+7.64
+6.94
+KubeAdaptor
+Batch Job
+Argo
+Figure 13: Average CPU usage rate.
+[15] K. Psychas, J. Ghaderi,
+Scheduling jobs with random resource
+requirements in computing clusters,
+in: Proceedings of IEEE IN-
+FOCOM Conference on Computer Communications, IEEE, 2019, pp.
+2269–2277.
+Montage
+Epigenomics
+CyberShake
+LIGO
+1
+2
+3
+4
+5
+6
+Average memory usage rate (%)
+3.07
+3.55
+4.91
+4.47
+2.77
+3.09
+4.14
+3.7
+2.22
+2.64
+3.63
+3.27
+KubeAdaptor
+Batch Job
+Argo
+Figure 14: Average memory usage rate.
+[16] T. Menouer, Kcss: Kubernetes container scheduling strategy, The
+Journal of Supercomputing 77 (2021) 4267–4293.
+[17] E. Deelman, K. Vahi, G. Juve, M. Rynge, S. Callaghan, P. J. Maech-
+ling, R. Mayani, W. Chen, R. F. Da Silva, M. Livny, et al., Pegasus,
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 16 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+a workﬂow management system for science automation,
+Future
+Generation Computer Systems 46 (2015) 17–35.
+[18] V. Jalili, E. Afgan, Q. Gu, D. Clements, D. Blankenberg, J. Goecks,
+J. Taylor, A. Nekrutenko, The galaxy platform for accessible, repro-
+ducible and collaborative biomedical analyses: 2020 update, Nucleic
+acids research 48 (2020) W395–W402.
+[19] K. Wolstencroft, R. Haines, D. Fellows, A. Williams, D. Withers,
+S. Owen, S. Soiland-Reyes, I. Dunlop, A. Nenadic, P. Fisher, et al.,
+The taverna workﬂow suite: designing and executing workﬂows of
+web services on the desktop, web or in the cloud,
+Nucleic acids
+research 41 (2013) W557–W561.
+[20] L.-H. Hung, J. Hu, T. Meiss, A. Ingersoll, W. Lloyd, D. Kristiyanto,
+Y. Xiong, E. Sobie, K. Y. Yeung, Building containerized workﬂows
+using the biodepot-workﬂow-builder, Cell systems 9 (2019) 508–514.
+[21] nextﬂow, Nextﬂow’s documentation, 2021. URL:
+https://www.
+nextflow.io/docs/latest/kubernetes.html.
+[22] J. A. Novella, P. Emami Khoonsari, S. Herman, D. Whitenack,
+M. Capuccini, J. Burman, K. Kultima, O. Spjuth, Container-based
+bioinformatics with pachyderm, Bioinformatics 35 (2019) 839–846.
+[23] Luigi, Luigi - github, 2021. URL: https://github.com/spotify/luigi.
+[24] S. Lampa, M. Dahlö, J. Alvarsson, O. Spjuth, Scipipe: A workﬂow
+library for agile development of complex and dynamic bioinformatics
+pipelines, GigaScience 8 (2019) giz044.
+[25] Kubeﬂow, The machine learning toolkit for kubernetes, 2021. URL:
+https://www.kubeflow.org/.
+[26] Argo, Argo workﬂows - github, 2021. URL: https://github.com/
+argoproj/argo.
+[27] M. Rodriguez, R. Buyya, Container orchestration with cost-eﬃcient
+autoscaling in cloud computing environments,
+in: Handbook of
+research on multimedia cyber security, IGI Global, 2020, pp. 190–
+213.
+[28] KubeAdaptor, Kubeadaptor - github, 2021. URL: https://github.
+com/CloudControlSystems/KubeAdaptor.
+[29] B. Hindman, A. Konwinski, M. Zaharia, A. Ghodsi, A. D. Joseph,
+R. H. Katz, S. Shenker, I. Stoica, Mesos: A platform for ﬁne-grained
+resource sharing in the data center, in: NSDI, volume 11, USENIX
+Association, 2011, pp. 22–22.
+[30] Docker Swarm, Swarm mode overview, 2021. URL: https://docs.
+docker.com/engine/swarm/.
+[31] K. Vahi, M. Rynge, G. Papadimitriou, D. A. Brown, R. Mayani,
+R. F. da Silva, E. Deelman, A. Mandal, E. Lyons, M. Zink, Custom
+execution environments with containers in pegasus-enabled scientiﬁc
+workﬂows, in: Proceedings of the 15th International Conference on
+eScience (eScience), IEEE, 2019, pp. 281–290.
+[32] G. Gudukbay, J. R. Gunasekaran, Y. Feng, M. T. Kandemir,
+A. Nekrutenko, C. R. Das, P. Medvedev, B. Gruning, N. Coraor,
+N. Roach, et al., Gyan: Accelerating bioinformatics tools in galaxy
+with gpu-aware computation mapping, in: Proceedings of Interna-
+tional Parallel and Distributed Processing Symposium Workshops
+(IPDPSW), IEEE, 2021, pp. 194–203.
+[33] P. Di Tommaso, M. Chatzou, E. W. Floden, P. P. Barja, E. Palumbo,
+C. Notredame, Nextﬂow enables reproducible computational work-
+ﬂows, Nature biotechnology 35 (2017) 316–319.
+[34] Airﬂow, Apache airﬂow website, 2021. URL: https://airflow.
+apache.org.
+[35] M. Albrecht, P. Donnelly, P. Bui, D. Thain, Makeﬂow: A portable
+abstraction for data intensive computing on clusters, clouds, and grids,
+in: Proceedings of the 1st ACM SIGMOD Workshop on Scalable
+Workﬂow Execution Engines and Technologies, ACM, 2012, pp. 1–
+13.
+[36] C. Zheng, D. Thain, Integrating containers into workﬂows: A case
+study using makeﬂow, work queue, and docker,
+in: Proceedings
+of the 8th International Workshop on Virtualization Technologies in
+Distributed Computing, ACM, 2015, pp. 31–38.
+[37] P. Bui, D. Rajan, B. Abdul-Wahid, J. Izaguirre, D. Thain, Work queue
++ python: A framework for scalable scientiﬁc ensemble applications,
+in: Proceedings of the workshop on python for high performance and
+scientiﬁc computing at sc11, Citeseer, 2011.
+[38] C. Zheng, B. Tovar, D. Thain, Deploying high throughput scientiﬁc
+workﬂows on container schedulers with makeﬂow and mesos,
+in:
+Proceedings of the 17th IEEE/ACM International Symposium on
+Cluster, Cloud and Grid Computing, IEEE, 2017, pp. 130–139.
+[39] K. Peters, J. Bradbury, S. Bergmann, M. Capuccini, M. Cascante,
+P. de Atauri, T. M. Ebbels, C. Foguet, R. Glen, A. Gonzalez-Beltran,
+et al., Phenomenal: processing and analysis of metabolomics data in
+the cloud, Gigascience 8 (2019) giy149.
+[40] P. Moreno, L. Pireddu, P. Roger, N. Goonasekera, E. Afgan, M. Van
+Den Beek, S. He, A. Larsson, D. Schober, C. Ruttkies, et al., Galaxy-
+kubernetes integration: scaling bioinformatics workﬂows in the cloud,
+BioRxiv (2019) 488643.
+[41] Airﬂow-operator, Airﬂow-operator, 2021. URL: https://github.com/
+GoogleCloudPlatform/airflow-operator.
+[42] J. Chakraborty, C. Maltzahn, I. Jimenez, Enabling seamless execution
+of computational and data science workﬂows on hpc and cloud with
+the popper container-native automation engine, in: Proceedings of
+the 2nd International Workshop on Containers and New Orchestra-
+tion Paradigms for Isolated Environments in HPC (CANOPIE-HPC),
+IEEE, 2020, pp. 8–18.
+[43] Y. C. Lee, A. Y. Zomaya,
+Stretch out and compact: Workﬂow
+scheduling with resource abundance,
+in: Proceedings of the 13th
+IEEE/ACM International Symposium on Cluster, Cloud, and Grid
+Computing, IEEE, 2013, pp. 219–226.
+[44] C. Pahl, Containerization and the paas cloud, IEEE Cloud Computing
+2 (2015) 24–31.
+[45] Harbor, The trusted cloud native repository for kubernetes, 2021.
+URL: https://goharbor.io/.
+[46] Docker, Docker docs, 2021. URL: https://docs.docker.com.
+[47] Client-go, client-go - github, 2021. URL:
+https://github.com/
+kubernetes/client-go.
+[48] gRPC, A high performance, open source universal rpc framework,
+2021. URL: https://www.grpc.io/.
+[49] A. Verma, L. Pedrosa, M. Korupolu, D. Oppenheimer, E. Tune,
+J. Wilkes,
+Large-scale cluster management at google with borg,
+in: Proceedings of the Tenth European Conference on Computer
+Systems, ACM, 2015, pp. 1–17.
+[50] G. Juve, A. Chervenak, E. Deelman, S. Bharathi, G. Mehta, K. Vahi,
+Characterizing and proﬁling scientiﬁc workﬂows, Future generation
+computer systems 29 (2013) 682–692.
+[51] pegasus, Workﬂow gallery, 2021. URL: https://pegasus.isi.edu/
+workflow_gallery/index.php.
+[52] Stress, Linux man page, 2021. URL: https://linux.die.net/man/1/
+stress.
+[53] Isaac Klop, task-emulator - github, 2021. URL: https://github.com/
+IsaacKlop/task-emulator.
+Chenggang Shan received the
+M.S. degree in computer applied
+technology from Qiqihr University,
+China, in 2007. He is working toward
+the Ph.D. degree with the School
+of Automation, Beijing Institute of
+Technology, Beijing, China. He was
+an associate professor with the School
+of Artiﬁcial Intelligence, Zaozhuang
+University, China, in 2017. His re-
+search interests include networked control systems, cloud
+computing, cloud-edge collaboration, wireless networks. He
+is a member of Chinese Computer Federation (CCF).
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 17 of 18
+
+Chenggang Shan et al. KubeAdaptor: A Docking Framework for Workﬂow Containerization on Kubernetes
+Guan Wang received the M.S.
+degree in CTS from University of
+Jinan, China, in 2014. He currently
+working toward the Ph.D. in the
+School of Automation, Beijing Insti-
+tute of Technology, China. He was a
+lecturer in the School of Information
+Science and Engineering, University
+of Zaozhuang, China in 2019. His re-
+search interests lie in the areas of networking systems, cloud
+computing, gene expression data, and machine learning.
+Yuanqing Xia (M’15-SM’16) re-
+ceived the Ph.D. degree in Con-
+trol Theory and Control Engineering
+from Beijing University of Aeronau-
+tics and Astronautics, Beijing, China,
+in 2001. From November 2003 to
+February 2004, he was with the Na-
+tional University of Singapore as a
+Research Fellow, where he worked
+on variable structure control. Since
+2004, he has been with the School of Automation, Beijing
+Institute of Technology, Beijing, ﬁrst as an Associate Profes-
+sor, then, since 2008, as a Professor. His current research in-
+terests are in the ﬁelds of networked control systems, robust
+control and signal processing, active disturbance rejection
+control.
+Yufeng Zhan received his Ph.D.
+degree from Beijing Institute of Tech-
+nology (BIT), Beijing, China, in
+2018. He is currently an assistant pro-
+fessor in the School of Automation
+with BIT. Prior to join BIT, he was
+a post-doctoral fellow in the Depart-
+ment of Computing with The Hong
+Kong Polytechnic University. His re-
+search interests include networking
+systems, game theory, and machine learning.
+Jinhui Zhang received the Ph.D.
+degree in Control Science and En-
+gineering from Beijing Institute of
+Technology, Beijing, China, in 2011.
+He was a Visiting Fellow with the
+School of Computing, Engineering
+& Mathematics, University of West-
+ern Sydney, Sydney, Australia, from
+February 2013 to May 2013. He was
+an Associate Professor in the Beijing
+University of Chemical Technology, Beijing, from March
+2011 to March 2016, a Professor in the School of electrical
+and automation engineering, Tianjin University, Tianjin,
+from April 2016 to September 2016. He joined Beijing Insti-
+tute of Technology n October 2016, where he is currently an
+Tenured Professor. His research interests include networked
+control systems and composite disturbance rejection control.
+Chenggang Shan et al.: Preprint submitted to Elsevier
+Page 18 of 18

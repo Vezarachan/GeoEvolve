@@ -1,0 +1,1815 @@
+arXiv:gr-qc/0610049v2  23 Apr 2007
+Absolute Being vs Relative Becoming∗
+Joy Christian1,2
+1 Perimeter Institute, 31 Caroline Street North, Waterloo, ON, N2L 2Y5, Canada
+jchristian@perimeterinstitute.ca
+2 Department of Physics, Oxford University, Oxford OX1 3PU, United Kingdom
+joy.christian@wolfson.ox.ac.uk
+Summary. Contrary to our immediate and vivid sensation of past, present, and
+future as continually shifting non-relational modalities, time remains as tenseless and
+relational as space in all of the established theories of fundamental physics. Here an
+empirically adequate generalized theory of the inertial structure is discussed in which
+proper time is causally compelled to be tensed within both spacetime and dynamics.
+This is accomplished by introducing the inverse of the Planck time at the conjunction
+of special relativity and Hamiltonian mechanics, which necessitates energies and
+momenta to be invariantly bounded from above, and lengths and durations similarly
+bounded from below, by their respective Planck scale values. The resulting theory
+abhors any form of preferred structure, and yet captures the transience of now along
+timelike worldlines by causally necessitating a genuinely becoming universe. This is
+quite unlike the scenario in Minkowski spacetime, which is prone to a block universe
+interpretation. The minute deviations from the special relativistic eﬀects such as
+dispersion relations and Doppler shifts predicted by the generalized theory remain
+quadratically suppressed by the Planck energy, but may nevertheless be testable in
+the near future, for example via observations of oscillating ﬂavor ratios of ultrahigh
+energy cosmic neutrinos, or of altering pulse rates of extreme energy binary pulsars.
+1 Introduction
+From the very ﬁrst imprints of awareness, “change” and “becoming” appear
+to us to be two indispensable norms of the world. Indeed, prima facie it
+seems impossible to make sense of the world other than in terms of changing
+things and happening events through the incessant passage of time. And yet,
+the Eleatics, led by Parmenides, forcefully argued that change is nothing but
+an illusion, thereby rejecting the prevalent view, expounded by Heraclitus,
+that becoming is all there is. The great polemic that has ensued over these
+two diametrically opposing views of the world has ever since both dominated
+and shaped the course of western philosophy [1]. In modern times, inﬂuential
+∗To appear in Relativity and the Dimensionality of the World (within the series
+Fundamental Theories of Physics), edited by Vesselin Petkov (Springer, NY 2007).
+
+2
+Joy Christian
+neo-Eleatics such as McTaggart have sharpened the choice between the being
+and the becoming universe by distinguishing two diﬀerent possible modes of
+temporal discourse, one with and the other without a clear reference to the
+distinctions of past, present, and future; and it is the former mode with explicit
+reference to the tenses that is deemed essential for capturing the notions
+of change and becoming [2]. Conversely, the latter mode—which relies on a
+tenseless linear ordering of temporal moments by a transitive, asymmetric,
+and irreﬂexive relation precedes—is deemed incapable of describing a genuine
+change or becoming. Such a sharpening of the temporal discourse, in turn, has
+inspired two rival philosophies of time, each catering to one of the two possible
+modes of the discourse [3]. One tenseless philosophy of time holds that time is
+relational, much like space, which clearly does not seem to “ﬂow”, and hence
+what we perceive as the ﬂow or passage of time must be an illusion. The other
+tensed philosophy of time holds, on the other hand, that there is more to time
+than mere relational ordering of moments. It maintains that time is rather
+a dynamic or evolving entity unlike space, and does indeed “ﬂow”—like a
+refreshing river—much in line with our immediate experience of it. That is to
+say, far from being an illusion, our sensation of that sumptuous moment now,
+ceaselessly streaming-in from nowhere and slipping away into the unchanging
+past, happens to reﬂect a truly objective feature of the world.
+In terms of these two rival philosophies of time, a genuinely becoming
+universe must then correspond to a notion of time that is more than a mere
+set of “static” moments, linearly ordered by the relation precedes. In addition,
+it must at least allow a genuine partition of this ordered set into the moments
+of past, present, and future. From the perspective of physics, the choice of a
+becoming universe must then necessitate a theory of space and time that not
+only distinguishes the future events from the past ones intrinsically, but also
+thereby accounts for the continual passage of the ﬂeeting present, from a non-
+existing future into the unalterable past, as a bona ﬁde structural attribute
+of the world. Such a theory of space and time, which would account for the
+gradual coming-into-being of the non-existent future events—or a continual
+accumulation of the unalterable past ones—giving rise to a truly becoming
+universe, may be referred to as a Heraclitean theory of space-time, as opposed
+to a Parmenidean one, devoid of any such explicit dictate to becoming.
+One such Heraclitean theory of space-time was, of course, that of Newton,
+for whom “[a]bsolute, true, and mathematical time, of itself, and from its
+own nature, ﬂow[ed] equably without relation to anything external...” [4]. To
+be sure, Newton well appreciated the relational attributes of time, and in
+particular their remarkable similarities with those of space:
+Just as the parts of duration are individuated by their order, so that
+(for example) if yesterday could change places with today and become
+the later of the two, it would lose its individuality and would no longer
+be yesterday, but today; so the parts of space are individuated by their
+positions, so that if any two could exchange their positions, they would
+
+Absolute Being vs Relative Becoming
+3
+also exchange their identities, and would be converted into each other
+qua individuals. It is only through their reciprocal order and positions
+that the parts of duration and space are understood to be the very
+ones that they truly are; and they do not have any other principle of
+individuation besides this order and position [5].
+And yet, Newton did not fail to recognize the non-relational, or absolute,
+attributes of time that go beyond the mere relational ordering of moments.
+He clearly distinguished his neo-platonic notion of “equably” ﬂowing absolute
+time, existing independently of changing things, from the Aristotelian notion
+of “unequably” ﬂowing relative times, determined by their less than perfect
+empirical measures (such as clocks) [4]. What is more, he well appreciated
+the closely related need of a temporally founded theory of calculus within
+mathematics, formulated in terms of his notion of ﬂuxions (i.e., continuously
+generated temporally ﬂowing quantities [6]), and defended this theory vigor-
+ously against the challenges that arose from the quiescent theory of calculus
+put forward by Leibniz [6]. Thus, the notions of ﬂowing time and becoming
+universe were central to Newton not only for his mechanics, but also for his
+mathematics [6]. More relevantly for our purposes, according to him the rate
+of ﬂow of time—i.e., the rate at which the relationally ordered events succeed
+each other in the world—is determined by the respective moments of his ab-
+solute time, which ﬂows by itself, continuously, uniformly, and unstoppably,
+without relation to anything external [7]. Alas, as we now well know, such a
+Newtonian theory of externally ﬂowing absolute time, giving rise to an objec-
+tively becoming universe, is no longer physically viable. But is our celebration
+of Einstein’s relativistic revolution complete only through an unconditional
+renunciation of Newton’s non-relationally becoming universe?
+The purpose of this essay, ﬁrst, is to disentangle the notion of a becoming
+universe from that of an absolute time, and then to diﬀerentiate two physically
+viable and empirically distinguishable theories of spacetime: namely, special
+relativity—which is prone to a Parmenidean interpretation—and a generalized
+theory [8]—which is intrinsically Heraclitean by construction. The purpose of
+this essay may also be taken as a case study in experimental metaphysics,
+since it evaluates conceivable experiments that can adjudicate between the
+two rival philosophies of time under discussion. Experimental metaphysics is
+a term suggested by Shimony [9] to describe the enterprise of sharpening of
+the disputes traditionally classiﬁed as metaphysical, to the extent that they
+can be subjected to controlled experimental investigations. A prime example
+of such an enterprise is the sharpening of a dispute over the novel conceptual
+implications of quantum mechanics, which eventually led to a point where
+empirical evidence was brought to bear on the traditionally metaphysical con-
+cerns of scientiﬁc realism [9]. Historically, recall how resistance to accept the
+novel implications of quantum mechanics had led to suggestions of alterna-
+tive theories—namely, hidden variable theories. Subsequently, the eﬀorts by
+de Broglie, von Neumann, Einstein, Bohr, Bohm and others led to theoretical
+
+4
+Joy Christian
+sharpening of the central concepts of quantum mechanics, which eventually
+culminated into Bell’s incisive derivation of his inequalities. The latter, of
+course, was a breakthrough that made it possible to experimentally test the
+rival metaphysical positions on quantum mechanics [10]. As this well known
+example indicates, however, experimental investigations alone cannot be ex-
+pected to resolve profound metaphysical questions once and for all, without
+careful conceptual analyses. Indeed, Shimony [9] warns us against overplay-
+ing the signiﬁcance of experimental metaphysics. He points out that without
+careful conceptual analyses even those questions that are traditionally clas-
+siﬁed as scientiﬁc cannot be resolved by experimental tests alone. Hence, it
+should not be surprising that questions as slippery as those concerning time
+and becoming would require more than a mere experimental input. On the
+other hand, as the above example proves, a judicious experimental input can,
+indeed, facilitate greatly towards a possible resolution of these questions.
+Bearing these cautionary remarks in mind, the question answered, aﬃr-
+matively, in the present essay is: Can the debate over the being vs becoming
+universe—which is usually also viewed as metaphysical [11]—be sharpened
+enough to bear empirical input? Of course, as the above example of hidden
+variable theories suggests, the ﬁrst step towards any empirical eﬀort in this
+direction should be to construct a physically viable Heraclitean alternative
+to special relativity. As alluded to above, this step has already been taken in
+Ref. [8], with motivations for it stemming largely from the temporal concerns
+in quantum gravity. What is followed up here is a comparison of these two
+alternative theories of causal structure with regard to the status of becoming.
+Accordingly, in the next section we begin by reviewing the status of becoming
+within special relativity. Then, in Sec. 3, we review the alternative to special
+relativity proposed in Ref. [8], with an emphasis in Subsec. 3.3 on the causal
+inevitability of the strictly Heraclitean character of this alternative. Finally,
+before concluding, in Sec. 4 we discuss the experimental distinguishability of
+the two alternatives, and its implications for the status of becoming.
+2 The status of becoming within special relativity
+The prevalent theory of the local inertial structure at the heart of modern
+physics—classical or quantal, non-gravitational or gravitational—is, of course,
+Einstein’s special theory of relativity. This theory, however, happens to be
+oblivious to any structural distinction between the past and the future [12].
+To be sure, one frequently comes across references within its formalism to the
+notions of “absolute past” and “absolute future” of a given event. But these
+are mere conventional choices, corresponding to assignment of tenseless linear
+ordering to “static” moments mentioned above, with the ordering now being
+along the timelike worldline of an ideal observer tracing through that event
+(see Fig. 1). There is, of course, no doubt about the objectivity of this ordering.
+It is preserved under Lorentz transformations, and hence remains unaltered
+
+Absolute Being vs Relative Becoming
+5
+b
+c
+b
+c
+b
+c
+From eternity
+Conventional
+Past
+To eternity
+Conventional
+Future
+A
+B
+C
+Fig. 1. Timelike worldline of an observer tracing through an event B in a Minkowski
+spacetime. Events A and C in the conventional past and conventional future of
+the event B are related to B by the transitive, asymmetric, and irreﬂexive relation
+precedes. Such a linear ordering of events is preserved under Lorentz transformations.
+for all inertial observers. But such a sequence of moments has little to do with
+becoming per se, as both physically and mathematically well appreciated by
+Newton [5][6], and conceptually much clariﬁed by McTaggart [2]. Worse still,
+there is no such thing as a world-wide moment “now” in special relativity,
+let alone the notion of a passage of that moment. Due to the relativity of
+simultaneity, what is a “now-slice” cutting through a given event for one
+observer would be a “then-slice” for another one moving relative to the ﬁrst,
+and vise versa. In other words, what is past (or has “already happened”) for
+one observer could be the future (or has “not yet happened”) for the other,
+and vise versa [13]. This indeterminacy in temporal order cannot lead to any
+causal inconsistency however, for it can only occur for spacelike separated
+events—i.e., for pairs of events lying outside the light-cones of each other.
+Nevertheless, these facts suggest two rival interpretations for the continuum of
+events presupposed by special relativity: (1) an absolute being interpretation
+and (2) a relative becoming interpretation. According to the ﬁrst of these
+interpretations, events in the past, present, and future exist all at once, with
+equal ontological status, across the whole span of time; whereas according to
+the second, events can be partitioned, causally, consistently, and ontologically,
+into the sets of deﬁnite past and indeﬁnite future events, mediated by a ﬂeeting
+present, albeit only in a relative and observer-dependent manner.
+The ﬁrst of these two interpretations of special relativity is sometimes also
+referred to as the “block universe” interpretation, because of its resemblance
+
+6
+Joy Christian
+to a 4-dimensional block of “already laid out” events. The moments of time
+in this block are supposed to be no less actual than the locations in space are.
+Just as London and New York are supposed to be there even if you may not be
+at either of these locations, the moments of your birth and death are “there”
+on your time-line, even if you are presently far from being “at” either of these
+two moments of your life. More precisely, along your timelike worldline all
+events of your life are ﬁxed once and for all, beyond your control, and in
+apparent conﬂict with your freedom of choice. In fact, in special relativity, a
+congruence of such non-intersecting timelike worldlines—sometimes referred
+to as a ﬁbration of spacetime—represents a 3-dimensional relative space (or
+an inertial frame). The 4-dimensional spacetime is then simply ﬁlled by these
+“lifeless” ﬁbers, with the proper time along any one of them representing the
+local time associated with the ordered series of events laid out along that
+ﬁber. Informally, such a ﬁber is a track in spacetime of an observer moving
+subluminally for all eternity. In particular, for a given moment, all the future
+instants of time along this track—in exactly the same sense as all the past
+instants—are supposed to be ﬁxed, once and for all, till eternity.
+Such an interpretation of time in special relativity, of course, sharply diﬀers
+from our everyday conception of time, where we expect the nonexistent future
+instants to spring into existence from nowhere, streaming-in one after another,
+and then slipping away into the unalterable past, thus gradually materializing
+the past track of our worldline, as depicted in Fig. 2. In other words, in our
+everyday life we normally do not think of the future segment of our worldline
+to be preexisting for all eternity; instead, we perceive the events in our lives
+to be occurring non-fatalistically, one after another, rendering our worldline
+to “grow”, like a tendril on a wall. But such a “dynamic” conception of time
+appears to be completely alien to the universe purported by special relativity.
+Within the Minkowski universe, as Einstein himself has been quoted as saying,
+“the becoming in three-dimensional space is transformed into a being in the
+world of four dimensions” [14]. More famously, Weyl has gone one step further
+in endorsing such a static view of the world: “The objective world simply is, it
+does not happen” [15]. Accordingly, the appearances of change and becoming
+are construed to be mere ﬁgments of our conscious experience, as Weyl goes
+on to explain: “Only to the gaze of my consciousness, crawling upward along
+the life line of my body, does a section of this world come to life as a ﬂeeting
+image in space which continuously changes in time.” Not surprisingly, some
+commentators have reacted strongly against such a grim view of reality:
+But this picture of a “block universe”, composed of a timeless web of
+“world-lines” in a four-dimensional space, however strongly suggested
+by the theory of relativity, is a piece of gratuitous metaphysics. Since
+the concept of change, of something happening, is an inseparable com-
+ponent of the common-sense concept of time and a necessary component
+of the scientist’s view of reality, it is quite out of the question that the-
+oretical physics should require us to hold the Eleatic view that nothing
+
+Absolute Being vs Relative Becoming
+7
+b
+c
+Unchangeable Past
+Non-existent Future
+Becoming Events
+Moving “Now”
+Eternal Present
+Growing Worldline
+Fig. 2. The tensed time of the proverbial man in the street, with a degree in special
+relativity. His sensation of time is much richer than a mere tenseless linear ordering
+of events. Future events beyond the moving present are non-existent to him, whereas
+he, at least, has a memory of the past events that have occurred along his worldline.
+happens in “the objective world.” Here, as so often in the philosophy
+of science, a useful limitation in the form of representation is mistaken
+for a deﬁciency of the universe [16].
+The frustration behind these sentiments is, of course, quite understandable.
+It turns out not to be impossible, however, to appease the sentiments to some
+extent. It turns out that a formal “becoming relation” of a limited kind can
+indeed be deﬁned along a timelike worldline, uniquely and invariantly, with-
+out in any way compromising the principles of special relativity. The essential
+idea of such a relation goes back to Putnam [17], who tried to demonstrate
+that no meaningful binary relation between two events can exist within the
+framework of special relativity that can ontologically partition a worldline into
+distinct parts of already settled past and not yet settled future. Provoked by
+this and related arguments by Rietdijk [18] and Maxwell [19], Stein [20][21]
+set out to expose the inconsistencies within such arguments (without unduly
+leaning on either side of the debate), and proved that a transitive, reﬂexive,
+and asymmetric “becoming relation” of a formal nature can indeed be deﬁned
+consistently between causally connected pairs of events, on a time-orientable
+Minkowski spacetime. Stein’s analysis has been endorsed by Shimony [22] in
+an approach that is diﬀerent in emphasis but complementary in philosophy,
+and extended by Clifton and Hogarth [23] to a more natural setting for the
+becoming along timelike worldlines. This coherent set of arguments, taken
+individually or collectively, amounts to formally proving the permissibility of
+
+8
+Joy Christian
+objective becoming within the framework of special relativity, but only rela-
+tive to a given timelike worldline. And since a timelike worldline in Minkowski
+spacetime is simply the integral curve of a never vanishing, future-directed,
+timelike vector ﬁeld representing the direction of a moving observer, the be-
+coming defended here is meaningful only relative to such an observer. There
+is, of course, no inconsistency in this relativization of becoming, since—thanks
+to the absoluteness of simultaneity for coincident events—diﬀerent observers
+would always agree on which events have already “become”, and which have
+not, when their worldlines happen to intersect. Consequently, this body of
+works make it abundantly plain that special relativity does not compel us
+to adopt an interpretation as radical as the block universe interpretation, but
+leaves room for a rather sophisticated version of our common-sense conception
+of becoming. To be sure, this counterintuitive notion of a worldline-dependent
+becoming permitted within special relativity is a far cry from our everyday
+experience, where a world-wide present seems to perpetually stream-in from a
+non-existent future, and then slip away into the unchanging past. But such a
+pre-relativistic notion of absolute, world-wide becoming, occurring simultane-
+ously for each and every one of us regardless of our motion, has no place in the
+post-relativistic physics. Moreover, this apparent absolute becoming can be
+easily accounted for as a gross collective of “local” or “individual” becomings
+along timelike worldlines, emerging cohesively in the nonrelativistic limit. Just
+as Newtonian mechanics can be viewed as an excellent approximation to the
+relativistic mechanics for small velocities, our commonly shared “world-wide”
+becoming can be shown to be an excellent approximation to these relativistic
+becomings for small distances, thanks to the enormity of the speed of light in
+everyday units. Consequently, the true choice within special relativity should
+be taken not as between absolute being and absolute becoming, but between
+the former (i.e., block universe) and the relativity of distant becoming.
+There has been rather surprising reluctance to accept this relativization
+of becoming, largely by the proponents of the block universe interpretation
+of special relativity. As brought out by Stein [21], some of this reluctance
+stems from elementary misconceptions regarding the true physical import of
+the theory, even by philosophers with considerable scientiﬁc prowess. There
+seems to remain a genuine concern, however, because the notion of worldline-
+dependent becoming tends to go against our pre-relativistic ideas of existence.
+This concern can be traced back to G¨odel, who ﬂatly refused to accept the
+relativity of distant becoming on such grounds: “A relative lapse of time, ... if
+any meaning at all can be given to this phrase, would certainly be something
+entirely diﬀerent from the lapse of time in the ordinary sense, which means
+a change in the existing. The concept of existence, however, cannot be rela-
+tivized without destroying its meaning completely” [24]. In the similar vein,
+in a certain book-review Callender remarks: “... the relativity of simultaneity
+poses a problem: existence itself must be relativized to frame. This may not
+be a contradiction, but it is certainly a queer position to hold” [25]. Perhaps.
+But nature cannot be held hostage to what our pre-relativistic prejudices ﬁnd
+
+Absolute Being vs Relative Becoming
+9
+queer. Whether we like it or not, the Newtonian notion of absolute world-
+wide existence has no causal meaning in the post-relativistic physics. Within
+special relativity, discernibility of events existing at a distance is constrained
+by the absolute upper-bound on the speeds of causal propagation, and hence
+the Newtonian notion of absolute distant existence becomes causally mean-
+ingless. To be sure, when we regress back to our everyday Euclidean intuitions
+concerning the causal structure of the world, the idea of relativized existence
+seems strange. However, according to special relativity the topology of this
+causal structure—i.e., the neighborhood relations between causally admissible
+events—happens not to be Euclidean but pseudo-Euclidean. Once this aspect
+of the theory is accepted, it is quite anomalous to hang on to the Euclidean
+notion of existence, or equivalently to the absoluteness of distant becoming.
+It is of course logically possible to accept the relativity of distant simultaneity
+but reject the relativity of distant becoming, as G¨odel seems to have done,
+but conceptually that would be quite inconsistent, since the former relativity
+appears to us no less queer than the latter. In fact, perhaps unwittingly, some
+textbook descriptions of the relativity of simultaneity explicitly end up using
+the language of becoming. Witness for example Feynman’s description of a
+typical scenario [26]: “ ... events that occur at two separated places at the
+same time, as seen by Moe in S′, do not happen at the same time as viewed
+by Joe in S [emphasis rearranged].” Indeed, keeping the geometrical formal-
+ism intact, every statement involving the relativity of distant simultaneity
+in special relativity can be replaced by an identical statement involving the
+relativity of distant becoming, without aﬀecting either the theoretical or the
+empirical content of the theory. In other words, Einstein could have written
+his theory using the latter relativity rather than the former, and that would
+have made no diﬀerence to the relativistic physics—classical or quantal—of
+the past hundred years. The former would have been then seen as a useful but
+trivial corollary of the latter. Thus, as Callender so rightly suspects, there is
+indeed no contradiction in taking the relativity of distant becoming seriously,
+since any evidence of our perceived co-becoming of objectively existing distant
+events (i.e., of our perceived absoluteness of becoming) is quite indirect and
+causal [22]. Therefore, the alleged queerness of the relativity of distant be-
+coming by itself cannot be taken as a good reason to opt for an interpretation
+of special relativity as outrageous as the block universe interpretation.
+There do exist other good reasons, however, that, on balance, land the
+block interpretation the popularity it enjoys. Einstein-Minkowski spacetime
+is pretty “lifeless” on its own, as evident from comparisons of Figs. 1 and 2
+above. If becoming is a truly ontological feature of the world, however, then
+we expect the sum total of reality to grow incessantly, by objective accretion
+of entirely newborn events. We expect this to happen as non-existent future
+events momentarily come to be the present event, and then slip away into the
+unchanging past, as we saw in Fig. 2. No such objective growth of reality can
+be found within the Einstein-Minkowski framework for the causal structure.
+It is all very well for Stein to prove the deﬁnability of a two-place “becoming
+
+10
+Joy Christian
+relation” within Minkowski spacetime, but in a genuinely becoming universe
+no such relation between future events and a present event can be meaningful.
+Indeed, as recognize by Broad long ago, “...the essence of a present event is,
+not that it precedes future events, but that there is quite literally nothing
+to which it has the relation of precedence” [27]. Even more tellingly, in the
+Einstein-Minkowski framework there is no causal compulsion for becoming. In
+a genuinely becoming universe we would expect the accretion of new events to
+be necessitated causally, not left at the mercy of our interpretive preferences.
+In other words, we would expect the entire spatio-temporal structure to not
+only grow, but this growth to be also necessitated by causality itself. No such
+causal dictate to becoming is there in the Einstein-Minkowski framework of
+causality. A theory of local inertial structure with just such a causal necessity
+for objective temporal becoming is the subject matter of our next section.
+3 A purely Heraclitean generalization of relativity
+Despite the fact that temporal transience is one of the most immediate and
+constantly encountered aspects of the world [11], Newton appears to be the
+last person to have actively sought to capture it, at the most fundamental level,
+within a successful physical theory. Equipped with his hypothetico-deductive
+methodology, he was not afraid to introduce metaphysical notions into his
+theories as long as they gave rise to testable experimental consequences. After
+the advent of excessively operationalistic trends within physics since the dawn
+of the last century, however, questions of metaphysical ﬂavor—questions even
+as important as those concerning time—have tended to remain on the fringe
+of serious physical considerations.3 Perhaps this explains why most of the
+popular approaches to the supposed quantum gravity are entirely oblivious
+to the profound controversies concerning the status of temporal becoming.4
+If, however, temporal becoming is indeed a genuinely ontological attribute of
+the world, then no approach to quantum gravity can aﬀord to ignore it. After
+all, by quantum gravity one usually means a complete theory of nature. How
+can a complete theory of nature be oblivious to one of the most immediate
+and ubiquitous features of the world? Worse still: if temporal becoming is a
+genuine feature of the world, then how can any approach to quantum gravity
+possibly hope to succeed while remaining in total denial of its reality?
+3 There are, of course, a few brave-hearts, such as Shimony [28] and Elitzur [29],
+who have time and again urged the physics community to take temporal becoming
+seriously. However, there are also those who have preferred to explain it away as a
+counterfeit, resulting from some sort of “macroscopic irreversibility” [30][31][32].
+4 A welcome exception is the causal set approach initiated by Sorkin [33]. However,
+the stochasticity of “growth dynamics” discovered a posteriori within this discrete
+approach is a far cry from the inevitable continuity of becoming recognized by
+Newton [6]. Such a deﬁciency seems unavoidable within any discrete approach to
+quantum gravity, due to the “inverse problem” of recovering the continuum [34].
+
+Absolute Being vs Relative Becoming
+11
+GN
+h
+GTR
+STR
++
+CHM
+CTN
+QTF
+t−1
+P
+Fig. 3. Introducing the inverse of the Planck time at the conjunction of Special
+Theory of Relativity (STR) and Classical Hamiltonian Mechanics (CHM), with a
+bottom-up view to a Complete Theory of Nature (CTN). Both General Theory of
+Relativity (GTR) and Quantum Theory of Fields (QTF) are viewed as limiting cases,
+corresponding to negligible quantum eﬀects (represented by Planck’s constant h) and
+negligible gravitational eﬀects (represented by Newton’s constant GN ), respectively.
+Partly in response to such ontological and methodological questions, an
+intrinsically Heraclitean generalization of special relativity was constructed in
+Ref. [8]. The strategy behind this approach was to judiciously introduce the
+inverse of the Planck time, namely t−1
+P , at the conjunction of special relativity
+and Hamiltonian mechanics, with a bottom-up view to a complete theory of
+nature, in a manner similar to how general relativity was erected by Einstein
+on special relativity (see Fig. 3). The resulting theory of the causal structure
+has already exhibited some remarkable physical consequences. In particular,
+such a judicious introduction of t−1
+P
+necessitates energies and momenta to be
+invariantly bounded from above, and lengths and durations similarly bounded
+from below, by their respective Planck scale values. By contrast, within special
+relativity nothing prevents physical quantities such as energies and momenta
+to become unphysically large—i.e., inﬁnite—in a rapidly moving frame. In
+view of the primary purpose of the present essay, however, we shall refrain
+form dwelling too much into these physical consequences (details of which
+may be found in Ref. [8]). Instead, we shall focus here on those features of the
+generalized theory that accentuate its purely Heraclitean character.
+
+12
+Joy Christian
+M
+4
+e1
+e2
+×
+s1
+s2
+2n
+N
+Fig. 4. (a) The motion of a clock from event e1 to event e2 in a Minkowski Spacetime
+M. (b) As the clock moves from e1 to e2, it also inevitably evolves, as a result of its
+external motion, from state s1 to state s2 in its own 2n-dimensional phase space N.
+3.1 Fresh look at the proper duration in special relativity
+To this end, let us reassess the notion of proper duration residing at the very
+heart of special relativity. Suppose an object system, equipped with an ideal
+classical clock of unlimited accuracy, is moving with a uniform velocity v in a
+Minkowski spacetime M, from an event e1 at the origin of a reference frame
+to a nearby event e2 in the future light cone of e1, as shown in Fig. 4a. For our
+purposes, it would suﬃce to refer to this system, say of n degrees of freedom,
+simply as “the clock.” As it moves, the clock will also necessarily evolve, as
+a result of its external motion, say at a uniform rate ω, from one state, say
+s1, to another state, say s2, within its own relativistic phase space, say N.
+In other words, the inevitable evolution of the clock from s1 to s2—or rather
+that of its state—will trace out a unique trajectory in the phase space N, as
+shown in Fig. 4b. For simplicity, we shall assume that this phase space of the
+clock is ﬁnite dimensional; apart from possible mathematical encumbrances,
+the reasoning that follows would go through unabated for the case of inﬁnite
+dimensional phase spaces (e.g. for clocks made out of relativistic ﬁelds).
+Now, nothing prevents us from thinking of this motion and evolution of the
+clock conjointly, as taking place in a combined 4 + 2n−dimensional space, say
+E, the elements of which may be called event-states and represented by pairs
+(ei, si), as depicted in Fig. 5. Undoubtedly, it is this combined space that truly
+captures the complete speciﬁcation of all possible physical attributes of our
+classical clock. Therefore, we may ask: What will be the time interval actually
+registered by the clock as it moves and evolves from the event-state (e1, s1)
+to the event-state (e2, s2) in this combined space E? It is only by answering
+such a physical question can one determine the correct topology and geometry
+of the combined space in the form of a metric, analogous to the Minkowski
+
+Absolute Being vs Relative Becoming
+13
+(e1, s1)
+(e2, s2)
+4 + 2n
+E
+?= M × N
+Fig. 5. What is the correct metric-topology of the combined space E—made up of
+the external Minkowski spacetime M and the internal space of states N—in which
+our clock moves as well as evolves from event-state (e1, s1) to event-state (e2, s2)?
+metric corresponding to the line element
+dτ 2
+E = dt2 −c−2dx2 ≥0 ,
+(1)
+where the inequality asserts the causality condition. Of course, after Einstein
+the traditional answer to the above question, in accordance with the line
+element (1), is simply
+∆τE =
+Z (e2, s2)
+(e1, s1)
+dτE =
+Z t2
+t1
+1
+γ(v) dt ,
+(2)
+with the usual Lorentz factor
+γ(v) :=
+1
+p
+1 −v2/c2 > 1.
+(3)
+In other words, the traditional answer is that the metrical topology of the
+space E is of a product form, E = M × N, and—more to the point—the clock
+that records the duration ∆τE in question remains insensitive to the passage
+of time that marks the evolution of variables within its own phase space N.
+But from the above perspective—i.e., from the perspective of Fig. 5—
+it is evident that Einstein made an implicit assumption while proposing the
+proper duration (2). He tacitly assumed that the rate at which a given physical
+state can evolve remains unbounded. Of course, he had no particular reason
+to question the limitlessness of how fast a physical state can evolve. However,
+for us—from what we have learned from our eﬀorts to construct a theory of
+quantum gravity—it is not unreasonable to suspect that the possible rate at
+which a physical state can evolve is invariantly bounded from above. Indeed,
+it is generally believed that the Planck scale marks a threshold beyond which
+our theories of space and time, and possibly also of quantum phenomena,
+
+14
+Joy Christian
+(t1, s1)
+(t2, s2)
+1 + 2n
+O
+?= R × N
+Fig. 6. The evolution of our clock from instant-sate (t1, s1) to instant-state (t2, s2)
+in the odd dimensional extended phase space O. What is the correct topology of O?
+are unlikely to survive [8][35][36]. In particular, the Planck time tP is widely
+thought to be the minimum possible duration. It is then only natural to suspect
+that the inverse of the Planck time—namely t−1
+P , with its approximate value of
+10+43 Hertz in ordinary units—must correspond to the absolute upper bound
+on how fast a physical state can possibly evolve. In this context, it is also
+worth noting that the speed of light is simply a ratio of the Planck length
+over the Planck time, c := lP /tP , which suggests that perhaps the assumption
+of absolute upper bound t−1
+P
+on possible rates of evolution should be taken to
+be more primitive in physical theories than the usual assumption of absolute
+upper bound c on possible speeds of motion. In fact, as we shall see, the
+assumption of upper bound c on speeds of motion can indeed be viewed as a
+special case of our assumption of upper bound t−1
+P
+on rates of evolution.
+To this end, let us then systematize the above thoughts by incorporating
+t−1
+P
+into a physically viable and empirically adequate theory of the local causal
+structure. One way to accomplish this task is to ﬁrst consider a simpliﬁed pic-
+ture, represented by what is known as the extended phase space, constructed
+within a global inertial frame in which the clock is at rest (see Fig. 6). Now,
+in such a frame the proper time interval the clock would register is simply
+the Newtonian time interval ∆t. Using this time t ∈R as an external parame-
+ter, within this frame one can determine the extended phase space O = R × N
+for the dynamical evolution of the clock using the usual Hamiltonian prescrip-
+tion. Suppose next we consider time-dependent canonical transformations of
+the dimensionless phase space coordinates yµ(t) (µ = 1, . . . , 2n), expressed in
+Planck units, into coordinates y′µ(t) of the following general linear form:
+y′µ(yµ(0), t) = yµ(0) + ωµ
+r (y(0)) t + bµ ,
+(4)
+
+Absolute Being vs Relative Becoming
+15
+where ωµ
+r and bµ do not have explicit time dependence, and the reason for
+the subscript r in ωµ
+r , which stands for “relative”, will become clear soon.
+Interpreted actively, these are simply the linearized solutions of the familiar
+Hamiltonian ﬂow equations,
+dyµ
+dt
+= ωµ
+r (y(t)) := Ωµν ∂H
+∂yν ,
+(5)
+where ωr is the Hamiltonian vector ﬁeld generating the ﬂow, y(t) is a 2n-
+dimensional local Darboux vector in the phase space N, Ωis the symplectic
+2-form on N, and H is a Hamiltonian function governing the evolution of the
+clock. If we now denote by ωµ the uniform time rate of change of the canonical
+coordinates yµ, then the linear transformations (4) imply the composition law
+ω′µ = ωµ + ωµ
+r
+(6)
+for the evolution rates of the two sets of coordinates, with −ωµ
+r interpreted
+as the rate of evolution of the transformed coordinates with respect to the
+original ones. Crucially for our purposes, what is implicit in the law (6) is
+the assumption that there is no upper bound on the rates of evolution of
+physical states. Indeed, successive transformations of the type (4) can be used,
+along with (6), to generate arbitrarily high rates of evolution for the state of
+the clock. More pertinently, the assumed validity of the composition law (6)
+turns out to be equivalent to assuming the absolute simultaneity of “instant-
+states” (ti, si) within the 1 + 2n−dimensional extended phase space O. In
+other words, within the 1 + 2n−dimensional manifold O, the 2n−dimensional
+phase spaces simply constitute strata of hypersurfaces of simultaneity, much
+like the strata of spatial hypersurfaces within a Newtonian spacetime. Indeed,
+the extended phase spaces such as O are usually taken to be contact manifolds,
+with topology presumed to be a product of the form R × N .
+Thus, not surprisingly, the assumption of absolute time in contact spaces
+is equivalent to the assumption of “no upper bound” on the possible rates of
+evolution of physical states. Now, in accordance with our discussion above,
+suppose we impose the following upper bound on the evolution rates5:
+
+dy
+dt
+ =: ω ≤t−1
+P
+.
+(7)
+If this upper bound is to have any physical signiﬁcance, however, then it
+must hold for all possible evolving phase space coordinates yµ(t), and that is
+amenable if and only if the composition law (6) is replaced by
+ω′µ =
+ωµ + ωµ
+r
+1 + t2
+P ωµ ωµ
+r ,
+(8)
+5 The “ﬂat” Euclidean metric on the phase space that is being used here is the
+“quantum shadow metric”, viewed as a classical limit of the Fubini-Study metric
+of the quantum state space (namely, the projective Hilbert space), in accordance
+with our bottom-up philosophy depicted in Fig. 3. See Ref. [8] for further details.
+
+16
+Joy Christian
+which implies that as long as neither ωµ nor ωµ
+r exceeds the causal upper
+bound t−1
+P , ω′µ also remains within t−1
+P . Of course, this generalized law of
+composition has been inspired by Einstein’s own such law for velocities, which
+states that the velocity, say vk (k = 1, 2, or 3), of a material body in a given
+direction in one inertial frame is related to its velocity, say v′k, in another
+frame, moving with a velocity −vk
+r with respect to the ﬁrst, by the relation
+v′k =
+vk + vk
+r
+1 + c−2 vk vkr
+.
+(9)
+Thus, as long as neither vk nor vk
+r exceeds the upper bound c, v′k also remains
+within c. It is this absoluteness of c that lends credence to the view that it is
+merely a conversion factor between the dimensions of time and space. This fact
+is captured most conspicuously by the quadratic invariant (1) of spacetime.
+In exact analogy, if we require the causal relationships among the possible
+instant-states (ti, si) in O to respect the upper bound t−1
+P
+in accordance with
+the law (8), then the usual product metric of the space O would have to be
+replaced by the pseudo-Euclidean metric corresponding to the line element
+dτ 2
+H = dt2 −t2
+P dy2 ≥0,
+(10)
+where the phase space line element dy was discussed in the footnote 5 above.
+But then, in the resulting picture, diﬀerent canonical coordinates evolving
+with nonzero relative rates would diﬀer in general over which instant-states
+are simultaneous with a given instant-state. As unorthodox as this new picture
+may appear to be, it is an inevitable consequence of the upper bound (7).
+Let us now raise a question analogous to the one raised earlier: In its rest
+frame, what will be the time interval registered by the clock as it evolves from
+an instant-state (t1, s1) to an instant-state (t2, s2) within the space O? The
+answer, according to the pseudo-Euclidean line element (10), is clearly
+∆τH =
+Z (t2, s2)
+(t1, s1)
+dτH =
+Z t2
+t1
+1
+γ(ω) dt = | t2 −t1|
+γ(ω)
+=
+∆t
+γ(ω) ,
+(11)
+where
+γ(ω) :=
+1
+p1 −t2
+P ω2 > 1.
+(12)
+Thus, if the state of the clock is evolving, then we will have the phenomenon of
+“time dilation” even in the rest frame. Similarly, we will have a phenomenon of
+“state contraction” in analogy with the phenomenon of “length contraction”:
+∆y′ = ω ∆τH = ω ∆t
+γ(ω) = ∆y
+γ(ω) .
+(13)
+It is worth emphasizing here, however, that, as in ordinary special relativity,
+nothing is actually “dilating” or “contracting”. All that is being exhibited by
+
+Absolute Being vs Relative Becoming
+17
+these phenomena is that the two sets of mutually evolving canonical coordi-
+nates happen to diﬀer over which instant-states are simultaneous.
+So far, to arrive at the expression (10) for the proper duration, we have
+used a speciﬁc Lorentz frame, namely the rest frame of the clock. In a frame
+with respect to which the same clock is uniformly moving, the expression for
+the actual proper duration can be obtained at once from (10), by simply using
+the Minkowski line element (1), yielding
+dτ 2 = dt2 −c−2dx2 −t2
+P dy2 ≥0.
+(14)
+This, then, is the 4 + 2n−dimensional quadratic invariant of our combined
+space E of Fig. 5. We may now return to our original question and ask: What,
+according to this generalized theory of relativity, will be the proper duration
+registered by a given clock as it moves and evolves from an event-state (e1, s1)
+to an event-state (e2, s2) in the combined space E? Evidently, according to
+the quadratic invariant (14), the answer is simply:
+∆τ =
+Z (e2, s2)
+(e1, s1)
+dτ =
+Z t2
+t1
+1
+γ(v, ω) dt ,
+(15)
+with
+γ(v, ω) :=
+1
+p
+1 −c−2 v2 −t2
+P ω2 > 1.
+(16)
+We are now in a position to isolate the two basic postulates on which the
+generalized theory of relativity developed above can be erected in the manner
+analogous to the usual special relativity. In fact, the ﬁrst of the two postulates
+can be taken to be Einstein’s very own ﬁrst postulate, except that we must
+now revise the meaning of inertial coordinate system. In the present theory
+it is taken to be a system of 4 + 2n dimensions, “moving” uniformly in the
+combined space E, with 4 being the external spacetime dimensions, and 2n
+being the internal phase space dimensions of the system. Again, the internal
+dimensions of the object system can be either ﬁnite or inﬁnite in number.
+Next, note that by eliminating the speed of light in favor of pure Planck scale
+quantities the quadratic invariant (14) can be expressed in the form
+dτ 2 = dt2 −t2
+P
+
+l−2
+P
+dx2 + dy2	
+≥0 ,
+(17)
+where lP is the Planck length of the value ∼10−33 cm in ordinary units. The
+two postulates of generalized relativity may now be stated as follows:
+(1)
+The laws governing the states of a physical system are insensitive to “the
+state of motion” of the 4 + 2n−dimensional reference coordinate system
+in the pseudo-Euclidean space E, as long as it remains “inertial”.
+(2)
+No time rate of change of a dimensionless physical quantity, expressed
+in Planck units, can exceed the inverse of the Planck time.
+
+18
+Joy Christian
+Clearly, the generalized invariance embedded within this new causal theory
+of local inertial structure is much broader in its scope—both physically and
+conceptually—than the invariance embedded within special relativity. For ex-
+ample, in the present theory even the four dimensional continuum of spacetime
+no longer enjoys the absolute status it does in Einstein’s theories of relativity.
+Einstein dislodged Newtonian concepts of absolute time and absolute space,
+only to replace them by an analogous concept of absolute spacetime—namely, a
+continuum of in principle observable events, idealized as a connected pseudo-
+Riemannian manifold, with observer-independent spacetime intervals. Since
+it is impossible to directly observe this remaining absolute structure without
+recourse to the behavior of material objects, perhaps it is best viewed as the
+“ether” of the modern times, as Einstein himself occasionally did [37]. By
+contrast, it is evident that in the present theory even this four-dimensional
+spacetime continuum has no absolute, observer-independent meaning. In fact,
+apart from the laws of nature, there is very little absolute structure left in the
+present theory, for now even the quadratic invariant (14) is dependent on the
+phase space structure of the material system being employed.
+3.2 Physical implications of the generalized theory of relativity
+Although not our main concern here6, it is worth noting that the generalized
+theory of relativity described above is both a physically viable and empirically
+adequate theory. In fact, in several respects the present theory happens to
+be physically better behaved than Einstein’s special theory of relativity. For
+instance, unlike in special relativity, in the present theory physical quantities
+such as lengths, durations, energies, and momenta remain bounded by their
+respective Planck scale values. This physically sensible behavior is due to the
+fact that present theory assumes even less preferred structure than special
+relativity, by positing democracy among the internal phase space coordinates
+in addition to that among the external spacetime coordinates.
+Mathematically, this demand of combined democracy among spacetime
+and phase space coordinates can be captured by requiring invariance of the
+physical laws under the 4 + 2n−dimensional coordinate transformations [8]
+zA = ΛA
+B z′B + bA
+(18)
+analogous to the Poincar´e transformations, with the index A = 0, . . . , 3 + 2n
+now running along the 4 + 2n dimensions of the manifold E of Fig. 5. These
+transformations would preserve the quadratic invariant (17) iﬀthe constraints
+ΛA
+C ΛB
+D ξAB = ξCD
+(19)
+are satisﬁed, where ξAB are the components of the metric on the manifold E.
+At least for simple ﬁnite dimensional phase spaces, the coeﬃcients ΛA
+B are
+6 In this subsection we shall only brieﬂy highlight the physical implications of the
+generalized theory of relativity. For a complete discussion see Sec. VI of Ref. [8].
+
+Absolute Being vs Relative Becoming
+19
+easily determinable. For example, consider a massive relativistic particle at
+rest (and hence also not evolving) with respect to a primed coordinate system
+in the external spacetime, which is moving with a uniform velocity v with
+respect to another unprimed coordinate system. Since, as it moves, the state
+of the particle will also be evolving in its six dimensional phase space, say at
+a uniform rate ω, we can view its motion and evolution together with respect
+to a 4 + 6−dimensional unprimed coordinate system in the space E.
+Restricting now to the external spatio-temporal sector where we actually
+perform our measurements, it is easy to show [8] that the coeﬃcients ΛA
+B
+are functions of the generalized gamma factor (16), with the corresponding
+expression for the length contraction being
+∆x′ =
+∆x
+γ(v, ω) ,
+(20)
+which can be further evaluated to yield
+∆x′ = ∆x
+s
+1 −v2
+c2 −l2
+P
+∆x −∆x′
+∆x′∆x
+2
+.
+(21)
+Although nonlinear, this expression evidently reduces to the special relativistic
+expression for length contraction in the limit of vanishing Planck length. For
+the physically interesting case of ∆x′ ≪∆x, it can be simpliﬁed and solved
+exactly, yielding the “linearized” expression for the “contracted” length,
+∆x′ = ∆x
+v
+u
+u
+t1
+2
+
+1 −v2
+c2
+
++
+s
+1
+4
+
+1 −v2
+c2
+2
+−
+l2
+P
+(∆x)2 ,
+(22)
+provided the reality condition
+1
+4
+
+1 −v2
+c2
+2
+≥
+l2
+P
+(∆x)2
+(23)
+is satisﬁed. Substituting this condition back into the solution (22) then gives
+∆x′ ≥
+p
+lP ∆x ,
+(24)
+which implies that as long as ∆x remains greater than lP the “contracted”
+length ∆x′ also remains greater than lP , in close analogy with the invariant
+bound c on speeds in special relativity. That is to say, in addition to the
+upper bound ∆x on lengths implied by the condition γ(v, ω) > 1 above, the
+“contracted” length ∆x′ also remains invariantly bounded from below, by lP :
+∆x > ∆x′ > lP .
+(25)
+Starting again from the expression for time dilation analogous to that for
+the length contraction,
+
+20
+Joy Christian
+∆τ =
+∆t
+γ(v, ω) ,
+(26)
+and using almost identical line of arguments as above, one analogously arrives
+at a generalized expression for the time dilation,
+∆τ = ∆t
+v
+u
+u
+t1
+2
+
+1 −v2
+c2
+
++
+s
+1
+4
+
+1 −v2
+c2
+2
+−
+t2
+P
+(∆t)2 ,
+(27)
+together with the corresponding invariant bounds on the “dilated” time:
+∆t > ∆τ > tP .
+(28)
+Thus, in addition to being bounded from above by the time ∆t, the “dilated”
+time ∆τ remains invariantly bounded also from below, by the Planck time tP .
+So far we have not assumed or proved explicitly that the constant “c”
+is an upper bound on possible speeds. As alluded to above, in the present
+theory the observer-independence of the upper bound c turns out to be a
+derivative notion. This can be easily appreciated by considering the ratio of the
+“contracted” length (22) and “dilated” time (27), along with the deﬁnitions
+u := ∆x
+∆t
+and
+u′ := ∆x′
+∆τ
+(29)
+for velocities, leading to the upper bound on velocities in the moving frame:
+u′ ≤u
+q
+1 +
+p
+1 −c2 u−2 .
+(30)
+Hence, as long as u does not exceed c, u′ also remains within c. In other words,
+in the present theory c retains its usual status of the observer-independent
+upper bound on causally admissible speeds, but in a rather derivative manner.
+In addition to the above kinematical implications, the basic elements of the
+particle physics are also modiﬁed within our generalized theory, the central
+among which being the Planck scale ameliorated dispersion relation
+p2 c2 + m2 c4 = E2
+"
+1 −
+ E −m c22
+E2
+P
+#
+,
+(31)
+where EP is the Planck energy. It is worth emphasizing here that this is an
+exact relation between energies and momenta, which in the rest frame of the
+massive particle reproduces Einstein’s famous mass-energy equivalence:
+E = m c2.
+(32)
+Moreover, in analogy with the invariant lower bounds on lengths and durations
+we discussed above, in the present theory energies and momenta can also be
+shown to remain invariantly bounded from above by their Planck values:
+
+Absolute Being vs Relative Becoming
+21
+E′ ≤
+p
+EP E
+and
+p′ ≤
+p
+kP p ×
+rv
+c ,
+(33)
+where kP is the Planck momentum. Thus, as long as the unprimed energy E
+does not exceed EP , the primed energy E′ also remains within EP . That is to
+say, in addition to the lower bound E on energies implied by the condition
+γ(v, ω) > 1, the energies E′ remain invariantly bounded also from above, by
+the Planck energy EP :
+E < E′ < EP .
+(34)
+Similarly, as long as the relative velocity v does not exceed c and the unprimed
+momentum p does not exceed kP , the primed momentum p′ also remains within
+kP . Hence, in addition to the lower bound p on momenta set by the condition
+γ(v, ω) > 1, the momenta p′ remain invariantly bounded also from above, by
+the Planck momentum kP :
+p < p′ < kP .
+(35)
+Thus, unlike in special relativity, in the present theory all physical quantities
+remain invariantly bounded by their respective Planck scale values.
+Next, consider an isolated system of mass msys composed of a number
+of constituents undergoing an internal reaction. It follows from the quadratic
+invariant (17) that the 4 + 2n−vector Psys, deﬁned as the abstract momentum
+of the system as a whole, would be conserved in such a reaction (cf. [8]),
+∆Psys = 0 ,
+(36)
+where ∆denotes the diﬀerence between initial and ﬁnal states of the reaction,
+and Psys is deﬁned by
+msys
+dzA
+dτ
+=: PA
+sys :=
+ Esys/c , pk
+sys , P µ
+sys
+
+,
+(37)
+with k = 1, 2, 3 denoting the external three dimensions and µ = 4, 5, . . ., 3 + 2n
+denoting the phase space dimensions of the system as a whole. It is clear from
+this deﬁnition that, since dzA is a 4 + 2n−vector whereas msys and dτ are
+invariants, PA
+sys is also a 4 + 2n−vector, and hence transforms under (18) as
+P′A
+sys = ΛA
+B PB
+sys .
+(38)
+Moreover, since Λ depends only on the overall coordinate transformations
+being performed within the space E, the diﬀerence on the left hand side of
+(36) is also a 4 + 2n−vector, and therefore transforms as
+∆P′A
+sys = ΛA
+B ∆PB
+sys .
+(39)
+Thus, if the conservation law (36) holds for one set of coordinates within the
+space E, then, according to (39), it does so for all coordinates related by the
+
+22
+Joy Christian
+transformations (18). Consequently, the conservation law (36), once unpacked
+into its external, internal, and constituent parts as
+0 = ∆Psys =
+ ∆Esys/c , ∆psys , ∆Pint
+sys
+
+,
+(40)
+leads to the familiar conservation laws for energies and momenta:
+0 = ∆Esys :=
+X
+f
+Ef −
+X
+i
+Ei
+(41)
+and
+0 = ∆psys :=
+X
+f
+pf −
+X
+i
+pi ,
+(42)
+where the indices f and i stand for the ﬁnal and initial number of constituents
+of the system. Thus in the present theory the energies and momenta remain as
+additive as in special relativity. In other words, in the present theory not only
+are there no preferred class of observers, but also the usual conservation laws
+of special relativity remain essentially unchanged, contrary to expectation.
+3.3 The raison d’ˆetre of time: causal inevitability of becoming
+With the physical structure of the generalized relativity in place, we are now
+in a position to address the central concern of the present essay: namely, the
+raison d’ˆetre of the tensed time, as depicted in Fig. 2. To this end, let us ﬁrst
+note that the causal structure embedded within our generalized relativity is
+profoundly unorthodox. One way to appreciate this unorthodoxy is to recall
+the blurb for spacetime put forward by Minkowski in his seminal address at
+Cologne, in 1908. “Nobody has ever noticed a place except at a time, or a
+time except at a place”, he ventured [38]. But, surely, this famous quip of
+Minkowski hardly captures the complete picture. Perhaps it is more accurate
+to say something like: Nobody has ever noticed a place except at a certain time
+while being in a certain state, or noticed a time except at a certain place while
+being in a certain state, or been in some state except at a certain time, and a
+certain place. At any rate, this revised statement is what better captures the
+notion of time aﬀorded by our generalized theory of relativity. For, as evident
+from the quadratic invariant (14), in addition to space, time in our generalized
+theory is as much a state-dependent attribute as states are time-dependent
+attributes, and as states of the world do happen and become, so does time.
+Intuitively, this dynamic state of aﬀairs can be summarized as follows:
+x = x(t, y)
+t = t(x, y)
+y = y(t, x),
+(43)
+where y is the phase space coordinate as before. In other words, place in the
+present theory is regarded as a function of time and state; time is regarded as
+
+Absolute Being vs Relative Becoming
+23
+Phase
+space
+Space
+Time
+The moving now
+b
+c
+b
+c
+b
+c
+b
+c
+b
+c
+(e1, s1)
+(e5, s5)
+Fig. 7. Space-time-state diagram depicting the ﬂow of time. The solid blue curves
+represent growing timelike worldlines at ﬁve successive stages of growth, from s1 to
+s5, whereas the dashed green curve represents the growing overall worldline from
+(e1, s1) to (e5, s5). The red dot represents the necessarily moving present. In fact,
+the entire space-time-state structure is causally necessitated to expand continuously.
+a function of place and state; and state is regarded as a function of time and
+place. As we shall see, it is this state-dependence of time that is essentially
+what mandates the causal necessity for becoming in the present theory.
+To appreciate this dynamic or tensed nature of time in the present theory,
+let us return once again to our clock that is moving and evolving, say, from
+an event-state (e1, s1) to an event-state (e5, s5) in the combined space E, as
+depicted in the space-time-state7 diagram of Fig. 7. According to the line
+element (14), the proper duration recorded by the clock would be given by
+∆τ =
+Z t5
+t1
+1
+γ(v, ω) dt ,
+(44)
+where γ(v, ω) is deﬁned by (16). Now, assuming for simplicity that the clock
+is not massless, we can represent its journey by the integral curve of a timelike
+4 + 2n−velocity vector ﬁeld V A on the space E, deﬁned by
+V A := lP
+dzA
+dτ
+,
+(45)
+such that its external components V a (a = 0, 1, 2, 3) would trace out, for each
+possible state si of the clock, the familiar four dimensional timelike worldlines
+7 Here perhaps “space-time-phase space diagram” would be a much more accurate
+neologism, but it would be even more mouthful than “space-time-state diagram.”
+
+24
+Joy Christian
+in the corresponding Minkowski spacetime. In other words, the overall velocity
+vector ﬁeld V A would give rise to the familiar timelike, future-directed, never
+vanishing, 4-velocity vector ﬁeld V a, tangent to each of the external timelike
+worldlines. As a result, the “length” of the overall enveloping worldline would
+be given by the proper duration (44), whereas the “length” of the external
+worldline, for each si, would be given by the Einsteinian proper duration
+∆τi
+E =
+Z ti
+t1
+1
+γ(v) dt ,
+(46)
+where γ(v) is the usual Lorentz factor given by (3). In Fig. 7, ﬁve of such
+external timelike worldlines—one for each si (i=1,2,3,4,5)—are depicted by
+the blue curves with arrowheads going “upwards”, and the overall enveloping
+worldline traced out by V A is depicted by the dashed green curve going from
+the “initial” event-state (e1, s1) to the “ﬁnal” event-state (e5, s5).
+It is perhaps already clear from this picture that the external worldline
+of our clock is not given all at once, stretched out till eternity, but grows
+continuously, along with each temporally successive stage of the evolution of
+the clock, like a tendril on a wall. That is to say, as anticipated in Fig. 2, the
+future events along the external worldline of the clock simply do not exist.
+Hence the “now” of the clock cannot even be said to be preceding the future
+events, since, quite literally, there exists nothing to which it has the relation of
+precedence [27]. Moreover, since the external Minkowski spacetime is simply
+a congruence of non-intersecting timelike worldlines of idealized observers,
+according to the present theory the entire sum total of existence must increase
+continuously [27]. In fact, this continuous growth of existence turns out to be
+causally necessitated in the present theory, and can be represented by a Growth
+Vector Field quantifying the instantaneous directional rate of this growth:
+U a := ˆV a dτE
+dy ,
+(47)
+where ˆV a is a unit vector ﬁeld in the direction of the 4-velocity vector ﬁeld V a,
+dy := |dy| is the inﬁnitesimal dimensionless phase space distance between the
+two successive states of the clock discussed before, and dτE is the inﬁnitesimal
+Einsteinian proper duration deﬁned by (1). It is crucial to note here that in
+special relativity this Growth Vector Field would vanish identically everywhere,
+whereas in our generalized theory it cannot possibly vanish anywhere. This is
+essentially because of the mutual dependence of place, time, and state in the
+present theory we discussed earlier (cf. Eq. (43)). More technically, this is
+because the 4-velocity vector V a of an observer in Minkowski spacetime, such
+as the one in Eq. (47), can never vanish, whereas the causality constraint (14)
+of the present theory imposes the lower bound tP on the rate of change of
+Einsteinian proper duration with respect to the phase space coordinates,
+dτE
+dy ≥tP ,
+(48)
+
+Absolute Being vs Relative Becoming
+25
+which, taken together, causally necessitates the never-vanishing of the Growth
+Vector Filed U a. Consequently, the “now” of the clock (the red dot in Fig. 7)
+moves in the future direction along its external worldline, at the rate of no less
+than one Planck unit of time per Planck unit of change in its physical state.
+And, along with the non-vanishing of the 4-velocity vector ﬁeld V a, the lower
+bound tP on the growth rate of any external worldline implies that not only
+do all such “nows” move, but they cannot not move—i.e., not only does the
+sum total of existence increase, but it cannot not increase. To parody Weyl
+quoted above, the objective world cannot simply be, it can only happen.
+This conclusion can be further consolidated by realizing that in the present
+theory even the overall enveloping worldline (the dashed green curve in Fig. 7)
+cannot help but grow non-relationally and continuously. This can be conﬁrmed
+by ﬁrst parallelling the above analysis for the 1 + 2n−dimensional internal
+space O instead of the external spacetime M, which amounts to slicing up
+the combined space E of Fig. 7 along the spatial axis instead of the phase
+space axis, and then observing that even the “internal worldline” (not shown
+in the ﬁgure) must necessarily grow progressively further as time passes, at
+the rate given by the internal growth vector ﬁeld
+U α = lP ˆV α dtH
+dx .
+(49)
+Here ˆV α is a unit vector ﬁeld in the direction of the 1 + 2n−velocity vector
+ﬁled V α corresponding to the internal part of the overall velocity vector ﬁeld
+V A, dx := |dx| is the inﬁnitesimal spatial distance between two slices, and dtH
+is the inﬁnitesimal internal proper duration deﬁned by Eq. (10). Once again,
+it is easy to see that the causality condition (14) gives rise to the lower bound
+lP
+dtH
+dx ≥tP .
+(50)
+Thus, “now” of the clock necessarily moves in the future direction also along
+its internal worldline within the internal space O. As a result, even the overall
+worldline—namely, the dashed green curve in Fig. 7—can be easily shown
+to be growing non-relationally and continuously. Indeed, using Eqs. (47) to
+(50), an elementary geometrical analysis [8] shows that the instantaneous
+directional rate of this growth is given by the overall growth vector ﬁeld
+U A =
+
+ˆV a dtE
+dy , lP ˆV µ dtH
+dx
+
+,
+(51)
+whose magnitude also remains bounded from below by the Planck time tP :
+p
+−ξABU AU B ≥tP .
+(52)
+Thus, in the present theory, not only are the external events in E not all
+laid out once and for all, for all eternity, but there does not remain even an
+
+26
+Joy Christian
+overall 4 + 2n−dimensional “block” that could be used to support a “block”
+view of the universe. In fact, the causal necessity of the lower bound (52) on
+the magnitude of the overall growth vector ﬁeld U A—which follows from the
+causality constraint (14)—exhibits that in the present theory the sum total
+of existence itself is causally necessitated to increase continuously. That is to
+say, the very structure of the present theory causally necessitates the universe
+to be purely Heraclitean, in the sense discussed in the Introduction.
+4 Prospects for the experimental metaphysics of time
+As alluded to in the Introduction, any empirical confrontation of the above
+generalized relativity with special relativity would amount to a step towards
+what may be called the experimental metaphysics of time. However, since
+the generalized theory is deeply rooted in the Planck regime, any attempt to
+experimentally discriminate it from special relativity immediately encounters
+a formidable practical diﬃculty. To appreciate this diﬃculty, consider the
+following series expansion of expression (27) for the generalized proper time,
+up to second order in the Planck time:
+∆τ = ∆t
+r
+1 −v2
+c2 −1
+2
+t2
+P
+∆t
+
+1 −v2
+c2
+−3
+2
++ . . .
+(53)
+The ﬁrst term on the right hand side of this expansion is, of course, the familiar
+special relativistic term. The diﬃculty arises in the second term, i.e. in the
+ﬁrst largest correction term to the special relativistic time dilation eﬀect, since
+this term is modulated by the square of the Planck time, which in ordinary
+units amounts to some 10−87 sec2. Clearly, the precision required to directly
+verify such a miniscule correction to the special relativistic prediction is well
+beyond the scope of any foreseeable precision technology.
+Fortunately, in recent years an observational possibility has emerged that
+might save the day for the experimental metaphysics of time. The central
+idea that has emerged during the past decade within the context of quantum
+gravity is to counter the possible Planck scale suppression of physical eﬀects by
+appealing to ultrahigh energy particles cascading the earth that are produced
+at cosmological distances. One strategy along this line is to observe oscillating
+ﬂavor ratios of ultrahigh energy cosmic neutrinos to detect possible deviations
+in the energy-momentum relations predicted by special relativity [39]. Let
+us brieﬂy look at this strategy, as it is applied to our generalized theory of
+relativity (further details can be found in Refs. [36] and [39]; as in these
+references, from now on we shall be using the Planck units: ℏ= c = G = 1).
+4.1 Testing Heraclitean relativity using cosmic neutrinos
+The remarkable phenomena of neutrino oscillations are due to the fact that
+neutrinos of deﬁnite ﬂavor states |να⟩, α = e, µ, or τ, are not particles of
+
+Absolute Being vs Relative Becoming
+27
+deﬁnite mass states |νj⟩, j = 1, 2, or 3, but are superpositions of the deﬁnite
+mass states. As a neutrino of deﬁnite ﬂavor state propagates through vacuum
+for a long enough laboratory time, its heavier mass states lag behind the
+lighter ones, and the neutrino transforms itself into an altogether diﬀerent
+ﬂavor state. The probability for this “oscillation” from a given ﬂavor state,
+say |να(0)⟩, to another ﬂavor state, say |νβ(t)⟩, is famously given by
+Pαβ(E, L) = δαβ −
+X
+j̸=k
+U ∗
+αjUαkUβjU ∗
+βk
+h
+1 −e−i(∆m2
+jk/2E)Li
+.
+(54)
+Here ∆m2
+jk ≡m2
+k −m2
+j > 0 is the diﬀerence in the squares of the two neutrino
+masses, U is the time-independent leptonic mixing matrix, and E and L are,
+respectively, the energy and distance of propagation of the neutrinos. It is
+clear from this transition probability that the experimental observability of
+the ﬂavor oscillations is dependent on the quantum phase
+Φ := 2π L
+LO
+,
+(55)
+where
+LO := 2 π
+∆p =
+4πE
+∆m2
+jk
+(56)
+is the energy-dependent oscillation length. Thus, changes in neutrino ﬂavors
+would be observable whenever the propagation distance L is of the order of the
+oscillation length LO. However, in deﬁnition (56) the diﬀerence in momenta,
+∆p ≡pj −pk, was obtained by using the special relativistic relation
+pj =
+q
+E2 −m2
+j ≈E −m2
+j
+2E .
+(57)
+In the present theory this relation between energies and momenta is, of course,
+generalized, and given by (31), replacing the above approximation by
+pj ≈E −m2
+j
+2E + E2
+m2
+P
+mj
+(58)
+up to the second order, with mP being the Planck mass. The corresponding
+modiﬁed oscillation length analogous to (56) is then given by
+L
+′
+O := 2 π
+∆p =
+2 π
+1
+2E ∆m2
+jk −
+E2
+m2
+P ∆mjk
+,
+(59)
+where ∆m2
+jk ≡m2
+k −m2
+j as before, and ∆mjk ≡mk −mj > 0. Consequently,
+according to our generalized relativity the transition probability (54) would
+be quite diﬀerent in general, as a function of E and L, from how it is according
+to special relativity. And despite the quadratic Planck energy suppression of
+
+28
+Joy Christian
+the correction to the oscillation length, this diﬀerence would be observable for
+neutrinos of suﬃciently high energies and long propagation distances. Indeed,
+it can be easily shown [39] that the relation
+L ∼π m4
+P
+E5
+(60)
+is the necessary constraint between the neutrino energy E and the propagation
+distance L for the observability of possible deviations from the standard ﬂavor
+oscillations. For instance, it can be readily calculated from this constraint
+that the Planck scale deviations in the oscillation length predicted by our
+generalized relativity would be either observable, or can be ruled out, for
+neutrinos of energy E ∼1017 eV, provided that they have originated from a
+cosmic source located at some 105 light-years away from a terrestrial detector.
+The practical means by which this can be achieved in the foreseeable future
+have been discussed in some detail in the Refs. [36] and [39] cited above.
+4.2 Testing Heraclitean relativity using γ-ray binary pulsars
+The previous method of confronting the generalized theory of relativity with
+special relativity is clearly phenomenological. Fortunately, a much more direct
+test of the generalized theory may be possible, thanks to the precise deviations
+it predicts from the special relativistic Doppler shifts [8]:
+E′
+E
+= ε′ 
+ε′ −v
+c cos φ
+
+q
+(ε′)2 −v2
+c2
+,
+(61)
+with
+ε′ :=
+s
+1 −E2
+E2
+P
+
+1 −E′
+E
+2
+.
+(62)
+Here v is the relative speed of a receiver receding from a photon source, E
+and E′, respectively, are the energy of the photon and that observed by the
+receiver, and φ is the angle between the velocity of the receiver and the photon
+momentum. Note that ε′ here clearly reduces to unity for E′ −E ≪EP , thus
+reducing the generalized expression (61) to the familiar linear relation for
+Doppler shifts predicted by special relativity.
+Even without solving the relation (61) for E′ in terms of E, it is not
+diﬃcult to see that, since ε′ < 1, at suﬃciently high energies any red-shifted
+photons would be somewhat more red-shifted according to (61) than predicted
+by special relativity. But one can do better than that. A Maclaurin expansion
+of the right hand side of (61) around the value E/EP = 0, after keeping terms
+only up to the second order in the ratio E/EP , gives
+E′
+E ≈1 −v
+c cos φ
+q
+1 −v2
+c2
++ 1
+2
+E2
+E2
+P
+
+1 −v
+c cos φ
+ 1 −v2
+c2
+3/2 −2 −v
+c cos φ
+ 1 −v2
+c2
+1/2
+
+
+
+1 −E′
+E
+2
++ . . . (63)
+
+Absolute Being vs Relative Becoming
+29
+This truncation is an excellent approximation to (61). The quadratic equation
+(63) can now be solved for the desired ratio E′/E, and then the physical root
+once again expanded, now in the powers of v/c. In what results if we again
+keep terms only up to the second order in the ratios E/EP and v/c, then,
+after some tedious but straightforward algebra, we arrive at
+E′
+E ≈1 −v
+c cos φ + 1
+2
+
+1 −E2
+E2
+P
+cos2φ
+ v2
+c2 ± . . . ,
+(64)
+which, in the limit E ≪EP , reduces to the special relativistic result
+E′
+E ≈1 −v
+c cos φ + 1
+2
+v2
+c2 ± . . . .
+(65)
+Comparing (64) and (65) we see that up to the ﬁrst order in v/c there
+is no diﬀerence between the special relativistic result and that of the present
+theory. The ﬁrst deviation between the two theories occur in the second-
+order coeﬃcient, precisely where special relativity diﬀers also from the classical
+theory. What is more, this second-order deviation depends non-trivially on the
+angle between the relative velocity and photon momentum. For instance, up to
+the second order both red-shifts (φ = 0) and blue-shifts (φ = π) predicted by
+(64) signiﬁcantly diﬀer from those predicted by special relativity. In particular,
+the red-shifts are now somewhat more red-shifted, whereas the blue-shifts
+are somewhat less blue-shifted. On the other hand, the transverse red-shifts
+(φ = π/2 or φ = 3π/2) remain identical to those predicted by special relativity.
+As a result, even for the photon energy approaching the Planck energy an
+Ives-Stilwell type classic experiment [40] would not be able to distinguish
+the predictions of the present theory from those of special relativity. The
+complete angular distribution of the second-order coeﬃcient predicted by the
+two theories, along with its energy dependence, is displayed in Fig. 8.
+In spite of this rather non-trivial angular dependence of Doppler shifts, in
+practice, due to the quadratic suppression by Planck energy, distinguishing
+the expansion (64) from its special relativistic counterpart (65) would be a
+formidable task. The maximum laboratory energy available to us is of the
+order of 1012 eV, yielding E2/E2
+P ∼10−32. This represents a correction of
+one part in 1032 from (65), demanding a phenomenal sensitivity of detection
+well beyond the means of any foreseeable precision technology. However, an
+extraterrestrial source, such as an extreme energy γ-ray binary pulsar, may
+turn out to be accessible for distinguishing the second order Doppler shifts
+predicted by the two theories. It is well known that binary pulsars not only
+exhibit Doppler shifts, but the second-order shifts resulting from the periodic
+motion of such a pulsar about its companion can be isolated, say, from the
+ﬁrst order shifts, because they depend on the square of the relative velocity,
+which varies as the pulsar moves along its two-body elliptical orbit [41]. Due
+to these Doppler shifts, the rate at which the pulses are observed on Earth
+reduces slightly when the pulsar is receding away from the Earth, compared to
+
+30
+Joy Christian
+0
+90
+180
+270
+360
+0
+0.5
+Angle between relative velocity and photon momentum
+Second order coeﬃcient
+Fig. 8. The energy-dependent signatures of Heraclitean relativity. The green curves
+are based on the predictions of the present theory, for E/EP = 0.3 to 0.9 in the
+descending order, whereas the dashed black line is the prediction of special relativity.
+when it is approaching towards it. As a result, the period, its variations, and
+other orbital characteristics of the pulsar, as they are determined on Earth,
+crucially depend on these Doppler shifts. In practice, the parameter relevant
+in the arrival-time analysis of the pulses received on Earth turns out to be a
+non-trivial function of the gravitational red-shift, the masses of the two binary
+stars, and other Keplerian parameters of their orbits, and is variously referred
+to as the red-shift-Doppler parameter or the time dilation parameter [41]. For
+a pulsar that is also following a periastron precession similar to the perihelion
+advance of Mercury, it can be determined with excellent precision.
+The arrival-time analysis of the pulses begins by considering the time of
+emission of the N th pulse, which is given by
+N = NO + ντ + 1
+2 ˙ντ 2 + 1
+6 ¨ντ 3 + . . . ,
+(66)
+where NO is an arbitrary integer, τ is the proper time measured by a clock in
+an inertial frame on the surface of the pulsar, and ν is the rotation frequency
+of the pulsar, with ˙ν ≡dν/dτ|τ=0 and ¨ν ≡d2ν/dτ 2|τ=0. The proper time τ is
+related to the coordinate time t by
+dτ = dt
+
+1 −α∗
+2m2
+r
+−1
+2
+v2
+1
+c2 + ...
+
+,
+(67)
+where the ﬁrst correction term represents the gravitational red-shift due to the
+ﬁeld of the companion, and the second correction term represents the above
+
+Absolute Being vs Relative Becoming
+31
+mentioned second-order Doppler shift due to the orbital motion of the pulsar
+itself. The time of arrival of the pulses on Earth diﬀers from the coordinate
+time t taken by the signal to travel from the pulsar to the barycenter of the
+solar system, due to the geometrical intricacies of the pulsar binary and the
+solar system [41]. More relevantly for our purposes, the time of arrival of the
+pulses is directly aﬀected by the second-order Doppler shift appearing in Eq.
+(67), which thereby aﬀects the observed orbital parameters of the pulsar.
+Now, returning to our Heraclitean generalization of relativity, it is not
+diﬃcult to see that the generalized Doppler shift expression (64) immediately
+gives the following generalization of the inﬁnitesimal proper time (67):
+dτ = dt
+
+1 −α∗
+2m2
+r
+−1
+2
+
+1 −E2
+E2
+P
+cos2 φ
+ v2
+1
+c2 + ...
+
+.
+(68)
+Thus, in our generalized theory the second-order Doppler shift acquires an
+energy-dependent modiﬁcation. The question then is: At what radiation energy
+this nontrivial modiﬁcation will begin to aﬀect the observable parameters of
+the pulsar? The most famous pulsar, namely PSR B1913+16, which has been
+monitored for three decades with exquisite accumulation of timing data, is a
+radio pulsar, and hence for it the energy-dependent modiﬁcation predicted in
+(68) is utterly negligible, thanks to the quadratic suppression by the Planck
+energy. However, for a γ-ray pulsar with suﬃciently high radiation energy
+the modiﬁcation predicted in (68) should have an impact on its observable
+parameters, such as the orbital period and its temporal variations.
+The overall precision in the timing of the pulses from PSR B1913+16, and
+consequently in the determination of its orbital period, is famously better than
+one part in 1014 [42]. Indeed, the monitoring of the decaying orbit of PSR
+B1913+16 constitutes one of the most stringent tests of general relativity to
+date. It is therefore not inconceivable that similar careful observations of a
+suitable γ-ray pulsar may be able to distinguish the predictions of the present
+theory from those of special relativity. Unfortunately, the highest energy of
+radiation from a pulsar known to date happens to be no greater than 1013 eV,
+giving the discriminating ratio E2/E2
+P to be of the order of 10−30, which is
+only two orders of magnitude improvement over a possible terrestrial scenario.
+On the other hand, the γ-rays emitted by a binary pulsar would have to be of
+energies exceeding 1021 eV for them to have desired observable consequences,
+comparable to those of PSR B1913+16. Moreover, the desired pulsar have to
+be located suﬃciently nearby, since above the 1013 eV threshold γ-rays are
+expected to attenuate severely through pair-production if they are forced to
+pass through the cosmic infrared background before reaching the Earth. It is
+not inconceivable, however, that a suitable binary pulsar emitting radiation of
+energies exceeding 1021 eV is found in the near future, allowing experimental
+discrimination of our generalized relativity from special relativity.
+
+32
+Joy Christian
+5 Concluding remarks
+One of the perennial problems in natural philosophy is the problem of change;
+namely, How is change possible? Over the centuries, this problem has fostered
+two diametrically opposing views of time and becoming. While these two views
+tend to agree that time presupposes change, and that genuine change requires
+becoming, one of them actually denies the reality of change and time, by
+rejecting becoming as a “stubbornly persistent illusion” [43]. The other view,
+by contrast, accepts the reality of change and time, by embracing becoming as
+a bona ﬁde attribute of the world. Since the days of Aristotle within physics we
+have been rather successful in explaining how the changes occur in the world,
+but seem to remain oblivious to the deeper question of why do they occur at all.
+The situation has been aggravated by the advent of Einstein’s theories of space
+and time, since in these theories there is no room to structurally accommodate
+the distinction between the past and the future—a prerequisite for the genuine
+onset of change. By contrast, the causal structure of the Heraclitean relativity
+discussed above not only naturally distinguishes the past form the future by
+causally necessitating becoming, but also forbids inaction altogether, thereby
+providing an answer to the deeper question of change. Moreover, since it is
+not impossible to experimentally distinguish the Heraclitean relativity from
+special relativity, and since the ontology underlying only the latter of these
+two relativities is prone to a block universe interpretation, the enterprise of
+experimental metaphysics of time becomes feasible now, for the ﬁrst time,
+within a relativistic context. At the very least, such an enterprise should help
+us decide whether time is best understood relationally, or non-relationally.
+Acknowledgments
+I would like to thank Huw Price and Abner Shimony for their comments on
+Ref. [8], of which this essay is an apologia. I would also like to thank Lucien
+Hardy, Lee Smolin, Antony Valentini, and other members of the Foundations
+of Physics group at the Perimeter Institute for their hospitality and support.
+References
+[1] K.R. Popper: The World of Parmenides: Essays on the Presocratic
+Enlightenment, edited by A.F. Petersen (Routledge, New York, NY 2001)
+[2] J.M.E. McTaggart: Mind (New Series) 17, No. 68, 457 (1908)
+[3] Q. Smith: General Introduction: The Implications of the Tensed and
+Tenseless Theories of Time. In: The New Theory of Time, edited by L.N.
+Oaklander and Q. Smith (Yale University Press, New Haven 1994) p 1
+[4] I. Newton: Mathematical Principles of Natural Philosophy, translated by
+A. Motte, revised and annotated by F. Cajori (University of California
+Press, Berkeley 1962) Vol. I, p 6
+
+Absolute Being vs Relative Becoming
+33
+[5] A.R. Hall and M.B. Hall (eds): Unpublished Scientiﬁc Papers of Isaac
+Newton (Cambridge University Press, Cambridge 1962) p 103
+[6] R.T.W. Arthur: Studies in History and Philosophy of Science 26, No. 2,
+323 (1995)
+[7] G.J. Whitrow: The Natural Philosophy of Time, Second Edition (Oxford
+University Press, Oxford 1980) p 41
+[8] J. Christian: International Journal of Modern Physics D 13, 1037 (2004);
+see also J. Christian: [arXiv:gr-qc/0308028]
+[9] A. Shimony: Search for a Worldview which can Accommodate Our
+Knowledge of Microphysics. In: Search for a Naturalistic World View,
+Vol. I (Cambridge University Press, Cambridge 1993) p 64
+[10] A. Shimony: Experimental Test of Local Hidden-Variable Theories. In:
+Search for a Naturalistic World View, Vol. II (Cambridge University
+Press, Cambridge 1993) p 77
+[11] G.N. Schlesinger: Aspects of Time (Hackett, Indianapolis, IN 1980) p 24
+[12] P.C.W. Davies: The Physics of Time Asymmetry (Surrey University
+Press, 450 Edgware Road, London 1974) p 12
+[13] R. Penrose: The Emperor’s New Mind (Oxford University Press, Oxford
+1989) p 303
+[14] ´E. Meyerson: The Relativistic Deduction: Epistemological Implications of
+the Theory of Relativity, translated by D.A. and M-A. Sipﬂe (D. Reidel
+Publishing Company, Dordrecht, Holland 1985) p xl
+[15] H. Weyl: Philosophy of Mathematics and Natural Science (Princeton
+University Press, Princeton 1949) p 116
+[16] M. Black: Scientiﬁc American 206, No. 4, 179 (April 1962) p 181
+[17] H. Putnam: The Journal of Philosophy 64, 240 (1967)
+[18] C.W. Rietdijk: Philosophy of Science 33, 341 (1966)
+[19] N. Maxwell: Philosophy of Science 52, 23 (1985)
+[20] H. Stein: The Journal of Philosophy 65, 5 (1968)
+[21] H. Stein: Philosophy of Science 58, 147 (1991)
+[22] A. Shimony: The Transient Now. In: Search for a Naturalistic World
+View, Vol. II (Cambridge University Press, Cambridge 1993) p 271
+[23] R. Clifton and M. Hogarth: Synthese 103, 355 (1995)
+[24] K. G¨odel: A Remark about the Relationship between Relativity Theory
+and Idealistic Philosophy. In: Albert Einstein: Philosopher-Scientist,
+edited by P.A. Schilpp (Open Court, La Salle, IL 1949) p 558
+[25] C. Callender: British Journal for the Philosophy of Science 48, 117 (1997)
+[26] R.P. Feynman, R.B. Leighton, and M. Sands: The Feynman Lectures on
+Physics (Addison-Wesley Publishing Company, London 1963) p 15-7
+[27] C.D. Broad: Scientiﬁc Thought (Kegan Paul, London 1923) pp 66
+[28] A. Shimony: Implications of Transience for Spacetime Structure. In: The
+Geometric Universe: Science, Geometry, and the Work of Roger Penrose,
+S.A. Huggett et al. (eds) (Oxford University Press, Oxford 1998) p 161
+[29] A. Elitzur and S. Dolev: Foundations of Physics Letters 12, 309 (1999)
+[30] H. Primas: Mind and Matter 1, 81 (2003)
+
+34
+Joy Christian
+[31] J.B. Hartle: American Journal of Physics 73, No. 2, 101 (2005)
+[32] G.F.R. Ellis: Physics in the Real Universe: Time and Spacetime. In this
+volume
+[33] D.P. Rideout and R.D. Sorkin: Physical Review D 61, 024002 (2000)
+[34] L. Smolin: The case for background independence [arXiv:hep-th/0507235]
+[35] J. Christian: Why the Quantum Must Yield to Gravity. In: Physics Meets
+Philosophy at the Planck Scale, edited by C. Callender and N. Huggett
+(Cambridge University Press, Cambridge 2001) p 305
+[36] J. Christian: Physical Review Letters 95, 160403 (2005)
+[37] A. Einstein: Ether and the Theory of Relativity. In: The Collected
+Papers of Albert Einstein, Vol. 7, translated by Alfred Engel (Princeton
+University Press, Princeton 2002) p 161
+[38] H. Minkowski: Space and Time. In: The Principle of Relativity, translated
+by W. Perrett and G.B. Jeﬀery (Dover, New York, NY 1952) p 75
+[39] J. Christian: Physical Review D 71, 024012 (2005)
+[40] H.E. Ives and G.R. Stilwell: Journal of the Optical Society of America
+28, 215 (1938).
+[41] C.M. Will: Theory and Experiment in Gravitational Physics, Revised
+Edition (Cambridge University Press, Cambridge 1993) pp 283
+[42] C.M. Will: Living Reviews in Relativity 9, 3 (2006) [Online article,
+http://www.livingreviews.org//lrr-2006-3] pp 58
+[43] A. Einstein: letter of condolence to V. Besso. In: Albert Einstein-Michele
+Besso Correspondence, edited by P. Speziali (Hermann, Paris 1972) p 537

@@ -1,0 +1,491 @@
+arXiv:1111.4542v1  [math.ST]  19 Nov 2011
+A note on kernel density estimation at a parametric
+rate
+J. E. Chac´on, J. Montanero, A. G. Nogales
+Dpto. de Matem´aticas, Universidad de Extremadura, SPAIN.
+Abstract. In the context of kernel density estimation, we give a
+characterization of the kernels for which the parametric mean inte-
+grated squared error rate n−1 may be obtained, where n is the sample
+size. Also, for the cases where this rate is attainable, we give an asymp-
+totic bandwidth choice that makes the kernel estimator consistent in
+mean integrated squared error at that rate and a numerical example
+showing the superior performance of the superkernel estimator when
+the bandwidth is properly chosen.
+AMS Subject Class. (2000): Primary 62G05. Secondary 62G07.
+Key words and phrases: optimal density estimation, convergence rates, mean
+integrated squared error, superkernel.
+Short running title: Kernel density estimation at a parametric rate
+Research supported by Spanish Ministerio de Ciencia y Tecnolog´ıa project
+MTM2005-06348.
+Proofs should be sent to: Agust´ın G. Nogales, Dpto.
+de Matem´aticas,
+Universidad de Extremadura, Avda.
+de Elvas, s/n, 06071–Badajoz,
+SPAIN. e-mail: nogales@unex.es
+
+1
+Introduction
+If X1, . . . , Xn is a sample from a probability distribution on the real line with
+density f, the kernel density estimator is given by
+fn,K,h(x) = 1
+n
+n
+X
+i=1
+Kh(x −Xi),
+where the kernel K is an integrable function with
+R
+K = 1, the bandwidth h
+is a positive real number and we have used the notation Kh(x) = K(x/h)/h;
+see, e.g., Silverman (1986), Simonoﬀ(1996) or Wand and Jones (1995). The
+L2 error criterion will be used here; that is, we will measure the error of the
+estimate fn,K,h through the mean integrated square error (MISE), deﬁned by
+MISEf(fn,K,h) = Ef
+Z
+[fn,K,h(x) −f(x)]2dx.
+We will assume henceforth that all the kernels below are bounded functions,
+continuous at zero and such that
+R
+K2 < 2K(0). This technical conditions
+ensure that an optimal bandwidth h0n(f) = argminh>0 MISEf(fn,K,h) exists
+(see Chac´on et al., 2006).
+The main goal of this paper is to characterize the kernel functions that
+make the MISE converge to zero as fast as possible. Most commonly used
+kernels are the positive ones, because they produce bona ﬁde density esti-
+mators; that is, estimators that, for every observed sample, provide a true
+density function (i.e., fn,K,h ≥0 and
+R
+fn,K,h = 1). However, it is widely
+known that for positive kernels the MISE cannot decrease to zero faster than
+n−4/5 (Rosenblatt, 1956). In this sense, some beneﬁt can be obtained if we
+allow the kernel to take negative values (see Theorem 1 below), although
+the price to be paid is that the resulting estimate is not a positive function.
+Nevertheless, in a recent paper, Glad, Hjort and Ushakov (2003) show that,
+based on a non-bona ﬁde estimator, it is possible to construct a bona ﬁde
+one with even smaller MISE. Thus, there is no reason, in terms of MISE, to
+avoid the use of kernels taking negative values in density estimation.
+2
+
+Watson and Leadbetter (1963) showed, in a very general background,
+that the MISE of kernel density estimators cannot decrease faster than n−1.
+Davis (1977) characterized the class of densities for which this “parametric”
+rate n−1 can be achieved (see Theorem 3 below). In this paper, we give a
+characterization of those kernels for which the MISE of the corresponding
+kernel estimator goes to zero at rate n−1 for some density, so that together
+with the result of Davis (1977) we obtain a precise description of the family of
+densities and kernels for which the parametric rate is attainable (see Theorem
+4). Besides, for this family we provide practical bandwidth-choice advice for
+achieving this rate.
+2
+Main results
+Let us recall some facts about kernels. If we denote by mj(K) =
+R
+xjK(x)dx
+the j-th moment of a kernel K, we say that K is of ﬁnite order if the set
+AK = {j ∈N, j ≥1: mj(K) ̸= 0}
+is non-empty. In this case, k = min AK is called the order of the kernel K. If
+AK = ∅then it is said that K is a kernel of inﬁnite order and such a kernel
+should satisfy mj(K) = 0 for j = 1, 2, . . .
+An example of an inﬁnite order kernel is Natterer’s kernel, whose char-
+acteristic function is given by ϕ(t) = e−t2/(1−t2)I[−1,1](t), where IA stands for
+the indicator function of the set A (see Devroye and Lugosi, 2001, Ch. 17). If
+K is the density of a symmetric distribution with ﬁnite variance, then K is a
+kernel of order 2. A method for constructing a kernel of arbitrary ﬁnite order
+is shown in Schucany and Sommers (1977); however, if we want a kernel K
+to have order k > 2 then K must necessarily take negative values.
+Let us denote
+Φ(n, f, K) = min
+h>0 MISEf(fn,K,h)
+that is, Φ(n, f, K) is the minimal MISE that can be achieved when we use the
+kernel K and a sample of size n to estimate f. The reason for using kernels
+3
+
+of order greater than 2 (non-positive, therefore) rests upon the following
+theorem, which can be found, for instance, in Wand and Jones (1995).
+Theorem 1. If K ∈L2 is a symmetric kernel of ﬁnite order k and the
+density f has a k-th continuous derivative belonging to L2 then the minimal
+MISE that may be obtained by estimating f using a kernel estimator with
+kernel K is of exact order n−2k/(2k+1); that is,
+lim
+n→∞n2k/(2k+1)Φ(n, f, K) = α1,
+where α1 ∈(0, ∞) is a constant depending on f and K.
+Thus, as we make the kernel order grow, the rate of convergence of the
+optimal MISE to zero approaches the parametric rate n−1, although the class
+of densities for which this rate is valid gets smaller and smaller. The question
+is: is there any kernel that eﬀectively attains the rate n−1 for some density?
+The kernels that achieve that MISE-rate for some density will deserve to be
+called superkernels; that is, a superkernel will be a kernel K which satisﬁes,
+lim
+n→∞nΦ(n, f, K) = α2
+for some density f, with 0 < α2 < ∞. As stated in the previous section, our
+purpose here is to give a characterization of such superkernels.
+In view of Theorem 1, one is tempted to conjecture that an inﬁnite order
+kernel is a good candidate to be a superkernel; however, we will see below
+that an inﬁnite order kernel does not need to be a superkernel.
+Denote by ϕK(t) the characteristic function of a kernel K and
+SK = inf{t ≥0: |ϕK(t) −1| ̸= 0}
+TK = inf{r ≥0: |ϕK(t) −1| ̸= 0 a.e. for t ≥r}.
+That is, SK is the greatest value of r such that ϕK is identically equal to 1
+on [0, r] and TK is the greatest value of t such that ϕK(t) = 1. Notice that
+nearly every kernel used in practice satisﬁes SK = TK.
+The next result gives a characterization of the class of superkernels, in
+terms of their characteristic functions.
+4
+
+Theorem 2. Let K be a kernel in L2 such that SK = TK. The following
+statements are equivalent:
+i) SK > 0.
+ii) Φ(n, f, K) is of exact order n−1 for some density f ∈L2.
+The previous theorem allows us to give an alternative (and equivalent)
+deﬁnition of a superkernel: we will say that a kernel K with SK = TK is
+a superkernel if SK > 0; that is, if its characteristic function is identically
+equal to 1 in a neighborhood of the origin. This is just the classical deﬁnition
+of superkernel used in Devroye (1992) or in Glad, Hjort and Ushakov (2003),
+for instance. Thus, although this deﬁnition is not very intuitive, Theorem
+2 allows us to conclude that it is just the one that we were looking for.
+Besides, from this characterization it follows that Natterer’s kernel, which
+has inﬁnite order, is not a superkernel; that is, the minimal MISE that we
+obtain using Natterer’s kernel cannot decrease to zero at rate n−1 for any
+density. A classical example of superkernel is given by the trapezoidal kernel
+K(x) = (cos x −cos(2x))/(πx2), which has characteristic function ϕK(t) =
+I[0,1)(|t|) + (2 −|t|)I[1,2)(|t|), so that SK = TK = 1; see Devroye and Lugosi
+(2001). Some more examples of superkernels are included in Section 3 of
+McMurry and Politis (2004), they are called inﬁnite order ﬂat-top kernels
+there.
+The characterization of the class of densities for which the rate n−1 is
+attainable is given in a paper by Davis (1977). Let us denote by ϕf(t) the
+characteristic function of a density f and
+Cf = sup{r ≥0: ϕf(t) ̸= 0 a.e. for t ∈[0, r]}
+Df = sup{t ≥0: ϕf(t) ̸= 0}.
+Notice that the support of ϕf is contained in (−Df, Df); moreover, this
+interval coincides with the support in the common case where Cf = Df.
+Theorem 3 (Davis, 1977). Let f be a density in L2. The following state-
+ments are equivalent:
+5
+
+i) Df < ∞; i.e., ϕf has bounded support.
+ii) Φ(n, f, K) is of exact order n−1 for some kernel K ∈L2.
+Davis’ theorem states that in kernel density estimation the MISE may
+decrease to zero at rate n−1 only if the characteristic function of the density
+we aim to estimate has bounded support. An example of this kind of density
+is given by the Fej´er-de la Vall´e-Poussin density, f(x) = (1 −cos x)/(πx2),
+which has characteristic function ϕf(t) = (1−|t|)I[−1,1](t). Davis (1977) even
+provides a kernel estimator that achieves the parametric rate if the bandwidth
+is properly chosen (see also Ibragimov and Khasminskii, 1982); however, her
+estimator is based on the sinc function S(x) = (sin x)/(πx2), which is not a
+kernel as it is not an integrable function. In contrast, our Theorem 2 is valid
+for true kernel functions and gives a condition that is not only suﬃcient but
+also necessary for kernel density estimation at a parametric rate.
+We can combine theorems 2 and 3 to get:
+Theorem 4. Let K be a kernel with SK = TK and f a density, both in L2.
+Then,
+Φ(n, f, K) is of exact order n−1 iﬀSK > 0 and Df < ∞.
+The theorem above gives a precise characterization of the only case where
+kernel density estimation at a parametric rate is possible. Then, we may
+wonder what would happen if we use a superkernel when the density does
+not fulﬁl the condition Df < 0, i.e., when kernel density estimation at a
+parametric rate is not possible. In the L1 context, Devroye (1992) showed
+that superkernel estimators are rate-adaptive, in the sense that they achieve
+the best possible rate that the density permits. Below we show that this is
+also the case in the L2 setup.
+Theorem 5. Let K be a superkernel and f be a density, both in L2. It is
+veriﬁed:
+6
+
+i) (Smooth case) If f has a k-th derivative in L1 ∩L2, then Φ(n, f, K)
+goes to zero as n−2k/(2k+1) or faster; that is, the sequence
+n2k/(2k+1)Φ(n, f, K)
+is bounded.
+ii) (Supersmooth case) If for some α > 0 and γ > 0 the integral
+Iα,γ(f) =
+Z
+eγ|t|α|ϕf(t)|2dt
+is ﬁnite, then Φ(n, f, K) goes to zero as (log n)1/α/n or faster; that is,
+the sequence
+n
+(log n)1/α Φ(n, f, K)
+is bounded.
+Remark 1. We have borrowed the terminology “smooth” and “supersmooth”
+case from Glad, Hjort and Ushakov (1999), where a result similar to our The-
+orem 5 is shown for the sinc kernel; see also Davis (1977). Notice that when
+Df < ∞we are in the supersmooth case for all α > 0. Some examples
+of densities with Iα,λ(f) < ∞include the standard Gaussian (α = 2) and
+Cauchy (α = 1) densities. Also, it should be remarked that Theorem 3.1
+in Politis (2003) is the analogue to the previous result in a pointwise sense
+(rather than for the MISE criterion).
+Remark 2. Denote R(g) =
+R
+g(x)2dx for any g ∈L2. From the proof of The-
+orem 5 (see Section 4 below), in the smooth case the quantity n2k/(2k+1)Φ(n, f, K)
+can be bounded by
+(2k + 1)(2k)−2k/(2k+1)
+R(K)
+SK
+2k/(2k+1)
+R(f (k)).
+For all k, this bound depends on the superkernel K only through R(K)/SK;
+therefore, we could try to ﬁnd the supernernel K minimizing this value, as it
+is done in the ﬁnite-order case. For kernels of order 2, it is well-known that
+7
+
+the kernel minimizing an asymptotic version of the MISE is the so-called
+Epanechinikov kernel; see, e.g., Silverman (1986). Here, in the superkernel
+case, we have R(K) ≥SK/π for all K. This lower bound is achievable if
+and only if ϕK(t) = 0 for all |t| ≥SK but clearly, among all the superkernels
+satisfying such a condition, the only one fulﬁlling R(K) = SK/π is given by
+ϕK(t) = I[−SK,SK](t), which corresponds to (a rescaled version of) the sinc
+kernel. In this sense, although the sinc function does not provide a proper
+kernel, it is the asymptotically optimal choice; that is, the analogue to the
+Epanechnikov kernel for the superkernel case.
+Although Theorem 4 seems to be of purely theoretical interest, as it says
+nothing about the main problem in kernel density estimation, the choice of
+the bandwidth, this issue may be solved by using the next result, which can
+be found in Chac´on et al. (2006). Let us recall the notation h0n(f) for the
+L2-optimal bandwidth; that is,
+h0n(f) = argmin
+h>0
+MISEf(fn,K,h).
+Theorem 6. Let K be a kernel and f a density, both in L2. If SK = TK or
+Cf = Df then
+h0n(f) →SK/Df as n →∞.
+Moreover, if SK > 0 and Df < ∞then, for any ﬁxed h⋆∈(0, SK/Df] (not
+depending on n), we have
+Ef[fn,K,h⋆(x)] = f(x), for a.e. x ∈R, ∀n ∈N,
+so that MISEf(fn,K,h⋆) is of exact order n−1.
+Remark 3. Theorem 6 suggests taking h = SK/Df under the conditions of
+Theorem 4. This is an asymptotic selection, as it is the limit of the optimal
+bandwidth sequence but, also, in this case it provides us with an unbiased
+kernel density estimator, whose MISE goes to zero at a parametric rate.
+Indeed, in such a situation we can bound
+nΦ(n, f, K) ≤nMISEf(fn,K,SK/Df) ≤DfR(K)/SK,
+8
+
+so that same argument as in Remark 1 shows that the sinc kernel is also the
+asymptotically optimal choice for the case where Df < ∞.
+Remark 4. Any bandwidth h⋆as in the previous theorem may be called a
+global “zero-bias bandwidth”. In a similar way, Sain and Scott (2002) show,
+for non-negative kernels, the existence of local zero-bias bandwidths h0(x),
+not varying with n, for every x in the region where f is convex. Using this
+local bandwidths they also get a n−1 rate, but with respect to the pointwise
+mean squared error.
+3
+A numerical illustration
+Next we give a simple numerical example showing the performance of the
+superkernel estimators “at full power”, that is, in the optimal situation where
+the characteristic function of the density has bounded support. To do so, we
+are going to focus on the aforementioned Fej´er-de la Vall´e-Poussin density
+f(x) = 1 −cos x
+πx2
+,
+x ∈R,
+and the trapezoidal superkernel
+K(x) = cos x −cos(2x)
+πx2
+,
+x ∈R.
+For this superkernel, we will use two diﬀerent bandwidth selection ap-
+proaches: the ﬁrst bandwidth is selected by a cross-validation method (see
+Silverman, 1986, or Wand and Jones, 1995); the second bandwidth comes
+from a version of the bandwidth selection procedure proposed by Politis
+(2003). This method aims to estimate Df making use of the empirical charac-
+teristic function, and it is closely related to the one proposed by Chiu (1991)
+for a similar problem in density estimation (see also Politis and Romano,
+1999). If ϕn(t) = n−1 Pn
+j=1 exp{itXj} denotes the empirical characteristic
+function, Df is estimated by
+bDn = inf{D > 0: |ϕn(D + t)|2 < c log n
+n , ∀t ∈(0, ℓn)},
+9
+
+where c > 0 is a ﬁxed constant and (ℓn) is a positive nondecreasing sequence.
+As suggested in Remark 3, the chosen bandwidth is then bhn = 1/ bDn. Fol-
+lowing the advice in Politis (2003), in all the simulations we have taken c = 1
+and ℓn = 1.
+We want to compare this superkernel density estimator with the classical
+one, using a density function as a kernel. To this aim, we also include in the
+simulations the results for the Sheather-Jones method (Sheather and Jones,
+1991), which uses the standard normal density as the kernel, so that it is
+known that the MISE cannot decrease faster than n−4/5 (again, see Theorem
+1 above).
+We have tried these three methods for sample sizes n = 100 (small),
+n = 400 (medium) and n = 1600 (large) over 100 simulated samples of each
+size drawn from the Fej´er-de la Vall´e-Poussin density. The results are shown
+in Table 1. For each estimator ˆfn and sample size we give the average and
+standard deviation of the 100 values of ISE( ˆfn) = 103 ×
+R
+( ˆfn −f)2.
+n
+ISECV
+ISESJ
+ISEPol
+100
+3.36
+3.04
+2.53
+(4.38)
+(2.21)
+(2.28)
+400
+2.59
+0.902
+0.612
+(1.14)
+(0.549)
+(0.365)
+1600
+1.10
+0.348
+0.179
+(0.811)
+(0.172)
+(0.132)
+Table 1: Simulation results for sample sizes n = 100, 400, 1600. Averages
+and (standard deviations) of the ISE are given for each method.
+As usual, it can be seen from Table 1 that the cross-validated selector is
+far more variable than the others. In this case, even the average ISE is also
+unacceptably large, when it is used together with a superkernel. In contrast,
+the selector of Politis does a good work: it is comparable with the Sheather-
+Jones method for small sample size, but the superior asymptotics of the
+superkernel estimator clearly begin to take their advantage yet for n = 400.
+10
+
+For large sample size, the better performance of the superkernel estimator
+is even more evident, obtaining nearly half the average ISE of the Sheather-
+Jones selector and less variance. Therefore, the usefulness of superkernels in
+density estimation becomes clear, at least in this case.
+4
+Proofs
+The proof of our main result (Theorem 2) relies heavily on previous results
+that may be found in Chac´on et al. (2006). For the sake of completeness we
+also include their statements here.
+Lemma 1. Let f be a density and K a kernel, both in L2. It is veriﬁed:
+i)
+R(Kh ∗f) →R(f) as h →0.
+ii) If SK = 0 then h0n(f) →0 as n →∞.
+For the proof of Theorem 2 we will need an auxiliary result. It states that
+if we use a kernel K with SK = 0, then the MISE-convergence rate is slower
+than n−1 for every density. It can be applied, for instance, to ﬁnite-order
+kernels, as it is easy to show that any kernel of ﬁnite order satisﬁes SK = 0.
+Lemma 2. If K ∈L2 is a kernel such that SK = 0 then, for every density
+f ∈L2, we have that
+lim
+n→∞nΦ(n, f, K) = ∞.
+Proof. It is easy to show that
+R
+Varf[fn,K,h(x)]dx = R(K)/(nh) −R(Kh ∗f)/n,
+where ∗stands for convolution (see Wand and Jones, 1995). Therefore,
+nΦ(n, f, K) = nMISEf(fn,K,h0n(f))
+≥n
+R
+Varf[fn,K,h0n(f)(x)]dx
+= R(K)
+h0n(f) −R(Kh0n(f) ∗f)
+Then, the conclusion follows immediately from Lemma 1.
+11
+
+Proof of Theorem 2. If SK > 0, then Theorem 6 states that it suﬃces to
+consider a density with Df < ∞, such as the Fej´er-de la Vall´ee-Poussin
+density, to get a parametric MISE-convergence rate. On the other hand, the
+previous lemma shows precisely the implication ii) ⇒i).
+Proof of Theorem 5. In the smooth case, standard Fourier transform theory
+shows that the conditions on f ensure that
+Z
+|t|2k|ϕf(t)|2dt = 2πR(f (k)) < ∞.
+Using Parseval identity, 2πMISEf(fn,K,h) = B(h) + V (h), where
+0 ≤B(h) =
+Z
+|ϕf(t)|2|ϕK(th) −1)|2dt
+0 ≤V (h) = 1
+nh
+Z
+|ϕK(t)|2dt −1
+n
+Z
+|ϕf(t)|2|ϕK(th)|2dt.
+Then, we can bound V (h) by
+R
+|ϕK|2/(nh) and
+B(h) =
+Z
+|t|>SK/h
+|ϕf(t)|2|ϕK(th) −1|2dt
+≤
+Z
+|t|>Sk/h
+|ϕf(t)|2dt
+≤h2k
+S2k
+K
+Z
+|t|2k|ϕf(t)|2dt
+so that
+MISEf(fn,K,h) ≤h2k
+S2k
+K
+R(f (k)) + R(K)
+nh .
+Calculating the minimum of the expression on the right-hand-side of the
+previous display, we get
+Φ(n, f, K) ≤Cn−2k/(2k+1),
+as desired.
+For the supersmooth case, the same kind of calculations can be used to
+bound
+B(h) ≤e−SKγ/hαIα,γ(f).
+Now, taking h to be of order (log n)−1/α in B(h) + V (h) gives the proof.
+12
+
+References
+Chac´on, J. E., Montanero, J., Nogales, A. G. and P´erez, P. (2006).
+On the existence and limit behavior of the optimal bandwidth in kernel
+density estimation. To appear in Statistica Sinica.
+Chiu, S.-T. (1991) . Bandwidth selection for kernel density estimation.
+Annals of Statistics, 19, 1883–1905.
+Davis, K. B. (1975). Mean square error properties of density estimates.
+Annals of Statistics, 3, 1025–1030.
+Davis, K. B. (1977). Mean integrated square error properties of density
+estimates. Annals of Statistics, 5, 530–535.
+Devroye, L. (1992). A note on the usefulness of superkernels in density
+estimation. Annals of Statistics, 20, 2037–2056.
+Devroye, L. and Lugosi, G. (2001). Combinatorial Methods in Den-
+sity Estimation. Springer-Verlag, New York.
+Glad, I. K., Hjort, N. L. and Ushakov, N. G. (1999). Upper
+bounds for the I-MSE and max-MSE of kernel density estimators. Sta-
+tistical Research Report 18-99, Department of Mathematics, University
+of Oslo.
+Glad, I. K., Hjort, N. L. and Ushakov, N. G. (2003). Correction
+of density estimators that are not densities. Scandinavian Journal of
+Statistics, 30, 415–427.
+Ibragimov, I. A. and Khasminskii, R. Z. (1982). Estimation of distri-
+bution density belonging to a class of entire functions. Theory of Proba-
+bility and its Applications, 27, 551–562.
+McMurry, T. L. and Politis, D. N. (2004). Nonparametric
+regres-
+sion with inﬁnite order ﬂat-top kernels. Nonparametric Statistics, 16,
+549–562.
+13
+
+Politis, D. N. (2003). Adaptive bandwidth choice. Nonparametric Statis-
+tics, 15, 517–533.
+Politis, D. N. and Romano, J. P. (1999). Multivariate density esti-
+mation with general ﬂat-top kernels of inﬁnite order. Journal of Mul-
+tivariate Analysis, 68, 1–25.
+Schucany, W.R. and Sommers, J.P. (1977). Improvement of kernel-
+type density estimators. Journal of the American Statistical Association,
+72, 420–423.
+Rosenblatt, M. (1956). Remarks on some nonparametric estimates of a
+density function. Annals of Mathematical Statistics, 27, 832–837.
+Sain, S. R. and Scott, D. W. (2002). Zero-bias locally adaptive den-
+sity estimators. Scandinavian Journal of Statistics, 29, 441–460.
+Sheather, S.J. and Jones, M.C. (1991). A reliable data-based band-
+width selection method for kernel density estimation. Journal of the Royal
+Statistical Society, Series B, 53, 683–690.
+Silverman, B. W. (1986). Density Estimation for Statistics and Data
+Analysis. Chapman & Hall, London.
+Simonoff, J. S. (1996) . Smoothing Methods in Statistics. Springer-
+Verlag, New York.
+Wand, M. P. and Jones, M. C. (1995). Kernel smoothing. Chapman &
+Hall, London.
+Watson, G. S. and Leabetter, M. R. (1963). On the estimation of
+the probability density, I. Annals of Mathematical Statistics, 34, 480–
+491.
+14

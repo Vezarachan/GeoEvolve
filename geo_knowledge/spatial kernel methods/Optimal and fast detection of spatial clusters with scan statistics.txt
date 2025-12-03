@@ -1,0 +1,1654 @@
+arXiv:1002.4770v1  [math.ST]  25 Feb 2010
+The Annals of Statistics
+2010, Vol. 38, No. 2, 1010–1033
+DOI: 10.1214/09-AOS732
+c
+⃝Institute of Mathematical Statistics, 2010
+OPTIMAL AND FAST DETECTION OF SPATIAL CLUSTERS
+WITH SCAN STATISTICS1
+By Guenther Walther
+Stanford University
+We consider the detection of multivariate spatial clusters in the
+Bernoulli model with N locations, where the design distribution has
+weakly dependent marginals. The locations are scanned with a rect-
+angular window with sides parallel to the axes and with varying sizes
+and aspect ratios. Multivariate scan statistics pose a statistical prob-
+lem due to the multiple testing over many scan windows, as well
+as a computational problem because statistics have to be evaluated
+on many windows. This paper introduces methodology that leads to
+both statistically optimal inference and computationally eﬃcient al-
+gorithms. The main diﬀerence to the traditional calibration of scan
+statistics is the concept of grouping scan windows according to their
+sizes, and then applying diﬀerent critical values to diﬀerent groups. It
+is shown that this calibration of the scan statistic results in optimal
+inference for spatial clusters on both small scales and on large scales,
+as well as in the case where the cluster lives on one of the marginals.
+Methodology is introduced that allows for an eﬃcient approximation
+of the set of all rectangles while still guaranteeing the statistical op-
+timality results described above. It is shown that the resulting scan
+statistic has a computational complexity that is almost linear in N.
+1. Introduction and overview of results.
+Spatial scan statistics are used
+to detect clusters in spatial data and are widely used, for example, in epi-
+demiology, biosurveillance and astronomy. In this paper, we consider the
+Bernoulli model in R2, which is important in many of the above applica-
+tions, see, for example, Kulldorﬀ(1999). All of the results in this paper can
+easily be extended to higher dimensions, but focusing on the important two-
+dimensional case simpliﬁes the exposition and the notation. The Bernoulli
+model states that there are N locations in R2, and that each location has a
+Received October 2008; revised June 2009.
+1Supported by NSF Grant DMS-05-05682 and NIH Grant 1R21AI069980.
+AMS 2000 subject classiﬁcations. Primary 62G10; secondary 62H30.
+Key words and phrases. Scan statistic, Bernoulli model, optimal detection, multiscale
+inference, fast algorithm, concentration inequality.
+This is an electronic reprint of the original article published by the
+Institute of Mathematical Statistics in The Annals of Statistics,
+2010, Vol. 38, No. 2, 1010–1033. This reprint diﬀers from the original in
+pagination and typographic detail.
+1
+
+2
+G. WALTHER
+label associated with it that takes on one of two possible outcomes, say 0 and
+1. Conditional on the locations, the values of these labels are realizations of
+independent Bernoulli random variables with parameter p at all locations in
+a certain set R and parameter q at all locations in Rc.
+The null hypothesis is
+H0 :p = q
+and the alternative hypothesis is H1 :q < p for some unknown set R out of a
+certain class of sets, which in this paper is taken to be the class of rectangles
+with sides parallel to the axes and with arbitrary sizes and aspect ratios.
+Example 1.
+Each location represents the spatial location of a person
+which is either healthy (label 0) or diseased (label 1). If q < p, then R
+represents the local area of a disease outbreak. The task is to detect such
+disease clusters R where the disease density is signiﬁcantly higher than the
+population density; see, for example, Kulldorﬀ(1999) and the references
+given there.
+Example 2.
+A ﬂow cytometer measures various numerical character-
+istics of each of a large number of cells. Thus, each cell can be identiﬁed
+with a point in Euclidean space. One task in the analysis ﬂow cytometry
+data is to describe local regions where two cell distributions are diﬀerent.
+Roederer and Hardy (2001) and Roederer et al. (2001) model such regions
+as rectangles with sides parallel to the axes. The reason for this is that such
+sets are easy to interpret and easy to implement on instruments for further
+processing. Also, sometimes the diﬀerence eﬀect lives on a lower-dimensional
+subspace, which is a special case of axis-parallel rectangles. Suppose one has
+a sample drawn i.i.d. from a distribution G, and a second sample drawn
+i.i.d. from a distribution H. Label each observation in the ﬁrst sample with
+a 0 and each observation in the second sample with a 1. If G = H, then the
+problem is left invariant under permutations of the labels. It will be seen
+shortly that thus the inference for Example 2 can proceed identically to that
+for Example 1.
+Further examples are given, for example, in Kulldorﬀ(1999). There is a
+large body of work on univariate scan statistics; see, for example, the refer-
+ences in Glaz and Balakrishnan (1999) and in Glaz, Naus and Wallenstein
+(2001), but the multivariate case is much less well developed. One reason
+is that computational issues play a prominent role when multivariate scan
+windows need to be evaluated at possibly many locations. Some references
+for the multivariate case that are relevant for the problem studied here are
+Naus (1965), Loader (1991), Chen and Glaz (1996), Alm (1997), Anderson
+and Titterington (1997), Kulldorﬀ(1997, 1999), Naiman and Priebe (2001),
+
+OPTIMAL AND FAST SCAN STATISTICS
+3
+and on the computational aspect, Neill and Moore (2004a, 2004b). A recent
+reference for the multivariate two-sample problem is Rohde (2009), who con-
+structs regions of signiﬁcant diﬀerence based on nearest-neighbor statistics.
+To simplify the exposition, we will assume that the distribution F of the
+locations is continuous and has independent marginals. All of the main re-
+sults continue to hold if the marginals are weakly dependent, for example,
+if they are ψ-mixing. But a completely general design of the N locations re-
+quires some modiﬁcations, which will be reported elsewhere. It is also conve-
+nient to only consider rectangles R with F(R) ≤1/8, which is an innocuous
+restriction for most problems.
+In our analysis, we will condition on the sample size N and on the N
+locations. Under the null hypothesis, the problem is then left invariant under
+permutations of the labels, and exact ﬁnite sample signiﬁcance statements
+for rectangles R can be obtained by a permutation test. There are two
+major problems associated with such an inference: as the class of rectangles
+is large, a statistical problem arises in the form of multiple testing, and
+a computational problem arises due to the need to evaluate test statistics
+on many rectangles. This paper introduces methodology that leads to both
+statistically optimal inference and computationally eﬃcient algorithms.
+The conventional deﬁnition of a scan statistic is
+max
+R∈RT(R),
+(1)
+where R is a set of scan windows such as the set of rectangles described
+above, and T is a standardized test statistic that is evaluated locally for
+each scan window. Critical values are then derived for this overall maximum.
+In this paper, we propose to use size-dependent critical values obtained by
+grouping windows according to their size: all windows that contain between
+2−ℓ−1N and 2−ℓN locations are grouped into one block, ℓ≥3. Then we
+use diﬀerent critical values for diﬀerent blocks as proposed by Ruﬁbach and
+Walther (2009) in a certain univariate context. The heuristic motivation for
+this approach is the following: there are of the order N disjoint windows
+containing a small number of locations each. As the corresponding local
+statistics T will be roughly independent, the maximum over the small win-
+dows will behave like the maximum of N i.i.d. random variables. This will
+tend to be stochastically much larger than the maximum over windows of
+size N/8 (say), which will roughly behave like the maximum of 8 of these
+i.i.d. random variables. Thus, the distribution of the conventional scan statis-
+tic (1) will be dominated by the small windows, with a corresponding loss
+of power for larger windows. Grouping windows according to their size and
+employing size-dependent critical values allows to remedy this eﬀect. Indeed,
+it will be shown below that this methodology allows for the following large
+sample results:
+
+4
+G. WALTHER
+• If the eﬀect q < p lives on a small rectangle, then the blocked scan statistic
+is essentially as powerful as any test can possibly be.
+• If the eﬀect q < p lives on a large rectangle, then the blocked scan statistic
+is again optimal, even in comparison to tests that are allowed to use
+a priori knowledge of the correct window size. That is, scanning with
+diﬀerent window sizes does not result in a signiﬁcant penalty.
+• If the eﬀect q < p lives on one of the two marginals, then the above
+optimality results still hold in the one-dimensional framework. That is,
+scanning with two-dimensional rectangles does not result in a signiﬁcant
+penalty even if it is known a priori that the eﬀect lives on a univariate
+marginal.
+We will give heuristic explanations of these results as well as rigorous
+mathematical statements. These results use a concentration inequality for
+the hypergeometric distribution which may be of independent interest. The
+optimality results require the use of size-dependent critical values, and it
+appears that such methodology has not been used before for scan statistics.
+In the setting of univariate function estimation in the Gaussian White Noise
+model, D¨umbgen and Spokoiny (2001) employed a scale-dependent penalty
+term. It is not clear how a useful penalty term can be derived for the prob-
+lem under consideration here. Also, the univariate results in Ruﬁbach and
+Walther (2009) suggest that the block procedure yields a better ﬁnite sample
+performance for relevant sample sizes.
+The construction of eﬃcient algorithms, and also the particular proof
+of the above optimality results, requires an economical approximation of
+the set of all rectangles. We prove an approximation theorem that allows
+for an adequate approximation of the set of all rectangles by O(N log2 N)
+rectangles. By comparison, there are O(N 4) rectangles that contain diﬀerent
+subsets of the N locations. As a consequence, it will be shown that the
+blocked scan statistic can be implemented with a computational complexity
+that is almost linear in N.
+It will be seen that there is a close connection between the computational
+approximation scheme and the statistical inference, with the grouping of
+rectangles according to their size being a central theme in each case.
+2. The blocked scan statistic.
+Kulldorﬀ(1997) derives the log-likelihood
+ratio statistic for a given scan window R as
+T(R) = n
+
+ˆplog ˆp
+p + (1 −ˆp)log 1 −ˆp
+1 −p
+
++ (N −n)
+
+ˆq log ˆq
+p + (1 −ˆq)log 1 −ˆq
+1 −p
+
+,
+
+OPTIMAL AND FAST SCAN STATISTICS
+5
+Fig. 1.
+Constructing an approximating set of rectangles. Units on the axes are with
+respect to the marginal distributions FX and FY .
+if ˆq ≤ˆp, and T(R) = 0, otherwise. Here, n := #R is the number of locations in
+R, p is the overall proportion of 1’s, and ˆp and ˆq are the proportion of 1’s in R
+and in Rc, respectively. Despite its cumbersome form, this statistic has been
+widely adapted in the computer science literature; see, for example, Neill
+and Moore (2004a, 2004b). The concentration inequality given in Theorem
+4 shows that this transformation of ˆq and ˆp has the beneﬁt of a clean tail
+behavior.
+T(R) is zero if ˆp = ˆq and positive if ˆq < ˆp. We restrict ourselves to the
+alternative hypothesis q < p for notational simplicity and because this case
+is most relevant for applications, but all the following results continue to
+hold for the alternative p ̸= q after a simple modiﬁcation of the deﬁnition of
+T(R).
+We will evaluate T on a set of rectangles that is a good approximation to
+the set R := {axis-parallel rectangles in R2}. The following theorem has a
+constructive proof that shows how to construct an economical set of rectan-
+gles that approximate all rectangles in R whose size (as measured in terms
+of F) is about s, namely R(s) := {R ∈R:s/2 < F(R) ≤s}.
+Theorem 1.
+For every s,ε ∈(0,1), there exists Rapp(s,ε) ⊂R such
+that:
+1. For every R ∈R(s), there exists R′ ∈Rapp(s,ε) with F(R△R′) ≤εF(R).
+2. #Rapp(s,ε) ≤Cs−1ε−4 log(2/s) for a universal constant C.
+The idea for the approximation scheme is depicted in Figure 1 and ex-
+plained in Section 3. To construct an approximation for all of R we proceed
+as follows. First, note that R = S∞
+ℓ=0 R(2−ℓ). Second, the construction of
+Rapp(s,ε) depends on F, which is typically unknown. To obtain an approx-
+imation that depends on the observations only, we replace F by the empir-
+ical measure FN in the construction of Rapp(s,ε) and call the resulting set
+
+6
+G. WALTHER
+Rapp,N(s,ε). Then we deﬁne our approximating set as
+Rapp,N :=
+⌊log2(N/(2log N))⌋
+[
+ℓ=3
+Rapp,N(2−ℓ,ℓ−1/2).
+(2)
+The particular choice ε = ℓ−1/2 yields the optimality results given in Theo-
+rem 2 below. Thus, the smaller the rectangle, the ﬁner the approximation
+relative to the size of the rectangle. Section 4 gives an algorithm that con-
+structs Rapp,N. The precise result about this approximation is as follows.
+Corollary 1.
+There exists Rapp,N ⊂R depending only on FN such
+that:
+1. For every R ∈R with F(R) ∈[2log N
+N
+, 1
+8], there exists R′ ∈Rapp,N with
+R′ ⊂R and F(R △R′) ≤9
+8
+F (R)
+√
+⌊log2(1/F (R))⌋with probability converging to
+1 uniformly in R ∈R and F.
+2. #Rapp,N ≤C′N log2 N for a universal constant C′.
+By comparison, a naive enumeration of all rectangles that contain diﬀer-
+ent subsets of the N locations results in O(N 4) rectangles and therefore is
+generally computationally infeasible. The algorithm in Section 4 computes
+the scan statistic T over Rapp,N in O(N log4 N) steps, i.e., with a compu-
+tation time that is almost linear in N.
+We will call Rapp,N(2−ℓ,...) the ℓth block of rectangles. The idea for the
+statistical methodology is closely connected to this approximation scheme:
+as all the rectangles in the ℓth block have about the same size, we will
+assign to those rectangles the same critical value. Following the criterion
+given in Ruﬁbach and Walther (2009), we set these critical values such that
+the signiﬁcance level of the ℓth block decreases as ∼ℓ−2.
+In more detail, let α ∈(0,1) and deﬁne qℓ(α) to be the (1−α)-quantile of
+maxR∈ℓth block T(R) when the labels are permuted randomly. For notational
+convenience, we suppress the dependence of qℓ(α) on the sample size N and
+on p. Let ˜α be the largest number such that
+P
+ ⌊log2(N/(2log N))⌋
+[
+ℓ=3
+
+max
+R∈ℓth blockT(R) > qℓ
+ ˜α
+ℓ2
+!
+≤α.
+(3)
+By construction, one can then claim with guaranteed simultaneous ﬁnite
+sample conﬁdence 1 −α that H0 is violated on every rectangle R on which
+T(R) > qℓ(˜α/ℓ2), where ℓis the block index of R. As explained in Ruﬁbach
+and Walther (2009), it is advantageous in practice to replace ℓ2 by, for
+
+OPTIMAL AND FAST SCAN STATISTICS
+7
+example, (10 + ℓ)2, and all of the following results also apply for such a
+modiﬁcation.
+The qℓcan be readily simulated with a simple extension of the usual
+Monte Carlo technique for a permutation test: for each block, one records in
+a list the maximum for each Monte Carlo permutation of the labels. Then
+one can use a bisection method on the lists of sorted maxima to ﬁnd ˜α.
+3. Optimality.
+In the following, we consider a growing sample size N.
+The result below allows for a quite general situation where the rectangle RN
+may vary with N, likewise the probabilities of success pN in RN and qN in
+Rc
+N, and the design distribution F N. For simplicity, we denote probabilities
+under this model by PN. The key quantity for detecting q < p on some
+rectangle R turns out to be
+D(F(R),p,q) := F(R)(1 −F(R))(p −q)2
+p(1 −q).
+D(F(R),p,q) increases, and hence the detection of R becomes easier, if for
+ﬁxed F(R) and q the diﬀerence p−q increases, as one would expect. If F(R)
+and p −q are ﬁxed, then D(F(R),p,q) increases as (p + q)/2 moves away
+from 1/2, i.e., detection is easier if the background probability q is closer to
+0 or if p is closer to 1. Theorem 2 below quantiﬁes when detection is possible
+and shows that the blocked scan statistic is optimal for detecting both small
+rectangles, that is, when F N(RN) →0, and large rectangles, that is, when
+liminf F N(RN) > 0. An appropriate way to formulate these optimality re-
+sults is via the asymptotic minimax framework, see, e.g., the investigation
+of univariate shape properties on small scales in the Gaussian white noise
+model in D¨umbgen and Spokoiny (2001) and the results for small and large
+scales in the context of a univariate density in D¨umbgen and Walther (2008).
+Theorem 2.
+(a) Let {(F N,RN,pN,qN)} be an arbitrary sequence of
+parameters with
+D(F N(RN),pN,qN) ≥(2 + εN)log(1/F N(RN))
+N
+where εN
+r
+log
+1
+F N(RN) →∞.
+Then
+PN(the blocked scan statistic ﬁnds a signiﬁcant rectangle R ⊂RN) →1.
+(b1) Let φN be any sequence of tests with asymptotic level α ∈(0,1) un-
+der H0. For any prescribed sequence of continuous distributions {F N}, there
+
+8
+G. WALTHER
+exists a sequence of parameters {(RN,pN,qN)} such that
+D(F N(RN),pN,qN) ≥(2 −εN)log(1/F N(RN))
+N
+with εN ↓0,εN
+q
+log
+1
+F N(RN) →∞, and limNPN(φN rejects) ≤α.
+This result continues to hold if one also prescribes the values {F N(RN)}
+and {εN}, provided that (log N)2/N ≤F N(RN) →0 and εN
+q
+log
+1
+F N(RN) →
+∞.
+(b2) Let {F N} be any sequence of continuous distributions and {RN} any
+sequence of rectangles with F N(RN)(1−F N(RN)) > 0, let bN ∈[0,NF N(RN)(1−
+F N(RN))), and let φN be any test with asymptotic level α ∈(0,1) under the
+null hypothesis that the probability of success on RN equals that on Rc
+N. If
+PN(φN rejects) →1
+for every sequence of parameters {(pN,qN)} that satisﬁes D(F N(RN),pN,qN) ≥
+bN
+N , then necessarily bN →∞.
+Parts (a) and (b1) show that in the case of small rectangles there is a
+cutoﬀat D = 2log
+1
+F N(RN)/N: if D ≥(2 + εN)log
+1
+F N(RN)/N with εN →0
+suﬃciently slowly, then the blocked scan statistic will detect the rectangle
+RN with asymptotic power one. One the other hand, if D is of the size
+(2 −εN)log
+1
+F N(RN )/N, then no test can exist that detects the rectangle
+with nontrivial asymptotic power. These two statements leave essentially no
+room for any other test to beat the blocked scan statistic for detecting small
+rectangles.
+In the case of large rectangles, part (b2) states that any test φN can
+have asymptotic power 1 only if ND →∞. But under the latter condition,
+the blocked scan statistic also has asymptotic power 1 [because ND →∞
+arbitrarily slowly is suﬃcient for the claim in (a) if
+1
+F N(RN) stays bounded].
+Note that (b2) even allows the competing test φN to possess prior knowledge
+of the rectangle R.
+These results clarify the tradeoﬀwhen using a scan statistic with varying
+window size. On the one hand, one can evidently gain substantial power by
+matching the window size with the extent of the eﬀect. On the other hand,
+varying the window size incurs a multiple testing penalty. The above results
+show that this multiple testing penalty becomes negligible for large samples,
+provided one employs an appropriate calibration of the various window sizes
+such as the blocked scan statistic introduced here. An illustration will be
+given in Section 4.
+Furthermore, there is no substantial multiple testing penalty for searching
+over multivariate rectangles when the eﬀect lives on one of the marginals.
+
+OPTIMAL AND FAST SCAN STATISTICS
+9
+Theorem 3.
+Suppose that the {RN} are in fact intervals on one of the
+two axes. Then the conclusions of Theorem 2 continue to hold, even if the
+tests φN in (b1) and (b2) are allowed to use the prior knowledge about which
+axis the {RN} live on.
+A heuristic explanation of this result is as follows: Figure 1(a) depicts
+1
+s disjoint rectangles with content s. The rectangles of Figure 1(b) are ob-
+tained by doubling the width of certain rectangles in Figure 1(a) and then
+dividing the rectangle into two with a horizontal split. After log 1
+s iterations
+one obtains the rectangles of Figure 1(c). The idea of Theorem 1 is that in
+the case of independent or weakly dependent marginals the totality of these
+rectangles (after a reﬁnement allowing, e.g., certain translations) constitutes
+an economical set of rectangles that approximates well the set of all rectan-
+gles with content s. The diﬃculty of the multiple testing problem depends
+essentially on the cardinality of this approximating set, as local statistics
+that pertain to rectangles with large overlap will be highly correlated and
+thus will not aﬀect the multiple testing problem much. But the construction
+depicted in Figure 1 results in 1
+s log 1
+s rectangles, which up to the log term is
+of the same order as the 1
+s rectangles in the univariate case of Figure 1(a).
+Thus, one expects that the multiple testing problem in this multivariate
+situation will not be signiﬁcantly more diﬃcult than in the univariate case.
+The proof of Theorem 2 makes use of the following concentration inequal-
+ity for the hypergeometric distribution.
+Theorem 4.
+Let X denote the number of red items among n items
+drawn without replacement out of N items of which R are red. Then
+P(X ≥x) ≤C(L(x) + 2)exp(−L(x))
+for x > m := nR/N,
+P(X ≤x) ≤C(L(x) + 2)exp(−L(x))
+for x < m
+and
+P(L(X) ≥x) ≤2C(x + 2)exp(−x)
+for x > 0,
+where L(x) := n(ˆplog ˆp
+p + (1 −ˆp)log 1−ˆp
+1−p) + (N −n)(ˆq log ˆq
+p + (1 −ˆq)log 1−ˆq
+1−p),
+p := R
+N , ˆp := x
+n, ˆq := R−x
+N−n, and C := 2exp{
+13
+12p(1−p)( 1
+n +
+1
+N−n)}.
+This inequality compares to the classical concentration bound obtained
+from the Chernoﬀ–Hoeﬀding theorem as follows. Hoeﬀding [(1963), Theo-
+rem 1 and Section 6] gives P(X ≥x) ≤exp(−n(ˆplog ˆp
+p + (1 −ˆp)log 1−ˆp
+1−p)). A
+Taylor series expansion shows that for ˆp near p the exponent behaves like
+−n (ˆp−p)2
+2p(1−p), whereas −L(x) ≈−n
+(ˆp−p)2
+(1−n/N)2p(1−p). Thus, Theorem 4 accounts
+for the variance correction factor N−n
+N−1 for sampling without replacement.
+
+10
+G. WALTHER
+Derbeko, El-Yaniv and Meir (2004) give an improvement to the Chernoﬀ–
+Hoeﬀding bound that is weaker than that of Theorem 4. Rohde (2009) gives
+a Bernstein-type inequality for the hypergeometric distribution.
+Scanning on a grid and comparison with the algorithm of Neill and Moore.
+Neill and Moore (2004a, 2004b) give an algorithm that runs in O(N log2 N)
+steps for data that are binned on a
+√
+N ×
+√
+N grid. That algorithm produces
+a rectangle R that attains maxR T(R) by partitioning the grid into overlap-
+ping regions, bounding maxT over subregions, and pruning regions which
+cannot contain the maximum. Thus, both the algorithm of Neill and Moore
+and the algorithm introduced here run in almost linear time; see Proposi-
+tion 1 below. Both algorithms achieve this by using an approximation. The
+algorithm of Neill and Moore approximates the data by binning them on a
+grid, and then ﬁnds the exact maximum over all rectangles on the grid. In
+contrast, the methodology introduced here evaluates rectangles on the exact
+data, but approximates the set of all rectangles. The results of this section
+show that this algorithm results in a solution that is statistically optimal.
+It is an open problem whether the algorithm of Neill and Moore results in a
+solution that is statistically optimal, and how the grid has to be constructed
+to achieve this.
+Consider now the related problem where one observes a Bernoulli random
+variable on each grid point of a
+√
+N ×
+√
+N grid. Then the design distribution
+F has independent marginals, but it is not continuous any more. Still, the
+methodology introduced in this paper can be readily adapted to this set-up
+and shown to be statistically optimal. The conclusions of Theorems 2 and
+3 continue to hold. However, the condition on the size of F(R) in Theorem
+2(b1) now has to be set diﬀerently for the marginal eﬀects considered in
+Theorem 3. In the multivariate case, (b1) allows rectangles R as small as
+F(R) ≥log2 N/N [and (a) even allows detection if F(R) ≥2log N/N], which
+results in a detection threshold of about 2log N/N for rectangles with these
+sizes. But any nonempty marginal interval R necessarily satisﬁes F(R) ≥
+√
+N/N due to the nature of the grid, which results in a detection threshold
+of about log N/N for the smallest detectable marginal intervals.
+Controlling maxR T(R).
+The cardinality of the approximating set of
+rectangles is small enough so that the tail behavior of maxR∈ℓth block T(R)
+can be controlled quite precisely by simply using Boole’s inequality; see (10)
+below. This is in contrast to the approximating set of intervals introduced
+by Ruﬁbach and Walther (2009) for certain multiple testing problems on
+the line. While that set leads to computationally eﬃcient algorithms, its
+cardinality is still so large that the control of maxI∈ℓth block T(I) requires in
+addition the diﬃcult stochastic control of the increments of T(I) as a pro-
+cess in I. In light of the above results, one may surmise that for these and
+
+OPTIMAL AND FAST SCAN STATISTICS
+11
+related problems, there typically exists an approximating set that not only
+allows for statistical optimality and computationally eﬃcient algorithms,
+but which also obviates the need for the stochastic control of the increments
+of T when used in conjunction with the block procedure. In particular, it
+may be possible to recover the optimality results for the inference problems
+treated in Ruﬁbach and Walther (2009) with the univariate version of the
+algorithm introduced here.
+4. Algorithm.
+It is helpful to use the following notation in this section.
+The coordinates of the N locations are (X1,Y1),...,(XN,YN), and we write
+X(r) := X(round(r)∧N) for real r, where X(1) ≤··· ≤X(N) are the order statis-
+tics of X1,...,XN. Each location has a label that is either 0 or 1. Here, is
+the pseudo-code to enumerate the set of approximating rectangles and to
+compute the corresponding local test statistics:
+Sort the locations (X1,Y1),...,(XN,YN) according to the X-value.
+for ℓ= 3,...,⌊log2
+N
+2log N ⌋do:
+Set s := 2−ℓ, ε := ℓ−1/2/6.
+for i = 0,...,ℓdo:
+for j = 0,...,⌊(εs2i)−1⌋do:
+for k = j + 1,...,j + ⌊1
+ε⌋do:
+Extract all locations (Xp,Yp) for which Xp falls in the interval
+Xjk := [X(jεs2iN+1),X(kεs2iN)] and denote by
+Njk the number of these locations.
+Sort these extracted Yp and compute the vector of cumulative
+sums of the labels of the (Xp,Yp) corresponding to the sorted Yp.
+for m = 0,...,⌊2i/ε⌋do:
+for n = m + 1,...,m + ⌊2/ε⌋do:
+Compute the test statistic on the rectangle
+Xjk × [Y(mε2−iNjk+1),Y(nε2−iNjk)], where the order
+statistics Y(·) are with respect to the extracted Yp.
+The running time of the algorithm is almost linear in N.
+Proposition 1.
+The above algorithm runs in O(N log4 N) time.
+We illustrate the methodology with an example where 1000 locations are
+drawn from a mixture of four bivariate normals. The labels are Bernoulli
+with p = 0.4, except in the strip [x ≥5], where p = 0.6, and in the box
+[1,2]×[3,5], where p = 0.75. Critical values for the conventional scan statistic
+(1) and the blocked scan statistic (3) were computed with 50000 random
+permutations of the labels. Figure 2 (left) shows all minimal (with respect
+to inclusion) boxes that are signiﬁcant at the 5% level using the calibration
+
+12
+G. WALTHER
+Fig. 2.
+Minimal signiﬁcant rectangles obtained with the conventional calibration for the
+scan statistic (left) and the blocked scan statistic (right). Locations having label 1 are
+plotted in red, locations with label 0 are black.
+for the traditional scan statistic. Thus, we are 95% conﬁdent that each of
+the depicted boxes contains a so-called overdensity, that is, somewhere inside
+the box the probability of success p is larger than outside the box. Figure
+2 (right) shows the resulting signiﬁcant boxes when the calibration for the
+blocked scan statistic is used. In addition to detecting the small box at
+[1,2] × [3,5], the blocked scan statistic also detects the large box [x ≥5]. It
+was found that this result was a frequent outcome for realizations of this
+example.
+5. Proofs.
+Proof of Theorem 1.
+We parametrize rectangles as follows: R =
+(x,x′,y,y′) denotes the rectangle with the vertices (x,y),(x′,y),(x′,y′) and
+(x,y′), where x,x′,y,y′ ∈[−∞,∞] and x < x′, y < y′. We will approximate
+R(s) by the ﬁnite set Rapp(s,ε), which for notational simplicity we deﬁne for
+ε ∈(0, 1
+6) by Rapp(s,6ε) := {R:R = (xj,xk,ym,yn) := (F −1
+X (jεs2i),F −1
+X (kεs2i),
+F −1
+Y (mε2−i), F −1
+Y (nε2−i)), where i,j,k,m and n are integers with 0 ≤i ≤
+⌈log2
+1
+s⌉, 0 ≤j ≤⌊(εs2i)−1⌋, j + 1 ≤k ≤j + ⌊1/ε⌋, 0 ≤m ≤⌊2i/ε⌋and
+m + 1 ≤n ≤m + ⌊2/ε⌋}. Here, F −1
+X
+and F −1
+Y
+denote the quantile functions
+of the ﬁrst and second marginals of F, respectively, with F −1
+X (p) = −∞for
+p < 0 and F −1
+X (p) = ∞for p > 1.
+Thus,
+#Rapp(s,6ε) ≤ε−12ε−1
+⌈log2(1/s)⌉
+X
+i=0
+((εs)−12−i + 1)(ε−12i + 1)
+
+OPTIMAL AND FAST SCAN STATISTICS
+13
+≤2ε−2
+⌈log2(1/s)⌉
+X
+i=0
+4
+3(εs)−12−i 7
+6ε−12i
+≤4s−1ε−4 log2(4/s).
+Now, let R = (x,x′y,y′) ∈R(s). We will show that there exists a R′ ∈
+Rapp(s,6ε) with F(R △R′) ≤6εs and that one can even arrange that R′ ⊂
+R. To this end set i := ⌈log2
+FX([x,x′])
+s
+⌉. Thus,
+s2i−1 < FX([x,x′]) ≤s2i
+(4)
+so the index i is assigned to rectangles whose “length,” as measured by FX,
+lies between s
+22i and s2i. Let j be the smallest integer such that xj > x,
+let k be the largest integer so that xk < x′, let m be the smallest integer
+with ym > y, and let n be the largest integer such that yn < y′. It will be
+shown below that these indices fall in the ranges given in the deﬁnition
+of Rapp(s,6ε), hence R′ := (xj,xk,ym,yn) ∈Rapp(s,6ε), and by deﬁnition
+R′ ⊂R. Further,
+F(R △R′) = F([x,x′] × ([y,ym] ∪[yn,y′]))
+(5)
++ F(([x,xj] ∪[xk,x′]) × [ym,yn]).
+Now, FY ([y,ym]) ≤ε2−i by the deﬁnition of m, and the same bound applies
+to FY ([yn,y′]). Likewise, both FX([x,xj]) and FX([xk,x′]) are not larger
+than εs2i. Hence, (5) is not larger than
+2FX([x,x′])ε2−i + 2εs2iFY ([y,y′])
+= 2ε(z + sF(R)/z)
+where z := FX([x,x′])2−i ∈(s/2,s] by (4)
+≤2ε(s/2 + 2F(R))
+since s/2 < F(R)
+< 6εF(R).
+It remains to show that i,j,k,m and n fall in the ranges given in the def-
+inition of Rapp(s,6ε): 1 ≥FX([x,x′]) ≥F(R) > s/2 implies 0 ≤i ≤⌈log2
+1
+s⌉.
+Clearly, j ≥0. For ˜j := ⌊(εs2i)−1⌋, we have x˜j ≥F −1
+X (1 −εs2i) ≥F −1
+X (1 −
+2εFX([x,x′])) ≥x by (4) and as ε ≤1/6. Hence, j ≤˜j. Next,
+(k −j)εs2i = FX([xj,xk])
+
+≤FX([x,x′]) ≤s2i,
+≥FX([x,x′]) −2εs2i > 0,
+by (4) and since ε ≤1/6. Hence, 1 ≤k −j ≤1/ε. Clearly, m ≥0. Fur-
+ther, s/2 < F(R) ≤(FX([xj,xk]) + 2εs2i) × (FY ([ym,∞)) + ε2−i) = (k −j +
+2)εs2i(1 −(m −1)ε2−i). Together with (k −j + 2)ε ≤3 (see above), this
+inequality yields 6(m−1)ε < 6×2i −1, whence m < 2i/ε−1/(6ε)+1 ≤2i/ε
+since ε ≤1/6. Finally, s/2 < F(R) ≤(FX([xj,xk]) + 2εs2i) × (FY ([ym,yn]) +
+
+14
+G. WALTHER
+2ε2−i). With (4) this yields FY ([ym,yn]) ≥2−i−1/(1+2ε)−ε2−i+1 > 0 since
+ε ≤1/6, hence n > m. Likewise, s ≥F(R) ≥FX([xj,xk]) × FY ([ym,yn]) to-
+gether with (4) gives s > s2i−1(n −m)ε2−i, hence n −m < 2/ε.
+□
+Proof of Corollary 1.
+Deﬁne the random collection of rectangles as
+in (2), where Rapp,N(s,ε) is deﬁned as Rapp(s,ε) in the proof of Theorem 1
+but with F −1
+X and F −1
+Y
+replaced by the empirical quantile functions F −1
+N,X and
+F −1
+N,Y , respectively. That is, we consider rectangles R = (xj,xk,ym,yn) such
+that (xj,xj+1] has empirical measure FN,X about equal to ε
+6s2i, likewise for
+(xk,xk+1]; further (ym,ym+1] and (yn,yn+1] have empirical measure FN,Y
+about equal to ε
+62−i, where 0 ≤i ≤⌈log2
+1
+s⌉. Then result 2 of Theorem 1
+yields
+#Rapp,N ≤C
+⌊log2(N/(2log N))⌋
+X
+ℓ=1
+2ℓℓ2 log 2ℓ+1
+≤2C
+N
+log N
+
+log2
+N
+2log N
+3
+log 2
+≤2CN log2
+2 N.
+Now, let R = (x,x′,y,y′) be a rectangle parametrized as in the proof of The-
+orem 1. Set ℓ:= ⌊log2
+1
+F (R)⌋. Then 3 ≤ℓ≤⌊log2
+N
+2log N ⌋by the assumptions
+on R. We will construct another deterministic rectangle ˜R = (˜x, ˜x′, ˜y, ˜y′) such
+that for γ = 1/8:
+(A) F(R \ ˜R) ≤(1 + γ)
+F (R)
+√
+⌊log2(1/F (R))⌋;
+(B) P(there exists R′ ∈Rapp,N(2−ℓ,ℓ−1/2): ˜R ⊂R′ ⊂R) ≥1 −16
+1+γ
+γ2√log N .
+The claim of the corollary then follows.
+To keep familiar notation set s := 2−ℓand ε := ℓ−1/2. Deﬁne
+i :=
+
+log2
+FX([x,x′])
+s
+
+,
+so
+2i−1 < FX([x,x′])
+s
+≤2i.
+(6)
+Then 0 ≤i ≤⌈log2
+1
+s⌉as required in the deﬁnition of Rapp,N(s,ε).
+To construct ˜R, deﬁne ˜x, ˜x′, ˜y, ˜y′ such that FX([x, ˜x]) = FX([˜x′,x′]) = (1+
+γ)εs2i/6, FY ([y, ˜y]) = FY ([˜y′,y′]) = (1 + γ)ε2−i/6. Then x < ˜x < ˜x′ < x′ and
+y < ˜y < ˜y′ < y′: by (6), (1+γ)εs2i/6 < FX([x,x′])/2. Likewise, the deﬁnition
+
+OPTIMAL AND FAST SCAN STATISTICS
+15
+of ℓimplies s = 2−ℓ< 2F(R), hence (1+γ)ε2−i/6 ≤
+s
+4FX([x,x′]) = sFY ([y,y′])
+4F (R)
+<
+FY ([y,y′])
+2
+, which yields y < ˜y < ˜y′ < y′. Thus, ˜R ⊂R and
+F(R \ ˜R) = F([x,x′] × ([y, ˜y] ∪[˜y′,y′]))
++ F(([x, ˜x] ∪[˜x′,x′]) × [˜y, ˜y′])
+< (1 + γ)εF(R)
+as in the proof of Theorem 1,
+using s/2 < F(R) by the deﬁnition of ℓ. This establishes (A). Next,
+P
+
+at most ε
+6s2iN observations in [x, ˜x]
+
+= P(FN,X([x, ˜x]) ≤εs2i)
+= P(FN,X([x, ˜x]) −FX([x, ˜x]) ≤−γεs2i/6)
+≤
+1 + γ
+Nγ2εs2i/6
+by Chebyshev
+≤3
+1 + γ
+γ2p
+(log 2)(log N)
+since s2i ≥FX([x,x′]) ≥F(R) ≥2log N
+N
+by (6) and ℓ≤log2 N. Hence, with
+probability at least 1 −4
+1+γ
+γ2√log N an endpoint xj of one the rectangles in
+Rapp,N(2−ℓ,ℓ−1/2) falls into [x, ˜x]. Analogously, one can show that some xk,
+ym and yn fall into [˜x′,x′], [y, ˜y] and [˜y′,y′], respectively. Hence, there exists
+a rectangle R′ ∈Rapp,N(2−ℓ,ℓ−1/2) that satisﬁes ˜R ⊂R′ ⊂R. (B) follows.
+□
+Proof of Theorem 2(a).
+To simplify notation we write (F,R,p,q) for
+(F N,RN, pN,qN). It will become clear that these parameters may vary with
+N due to the uniformity of the following results. As usual, FN will denote
+the empirical measure pertaining to F.
+Set bN := εN
+q
+log
+1
+F (R) →∞. (a) follows after showing:
+(A)
+PN
+ 
+there exists a rectangle R′ ∈Rapp,N with R′ ⊂R and
+T(R′) > log
+1
+F(R) +
+s
+bN log
+1
+F(R)
+!
+→1.
+(B) R′ belongs to a block ℓwhose critical value satisﬁes
+qℓ
+ ˜α
+ℓ2
+
+≤log
+1
+F(R) + 6log log
+1
+F(R) + γ
+
+16
+G. WALTHER
+with γ depending on α only.
+For the proof of (A), one veriﬁes that the condition D(F(R),p,q) ≥(2 +
+εN)log
+1
+F (R)/N together with the inequality
+(p−q)2
+p(1−q) ≤1 for q < p implies
+F(R) ≥2log N
+N . So the block index ℓ:= ⌊log2
+1
+F (R)⌋of R satisﬁes 3 ≤ℓ≤
+⌊log2
+N
+2log N ⌋. Thus, by Corollary 1, with probability converging to 1 there
+exists R′ ∈Rapp,N such that R′ ⊂R and
+F(R′) ≥F(R)
+
+1 −
+9
+8
+p
+⌊log2(1/F(R))⌋
+
+≥F(R)(1 −λN),
+where λN := 2
+3
+q
+bN
+bN+⌊log2(1/F (R))⌋, and the last inequality follows from 3(1 +
+⌊log2
+1
+F (R)⌋/bN) ≤(1+3/bN)⌊log2
+1
+F (R)⌋≤28
+35 ⌊log2
+1
+F (R)⌋for N large enough,
+using ⌊log2
+1
+F (R)⌋≥3.
+Denote by ˆp and ˆq the proportion of 1’s in R′ and R′c, respectively. On the
+event AN := {FN(R′)(1−FN(R′))
+F (R)(1−F (R))
+≥1 −25
+24λN, ˆp−ˆq
+p−q ≥1 −λN
+6 , p
+ˆp ≥1 −λN
+24 , 1−q
+1−ˆq ≥
+1 −λN
+24 } we have ˆq < ˆp as q < p. The function l(ˆp) := ˆplog ˆp
+p + (1 −ˆp)log 1−ˆp
+1−p
+satisﬁes l(p) = 0, l′(p) = 0, and l′′(ξ) = ξ−1(1 −ξ)−1 ≥ˆp−1(1 −ˆq)−1 for ξ ∈
+[ˆq, ˆp]. Thus, Taylor’s theorem gives on AN
+T(R′) = (#R′)l(ˆp) + (N −#R′)l(ˆq)
+≥(#R′) (ˆp −p)2
+2ˆp(1 −ˆq) + (N −#R′) (ˆq −p)2
+2ˆp(1 −ˆq)
+= (#R′)(N −#R′)
+N
+(ˆp −ˆq)2
+2ˆp(1 −ˆq)
+≥NF(R)(1 −F(R)) (p −q)2
+2p(1 −q)
+
+1 −25
+24λN
+
+1 −λN
+6
+2
+1 −λN
+24
+2
+≥
+
+1 −35
+24λN
+
+ND(F(R),p,q)/2
+≥log
+1
+F(R) + 1
+2
+ 
+1 −35
+24λN
+
+bN −35
+12λN
+s
+log
+1
+F(R)
+!s
+log
+1
+F(R)
+≥log
+1
+F(R) + 1
+72(bN −140
+p
+bN)
+s
+log
+1
+F(R)
+since λN ≤2/3.
+(A) follows once we show that PN(AN) →1. As for the ﬁrst event in
+AN, the proof of Corollary 1 provided a deterministic rectangle ˜R with
+
+OPTIMAL AND FAST SCAN STATISTICS
+17
+F( ˜R) ≥(1 −λN)F(R) ≥2
+3 log N/N and PN( ˜R ⊂R′ ⊂R) →1. Chebyshev’s
+inequality gives for c = 1/24:
+PN
+
+FN( ˜R)
+F( ˜R)
+−1
+ > cλN
+
+≤
+F( ˜R)
+N(F( ˜R))2c2λ2
+N
+≤
+3
+2(log N)λ2
+Nc2
+≤
+27
+4c2 min(bN log 2,log N)
+by (8)
+and the same bound holds for |FN(R)
+F (R) −1|. But ˜R ⊂R′ ⊂R, FN( ˜R)/F( ˜R) ≥
+1 −λN/24 and FN(R)/F(R) ≤1 + λN/24 imply
+FN(R′)
+F(R)
+
+
+
+
+
+
+
+
+
+≥FN( ˜R)
+F( ˜R)
+F( ˜R)
+F(R) ≥
+
+1 −λN
+24
+
+(1 −λN) ≥1 −25
+24λN,
+≤FN(R)
+F(R) ≤1 + λN
+24 .
+(7)
+This entails the ﬁrst event in AN due to the inequality y(1−y)
+x(1−x) ≥min( y
+x,2−y
+x)
+for x,y ∈(0,1/2).
+For the other events in AN, note that given the locations X = (X1,...,XN),
+ˆp and ˆq are independent with ˆp ∼bin(#R′,p)/#R′, while ˆq is an average
+of N −#R′ independent Bernoulli random variables that have probability
+of success equal to p for the #R −#R′ locations in R \ R′ and q for the
+N −#R locations in Rc. Hence,
+EN(ˆq|X) = (#R −#R′)p + (N −#R)q
+N −#R′
+= q + FN(R) −FN(R′)
+1 −FN(R′)
+(p −q)
+≤q + 13/(12 · 8)λN
+1 −37/(8 · 36)(p −q)
+on (7) as λN ≤2
+3,F(R) ≤1
+8
+< q + 3
+19λN(p −q).
+Thus, on (7)
+PN
+ ˆp −ˆq
+p −q < 1 −λN
+6
+X
+
+≤PN
+
+ˆp −ˆq −EN(ˆp −ˆq) <
+ 3
+19 −1
+6
+
+λN(p −q)
+X
+
+
+18
+G. WALTHER
+≤p(1 −q)/#R′ + p(1 −q)/(N −#R′)
+114−2λ2
+N(p −q)2
+as q < p
+=
+1142
+λ2
+NND(F(R),p,q) ·
+F(R)(1 −F(R))
+FN(R′)(1 −FN(R′))
+≤
+1142
+λ2
+N(2 + bN(log(1/F(R)))−1/2)log(1/F(R)) ·
+
+1 −25
+24λN
+−1
+≤9 · 1142 · 2
+bN
+→0
+by (9) and as λN ≤2
+3.
+The other two events in AN obtain similarly. Above, we used the following
+properties of λN:
+λ2
+N log N ≥2
+9 min(bN log 2,log N),
+(8)
+λ2
+N
+
+2 +
+bN
+p
+log(1/F(R))
+
+log
+1
+F(R) ≥2bN/9.
+(9)
+For proof of those inequalities, note that λ2
+N log2
+1
+F (R) ≥4
+9 · bN log2(1/F (R))
+bN+log2(1/F (R)) ≥
+2
+9 min(bN,log2
+1
+F (R)). Now (8) follows since F(R) ≥2log N/N implies log N/
+log2
+1
+F (R) ≥log 2. Applying the above inequality to the LHS of (9), yields
+the lower bound 2
+9 min(bN2/log2(e),bN
+q
+log
+1
+F (R)) ≥2
+9bN.
+For the proof of (B), note that by the construction of Rapp,N in the
+proof of Corollary 1, the rectangle R′ belongs to Rapp,N(2−ℓ,ℓ−1/2) where
+ℓ:= ⌊log2
+1
+F (R)⌋. Hence, result 2 of Theorem 1 yields #Rapp,N(2−ℓ,ℓ−1/2) ≤
+K
+1
+F (R)(log2
+1
+F (R))3 for some universal constant K. Thus,
+P0
+
+max
+˜R∈Rapp,N(2−ℓ,ℓ−1/2)
+T( ˜R) ≥log
+1
+F(R) + 6log log
+1
+F(R) + γ
+
+≤
+K
+F(R)
+
+log2
+1
+F(R)
+3
+(10)
+×
+max
+˜R∈Rapp,N(2−ℓ,ℓ−1/2)
+P0
+
+T( ˜R) ≥log
+1
+F(R) + 6log log
+1
+F(R) + γ
+
+,
+where P0 denotes the null distribution, i.e., the permutation distribution,
+conditional on the N locations and on p = total no. of 1
+,s
+N
+. Thus, under P0,
+the number of 1’s in a rectangle ˜R follows the hypergeometric distribution
+where # ˜R labels are drawn out of N, of which pN are 1’s. Theorem 4 implies
+P0
+
+T( ˜R) ≥log
+1
+F(R) + 6log log
+1
+F(R) + γ
+
+
+OPTIMAL AND FAST SCAN STATISTICS
+19
+≤2C
+
+log
+1
+F(R) + 6log log
+1
+F(R) + γ + 2
+
+× F(R)
+
+log
+1
+F(R)
+−6
+exp(−γ)
+≤6α
+Kπ2 F(R)
+
+log2
+1
+F(R)
+−5
+for γ large enough, depending on α only. Thus, (10) is not larger than 6α
+π2 ×
+(log2
+1
+F (R))−2 ≤
+6α
+π2ℓ2 by the deﬁnition of ℓ. Now, (B) follows once it is shown
+that
+P0
+
+max
+˜R∈Rapp,N(2−ℓ,ℓ−1/2)
+T( ˜R) ≥qℓ
+ ˜α
+ℓ2
+
+≥6α
+π2ℓ2 .
+(11)
+But by the deﬁnition of qℓ(·), the probability in (3) is not larger than
+P
+ℓ≥1 ˜α/ℓ2 ≤˜απ2/6, hence ˜α ≥6α/π2 by the deﬁnition of ˜α. Now (11) fol-
+lows from the deﬁnition of qℓ(·).
+□
+Proof of Theorem 2(b1, b2).
+The idea of the proof of (b1) is classical,
+see, e.g., Lepski and Tsybakov (2000). Given the prescribed sequence of
+values {F N(RN)} and {εN}, partition R2 into rectangles ˜RN
+1 , ˜RN
+2 ,..., such
+that F N( ˜RN
+j ) = F N(RN) for j = 1,...,⌊
+1
+F N(RN)⌋. This is feasible since F N
+is continuous, e.g., by partitioning one axis into intervals. Set q = qN := 1/2
+and p = pN := q +
+q
+1
+2NF (R)(1−F (R)) log
+1
+F (R)(1−εN/8), where for notational
+simplicity, we write F(R) for F N(RN) and also drop the index N from
+F N,pN,qN, ˜RN
+j in the following. Without loss of generality, we may assume
+εN < 8. Thus, q < p and for j = 1,...,⌊
+1
+F (R)⌋:
+D(F( ˜Rj),p,q)
+= log(1/F(R))(1 −εn/8)2
+Np
+≥log(1/F(R))(1 −εn/4)/N
+1/2 + (log(1/F(R)))−1/2
+by (12)
+≥(2 −εN/2)
+
+1 −2
+
+log
+1
+F(R)
+−1/2log(1/F(R))
+N
+≥(2 −εN)log(1/F(R))
+N
+
+20
+G. WALTHER
+for N large enough, as εN
+q
+log
+1
+F (R) →∞. We used
+NF(R)(1 −F(R)) ≥(1 + o(1)) log2 N ≥(1 + o(1)) log2
+1
+F(R),
+(12)
+which is a consequence of the assumptions on F(R) stated in the theorem.
+Denote by Xi the location and by Yi the Bernoulli random variable that
+gives the label of the ith observation, i = 1,...,N. Denote by PN,0 the model
+where the Xi are i.i.d. F and all the Yi have probability of success q, while
+we deﬁne PN,j to be the model where instead Yi has probability of success
+p if Xi ∈˜Rj and q otherwise, i = 1,...,N. Thus, PN,0 belongs to H0. Deﬁne
+the likelihood ratio LN,j(X,Y) := QN
+i=1 fN,j(Xi,Yi), where
+fN,j(Xi,Yi) :=
+
+
+
+p
+q1(Yi = 1) + 1 −p
+1 −q 1(Yi = 0),
+if Xi ∈˜Rj,
+1,
+otherwise,
+j = 1,...,⌊
+1
+F (R)⌋. Hence, if φN(X,Y) is any level α test that depends on
+the locations X and the labels Y, then by conditioning on X one veriﬁes
+EN,jφN(X,Y) = EN,0φN(X,Y)LN,j(X,Y). We will show that
+EN,0
+
+
+1
+F(R)
+ ⌊1/F (R)⌋
+X
+j=1
+LN,j(X,Y) −1
+ →0.
+(13)
+Then
+min
+j=1,...,⌊1/F (R)⌋EN,jφN(X,Y) −α
+≤
+
+1
+F(R)
+ ⌊1/F (R)⌋
+X
+j=1
+EN,jφN(X,Y) −α
+= EN,0
+ 
+1
+F(R)
+ ⌊1/F (R)⌋
+X
+j=1
+LN,j(X,Y) −1
+!
+φN(X,Y) + o(1)
+≤EN,0
+
+
+1
+F(R)
+ ⌊1/F (R)⌋
+X
+j=1
+LN,j(X,Y) −1
+ + o(1)
+= o(1)
+and the claim of (b1) follows. [Note that one can even allow φN(X,Y) to
+depend on F N(RN). Further, the continuity assumption on F N was only
+used to allow for the above partition of R2 into rectangles and can be relaxed
+accordingly.] To prove (13), note that conditional on X the LN,j(X,Y) are
+
+OPTIMAL AND FAST SCAN STATISTICS
+21
+independent since LN,j(X,Y) is a function of only those Yi for which Xi ∈
+˜Rj. Further, one veriﬁes EN,0LN,j(X,Y) = EN,0(LN,j(X,Y)|X) = 1. Thus,
+we can proceed similarly as in the proof of Lemma 7.4 in D¨umbgen and
+Walther (2008) and obtain (13) once we show that
+max
+
+p
+q −1
+,
+
+1 −p
+1 −q −1
+
+
+≤C
+
+log
+
+1
+F(R)
+−1/2
+(14)
+for some constant C,
+s
+log
+
+1
+F(R)
+
+1 −NEN,0(fN,1 −1)2
+2log⌊1/F(R)⌋
+
+→∞.
+(15)
+Now |p
+q −1| = 2
+q
+1
+2NF (R)(1−F (R)) log
+1
+F (R)(1−εN/8) ≤2(log⌊
+1
+F (R)⌋)−1/2 by
+(12) and the same bound obtains for |1−p
+1−q −1|, proving (14). Finally,
+EN,0(fN,1(X1,Y1) −1)2
+= EN,0
+p
+q1(Yi = 1) + 1 −p
+1 −q 1(Yi = 0) −1
+2X1 ∈˜R1
+
+× PN,0(X1 ∈˜R1)
+=
+2log(1/F(R))
+NF(R)(1 −F(R))(1 −εN/8)2F(R).
+Together with
+log x
+log⌊x⌋≤1 +
+1
+log⌊x⌋for x ≥2 one sees that the expression in
+(15) is not smaller than
+s
+log
+
+1
+F(R)
+
+1 −(1 + 1/log⌊1/F(R)⌋)(1 −εN/8)
+1 −F(R)
+
+≥
+s
+log
+
+1
+F(R)
+
+εN/8 −
+1
+log⌊1/F(R)⌋−F(R)
+
+.
+(1 −F(R))
+→∞
+as F(R) →0 and εN
+q
+log
+1
+F (R) →∞, completing the proof of (b1). The
+bounds on F N(RN) and bN given in the statement of (b2) guarantee that
+there exists pN and qN such that D(F N(RN),pN,qN) ≥bN/N, e.g., take
+pN = 1, qN = 0. Then the claim obtains with a contiguity argument similar
+as in the proof of Theorem 4.1(c) in D¨umbgen and Walther (2008).
+□
+
+22
+G. WALTHER
+Proof of Theorem 3.
+Part (a) continues to hold as intervals on the
+axes are special cases of axis-parallel rectangles. Parts (b1) and (b2) continue
+to hold as their proofs do not depend on the dimensionality of the space. In
+fact, the proof of (b1) already uses a univariate partitioning of one axis into
+⌊
+1
+F N(RN)⌋intervals, and the rest of the proof of (b1) goes through verbatim.
+□
+Proof of Theorem 4.
+Let k,x ≥0 be integers with x+k ≤min(n,R).
+Then
+P(X = x + k)
+P(X = x)
+=
+k
+Y
+i=1
+(R −x −k + i)(n −x −k + i)
+(x + i)(N −R −n + x + i)
+is nonincreasing in x. Hence, for x ≥⌈m⌉
+P(X ≥x) =
+P(X = x)
+P(X = ⌈m⌉)
+X
+k≥0
+P(X = ⌈m⌉)P(X = x + k)
+P(X = x)
+≤
+P(X = x)
+P(X = ⌈m⌉)
+X
+k≥0
+P(X = ⌈m⌉)P(X = ⌈m⌉+ k)
+P(X = ⌈m⌉)
+≤
+P(X = x)
+P(X = ⌈m⌉).
+The connection between this hypergeometric probability and the log like-
+lihood ratio statistic L obtains by applying Stirling’s formula and collecting
+terms: the upper and lower bounds for Stirling’s formula in Feller [(1968),
+page 54] yield
+log
+P(X = x)
+P(X = ⌈m⌉)
+≤−L(x) + L(⌈m⌉)
++ 1
+2 log ⌈m⌉(R −⌈m⌉)(n −⌈m⌉)(N −R −n + ⌈m⌉)
+x(R −x)(n −x)(N −R −n + x)
++
+1
+12p(1 −p)
+ 1
+n +
+1
+N −n
+
+.
+Set L(n, ˆp) := n(ˆplog ˆp
+p + (1 −ˆp)log 1−ˆp
+1−p). Using log b
+a ≤b−a
+a
+for 0 < a < b
+and Taylor’s theorem, respectively, one ﬁnds
+n(ˆp −p)2
+p(1 −p) ≥L(n, ˆp) ≥
+
+
+
+
+
+
+
+n(ˆp −p)2
+2(1 −p),
+if ˆp ≥p,
+n(ˆp −p)2
+2p
+,
+if ˆp ≤p,
+
+OPTIMAL AND FAST SCAN STATISTICS
+23
+which implies L(⌈m⌉) ≤
+1
+p(1−p)( 1
+n +
+1
+N−n) and for ˆp ∈(p, n−1
+n ]:
+L(n, ˆp) + 1 ≥
+1 −p
+4(1 −ˆp)
+(16)
+[distinguish the cases ˆp ⋚(3 + p)/4], as well as for ˆq ∈[
+1
+N−n,p):
+L(N −n, ˆq) + 1 ≥p
+4ˆq .
+(17)
+First, consider the case ⌈m⌉≤x < min(n,R). Then (17) gives
+⌈m⌉(R −⌈m⌉)
+x(R −x)
+≤R −m
+R −x = p
+ˆq ≤4L(N −n, ˆq) + 4
+and analogously (16) implies
+(n −⌈m⌉)(N −R −n + ⌈m⌉)
+(n −x)(N −R −n + x)
+≤4L(n, ˆp) + 4.
+The ﬁrst inequality of the theorem now follows from the arithmetic–
+geometric means inequality.
+The case x = min(n,R) is treated similarly. For example, if x = n < R
+then log P(X ≥x) = log P(X = x) ≤−L(X) + 1
+2 log(R(N−n)
+(R−n)N ) + 1
+12( 1
+n +
+1
+N−n)
+and (17) gives
+R(N−n)
+(R−n)N = p
+ˆq ≤4L(N −n, ˆq) + 4, which yields the claimed
+inequality.
+The second inequality of the theorem obtains analogously. The third in-
+equality follows from the ﬁrst two because the function x →L(x) is strictly
+decreasing for x < m and strictly increasing for x > m.
+□
+Proof of Proposition 1.
+Sorting the data according to the X-coordinate
+requires O(N log N) steps. Note that the test statistic inside the n-loop
+can be computed in constant time: the rectangle Xjk × [Y(a),Y(b)] contains
+round(b) −round(a) + 1 locations, and the number of their labels that equal
+1 is just the cumulative sum vector of the labels evaluated at index round(b)
+minus the vector evaluated at round(a −1). These two quantities are suf-
+ﬁcient to calculate the test statistic once the overall number of locations
+N and the overall number of 1’s is known. Thus, there are O(1/ε) steps
+for the n-loop, and hence O(2i/ε2) for the m-loop. Inside the k-loop the
+number of steps required to extract the Njk locations (Xp,Yp), to sort the
+corresponding Y -values, and to compute the cumulative sum is dominated
+by the sorting, which requires O(Njk log Njk) steps. (Note that presorting
+the locations according to their X-coordinate allows an eﬃcient extraction.)
+Thus, the total number of steps in the algorithm is bounded by
+O(N log N) +
+log2(N/(2log N))
+X
+ℓ=3
+ℓ
+X
+i=0
+ℓ1/22ℓ2−i
+X
+j=0
+j+ℓ1/2
+X
+k=j+1
+(O(Njk log Njk) + O(2iℓ)).
+
+24
+G. WALTHER
+By deﬁnition, Njk ≤(k−j)εs2iN ≤2i−ℓN. Thus, the above sum is not larger
+than
+O(N log N)
++ C
+log2(N/(2log N))
+X
+ℓ=3
+ℓ
+X
+i=0
+ℓ2ℓ2−i(2i−ℓN log N + 2iℓ)
+≤CN log N
+log2(N/(2log N))
+X
+ℓ=3
+ℓ2
+≤CN(log N)4,
+where the constant C may change from line to line.
+□
+Acknowledgments.
+I would like to thank one referee for the Derbeko, El-
+Yaniv and Meir (2004) reference and another referee for the Rohde (2009)
+reference.
+REFERENCES
+Alm, S. E. (1997). On the distribution of the scan statistic of a two-dimensional Poisson
+process. Adv. in Appl. Probab. 29 1–16. MR1432927
+Anderson, N. H. and Titterington, D. M. (1997). Some methods for investigating
+spatial clustering, with epidemiological applications. J. Roy. Statist. Soc. Ser. A 160
+87–105.
+Chen, J. and Glaz, J. (1996). Two-dimensional discrete scan statistics. Statist. Probab.
+Lett. 31 59–68. MR1421770
+Derbeko, P., El-Yaniv, R. and Meir, R. (2004). Explicit learning curves for transduc-
+tion and applications to clustering and compression algorithms. J. Artiﬁcial Intelligence
+Res. 22 117–142. MR2129466
+D¨umbgen, L. and Spokoiny, V. G. (2001). Multiscale testing of qualitative hypotheses.
+Ann. Statist. 29 124–152. MR1833961
+D¨umbgen, L. and Walther, G. (2008). Multiscale inference about a density. Ann. Statist.
+36 1758–1785. MR2435455
+Feller, W. (1968). An Introduction to Probability Theory and Its Applications, 3rd ed.
+I. Wiley, New York. MR0228020
+Glaz, J. and Balakrishnan, N. (eds.) (1999). Scan Statistics and Applications.
+Birkh¨auser, Boston. MR1697781
+Glaz, J., Naus, J. and Wallenstein, S. (2001). Scan Statistics. Springer, New York.
+MR1869112
+Hoeffding, W. (1963). Probability inequalities for sums of bounded random. J. Amer.
+Statist. Assoc. 58 13–30.
+Kulldorff, M. (1997). A spatial scan statistic. Comm. Statist. Theory Methods 26 1481–
+1496. MR1456844
+Kulldorff, M. (1999). Spatial scan statistics: Models, calculations, and applications.
+In: Scan Statistics and Applications (J. Glaz and N. Balakrishnan, eds.). Birkh¨auser,
+Boston. MR1697758
+
+OPTIMAL AND FAST SCAN STATISTICS
+25
+Lepski, O. V. and Tsybakov, A. B. (2000). Asymptotically exact nonparametric hy-
+pothesis testing in sup-norm and at a ﬁxed point. Probab. Theory Related Fields 117
+17–48. MR1759508
+Loader, C. R. (1991). Large-deviation approximations to the distribution of scan statis-
+tics. Adv. in Appl. Probab. 23 751–771. MR1133726
+Naiman, D. Q. and Priebe, C. E. (2001). Computing scan statistic p-values using impor-
+tance sampling, with applications to genetics and medical image analysis. J. Comput.
+Graph. Statist. 26 296–328. MR1939702
+Naus, J. (1965). Clustering of random points in two dimensions. Biometrika 52 263–267.
+MR0211433
+Neill, D. and Moore, A. (2004a). A fast multi-resolution method for detection of sig-
+niﬁcant spatial disease clusters. Adv. Neural Inf. Process. Syst. 10 651–658.
+Neill, D. and Moore, A. (2004b). Rapid detection of signiﬁcant spatial disease clusters.
+In Proc. Tenth ACM SIGKDD International Conference on Knowledge Discovery and
+Data Mining 256–265. ACM, New York.
+Roederer, M. and Hardy, R. R. (2001). Frequency diﬀerence gating: A multivariate
+method for identifying subsets that diﬀer between samples. Cytometry 45 56–64.
+Roederer, M., Moore, W., Treister, A., Hardy, R. R. and Herzenberg, L. (2001).
+Probability binning comparison: A metric for quantitating multivariate distribution
+diﬀerences. Cytometry 45 47–55.
+Rohde, A. (2009). Sharp-optimal adjustment for multiple testing in the multivariate two-
+sample problem. Manuscript. Preprint No. 1356, Weirstrass Institute, Berlin, Germany.
+Rufibach, K. and Walther, G. (2009). The block criterion for multiscale inference about
+a density, with applications to other multiscale problems. J. Comput. Graph. Statist.
+In press.
+Department of Statistics
+Stanford University
+390 Serra Mall
+Stanford, California 94305
+USA
+E-mail: gwalther@stanford.edu

@@ -1,0 +1,23 @@
+Indicators of spatial association are statistics that evaluate the existence of clusters in the spatial arrangement of a given variable. For instance, if we are studying cancer rates among census tracts in a given city local clusters in the rates mean that there are areas that have higher or lower rates than is to be expected by chance alone; that is, the values occurring are above or below those of a random distribution in space.
+
+Global indicators
+Notable global indicators of spatial association include:
+
+Global Moran's I: The most commonly used measure of global spatial autocorrelation or the overall clustering of the spatial data developed by Patrick Alfred Pierce Moran.
+Geary's C (Geary's Contiguity Ratio): A measure of global spatial autocorrelation developed by Roy C. Geary in 1954. It is inversely related to Moran's I, but more sensitive to local autocorrelation than Moran's I.
+Getis–Ord G (Getis–Ord global G, Geleral G-Statistic): Introduced by Arthur Getis and J. Keith Ord in 1992 to supplement Moran's I.
+
+Local indicators
+Notable local indicators of spatial association (LISA) include:
+
+Local Moran's I: Derived from Global Moran's I, it was introduced by Luc Anselin in 1995 and can be computed using GeoDa.
+Getis–Ord Gi (local Gi): Developed by Getis and Ord based on their global G.
+INDICATE's IN: Originally developed to assess the spatial distribution of stars, can be computed for any discrete 2+D dataset using python-based INDICATE tool available from GitHub.
+
+See also
+Spatial analysis
+Tobler's first law of geography
+
+References
+Further reading
+Bivand, Roger S.; Wong, David W. S. (2018). "Comparing implementations of global and local indicators of spatial association". Test. 27 (3): 716–748. doi:10.1007/s11749-018-0599-x. hdl:11250/2565494. S2CID 125895189.

@@ -1,0 +1,564 @@
+arXiv:hep-lat/9305014v3  16 Sep 1993
+CERN-TH.6892/93
+Undesirable eﬀects of covariance matrix techniques for error analysis
+David Seibert∗
+Theory Division, CERN, CH-1211 Geneva 23, Switzerland
+Abstract
+Regression with χ2 constructed from the covariance matrix should not be used for
+some combinations of covariance matrices and ﬁtting functions. Using the technique for
+unsuitable combinations can amplify systematic errors. This ampliﬁcation is
+uncontrolled, and can produce arbitrarily inaccurate results that might not be ruled
+out by a χ2 test. In addition, this technique can give incorrect (artiﬁcially small) errors
+for ﬁt parameters. I give a test for this instability and a more robust (but
+computationally more intensive) method for ﬁtting correlated data.
+Submitted to Phys. Rev. D
+CERN-TH.6892/93
+May 1993
+(Revised September 1993)
+∗On leave until October 12, 1993 from: Physics Department, Kent State University,
+Kent, OH 44242 USA. Internet: seibert@surya11.cern.ch.
+
+Recently there has been some interest in the analysis of correlated data, and people
+seeking more sophisticated analysis techniques have often performed regression, using
+the covariance matrix to construct χ2 [1]. DeGrand [2], DeTar and Kogut [3] and
+Gottlieb et al. [4] use the technique to analyze lattice gauge theory results, while
+Abreu et al. [5] and Wosiek [6] use it to analyze scaled factorial moment data. I show
+here that this analysis technique can amplify systematic errors, unlike simpler, more
+robust techniques.
+This technique is simple in principle – transform the data to an uncorrelated basis,
+use regression to ﬁt the data in this basis, then transform back to the laboratory frame.
+However, some of the results obtained by this procedure are very odd. In particular,
+Gottlieb et al. [4], Toussaint [7] and Wosiek [6] ﬁnd that this procedure can produce
+best-ﬁt lines that fall below all data points, and even below all error bars!
+In this paper, I ﬁrst discuss the proposed treatment of correlated data, and show
+that in a gedanken experiment without systematic errors this treatment produces
+exactly the desired results. In a very similar gedanken experiment with arbitrarily
+small systematic errors, this procedure ampliﬁes the errors in the data; therefore, this
+treatment of data is not robust. I use these simple gedanken experiments instead of the
+scaled factorial moment data or the lattice gauge theory results for purposes of
+presentation, as the eﬀect observed in the diﬀerent data sets is qualitatively the same. I
+then give a more robust alternative procedure for ﬁtting correlated data, and in the
+course of this discussion a test for the stability of the regression is shown.
+The experimental procedure is very simple. Consider N trial measurements of I data
+points, yi. Calculate the covariance matrix from these data,
+Cij =
+1
+N −1
+" N
+X
+n=1
+(yi,n −yi)(yj,n −yj)
+#
+,
+(1)
+where
+yi =
+1
+N
+N
+X
+n=1
+yi,n .
+(2)
+Fit the data with the curve fi(α), where {α} is the set of free parameters, by
+minimizing
+χ2 =
+I
+X
+i=1
+I
+X
+j=1
+(yi −fi) (C−1)ij(yj −fj) .
+(3)
+I illustrate this procedure with a gedanken experiment to measure the mean voltage
+of a generator that produces random voltages v with probability distribution p(v). The
+generator charges a capacitor, and I then measure the voltage on the capacitor twice,
+calling the two measurements y1 and y2. Each measurement has some (uncorrelated)
+“measurement noise” in addition to the ﬂuctuations due to the random voltage
+generator; I assume that this noise may be diﬀerent for the two measurements.
+After N trials, the experimentally determined covariance matrix is
+C =
+1
+N −1
+ 
+σ2 + e2
+1
+σ2
+σ2
+σ2 + e2
+2
+!
+,
+(4)
+1
+
+where
+σ2 =
+Z
+dv p(v) v2 −
+Z
+dv p(v) v
+2
+(5)
+is the contribution to the covariance matrix from the distribution of random voltages,
+and e2
+1(2) is the contribution of noise from the set of ﬁrst (second) measurements.
+Fitting to the function f1 = f2 = V , χ2 is minimized when
+V = e−2
+1 ⟨y1⟩+ e−2
+2 ⟨y2⟩
+e−2
+1
++ e−2
+2
+,
+(6)
+where ⟨y1(2)⟩is the average value for the ﬁrst (second) measurement. It is clear from
+Eq. (6) that V is the average of ⟨y1⟩and ⟨y2⟩, properly weighted for measurement
+error, and so the analysis procedure is very successful at ﬁtting the curve for this
+gedanken experiment.
+The experimental error is given by
+σ2
+V = 2
+ d2
+dV 2χ2
+!−1
+.
+(7)
+Taking χ2 from eq. (3) and C from eq. (4) gives
+σ2
+V = σ2 + 1/(e−2
+1
++ e−2
+2 )
+N −1
+.
+(8)
+Again, this technique works well, clearly giving the correct error in the cases σ = 0 and
+σ →∞.
+Now, I modify the gedanken experiment slightly, by assuming that the capacitor
+discharges somewhat between the two measurements. I therefore assume that the ﬁrst
+measurement is unchanged, but that the voltage is reduced by a factor γ at the time of
+the second measurement. I could alternatively assume that the scales of the voltmeters
+are slightly diﬀerent, but I wish to have all systematic eﬀects occur before
+measurement rather than during it.
+In this case, the experimentally determined covariance matrix is
+C =
+1
+N −1
+ 
+σ2 + e2
+1
+γσ2
+γσ2
+γ2σ2 + e2
+2
+!
+.
+(9)
+After an inﬁnite number of measurements ⟨y1⟩= v and ⟨y2⟩= γv, where v is the mean
+value of the random voltage. Fitting again to the function f1 = f2 = V , χ2 is
+minimized when
+V =
+γe2
+1 + e2
+2
+(γ −1)2σ2 + e2
+1 + e2
+2
+v .
+(10)
+The procedure gives systematic errors for this second experiment, as V is always less
+than v. This is not totally unexpected, because the discharge of the capacitor between
+the measurements gives a systematically lower value of y2. If γ = 1, as in the ﬁrst
+experiment, all systematic errors vanish. For any other value of γ, however, V can have
+2
+
+any value between zero and v. By contrast, a naive least-squares ﬁt always yields a
+value for V between γv and v. Thus, the covariance matrix technique can produce
+large systematic errors from arbitrarily small intrinsic systematic errors.
+One might think that χ2 should be large whenever the ﬁt is very bad (V ≪v).
+However, this is not the case if the sample size is too small. In the limit σ →∞, where
+the ﬁt is the worst,
+χ2 →(N −1)
+v
+σ
+2
+.
+(11)
+Thus, χ2 will be acceptably small whenever N < (σ/v)2, so that an inﬁnite number of
+events may be required to rule out the worst ﬁts.
+One might then expect that, if χ2 is acceptably small, the error in V will be large
+enough that V is within a few standard deviations of v. However, in the limit
+(γ −1)σ ≫e1, e2,
+σ2
+V =
+(γ2e2
+1 + e2
+2)σ2 + e2
+1e2
+2
+(N −1) [(γ −1)2σ2 + e2
+1 + e2
+2] →
+γ2e2
+1 + e2
+2
+(N −1)(γ −1)2 ≪
+σ2
+N −1.
+(12)
+Thus, it is quite possible to have simultaneously V ≪v, χ2 small, and (V −v)2 ≫σ2
+V .
+Now I try a more robust technique, constructing the best estimator by minimizing
+the variance in
+V = ay1 + (1 −a)y2.
+(13)
+The variance is
+σ2
+V
+=
+⟨V 2⟩−⟨V ⟩2,
+(14)
+=
+a2 
+⟨y2
+1⟩−⟨y1⟩2
++ 2a(1 −a) (⟨y1y2⟩−⟨y1⟩⟨y2⟩) + (1 −a)2 
+⟨y2
+2⟩−⟨y2⟩2
+,(15)
+=
+1
+N −1
+n
+a2 h
+(γ −1)2σ2 + e2
+1 + e2
+2
+i
+−2a
+h
+γ(γ −1)σ2 + e2
+2
+i
++
+h
+γ2σ2 + e2
+2
+io
+. (16)
+The condition dσ2
+V /da = 0 then gives
+a
+=
+γ(γ −1)σ2 + e2
+2
+(γ −1)2σ2 + e2
+1 + e2
+2
+,
+(17)
+V
+=
+γe2
+1 + e2
+2
+(γ −1)2σ2 + e2
+1 + e2
+2
+v,
+(18)
+σ2
+V
+=
+(γe2
+1 + e2
+2)2 σ2 + (γ(γ −1)σ2 + e2
+2)2 e2
+1 + ((γ −1)σ2 −e2
+1)2 e2
+2
+(N −1) [(γ −1)2σ2 + e2
+1 + e2
+2]2
+.
+(19)
+The value of V is the same for the two techniques, and σ2
+V is the same when γ = 1.
+In the limit e1, e2 →0 I ﬁnd
+σ2
+V =
+γ2e2
+1 + e2
+2
+(N −1)(γ −1)2,
+(20)
+which is identical to the result obtained from regression. Thus, the techniques are
+almost the same. However, the best estimator technique is more transparent, and the
+cause of the instability is more easily recognized and corrected with this technique.
+3
+
+In the previous analysis I left out a condition — a and (1 −a) must both be
+non-negative. In this case, the solution (20) is only valid when
+e2
+1
+≥
+(γ −1)σ2,
+(21)
+e2
+2
+≥
+−γ(γ −1)σ2.
+(22)
+Applying this condition, σ2
+V is minimized with
+a =
+(
+0
+γ < 1,
+1
+γ > 1,
+(23)
+in the limit e1, e2 →0. I then obtain
+V =
+(
+γv
+γ < 1,
+v
+γ > 1,
+(24)
+and
+σ2
+V =
+(
+γ2σ2 + e2
+2
+γ < 1,
+σ2 + e2
+1
+γ > 1.
+(25)
+Thus, the systematic error is not ampliﬁed with this procedure, and the estimate of σ2
+V
+is not artiﬁcially small.
+The crucial point is the non-negativity of a and 1 −a. Mathematically, this can be
+written as
+∀i : ∂fi
+∂yi
+≥0.
+(26)
+This general requirement for a stable ﬁt is that, given a perturbation in the data, the
+function does not move locally against the direction of the perturbation. It is
+intuitively obvious, though I am not sure whether it has been rigorously demonstrated.
+The partial derivative is calculated as follows. The general ﬁtting condition of
+minimizing χ2 can be written as
+∀a :
+X
+j,k
+
+C−1
+jk
+∂fj
+∂αa
+(fk −yk) = 0,
+(27)
+where {α} is the set of ﬁtting parameters. If yi →yi + δyi, we must have now
+∀a :
+X
+j,k,b
+
+C−1
+jk
+( ∂fj
+∂αa
+∂fk
+∂αb
++
+∂2fj
+∂αa∂αb
+(fk −yk)
+)
+δαb −
+X
+j
+
+C−1
+ij
+∂fj
+∂αa
+δyi = 0.
+(28)
+This can be written more compactly in matrix form:
+δαb
+=
+X
+a
+
+M−1
+ab Kaiδyi,
+(29)
+Mab
+=
+X
+j,k
+
+C−1
+jk
+( ∂fj
+∂αa
+∂fk
+∂αb
++
+∂2fj
+∂αa∂αb
+(fk −yk)
+)
+,
+(30)
+Kai
+=
+X
+j
+
+C−1
+ij
+∂fj
+∂αa
+.
+(31)
+4
+
+Finally, I obtain
+δfi
+=
+X
+b
+∂fi
+∂αb
+δαb,
+(32)
+=
+X
+a,b
+∂fi
+∂αb
+
+M−1
+ab Kaiδyi,
+(33)
+and the partial derivative is
+∂fi
+∂yi
+=
+X
+a,b
+∂fi
+∂αb
+
+M−1
+ab Kai.
+(34)
+For the ﬁt to a constant V , ∂fi/∂V = 1, so
+∂fi
+∂yi
+=
+P
+j (C−1)ij
+P
+j,k (C−1)jk
+.
+(35)
+The denominator is never negative, as it is equal to a sum of eigenvalues of C−1 (with
+all weights non-negative), and all eigenvalues of C−1 are non-negative. Thus, the
+stability condition for this regression is
+∀i :
+X
+j
+
+C−1
+ij ≥0,
+(36)
+which is trivially satisﬁed for uncorrelated data (C is then diagonal). If this condition
+is violated, then the best estimator should be used instead of the regression, to obtain
+the variance in the ﬁt parameters.
+The best estimator technique can also be used to ﬁt lines and more complicated
+curves to data. For a line, ﬁrst ﬁt y = ax + b to all independent sets of points ij to
+obtain
+aij
+=
+yi −yj
+xi −xj
+,
+(37)
+bij
+=
+xiyj −xjyi
+xi −xj
+.
+(38)
+Then construct linear estimators for the quantities a and b,
+a
+=
+X
+i̸=j
+kijaij,
+(39)
+b
+=
+X
+i̸=j
+lijbij,
+(40)
+with the constraints
+X
+i̸=j
+kij =
+X
+i̸=j
+lij = 1.
+(41)
+Finally, minimize the variance in a and b, to obtain the values and variances of both,
+but with the conditions
+∀ij : kij, lij > 0.
+(42)
+5
+
+In general the procedure is not worth the eﬀort required, as the ﬁt parameters are
+identical to those obtained with regression.
+I have shown that covariance matrix regression should be supplemented by a test for
+the stability of the regression. When the regression is unstable, the ﬁt parameters can
+be altered in an uncontrolled fashion. These alterations can sometimes be ruled out by
+a χ2 test; however, for arbitrarily small χ2, if the data set is small and ﬂuctuations are
+large, the apparent errors in ﬁt parameters can be much smaller than the diﬀerence
+between their apparent values and the best estimators for these values.
+The alternative to using covariance matrix regression is to ﬁt all possible sets of
+points (as many points per set as there are ﬁt parameters) to obtain all possible
+linearly independent sets of the ﬁt parameters,and use the linear combinations of the
+values obtained in this way (with no negative multipliers) that have the lowest
+variances as the best estimators of the ﬁt parameters. This is computationally more
+cumbersome, but is the more rigorous procedure so it may be simplest to use this in
+the ﬁrst place rather than attempting covariance matrix regression ﬁrst.
+I thank F. James for helpful suggestions and K. Zalewski for useful discussions. This
+material is based upon work supported by the North Atlantic Treaty Organization
+under a Grant awarded in 1991.
+References
+1.
+W.T. Eadie et al., Statistical Methods in Experimental Physics (North-Holland,
+Amsterdam, 1971), pp. 62–66.
+2.
+T.A. DeGrand, Phys. Rev. D 36, 176 (1987).
+3.
+C. DeTar and J.B. Kogut, Phys. Rev. D 36, 2828 (1987).
+4.
+S. Gottlieb et al., Phys. Rev. D 38, 2245 (1988).
+5.
+Abreu, P. et al., Phys. Lett. B 247, 137 (1990).
+6.
+B. Wosiek, Acta Physica Polonica B21, 1021 (1990).
+7.
+D. Toussaint, in From Actions to Answers – Proceedings of the 1989 Theoretical
+Advanced Study Institute in Elementary Particle Physics (World Scientiﬁc,
+Singapore, 1990; T. DeGrand and D. Toussaint, eds.).
+6

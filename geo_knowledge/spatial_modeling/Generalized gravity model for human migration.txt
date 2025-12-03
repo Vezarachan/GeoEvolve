@@ -1,0 +1,1220 @@
+Generalized gravity model for human migration
+Hye Jin Park1, Woo Seong Jo2,3,4, Sang Hoon Lee5,∗, and Beom Jun Kim2,†
+1Department of Evolutionary Theory, Max Planck Institute for Evolutionary Biology, 24306
+Pl¨on, Germany
+2 Department of Physics, Sungkyunkwan University, Suwon 16419, Korea
+3 Northwestern Institute on Complex Systems (NICO), Evanston, Illinois 60208, USA
+4 Kellogg School of Management, Northwestern University, Evanston, Illinois 60208, USA
+5 Department of Liberal Arts, Gyeongnam National University of Science and Technology,
+Jinju 52725, Korea
+E-mail: ∗lshlj82@gntech.ac.kr
+E-mail: †beomjun@skku.edu
+Abstract.
+The gravity model (GM) analogous to Newton’s law of universal gravitation has
+successfully described the ﬂow between diﬀerent spatial regions, such as human migration,
+traﬃc ﬂows, international economic trades, etc. This simple but powerful approach relies
+only on the ‘mass’ factor represented by the scale of the regions and the ‘geometrical’ factor
+represented by the geographical distance. However, when the population has a subpopulation
+structure distinguished by diﬀerent attributes, the estimation of the ﬂow solely from the coarse-
+grained geographical factors in the GM causes the loss of diﬀerential geographical information
+for each attribute. To exploit the full information contained in the geographical information
+of subpopulation structure, we generalize the GM for population ﬂow by explicitly harnessing
+the subpopulation properties characterized by both attributes and geography. As a concrete
+example, we examine the marriage patterns between the bride and the groom clans of Korea in
+the past. By exploiting more reﬁned geographical and clan information, our generalized GM
+properly describes the real data, a part of which could not be explained by the conventional
+GM. Therefore, we would like to emphasize the necessity of using our generalized version of
+the GM, when the information on such nongeographical subpopulation structures is available.
+arXiv:1805.10422v2  [physics.soc-ph]  18 Sep 2018
+
+Generalized gravity model for human migration
+2
+1. Introduction
+For decades,
+the gravity model (GM) has successfully explained ﬂows between
+geographically separated two regions such as traﬃc ﬂow [1, 2, 3, 4, 5], international economic
+trades [6, 7], and human migration [8, 9]. The GM is named after Newton’s law of universal
+gravitation because of the similarity in the formula: a certain type of ﬂow between two regions
+is proportional to the product of ‘mass’ of each region and inversely proportional to a certain
+power of distance between the regions. We interpret the mass depending on contexts; we
+can quantify the relative importance of regions in human migration from their population
+sizes, and the relative importance of countries in international trades from their economic
+scales. This simple but powerful model has succeeded in interpreting the real world. For
+instance, the GM indeed accurately describes the empirical data of daily human mobility in
+multiscale mobility networks [10]. It also nicely explains the inter- and intra-city traﬃc ﬂows
+in Korea [11], along with the passenger ﬂows in the Korean subway system [12].
+However, those examples only concern the spatial aspect of population. We can easily
+imagine more complicated situations such as the population ﬂow between other attributes
+than the spatial or regional attributes, when the population at a given region consists
+of subpopulation structures. The subpopulation structures characterized by attributes for
+population ﬂows can be ethnic groups, income levels, etc.
+In particular, when spatial
+movement of the subpopulation belonging to one attribute to another subpopulation takes
+place, the ﬂow between attributes becomes relevant. This applies not only to the population
+ﬂow but also to the international trade, for instance.
+Goods are transferred in diﬀerent
+economic sectors as the attributes, and one may aim at estimating the ﬂow between economic
+sectors. One such previous attempt to apply the GM to explain ﬂow between attributes is
+[13] partly by a subset of the authors of this paper. However, the results have revealed the
+limitation of the conventional GM when the geographical location of population center of a
+clan is not representative. The limitation stems from the process of signiﬁcant coarse graining
+of the detailed geographical information of clans into a single point (the population center).
+In this paper, we exploit detailed information on the population substructures by
+generalizing the GM, rather than coarse graining the information. First, we formulate the
+generalized gravity model (GGM) to take the full information available on the subpopulation
+(characterized by both geographical information and attribute information) ﬂows. As we
+show in ﬁgure 1(a), when subpopulations are distinguished not only by geographical regions
+but also by attributes, ﬂows between regions or attributes can be calculated by properly
+taking subpopulation ﬂows without information loss (see ﬁgures 1(b) and (c), respectively).
+We also would like to emphasize the necessity of calculating subpopulation ﬂows, because
+the population ﬂows calculated from the coarse grained population data and those from
+individual subpopulation data are not equivalent. As a concrete example, we apply the GGM
+to marriage records combined with census data. The results show that it eﬀectively captures
+the geographical constraint imposed in the marriage patterns in the past, in contrast to the
+GM.
+The paper is organized as follows.
+We ﬁrst formulate the GGM in section 2.
+We
+
+Generalized gravity model for human migration
+3
+(b)
+A
+B
+i
+i
+j
+j
+i
+B
+i
+A
+B
+C
+j
+A
+B
+C
+j
+(a)
+i
+j
+A
+B
+C
+D
+A
+(c)
++
+iCM
++
+jCM
+D
+D
+i
+j
+i    j
+i    j
++
+iCM
++
+jCM
+GM
+GGM
+GM
+GGM
+Figure 1. (a) We present the schematic ﬁgure for two spatial distributions of attributes, i and
+j, and ﬂows between subpopulations. Each attribute has its own spatial population distribution
+represented by the color gradient with the center of mass, e.g., iCM or jCM (marked by the
+× symbol). Since the population for a given region is again distinguished by its attribute,
+each subpopulation is distinguished by both region and attribute indices denoted by uppercase
+letters, A, B, C, and D, and lowercase letters, i and j, respectively. We illustrate all of the
+possible ﬂow combinations between subpopulations, and we use the rectangular and oval
+boundaries to distinguish regions and attributes, respectively. (b) We show the comparison
+of ﬂows between regions in the viewpoints of GM and GGM. The GM described on the
+left considers the ﬂow between regions. It integrates the population size at a given region
+ﬁrst to calculate the ﬂow, while the GGM on the right ﬁrst considers subpopulation ﬂows
+and integrates them. As we show in section 2, the results from the GM and GGM are not
+equivalent. (c) We compare the ﬂows between attributes in the GM and GGM. The GM on the
+left takes into account the ﬂow between attributes i and j from the centers of populations as
+in [13], which causes some information loss due to the coarse graining. In contrast, we keep
+the entire information available by integrating all of the subpopulation ﬂows in the GGM (this
+paper).
+introduce our data set in section 3 and apply the model to this data. The result in section 4
+demonstrates that the GGM indeed captures the geographical information not available from
+the GM. Finally, we conclude our work in section 5.
+2. The GGM
+Our derivation of the GGM is a natural extension of using the maximum entropy principle
+to derive the GM [14, 15], where we replace regional indices with both regional and
+attribute indices.
+We provide our step-by-step derivation in this section partly for a
+pedagogical purpose and the self-containedness of this paper, but most importantly, we
+can directly demonstrate the problem of using the coarse-grained population data during
+the derivation. The maximum entropy principle is the way to estimate a real probability
+distribution by maximizing entropy. In particular, this method is useful for systems with
+many degrees of freedom because it focuses on only a few macroscopic quantities. The real
+
+Generalized gravity model for human migration
+4
+probability distribution is estimated by the maximum entropy principle from the agreement
+of those observed quantities. Each Lagrange multiplier corresponding to each constraint in
+maximization gives the corresponding model parameter.
+Let us start from the number N(ij)
+AB of people who move from region A with attribute i to
+region B with attribute j, where we take the convention of uppercase letters as the subscript
+for the region indices, and the lowercase letters as the superscript for the attribute indices.
+The sets of attributes {i} for the sender side and { j} for the receiver side can be diﬀerent. For
+example, {i} and { j} can be the education level and the income level, respectively, when we try
+to describe the ﬂow of employment from one city’s education system to another city’s industry.
+Our formalism adopts the discrete indices and summation, but it should be straightforward to
+deal with the continuous cases by using continuous variables and integration.
+The total number N(i)
+A of people moving from region A with attribute i to anywhere with
+any attribute is then
+N(i)
+A =
+X
+j,B
+N(i j)
+AB .
+(1)
+In the same way, the total number ˜N( j)
+B
+of people who arrive at region B with attribute j from
+anywhere with any attribute is given by
+˜N( j)
+B
+=
+X
+i,A
+N(i j)
+AB .
+(2)
+When people move, they have to pay the cost, which is naturally a function of the distance
+between two regions, among other factors. We denote the cost to move from (i, A) to ( j, B)
+for each unit of movement by c(ij)
+AB . Then, the total moving cost C is the following weighted
+sum,
+C =
+X
+i,A,j,B
+N(i j)
+AB c(i j)
+AB .
+(3)
+We can then write down the number W of all possible arrangements of travelers
+considering the multiplicity factor N(ij)
+AB as
+W =
+N!
+Y
+i,A,j,B
+N(i j)
+AB
+,
+(4)
+where N is the total number of moving people, N = P
+i,A,j,B N(i j)
+AB . In the entropy maximization
+scheme, {N(ij)
+AB } is estimated from maximizing the Boltzmann entropy kB log W (equivalently
+maximizing W) with constraints. We consider three constraints under which W is maximized:
+the outﬂows {N(i)
+A }, the inﬂows { ˜N( j)
+B }, and the total moving cost C represented in equations (1)–
+(3). For this optimization problem under given constraints, we have to use the Lagrange
+multiplier method, i.e., to ﬁnd the stationary point of the Lagrangian
+L({N(ij)
+AB }) =
+N!
+Q
+i,A, j,B N(ij)
+AB
++
+X
+i,A
+λi
+A
+N(i)
+A −
+X
+j,B
+N(i j)
+AB
++
+X
+j,B
+˜λj
+B
+˜N( j)
+B
+−
+X
+i,A
+N(i j)
+AB
++ γ
+C −
+X
+i,A, j,B
+N(i j)
+AB c(i j)
+AB
+,
+(5)
+where λi
+A, ˜λ j
+B, and γ are the Lagrange multipliers for each constraint.
+This problem is
+essentially the recap of the derivation for the most probable distribution in terms of a given
+
+Generalized gravity model for human migration
+5
+energy value, from the standard formalism of canonical ensemble in statistical mechanics, so
+the readers may check the details in any standard statistical mechanics textbooks such as [19].
+The moving cost for each movement and the γ parameter here play the roles of energy and
+inverse temperature there, respectively. The solution of maximizing equation (5) is given by
+N(i j)
+AB ∝N(i)
+A ˜N(j)
+B e−γc(ij)
+AB .
+(6)
+Note that all λi
+A and ˜λ j
+B become unity from the constraint itself (the mass conservation), so
+there is only one free parameter γ, which is determined by the real data. Later, we will
+speciﬁcally choose the γ value that minimizes the error between the model and real data.
+The ﬂow from region A to region B usually decays as a function of the distance between
+them due to the obviously rising cost, and thus we have to choose the cost function c(r) as an
+increasing function of the distance r between two regions. Conventionally, we set the form
+c(r) ∝ln r [20], which leads equation (6) to
+N(i j)
+AB ∝N(i)
+A ˜N( j)
+B
+(rAB)γ .
+(7)
+Note that, though the numbers of leaving or arriving people, N(i)
+A
+and ˜N(j)
+B , are not the
+population size P attribute
+region
+at each region and attribute, generally those are assumed to be linear
+to the population sizes [N(i)
+A ∝P(i)
+A and ˜N( j)
+B
+∝P(j)
+B ], yielding
+N(i j)
+AB ∝P(i)
+A P( j)
+B
+(rAB)γ .
+(8)
+In this case, we can reproduce the GM for the ﬂow between two spatial regions
+NAB ≡
+X
+i,j
+N(ij)
+AB ∝
+X
+i
+P(i)
+A
+X
+j
+P(j)
+B
+(rAB)γ
+= PAPB
+(rAB)γ ,
+(9)
+where PA and PB are total numbers of people who live in region A and region B, respectively.
+However, when N(i)
+A and ˜N( j)
+B
+are nonlinear with respect to the population sizes such as in [10],
+i.e., N(i)
+A
+∝[P(i)
+A ]α and ˜N( j)
+B
+∝[P(j)
+B ]β, the population ﬂow from region A with attribute i to
+region B with attribute j: N(ij)
+AB ∝[P(i)
+A ]α[P(j)
+B ]β/(rAB)γ. In this case, the ﬂow from region A to
+region B regardless of attributes: NAB cannot be explained by the GM unless α = β = 1 or the
+population contains only one attribute, because
+NAB ≡
+X
+i, j
+N(ij)
+AB ∝
+X
+i
+[P(i)
+A ]α X
+j
+[P(j)
+B ]β
+(rAB)γ
+, [PA]α[PB]β
+(rAB)γ
+.
+(10)
+Note that the conventional GM provides the upper or lower bounds: P
+i[P(i)
+A ]α ≤[P]α for α > 1
+and P
+i[P(i)
+A ]α ≥[P]α for α < 1, by using the convexity or concavity of the functional form.
+In parallel, summing up N(ij)
+AB for all of the regions gives the number of moving people
+from attribute i to j,
+N(ij) ≡
+X
+A,B
+N(i j)
+AB ∝
+X
+A,B
+N(i)
+A ˜N( j)
+B
+(rAB)γ .
+(11)
+
+Generalized gravity model for human migration
+6
+This is not reducible to the GM either, because
+X
+A,B
+N(i)
+A ˜N( j)
+B
+(rAB)γ ,
+1
+r(iCM, jCM)γ
+X
+A,B
+N(i)
+A ˜N(j)
+B ,
+(12)
+where r(iCM, jCM) is the distance between the centers of population of i and j, as shown
+in ﬁgure 1. The only case when the two expressions actually coincide is the assumption
+implicitly made in [13]—the population of each attribute i is treated as the ‘point mass’ located
+in a single location in space, namely, iCM. The GGM estimates the ﬂow between attributes
+without such a coarse graining process involving the information loss. Hence, the GGM is the
+correct way to handle subpopulation structures when it comes to the GM of population ﬂow.
+We later show that it indeed eﬀectively captures the geographical constraints for the marriage
+ﬂow in the past obtained from the data, which was not possible with the coarse-grained version
+of the GM due to the widely distributed population of the clans [13].
+3. Data sets
+In the traditionally patriarchal culture of Korea after around 17th century, a bride usually
+moved to her groom’s place in the past, once they got married. We treat this type of migration
+caused by the marriage as our main data of human migration. By applying the GGM to
+marriage patterns between clans in the past, we estimate the geographical constraints. We
+take the real marriage ﬂow O(ij) from the bride clan i to the groom clan j from the family book
+data called jokbo. We present more details in section 3.1. To compute the model ﬂow, we
+extract the distance rAB between two regions and the distribution of the population for each
+clan, N(i)
+A
+(the bride side) and ˜N( j)
+B
+(the groom side), from the modern census data in 1985,
+2000, and 2015—the three particular years when the information on the regional distribution
+of each clan’s population is available.
+We measure the distance rAB based on geographical coordinates of the regions using the
+Google maps application programming interface [21]. The traveling distance within the same
+region rAA is estimated as the square root of the region’s area. We assume that the size of
+the moving populations, represented by N(i)
+A and ˜N(j)
+B , are proportional to that of the resident
+populations (from the census data) of the corresponding clans living in the corresponding
+regions, so we just take the face values of populations in the census data and treat them as
+the migrating population for simplicity. As argued in [13], we use this modern population
+data to estimate the past migration ﬂow between clans in jokbo data, based on the fact that the
+proportion of each clan living in each region with respect to the total population of Korea has
+been relatively steady.
+3.1. Jokbo data
+Jokbo, or the Korean family book, records the members of paternal lineage and each
+member’s spouse and children. Even though a bride does not change her family name after
+marriage in Korean culture, she was (and still is in many conservative families) considered
+
+Generalized gravity model for human migration
+7
+Table 1.
+The volume of the jokbo and the census data. The number of bride clans and the
+total number of entries in each jokbo are counted based on the existing clans in the census data.
+Note that we count all brides in the jokbo whether it includes birth and death dates or not, and
+thus the volume can be diﬀerent from the previous research [13, 16, 17, 18]. In addition, the
+population sizes of the groom clans in the census data are presented.
+jokbo clan
+jokbo data
+census data (population size)
+number of bride clans
+number of entries
+year 1985
+year 2000
+year 2015
+1
+1 755
+155 392
+3 892 342
+4 324 478
+4 456 700
+2
+1 077
+59 588
+47 383
+61 650
+78 607
+3
+1 149
+54 377
+200 334
+232 753
+298 092
+4
+901
+25 542
+25 115
+25 667
+34 802
+5
+782
+39 405
+231 289
+238 505
+324 507
+6
+804
+25 343
+21 756
+21 536
+27 343
+7
+1 723
+189 158
+343 700
+380 530
+445 946
+8
+607
+12 846
+15 539
+17 939
+20 484
+9
+356
+5 146
+103 220
+123 688
+163 610
+to belong to the groom’s family after marriage. The key element of jokbo for our research
+is the fact that it records information of the female spouse’s original clan including the
+information on its geographical origin. Each clan has its own jokbo, which is passed down to
+descendants. Previously, the distributions of clans in Korea have been studied based on ten
+jokbo data [16, 17, 18]. Marriage patterns using the same data set have been studied in [13]
+with the GM framework under the assumption described in the left ﬁgure of ﬁgure 1(c).
+We also use the same ten jokbo data set, but at this time we merge two jokbo among
+ten because those two are diﬀerent subgroups of the same clan (because our attribute unit
+is the clans), which results in the total number of nine distinct jokbo used in our analysis.
+We count how many brides from clan i married the grooms from clan j, the owner of jokbo,
+and treat the number of brides as the real migration ﬂow O(i j) from the bride clan i to the
+groom clan j. Each jokbo contains between 5 146 and 189 158 marriage entries (see table 1
+for detailed statistics). We index the jokbo in the ascending order of the value of γ( j)
+opt (that will
+be introduced in section 4) predicted from the 2015 census data. There is a single case of a
+tie, and we break it by using γ( j)
+opt from the 1985 data.
+3.2. Census data
+We assume that the outﬂow N(i)
+A from (i, A) and the inﬂow ˜N(j)
+B to (j, B) are proportional to their
+population sizes, P(i)
+A and P( j)
+B , to predict the ﬂow N(i j) from equation (11). The population
+size of each clan residing in each region is taken from the Korean census data [22], where
+the spatial resolution of the data is determined by the set of 194 administrative regions. In
+particular, we use the census data in the years 1985 and 2000 as in [13], and the new data in
+2015. We present the detailed population statistics for each groom clan in the census data in
+table 1.
+Due to the changes in the administrative boundaries over 30 years (between 1985 and
+2015), we have generated the common set of 194 administrative regions for the three diﬀerent
+
+Generalized gravity model for human migration
+8
+
+
+
+     
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+     
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+Figure 2. The error landscapes as the function of γ and the scatter plot of real and estimated
+marriage ﬂows at γ(j)
+opt for each groom clan j, with the census data in 2015. We index the groom
+clans according to γ(j)
+opt in the ascending order, from 1 to 9. The panels (a)–(i) correspond to
+the groom clans 1–9, respectively. For the actual error landscape plots, we use the normalized
+error E(j)(γ)/E(j)(γ = 0) with respect to the γ = 0 case. The vertical dashed lines in the error
+landscapes indicate the γ( j)
+opt value that gives the minimum value of E(j).
+years, where we have uniﬁed the administrative regions whose boundaries had been changed,
+following the procedure of [13] to unify the administrative regions (for the two diﬀerent years:
+1985 and 2000, in [13]).
+4. Results
+We apply the GGM expressed in equation (11) to the marriage patterns in the past. The real
+number of marriage entries {O(ij)} are listed in the jokbo data, and we compare the predicted
+ﬂow {N(i j)} from the model with {O(ij)}. For each groom clan (corresponding to each jokbo
+clan) j, the diﬀerence is quantiﬁed by the error
+E( j) =
+sX
+i
+E(i j)2 ≡
+sX
+i
+O(i j) −N(i j)2 ,
+(13)
+calculated from the list of the bride clans {i}. Note that we discard the self migration ﬂow
+E( j j) when we calculate E(j), because the marriage between the same clans was forbidden
+in the past and it is indeed signiﬁcantly underrepresented as reported in [13]. In practice,
+we also checked that ignoring E( jj) does not make much of a diﬀerence in our results. The
+proportionality factor for equation (11) is calculated by minimizing E(j) at a given value of
+γ( j). The optimal value γ( j)
+opt is assigned as the γ( j) value that minimizes the error E(j). In this
+
+Generalized gravity model for human migration
+9
+ 0
+ 2
+ 4
+ 6
+ 8
+ 10
+1
+2
+3
+4
+5
+6
+7
+8
+9
+γopt
+(j)
+groom clan
+1985
+2000
+2015
+Figure 3. The estimated exponent γ(j)
+opt of distance in equation (11) from the census data in
+1985, 2000, and 2015, for each groom clan j. The horizontal axis indicates groom clans, and
+we use three diﬀerent types of symbols to distinguish the results for each year. We shade every
+other column for better readability.
+Table 2. The results of γ(j)
+opt for each groom clan j, from 1985, 2000, and 2015 census data,
+respectively. For the comparison between the GGM and the GM, we provide the values of ∆e(j)
+(%) in equation (14) as the percentage, representing the relative performance of the GGM. We
+also characterize the population distribution of each clan by measuring the dispersion ∆R(j)
+(km) in equation (15) and the eﬀective number of occupied regions n( j) in equation (16).
+groom
+clan j
+year 1985
+year 2000
+year 2015
+γ(j)
+opt
+∆e( j)
+∆R(j)
+n(j)
+γ( j)
+opt
+∆e( j)
+∆R(j)
+n(j)
+γ( j)
+opt
+∆e( j)
+∆R(j)
+n(j)
+1
+0.1
+0.02
+151.35
+104.23
+0.2
+0.17
+148.54
+81.43
+0.2
+0.38
+146.32
+76.65
+2
+1.7
+9.98
+118.39
+43.15
+1.7
+8.50
+118.43
+43.18
+1.7
+7.57
+117.83
+47.21
+3
+1.6
+17.81
+149.91
+71.31
+1.7
+18.99
+142.11
+62.44
+1.8
+16.81
+139.23
+60.14
+4
+1.7
+15.01
+131.46
+85.29
+1.7
+15.17
+125.76
+67.34
+1.8
+13.51
+125.52
+64.48
+5
+1.3
+0.52
+143.01
+54.98
+1.8
+1.28
+146.06
+51.84
+2.0
+2.02
+146.76
+62.44
+6
+1.7
+9.43
+141.09
+60.74
+2.0
+10.12
+137.44
+50.50
+2.1
+9.24
+134.61
+51.60
+7
+5.3
+6.05
+155.77
+91.37
+5.6
+9.69
+152.98
+74.21
+6.2
+10.32
+149.64
+71.26
+8
+6.0
+2.88
+140.40
+63.56
+6.6
+6.64
+136.73
+61.83
+6.9
+7.08
+133.10
+57.67
+9
+7.2
+2.18
+139.94
+87.32
+7.3
+2.54
+136.68
+70.49
+7.7
+2.40
+134.97
+69.69
+case, we vary the γ( j) value from 0 to 10 with the resolution of 0.1. The obtained γ( j)
+opt value
+indicates the geographical constraint for the brides’ migration to the groom clan j.
+In ﬁgure 2, on the left side of each panel (corresponding to each groom clan j), we show
+the error in equation (13) as a function of γ( j), via the fact that N(i j) is a function of γ( j). On
+the right side of each panel, we also show scatter plots comparing the real ﬂow O(i j) versus
+the predicted ﬂow N(ij) from the GGM at a given γ( j)
+opt value with the guideline corresponding
+to O(i j) = N(ij). The predicted ﬂow N(i j) and the number of entries O(i j) in jokbo are indeed
+close to the O(ij) = N(ij) line. Since the results from 1985, 2000, and 2015 census data are
+qualitatively the same, we only show the results in 2015. Except for the clan 1, the GGM
+actually captures nonzero γ( j)
+opt values, while the exponent γ( j)
+opt always vanishes when we use
+the GM for all of the jokbo [13].
+We calculate N(ij) from each census data in 1985, 2000, and 2015, so we obtain the
+
+Generalized gravity model for human migration
+10
+ 0
+ 4
+ 8
+ 12
+ 16
+ 20
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+ 9
+∆e(j) (%)
+groom clan
+Data
+Shuffled Data
+Figure 4.
+The performance of the GGM expressed as the normalized reduced error in
+equation (14) from the census data in 2015 for each groom clan j, compared with the
+model performance from geographically scrambled data. The values for the real data and the
+average values from the shuﬄed data are shown as the large purple diamonds and the small
+green diamonds with the error bars representing the standard deviation over 100 realizations,
+respectively. As in ﬁgure 3, The horizontal axis indicates groom clans and we shade every
+other column for better readability.
+three γ(j)
+opt values corresponding to each year, for each groom clan (see ﬁgure 3). From the
+similarity of error landscapes in each census data, the γ(j)
+opt values for diﬀerent years are not
+much diﬀerent for a given groom clan j (check table 2 for details), which indicates that the
+results of γ(j)
+opt are temporally robust for a given groom clan. It is also interesting to note
+that many γ(j)
+opt values are around 2 corresponding to the same formula with demographic
+gravitation introduced in [2]. Most importantly, compared with the GM results, i.e., γ( j)
+opt ≃0
+for all of the groom clans [13], the GGM indeed yields nonzero γ( j)
+opt values except for the clan
+1. It implies that the GGM actually captures the information of the geographical constraint on
+the ﬂow, in contrast to the GM where it is hard to capture this geographical information due
+to the coarse graining, i.e., treating the population of a clan as a point particle at a center of
+mass. On the contrary, the GGM uses much more detailed information of the subpopulation
+structure that eventually leads us to capture the actual geographical constraint imposed on the
+ﬂow.
+To validate our model, we measure the performance of our model compared with the GM
+using the normalized reduced error with respect to the case of no geographical constraint, i.e.,
+γ = 0, deﬁned as
+∆e(j) =
+h
+E(j) (γ = 0) −E(j) 
+γ = γ( j)
+opt
+i
+E(j) (γ = 0)
+.
+(14)
+The normalized reduced error ∆e(j) quantiﬁes the improvement of performance by using the
+GGM compared with the GM, which results in γ( j)
+opt ≃0 for all of the clans [13]. Large values
+of ∆e( j) indicate signiﬁcance of geographical constraints in the migration ﬂow. Except for
+clans such as j =1, 5, and 9, the normalized reduced error ∆e( j) ≃10%, as shown in ﬁgure 4.
+
+Generalized gravity model for human migration
+11
+To demonstrate the statistical signiﬁcance of geographical information of the data, we shuﬄe
+regional indices for the groom clan j to obtain the corresponding surrogate γ( j)
+opt values, also
+shown in ﬁgure 4.
+For the exceptional cases of j = 1, 5, and 9, we suspect the lack of geographical
+information in the data itself, as we argue.
+To test the statistical signiﬁcance of spatial
+correlation in the data, we shuﬄe the regional indices to scramble geographical information.
+We examine the result of our model in this shuﬄed data, which is shown in ﬁgure 4. It
+supports that the GGM extracts more geographical information than the GM, by capturing
+the nonzero γ exponent. If the shuﬄed data gives similar results to those from original data,
+the original data contains a small amount of geographical information. As shown in ﬁgure 4,
+this situation precisely happens for the clans j = 1, 5, and 9, whose original and shuﬄed data
+give similar results. In other words, the data corresponding to those three clans originally
+contain less geographical information than the other clans. The small ∆e( j), therefore, does
+not come from the GGM but from the clan data itself. Hence, we conclude that as long as the
+data has enough geographical information, the GGM eﬀectively extracts the corresponding
+information.
+As mentioned above, geographical information of the population distribution is closely
+related to the model performance and the statistical signiﬁcance of the nonzero γ( j)
+opt values.
+To quantify the geographical information in the distribution of clans more systematically, we
+introduce two measures: the dispersion that quantiﬁes how strongly localized the populations
+are, and the homogeneity that focuses on how uniformly the populations occupy distinct
+regions. For the latter, we use the concept of the eﬀective number of occupied regions based
+on the R´enyi entropy for a given probability distribution, as in [23]. We deﬁne the dispersion
+∆R(j) from the centroid R( j) of the clan j by taking population fractions as weights:
+∆R( j) =
+sX
+A
+f ( j)
+A
+
+rA −R( j)
+
+2,
+(15)
+where rA is the location of the administrative region A. The population fraction f (j)
+A
+is the
+population of clan j living in A divided by the total population of clan j, and || · · · || is the
+Euclidean norm. The population centroid of clan j is then R( j) = P
+A f (j)
+A rA. As the concept of
+moment of inertia or radius of gyration [13], ∆R(j) measures how (geographically) widely
+a certain clan is distributed. The eﬀective number of occupied regions is deﬁned as the
+reciprocal of the heterogeneity quantiﬁed by the second moment of the population fraction,
+given by
+n( j) =
+1
+X
+A
+h
+f ( j)
+A
+i2.
+(16)
+In contrast to ∆R(j), n( j) measures how many of distinct regions (regardless of their
+geographical location) a certain clan occupies eﬀectively; there are scaling relations for
+extreme cases: n(j) ≃the total number of administrative regions when the clan j is uniformly
+distributed to the entire set of administrative regions, while n(j) ≃1 when the clan j is almost
+exclusively living in a single particular administrative region [23].
+
+Generalized gravity model for human migration
+12
+ 0
+ 50
+ 100
+ 150
+ 200
+∆R(j) (km)
+ 0
+ 50
+ 100
+ 150
+n(j)
+ 0
+ 4
+ 8
+ 12
+ 16
+ 20
+Figure 5. The density plot of dispersion ∆R( j) and the eﬀective number of occupied regions
+n( j) for all of the clans in the 2015 census data. The nine orange diamonds correspond to the
+groom clans in the jokbo data.
+The dispersion ∆R( j) and the number n( j) of occupied regions are usually positively
+correlated. However, ∆R(j) can be large even when n(j) is small, e.g., when the clan has
+multiple localized residential regions.
+Hence, we use both measures for more accurate
+identiﬁcation of the population distributions. For all of the 788 clans in the 2015 census
+data, we measure both ∆R( j) and n( j) and present them as the density plot in ﬁgure 5. Among
+all of the clans listed in the census data, all of the groom clans corresponding to the jokbo data
+have relevantly large values of dispersion and the eﬀective number of occupied regions. Note
+that the combination of large ∆R( j) and small n(j) (as discussed before) is observed indeed,
+while the combination of small ∆R( j) and large n( j) does not appear, as shown in ﬁgure 5.
+This contrast hints the existence of such multiple localized residential regions, which is also
+discussed in [13].
+Finally, we compare the relative performance of GGM with these two measures,
+presented in ﬁgure 6. There is a trend of increasing ∆e(j) when the population distribution
+has more geographical information, low dispersion and low eﬀective number of occupation
+regions. The Pearson correlation coeﬃcients between ∆e( j) and the dispersion R(j) or the
+eﬀective number n(j) of occupied regions are −0.270 and −0.213, respectively, implying the
+anticorrelation.
+This observation again conﬁrms that when the data includes meaningful
+geographical information, the GGM captures the geographical constraint, while the GM may
+not.
+
+Generalized gravity model for human migration
+13
+1985
+2000
+2015
+ 100
+ 120
+ 140
+ 160
+∆R(j) (km)
+ 30
+ 60
+ 90
+ 120
+n(j)
+ 0
+ 4
+ 8
+ 12
+ 16
+ 20
+Figure 6. The same ∆R( j)–n( j) diagram as ﬁgure 5, but only with the groom clans, using
+the census data in the three diﬀerent years. The color of the points represents ∆e( j), and the
+diﬀerent symbols indicate the results from the census data in diﬀerent years.
+5. Conclusions and discussion
+In this paper, we formulate the GGM to properly take subpopulation structures for human
+migration, by keeping the entire geographical distribution of the subpopulations. The key
+aspect of our point is that we need to calculate individual subpopulation ﬂows, before trying
+any geographical coarsening. To test the validity of the GGM, we investigate the marriage
+patterns of Korea in the past. Applying our model to the marriage pattern, we identify the
+geographical constraint. The results demonstrate that the GGM captures the subpopulation
+aspect of the data without the information loss occurred in the GM.
+We believe that our approach is applicable to a wide range of research on population
+dynamics. Moreover, we would like to point out that the GGM is in fact even more general
+than the treatment for our particular data set, e.g., the diﬀerent types of attributes for the
+departure and arrival places by taking the diﬀerent sets {i} , { j}. For instance, the attribute in
+the departure place for education can be the education level of people, while the attribute of
+the arrival place for work can be the income level. Furthermore, if we release the constraints
+α = 1 and β = 1, one can also allow the nonlinear mass relation. In this case, the GGM
+becomes particularly important to prevent the loss of information because the scale factor, in
+addition to the distance factor, also has the nonlinear relation with the ﬂow.
+Finally, this scheme can be extended for multiple types of attributes that can be
+represented by the attribute vectors. For instance, people living in the region A with the
+attribute i = (ei, mi) representing the education level ei and the income level mi can move to
+the region B with j = (e j, mj). We hope to extend this type of general scheme for a wide
+
+Generalized gravity model for human migration
+14
+variety of diﬀerent data sets of human (and possibly nonhuman) migration or ﬂow patterns in
+the future.
+Acknowledgments
+S.H.L. was supported by Gyeongnam National University of Science and Technology Grant
+in 2018–2019. B.J.K. was supported by the National Research Foundation of Korea (NRF)
+grant funded by the Korea government (MSIT) (No. 2017R1A2B2005957). We appreciate
+the anonymous referee for pointing out that the conventional gravity model plays the role of
+upper or lower bounds.
+References
+[1] Reilly W J 1931 The Law of Retail Gravitation (New York: Knickerbocker Press)
+[2] Stewart J. Q. 1948 Sociometry 11 31–58
+[3] Carrothers G A P 1956 J. Am. Inst. Plan. 22 94–102
+[4] Erlander S and Stewart N F 1990 The Gravity Model in Transportation Analysis (Utrecht: Brill Academic
+Publishers)
+[5] Rodrigue J P, Comtois C and Slack B 2009 The Geography of Transport Systems (London, New York:
+Routledge)
+[6] Tinbergen J 1962 Shaping the World Economy; Suggestions for an International Economic Policy (New
+York: Twentieth Century Fund)
+[7] Nello S S 2009 The European Union: Economics, Policy and History (New York: McGraw-Hill)
+[8] Ravenstein E G 1885 Journal of the Statistical Society of London 48 167–235
+[9] Anderson J E 2011 Annu. Rev. Econ. 3 133–60
+[10] Balcan D, Colizza V, Gonc¸alves B, Hu H, Ramasco J J and Vespignani A 2009 Prof. Natl. Acad. Sci. 106
+21484–9
+[11] Jung W S, Wang F and Stanley H E 2008 Europhys. Lett. 81 48005
+[12] Goh S, Lee K, Park J S and Choi M Y 2012 Phys. Rev. E 86 026102
+[13] Lee S H, Ffrancon R, Abrams D M, Kim B J and Porter M A 2014 Phys. Rev. X 4 041009
+[14] Senior M L 1979 Prog. Geogr. 3 175–210
+[15] Hua C and Porell F 1979 Int. Reg. Sci. Rev. 4 97–126
+[16] Kiet H A T, Baek S K, Jeong H and Kim B J 2007 J. Korean Phys. Soc. 51 1812–6
+[17] Baek S K, Kiet H A T and Kim B J 2007 Phys. Rev. E 76 046113
+[18] Baek S K, Minnhagen P and Kim B J 2011 New J. Phys. 13 043004
+[19] Huang K 1987 Statistical Mechanics (New York: Wiley)
+[20] Chen Y 2015 Chaos Solitons Fractals 77 174–89
+[21] Google Maps https://cloud.google.com/maps-platform/
+[22] Korean Statistical Information Service http://kosis.kr/eng
+[23] Lee S H, Kim P J, Ahn Y Y and Jeong H 2010 PLoS One 5 e11233

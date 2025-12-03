@@ -1,0 +1,1066 @@
+Robust Estimation and Model Selection for the
+Controlled Directed Effect with Unmeasured
+Mediator–Outcome Confounders
+Shunichiro Orihara ∗1, Shinpei Imori2, Kosuke Morikawa3, Atsushi Goto4,
+and Masataka Taguri1
+1Department of Health Data Science, Tokyo Medical University, Tokyo,
+Japan
+2Graduate School of Advanced Science and Engineering, Hiroshima
+University, Hiroshima, Japan
+3Graduate School of Engineering Science, Osaka University, Osaka, Japan
+4Department of Public Health, School of Medicine, Yokohama City
+University, Yokohama, Japan
+Abstract
+Controlled Direct Effect (CDE) is one of the causal estimands used to evaluate both exposure
+and mediation effects on an outcome. When there are unmeasured confounders existing
+between the mediator and the outcome, the ordinary identification assumption does not
+work. In this manuscript, we consider an identification condition to identify CDE in the
+presence of unmeasured confounders. The key assumptions are: 1) the random allocation of
+the exposure, and 2) the existence of instrumental variables directly related to the mediator.
+Under these conditions, we propose a novel doubly robust estimation method, which work
+well if either the propensity score model or the baseline outcome model is correctly specified.
+Additionally, we propose a Generalized Information Criterion (GIC)-based model selection
+criterion for CDE that ensures model selection consistency. Our proposed procedure and
+related methods are applied to both simulation and real datasets to confirm the performance
+∗Address: 6-1-1 Shinjuku, Shinjuku-ku, Tokyo 160-8402, Japan; Email: orihara@tokyo-med.ac.jp
+1
+arXiv:2410.21832v1  [stat.ME]  29 Oct 2024
+
+of these methods. Our proposed method can select the correct model with high probability
+and accurately estimate CDE.
+Keywords: double robustness, instrumental variable, model selection, structural mean
+model, UK biobank
+1
+Introduction
+The estimation of causal effects and the exploration of their structures are central interests
+in causal inference. Causal mediation analysis meets these objectives by incorporating not
+only a treatment and an outcome variable but also the mediators that exist between them
+(Robins and Greenland, 1992; Pearl, 2022). In this manuscript, we explore the effect of
+a single nucleotide polymorphism (SNP) on the incidence of diabetes, considering smoking
+habits (measured by the number of cigarettes) as a mediator (refer to Figure 1).
+Specifically, we focus on the TCF7L2 SNP (rs7903146; Chromosome 10), which has been
+previously reported to impair β-cell function (Cauchi et al., 2008), and may be directly
+associated with the incedence of diabetes. Since this SNP is considered the most significant
+genetic marker associated with diabetes incidence today (Vaquero et al., 2012), specifying
+the causal construction between the SNP and diabetes incidence is important. A recent
+study suggested a link between the SNP and nicotine poisoning in mice and rats (Duncan et
+al., 2019). However, its relevance in humans has been challenged by Lehrer and Rheinstein
+(2021). The volume of studies examining this relationship in humans is limited, necessitating
+further research for a definitive conclusion. Additionally, it is well-established that smoking
+habits are a risk factor for the incidence of diabetes (Pan et al., 2015).
+[Figure 1 is here.]
+To assess the causal effect, we focus on estimating the controlled direct effect (CDE;
+Pearl, 2022). CDE is defined as “how much the outcome change on average if the mediator
+2
+
+were fixed at level m uniformly in the population but the treatment were changed from level
+a∗= 0 to level a = 1” (page 23 of VanderWeele, 2015). CDE is thought to reflect the
+effect interpreted as the impact of fixing the mediator value to m without intervening on
+the treatment (VanderWeele, 2009). Since we cannot directly manipulate the SNP but can
+modify smoking habits, this effect corresponds to our situation of interest. If CDE is small,
+it suggests that the SNP influences the incidence of diabetes primarily through its effects on
+smoking habits.
+For accurate identification of CDE, confounders related to both the exposure–outcome
+and mediator–outcome must be observed and adjusted—an assumption known as ‘no unmea-
+sured confounder.’ Under this assumption, it is well-established that CDE can be identified
+(VanderWeele, 2015). Although SNPs are determined before birth and are often viewed as
+a form of random allocation (Burgess and Thompson, 2015), confounders still exist between
+smoking habits and the incidence of diabetes (Will et al., 2001; Campagna et al., 2019). In
+addition, thoroughly observing all confounders in observational studies remains a challenge;
+there is a concern that some unmeasured mediator–outcome confounders might exist. This
+issue is referred to as the ‘unmeasured confounder problem’ in this manuscript.
+Several methods have been well-considered to identify CDE together with the unmea-
+sured confounder problem. Ten Have et al. (2007) introduced a straightforward outcome
+regression-based method anchored on the rank-preserving assumption.
+Joffe and Greene
+(2009) offered another outcome regression-based approach; however, it is distinguished from
+the Ten Have et al. method by its use of a surrogate outcome model (in our context, this is the
+mediator). Essentially, these methods require the assumption that exposure is independent
+of the (potential) outcome conditional on measured confounders (and mediator) to identify
+CDE. It is crucial to highlight that these methods demand accurate model specification and
+preclude the inclusion of an interaction term between the exposure and mediator in the
+outcome model. More recently, Sun and Ye (2020) and Wickramarachchi et al. (2023) have
+proposed a moment-based method. These approaches not only use the moments related to
+3
+
+the outcome and mediator models but also the covariance between these models to identify
+the natural direct and indirect effects (Robins and Greenland, 1992; Pearl, 2022). Although
+these methods can identify CDE, they still require precise specification of both the outcome
+and mediator models.
+In this manuscript, we propose an approach distinct from those in previous studies. We
+employ instrumental variables (IVs; Burgess and Thompson, 2015; Orihara et al., 2024) as-
+sociated with the mediator to account for unmeasured mediator–outcome confounders. The
+concept of using IVs to adjust for unmeasured confounders has been considered in prior stud-
+ies (e.g., Burgess et al., 2015; Rudolph et al., 2021; Chen et al., 2023). By leveraging these
+IVs, we construct an estimator based on an estimating equation for structured mean models
+(SMMs; refer to Vansteelandt and Joffe, 2014). Therefore, our method does not require
+the specification of all outcome models; only the parts of interest. Compared with previous
+methods, the risk of outcome model misspecification is decreased. Our proposed method
+requires valid IVs; however, it demonstrates double robustness: it remains a consistent CDE
+estimator if either the propensity score for the exposure or a subset of the outcome model is
+correctly specified—not necessarily all at once.
+Also, to determine CDE precisely, we propose a Generalized Information Criterion (GIC)-
+type model selection criterion specifically tailored for the important components of the out-
+come model based on Nishii (1984). The ordinary GIC is known for its model selection
+consistency (Nishii, 1984), and we aim to assess its properties.
+Our proposed GIC-type
+model selection criterion retains consistency if a subset of the outcome model is correctly
+specified, regardless of whether the propensity score model is correctly specified.
+Since many SNPs related to smoking habits have been identified in previous research
+(Erzurumluoglu et al., 2020; Lu et al., 2021), we use these SNPs as valid IVs to control
+for unmeasured mediator–outcome confounders in our study. Additionally, as the TCF7L2
+SNP is presumed to be a random allocation, the propensity score model can be accurately
+specified, allowing us to derive a consistent CDE estimator and model selection criterion.
+4
+
+The remainder of this paper is organized as follows. From Sections 2 to 4, we propose
+novel estimation procedure and model selection criterion that exhibit certain robust prop-
+erties. In Sections 5 and 6, we validate the properties of our proposed method through
+simulation experiments and analysis of real data obtained from the UK Biobank dataset.
+Supplementary material is provided in a separate supplemental file.
+2
+Preliminaries
+Let n denotes the sample size. Here, for i = 1, . . . , n, Ai ∈{0, 1}, M i ∈M, Xi ∈X, and
+Ui ∈U represent a treatment, mediators, measured confounders, and unmeasured mediator–
+outcome confounders (referred to hereinafter as “unmeasured confounder”), respectively.
+Additionally, we define potential outcomes Yami ∈Y for each a ∈{0, 1} and m ∈M, as
+well as an observed outcome Yi. It is assumed that the observed outcome Yi is consistent
+with the potential outcome Yami when Ai = a and M i = m. Additionally, we introduce
+instrumental variables (IV) Zi ∈Z associated with the mediators, with further details
+provided as we proceed. In our example, A is TCF7L2 SNP, M is smoking habits, Y is an
+outcome related to the incidence of diabetes, and Z is SNPs related to the smoking habits
+(see Figure 1), respectively.
+Here,
+M × X × Z × U × Y ⊂RdM
+≥0 × RdX × RdZ × RdU × RdY ,
+where M is a finite set including 0. Note that we assume that Pr(A = 0, M = 0) > 0. Under
+these settings, we suppose that (Ai, M i, Xi, Zi, Ui, Yi), i = 1, 2, . . . , n are i.i.d. copies from
+(A, M, X, Z, U, Y ). In this manuscript, we focus on estimating CDE defined as follows: for
+each m ∈M,
+∆(m) = E [Y1m −Y0m] .
+In the following discussion, we assume some independence assumptions. To avoid confu-
+5
+
+sion, we summarize these assumptions here.
+Assumption 1. Independence Assumptions
+For each a and m,
+Yam ⊥⊥M | A, X, U,
+Yam ⊥⊥A | X, U,
+(2.1)
+U ⊥⊥Z | X,
+Yam ⊥⊥Z | A, X, U, M,
+(2.2)
+A ⊥⊥U | X,
+A ⊥⊥Z | X, U.
+(2.3)
+(2.1) is necessary to identify CDE (VanderWeele, 2015), whereas (2.2) relates to the “valid”
+IV conditions (Burgess and Thompson, 2015).
+The IV necessaries to satisfy the following three conditions: 1) the IV is related to the
+mediators (corresponding to the regularity of matrix Γ described in Theorem 1), 2) the IV
+is not related to the unmeasured confounders (the former part of (2.2)), and 3) the IV is
+related to the outcome only through the mediators (the latter part of (2.2)).
+(2.3) is essential for advancing the discussion of our proposed method. The assumption
+is stated that an exposure variable needs to be independent of both unmeasured confounders
+and IVs related to mediators (conditional on some confounders). The former condition is
+identical to the standard requirement for ordinary IVs. In our context, where the variable is a
+SNP, this condition is presumed to be met. The latter condition relates to the independence
+assumption between SNPs. For example, if the exposure SNP and some SNPs related to
+the mediator belong to the same loci, this condition may not be satisfied (Burgess and
+Thompson, 2015). Therefore, the selection of SNPs associated with the mediator must be
+made with care. The similar independence assumption is considered in the context of valid
+IV selection (Sun et al., 2023).
+Assumption 2. No Additive Interaction (Wang and Tchetgen Tchetgen, 2018)
+E [Yam −Y00 | X, U] = E [Yam −Y00 | X]
+(2.4)
+6
+
+This assumption can be viewed as an extension of the “rank preserving assumption” (see,
+for example, Ten Have et al., 2007), and has been widely employed in various studies dealing
+with unmeasured confounders, such as the work by Wang et al. (2022) and Cui et al. (2023).
+To estimate CDE ∆(m), we consider the conditional expectation
+E [Y −Y00 | A = a, X, M = m, U] .
+(2.5)
+To identify this quantity, we rely on (2.1) in Assumption 1 commonly assumed in ordinary
+mediation analysis. Under these independence assumptions, the quantity simplifies to
+E [Y −Y00 | A = a, X, M = m, U] = E [Yam −Y00 | A = a, X, M = m, U]
+= E [Yam −Y00 | X, U] .
+Furthermore, from (2.1) in Assumption 1 and (2.4) in Assumption 2, the difference between
+the quantities, when averaged over X, becomes CDE:
+E [E [Y −Y00 | A = 1, X, M = m, U] −E [Y −Y00 | A = 0, X, M = m, U]]
+= E [E [Y1m −Y00 | X] −E [Y0m −Y00 | X]] = ∆(m).
+(2.6)
+From the above discussion, it is natural to model the conditional expectation (2.5) as the
+following function of a ∈{0, 1}, m ∈M, and x ∈X:
+τ(a, m, x)⊤ξ = τ 1(a, m, x)⊤ξ1 + τ 2(m, x)⊤ξ2,
+(2.7)
+where ξ = (ξ⊤
+1 , ξ⊤
+2 )
+⊤, τ 1 and τ 2 are known functions satisfying τ 1(0, m, x) = 0 and
+τ 2(0, x) = 0, (ξ⊤
+1 , ξ⊤
+2 )
+⊤∈Θξ, and Θξ ⊂RL is a parameter space to which ξ belongs.
+For instance, τ 1(a, m, x) = a(1, m, mx⊤)
+⊤and τ 2(m, x) = m(1, x⊤)
+⊤with dM = 1. These
+two functions carry significant interpretations: τ 1 captures the interaction relationship be-
+7
+
+tween the treatment variable, mediators, measured confounders, and the outcome, while
+τ 2 represents the relationship between the mediator and the outcome under the reference
+treatment variable (a = 0). We assume that there exists the true parameter ξ0 such that
+E[Y −Y00 | A = a, X, M = m, U] = τ(a, m, X)⊤ξ0,
+where the superscript “0” on each parameter denotes the true values.
+3
+Estimating Strategy and Double Robustness
+In this section, we address a scenario that necessitates the specification of parametric models
+for the propensity score and outcome. Our goal is to estimate CDE, which represents the
+target causal effect we are interested in. To achieve this, we use an estimating equation that
+includes IVs related to the mediator. We also explore the characteristics of the estimator with
+a focus on its “double robustness.” Although our primary data involves only a randomized
+treatment (i.e., the TCF7L2 SNP) and one mediator, we extend our consideration to more
+general situations, including those with multiple mediators and known confounders.
+To estimate CDE under the model (2.7), we would typically consider using an estimated
+equation based on the SMMs (Vansteelandt and Joffe, 2014). Unfortunately, we cannot apply
+this procedure directly due to the presence of some unmeasured confounders U. To address
+this issue, we use instrumental variables Z associated with the mediators, which satisfy
+(2.2) in Assumption 1. Specifically, we propose a two-step estimation strategy: estimating
+1) the parameters of propensity score, IVs, and the baseline outcome models (i.e., the models
+related to Y00), and 2) the parameter ξ of model (2.7).
+3.1
+Working Models
+In the first step, we consider following two working models:
+8
+
+Me: Propensity score model: e(x; α),
+Mφ: Baseline outcome model: φ(x; ζ),
+where e : X →(0, 1) and φ : X →R. We assume that there exists the true parameters α0
+and ζ0 such that E [A | Xi] = e(Xi; α0) and
+E [Y | A = 0, Xi, M = 0, U] = E [Y00 | Xi, U] = φ(Xi; ζ0).
+An estimator ˆα for α ∈Θα is obtained using procedures such as maximum likelihood
+estimation. Here, Θα is a parameter space to which α belongs. Similarly, an estimator ˆζ
+for ζ ∈Θζ is obtained by solving the following estimating equation:
+n
+X
+i=1
+˙φ(Xi; ζ) (yi −φ(Xi; ζ)) I {Ai = 0, M i = 0} = 0,
+where ˙φ(x; ζ) :=
+∂
+∂ζφ(x; ζ). Here, Θζ is a parameter space to which ζ belongs.
+It is worth noting that model specification of φ is commonly challenging, as the expec-
+tation includes unmeasured covariates U. One possibility is assuming that the expectation
+of the unmeasured covariates, conditioned on the observed values, becomes zero:
+E [Y | A = 0, X, M = 0, U] = φ(X; ζ) + U,
+E[U | X] = 0.
+Although it is hard to confirm the condition from the observed data, constructing the model is
+valuable. Our proposed procedure exhibits “double robustness,” meaning that the procedure
+yields a consistent estimator of CDE even if the baseline outcome model is misspecified.
+9
+
+3.2
+Double Robustness of Proposed Estimator
+In the second step, we focus on estimating the important parameter ξ in model (2.7). Specif-
+ically, we consider the following estimating equation:
+n
+X
+i=1
+(Ai −e(Xi; ˆα)) Zi
+
+yi −τ ⊤
+i ξ −φ(Xi; ˆζ)
+
+= 0,
+(3.1)
+where τ i ≡τ(Ai, M i, Xi) (note that, henceforth, dZ = L). Also, ˆα and ˆζ are obtained
+from first step. To proceed with the discussions, we use (2.3) in Assumption 1 hereinafter.
+The solution to (3.1), denoted as ˆξ, is given by
+ˆξ =
+ n
+X
+i=1
+(Ai −e(Xi; ˆα)) Ziτ ⊤
+i
+!−1
+n
+X
+i=1
+(Ai −e(Xi; ˆα)) Zi
+
+yi −φ(Xi; ˆζ)
+
+.
+(3.2)
+Note that the inverse matrix exists asymptotically from a regularity condition C.4 in Ap-
+pendix A of the supplemental file.
+Regarding the estimator, achieving consistency and
+asymptotic normality relies on the correctness of the two specified models. Hereafter, the
+phrase “M(·) is correct” indicates that the corresponding model is correctly specified. For
+instance, if “Me is correct,” it means that the propensity score model is correctly specified;
+that is, α∗= α0.
+Theorem 1.
+Assuming that regularity conditions C.1–C.6 in Appendix A of the supplemental file hold.
+If Me or Mφ is correctly specified, then we have ˆξ −ξ0 = Op(1/√n). If Me and Mφ are
+correctly specified, then we have
+√n
+
+ˆξ −ξ0
+L→N
+
+0, Γ−1Σ
+ Γ⊤−1
+,
+(3.3)
+10
+
+where
+Σ = E
+h A −e(X; α0)
+2 Z⊗2  Y −τ ⊤ξ0 −φ(X; ζ0)
+2i
+,
+Γ = −E
+ A −e(X; α0)
+
+Zτ ⊤
+.
+Here, A⊗2 := AA⊤. The proof of Theorem 1 can be found in Appendix B of the supplemental
+file. The concept of double robustness here resembles the double robustness of the standard
+SMMs as discussed in Vansteelandt and Joffe (2014). However, the presence of unmeasured
+confounders and the use of IVs our approach apart from conventional SMMs; this robustness
+introduces a novel aspect to estimators within this context.
+4
+Model Selection Criterion for CDE
+In this section, we introduce a GIC-based model selection criterion based on Nishii (1984)
+by modifying the penalty term of the information criterion proposed by Taguri et al. (2014)
+and Wallace et al. (2019). We also investigate its properties, particularly model selection
+consistency (Nishii, 1984; Shao, 1997).
+4.1
+GIC-based Model Selection Criterion
+Here, we introduce additional notations. Following the notation used by Shao (1997), let A
+represents a set of candidate models, and J ⊂{1, . . . , p} (J ∈A) represents a model. Ac
+denote the set of valid models, which is a subset of A, and
+J0 =
+
+j = {1, . . . , p} | ξ0
+j ̸= 0
+	
+denote the true model. Here, a “valid model” refers to a model that includes the construction
+of the true model at the minimum. Thus, we have J0 ∈Ac, and J0 has the minimum number
+of components among all J ∈Ac.
+In Taguri et al. (2014) and Wallace et al. (2019), the following AIC-based information
+11
+
+criterion is considered:
+−2Q
+
+ˆθJ
+
++ 2 × tr
+(
+b˜ΣJ
+
+b˜Γ
+−1
+J
+⊤)
+,
+where Q(ξJ, α, ζ) ≡Q(θJ) is a quasi-likelihood (QL):
+Q(θJ) = −1
+2
+n
+X
+i=1
+(Ai −e(Xi; α)) ξ⊤
+J G⊤
+J τ ⊗2
+i GJξJ
++
+n
+X
+i=1
+(Ai −e(Xi; α)) ξ⊤
+J G⊤
+J τ i (yi −φ(Xi; ζ)) ,
+ξJ ∈R|J| is a parameter under the model J ∈A and GJ ∈Rp×|J| is a sub-matrix of
+Ip corresponding to J.
+For instance, when extracting the first J component of τ, then
+GJ =
+ I|J|, O
+⊤. Here, b˜ΣJ and b˜ΓJ are estimators for matrices ˜ΣJ and ˜ΓJ under the model
+J ∈A, where
+˜ΣJ = E
+" ∂
+∂ξJ
+Q(θ∗
+J)
+⊗2#
+= E
+h
+(A −e(X; α∗))2  G⊤
+J τ
+⊗2  y −τ ⊤GJξ∗
+J −φ(Xi; ζ∗)
+2i
+,
+˜ΓJ = E
+ ∂2
+∂ξ⊗2
+J
+Q(θ∗
+J)
+
+= −E
+h
+(A −e(X; α∗))
+ G⊤
+J τ
+⊗2i
+.
+Note that since the derivation of −2Q(ξJ, ˆα, ˆζ) is not consistent with the left hand side of
+(3.1), the estimator (3.2) discussed in Section 3 may not minimize −2Q(ξJ, ˆα, ˆζ).
+Here, to modify the penalty term of QAICCDE, we propose the GIC-based model selection
+criterion, denoted as “QGICCDE” (c.f., Nishii, 1984):
+QGICCDE(J) := −2Q
+
+ˆθJ
+
++ λn × tr
+(
+b˜ΣJ
+
+b˜Γ
+−1
+J
+⊤)
+,
+where λn is a deterministic sequence satisfying λn →∞and λn/n →0 (n →∞).
+12
+
+4.2
+Model Selection Consistency of Model Selection Criterion
+Under certain regularity conditions, the QGICCDE exhibits a desirable property: model
+selection consistency
+Theorem 2.
+Assuming that regularity conditions C.1–C.8 in Appendix A of the supplemental file hold.
+If Mφ is correctly specified, then QGICCDE exhibits model selection consistency; i.e.,
+Pr
+
+ˆJ = J0
+→1,
+where ˆJ = arg min
+J∈A
+QGICCDE(J).
+The proof of Theorem 2 is presented in Appendix B of the supplemental file. To best of our
+knowledge, Theorem 2 is the first derivation of the model selection criterion for CDE which
+has model selection consistency.
+Finally, we conclude this section by discussing the model considerations related to the
+specific propensity score model used in our data analysis. As mentioned in Introduction, in
+our research the treatment variable (TCF7L2 SNP) is assumed to be randomly allocated.
+Therefore, the propensity score model can be correctly specified as e(Xi; ˆα) ≡1
+n
+Pn
+i=1 Ai =:
+¯A, which means implicity that the robustness property for parameter estimation holds exactly
+without considering the baseline outcome model. In the analysis presented in Section 5 and
+6, we apply the statistics ¯A.
+5
+Simulation Experiments
+In this section, we conduct simulation experiments to validate the proposed methods. Specif-
+ically, we aim to examine the performance of the proposed estimating procedure and model
+selection criteria, with particular emphasis on the double robustness. The iteration count
+for all simulation examples is set to 1000.
+13
+
+5.1
+Data-generating Mechanism
+First, we will explain the data-generating mechanism used in this simulation. We assume
+the presence of a single unmeasured confounder, denoted as Ui
+i.i.d.
+∼N(0, 2). Additionally, we
+assume that the assignment mechanism is completely random: Ai
+i.i.d.
+∼Ber(0.5), and three
+instrumental variables (IVs) are denoted as Zki
+i.i.d.
+∼Gamma(2, 4), k = 1, 2. These variables
+are assumed to represent certain genetic variations.
+Under this variable setting, a mediator has the following relationship:
+˜
+Mi
+i.i.d.
+∼Bin(4, pm(Ai, Zi, Xi, Ui)),
+pm(Ai, Zi, Xi, Ui) = expit {−1 + Z1i + Z2i + 0.4Ui + 0.4Ai × Ui} ,
+and Mi = 5 ˜
+Mi. Therefore, the mediator takes on discrete values: 0, 5, 10, 15, 20. The variable
+is assumed to represent the number of cigarettes smoked per day, and its value does not have
+a causal relationship with the exposure. Under this setting, the mean (SD) of the mediator
+is approximately 9.8 (8.7), Cor(M, Z1 + Z2) ≈0.43, and Cor(M, U) ≈0.75. The correlation
+between the mediator and the IVs is somewhat strong, but the objective of this simulation
+is to confirm the performance of methods under an ideal situation. In this sense, we consider
+the setting to be acceptable.
+Finally, we specify the following outcome model: Y00,i = 42 + 0.2Ui + εyi, εyi
+i.i.d.
+∼N(0, 2),
+and Yi = 2Ai+0.4Mi+Y00,i. The variable is assumed to represent the value of HbA1c, which
+serves as a surrogate for the incidence of diabetes (further details are provided in Section
+6). Under this setting, there are only a few cases (≈0%) of diabetes (HbA1c > 48) among
+the baseline subjects (i.e., A = 0 and M = 0), while there is a prevalence of 43% of diabetes
+among all subjects.
+14
+
+5.2
+Model Candidates
+As the previous simulation experiment, we introduce three candidate outcome models to
+evaluate the performance of the model selection criteria. These models are as follows:
+Model 1: E [Y −Y00 | a, x, m, U] = aξ1 + amξ2,
+Model 2: E [Y −Y00 | a, x, m, U] = aξ1 + amξ2 + mξ3,
+Model 3: E [Y −Y00 | a, x, m, U] = aξ1 + amξ2 + mξ3 + mxξ4.
+Clearly, Model 2 represents the true model, while Model 3 includes the correct construction
+of the true model. Therefore, a model selection criterion that accurately selects either Model
+2 or Model 3 is considered superior.
+5.3
+Estimating Methods
+We considered three methods for estimating the causal effect. The proposed method, referred
+to as ‘Proposed,’ was implemented as described in preceding sections. Two reference methods
+were employed in this study. The first, referred to as the ‘Ordinary SMM,’ is based on the
+standard SMM with a model selection criterion proposed by Wallace et al. (2019) for a single
+time point (for further details, see Section 3.3 in Wallace et al., 2019). Since their criterion
+is of the AIC-type, we also explore a GIC-type model selection criterion by modifying the
+penalty term as previously described.
+The second reference method, referred as the ‘2SLS,’ utilizes the two-stage least squares
+(2SLS) estimator. For the mediator and outcome models, it adopts the approach outlined
+in Joffe and Greene (2009), without any model selection. Consequently, for 2SLS, we only
+consider cases where both the true outcome model and the true mediator model are correctly
+specified. Specifically, the 2SLS is a two-step procedure: firstly, regressing the instrumental
+variable (IV) and measured confounder on the mediator to derive the mediator’s predictor;
+secondly, regressing the predicted mediator, exposure, and measured confounder on the
+15
+
+outcome using the exact model specifications for Model 1. Since 2SLS meets the necessary
+assumptions and has shown satisfactory performance in the work of Joffe and Greene (2009),
+we use it as a benchmark in our study.
+To estimate the parameters of interest (ξ1 and ξ2), it is essential to estimate the nuisance
+models, namely, the propensity score model (relevant only for the ‘Proposed’ and ‘Ordinary
+SMM’ methods) and the baseline outcome models. In this simulation, we only examine
+scenarios where the propensity score model is correctly specified. As a reference, we con-
+duct model selection for the proposed method with unmeasured confounders (i.e., correctly
+specified baseline outcome model).
+5.4
+Performance Metrics
+Regarding point estimates, the evaluation of the methods includes the calculation of the
+mean, empirical standard error (ESE), percent (%) bias, root mean squared error (RMSE),
+and the visualization of estimated causal effects using boxplots in 1000 iterations.
+Bias
+and RMSE are calculated as %bias = 100
+ ¯ˆθ−θ0
+θ0
+
+, and RMSE =
+r
+1
+1000
+P1000
+k=1
+
+ˆθk −θ0
+2
+,
+respectively. Here ¯ˆθ =
+1
+1000
+P1000
+k=1 ˆθk represents the average estimate over the 1000 iterations,
+ˆθk denotes the estimate obtained in each iteration, and θ0 is the true value of the parameter.
+θ0 corresponds to the true value of CDE under specific values of the mediator.
+Regarding model selection, the number and proportion of selections that correctly identify
+the true model, or include the true model, out of the 1000 iterations are summarized.
+5.5
+Simulation Results
+The simulation results are summarized in Tables 1, 2, and Figure 2 and 3. The results for
+Proposed method exhibit stability in terms of %bias and RMSE for both CDE(0), CDE(10),
+and CDE(20) when the sample size is large enough. In contrast, Ordinary SMM yields an un-
+biased baseline result (CDE(0)), but shows significant bias, especially for CDE(20). These
+results can be attributed to the model selection. As evident from Table 2, the valid models
+16
+
+cannot be selected, indicating obvious misspecification in model construction. Consequently,
+bias occurs when m > 0. Regarding 2SLS, all estimates are slightly biased.
+In our proposed method with correctly specified baseline outcome model, GIC-type has
+model selection consistency; this is consistent with the theoretical result. Whereas, in a
+misspecified situation, at least the underspecified model (Model 1) is not selected. In this
+sense, even if the baseline outcome model is misspecified, our proposed model selection
+criterion still works. For ordinary SMM, the model selection criteria do not work for all
+situations since estimates have obvious bias.
+[Table 1, 2, and Figure 2 and 3 are here.]
+6
+UK Biobank Data Analysis
+We conduct a real data analysis using UK Biobank Data to examine the causal effect of
+the TCF7L2 SNP on the incidence of diabetes, mediated by smoking habits. It is widely
+recognized that diabetes affects specific organs such as the eyes, kidneys, and heart. Addi-
+tionally, some cancers, such as colon cancer, have been associated with diabetes (Yu et al.,
+2022). With over 400 million individuals worldwide affected by diabetes (Cheng et al., 2019),
+prevention is crucial. To confirm the causal effect and underlying structure, we applied our
+proposed estimation strategy.
+6.1
+Analysis Plan
+The mediator variable in our analysis is the number of cigarettes per day (NCPD; Data-Field:
+2887), while the baseline HbA1c (HBBL; Data-Field: 30750) is used as the outcome variable.
+Additionally, Sex, baseline age (Data-Field: 21022), and baseline BMI (Data-Field: 21001)
+are considered as measured confounders between the mediator and outcome (Campagna et
+al., 2019). To handle the NCPD variable, any value over 20 is capped at 25, and responses
+such as “Less than one a day” or “Do not know” are treated as 0 to ensure accuracy in the
+17
+
+analysis.
+As evident from the previous sections, our model is applicable only to continuous out-
+comes. Therefore, in this study, we consider HBBL as a suitable surrogate for the incidence
+of diabetes in order to apply the model. Moreover, HBBL values are converted from IFCC
+units (the default unit in UK Biobank) to NGSP units for improved interpretability using
+the conversion formula: 0.09148 × IFCC + 2.152.
+For our exposure variable (EX) and instrumental variables (IVs), we use SNPs available
+from the UK Biobank. The EX is coded as 0 in the absence of any variation from the wild
+type, and as 1 otherwise. For the IVs, we employ 77 SNPs previously identified as related
+to NCPD (Erzurumluoglu et al., 2020; Lu et al., 2021). Since EX is rs7903146 located on
+Chromosome 10, we do not use SNPs from Chromosome 10 as IVs to satisfy the second part
+of condition (2.3).
+In summary, our dataset comprises 502,419 participants with crude demographic or ge-
+netic data. For this study, we conducted a complete case analysis, meaning that only subjects
+with no missing data in the aforementioned variables were included in the analysis. Addi-
+tionally, we excluded subjects with HBBL values exceeding 12, considering them as potential
+outliers (Landgra et al., 2022). Consequently, a total of 460,773 participants (91.7% of the
+original sample) were included in the analysis.
+We have prepared three candidate models: 1) including EX and the interaction term
+between EX and NCPD, 2) including EX and NCPD, or 3) including EX, NCPD, and the
+interaction term between EX and NCPD.
+6.2
+Analysis Results
+Firstly, the demographic data of the participants are summarized in Table 3. It is evident
+that no significant trends are observed. Tables C.1–C.3 in Appendix C of the supplemental
+file summarize the correlations between the two variables. The correlation between SNP and
+NCPD was quite low, which may raise concerns about the weak IV problem.
+18
+
+Since EX is assumed to be allocated randomly, we can estimate the total effect (TE)
+simply: 0.0531 (0.0490, 0.0572) (point estimate (99% confidence interval (CI))). This indi-
+cates that subjects with a genetic mutation in the TCF7L2 SNP tend to have higher HbA1c
+levels, suggesting a negative causal effect of the TCF7L2 SNP on the incidence of dia-
+betes. Using our proposed GIC-based model selection criterion under λn = log(n), Model
+3 is selected. The estimated causal effects when NCPD is manipulated at levels of 0, 10,
+and 20 are summarized as follows (point estimate (99% CI)): −0.3874 (−0.4150, −0.3694),
+0.5231 (0.4940, 0.5422), and 1.4337 (1.3478, 1.4900), respectively. This indicates that by con-
+trolling the mediator, the causal effects change; intervening in smoking habits may reduce
+the risk of developing diabetes.
+Additionally, we estimate the proportion eliminated (PE; VanderWeele, 2015). The def-
+inition is as follows: for all m ∈M,
+PE(m) := TE −CDE(m)
+TE
+.
+In our analysis, PE(0) and its 99% CI is 8.2997 (7.7800, 8.8194). This indicates that nearly all
+of the TE is explained by the mediator. These results suggest that manipulating the number
+of cigarettes has an influence on the causal effect of the TCF7L2 SNP on diabetes incidence.
+Specifically, as the number of cigarettes consumed decreases, implying that quitting smoking,
+particularly intervening at m = 0, can aid in diabetes prevention.
+Our data analysis has certain limitations. Firstly, the fact that the exposure, media-
+tor, and outcome are measured at the same time point introduces the possibility of reverse
+causation (Burgess and Thompson, 2015). This temporal restriction poses a challenge in
+estimating causal effects accurately. Secondly, there are inherent risks associated with weak
+IVs. This concern is particularly relevant to the limitations of one-sample mendelian ran-
+domization (Burgess and Thompson, 2015). Although we attempt to address this issue by
+constructing allele scores, we cannot completely eliminate the concern. Furthermore, the
+19
+
+confidence interval may be influenced by the presence of weak IVs. Consequently, it is cru-
+cial to interpret the results with awareness of the limitations of the analysis. Nevertheless,
+it is evident that our analysis has generated new insights: the effect of the SNP exposure on
+the incidence of diabetes can be modified by manipulating smoking habits.
+[Table 3 is here.]
+7
+Discussions and Conclusions
+In this manuscript, we propose a novel estimation and model selection procedure that exhibits
+double robustness for point estimation, and the model selection consistency. We mathemati-
+cally establish these properties and validate them through simulation studies, comparing our
+approach with existing methods. Our findings suggest that our proposed methods outper-
+form previous approaches, even when unmeasured confounders are absent. Additionally, in
+our analysis of UK Biobank data, we validate our research questions and conclude that the
+effect of SNP exposure on the incidence of diabetes can be modified by changing smoking
+habits.
+While our proposed method offers several advantages, it does rely on certain assumptions—
+most notably, the strong assumption of parametric models for nuisance variables like the
+propensity score and the baseline outcome model. It is essential to relax this assumption,
+given that these models are not typically of primary interest and may not be universally
+applicable. One solution is to use nonparametric models. Fortunately, our method is based
+on estimating equations, as seen in (3.1), which share the same form as those in the context
+of double machine learning (Chernozhukov et al., 2018). By leveraging this approach, we can
+construct an estimation procedure that achieves √n–consistency for the target parameter
+of interest. We anticipate that model selection criteria based on this approach can also be
+derived.
+Our proposed model selection criterion achieves model selection consistency if the baseline
+20
+
+outcome model is correctly specified. However, as mentioned in Section 3, specifying the
+model may be challenging. When we observe some covariates, a considerably complex model
+is necessary to approximate the correct model. In other words, our proposed model selection
+criterion does not have “double robustness.” In Baba and Ninomiya (2021), they propose a
+doubly robust AIC-based model selection criterion, which implies that the model selection
+criterion becomes an asymptotically unbiased estimator of the risk when either the propensity
+score model or the outcome model is correctly specified.
+It would be feasible to extend our estimation and model selection procedures to situations
+involving sequential treatments. In Wallace et al. (2019), these procedures were developed
+under the assumption of no sequential ignorability—an assumption that is often violated,
+especially in observational studies. More recent research, such as that by Cui et al. (2023),
+has considered situations involving sequential unmeasured confounders. By adapting our
+proposed methods, we aim to achieve not only accurate estimates of valid causal effects but
+also the identification of valid causal structures.
+Acknowledgements: This work was supported by JSPS KAKENHI Grant Number JP21K10500.
+All authors have accepted responsibility for the entire content of this manuscript and ap-
+proved its submission.
+Data availability statement: This study was conducted using the UK Biobank resource
+under application number 71079.
+The data that support the findings of this study are
+available from UK Biobank but restrictions apply to the availability of these data, which
+were used under license for the current study, and so are not publicly available. Data are
+however available from the authors upon reasonable request and with permission of UK
+Biobank. Simulation and Data analysis programs are available at the following URL:
+• https://github.com/SOrihara/DR_CDE
+21
+
+References
+[1] Burgess, S., and Thompson, S. G. (2015). Mendelian Randomization: Methods for Using
+Genetic Variants in Causal Estimation. CRC Press.
+[2] Burgess, S., Daniel, R. M., Butterworth, A. S., Thompson, S. G., et al. (2015). Network
+Mendelian randomization: using genetic variants as instrumental variables to investigate
+mediation in causal pathways. International Journal of Epidemiology, 44(2), 484-495.
+[3] Campagna, D., Alamo, A., Di Pino, A., Russo, C., et al. (2019). Smoking and dia-
+betes: dangerous liaisons and confusing relationships. Diabetology & Metabolic Syn-
+drome, 11(1), 1-12.
+[4] Cauchi, S., El Achhab, Y., Choquet, H., Dina, C., et al. (2007). TCF7L2 is reproducibly
+associated with type 2 diabetes in various ethnic groups: a global meta-analysis. Journal
+of Molecular Medicine, 85, 777-782.
+[5] Chen, F., Hu, W., Cai, J., Chen, S., et al. (2023). Instrumental variable-based high-
+dimensional mediation analysis with unmeasured confounders for survival data in the
+observational epigenetic study. Frontiers in Genetics, 14, 1092489.
+[6] Cheng, L., Zhuang, H., Ju, H., Yang, S., et al. (2019). Exposing the causal effect of
+body mass index on the risk of type 2 diabetes mellitus: a mendelian randomization
+study. Frontiers in Genetics, 10, 94.
+[7] Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., et al. (2018). Dou-
+ble/debiased machine learning for treatment and structural parameters. The Econo-
+metrics Journal, 21(1).
+[8] Cui, Y., Michael, H., Tanser, F., and Tchetgen Tchetgen, E. (2023). Instrumental
+variable estimation of the marginal structural Cox model for time-varying treatments.
+Biometrika, 110(1), 101-118.
+22
+
+[9] Duncan, A., Heyer, M. P., Ishikawa, M., Caligiuri, S. P. B., et al. (2019). Habenular
+TCF7L2 links nicotine addiction to diabetes. Nature, 574(7778), 372-377.
+[10] Erzurumluoglu, A. M., Liu, M., Jackson, V. E., Barnes, D. R., et al. (2020). Meta-
+analysis of up to 622,409 individuals identifies 40 novel smoking behaviour associated
+genetic loci. Molecular Psychiatry, 25(10), 2392-2409.
+[11] Joffe, M. M., and Greene, T. (2009). Related causal frameworks for surrogate outcomes.
+Biometrics, 65(2), 530-538.
+[12] Landgraf, W., Bigot, G., Hess, S., Asplund, O., et al. (2022). Distribution and charac-
+teristics of newly-defined subgroups of type 2 diabetes in randomised clinical trials: Post
+hoc cluster assignment analysis of over 12,000 study participants. Diabetes Research and
+Clinical Practice, 190, 110012.
+[13] Lehrer, S., and Rheinstein, P. H. (2021). Diabetes, cigarette smoking and transcription
+factor 7-like 2 (Tcf7L2) in the UK Biobank cohort. Bulletin de L’academie Nationale
+de Medecine, 205(9), 1146-1150.
+[14] Lu, Y., Guo, Y., Lin, H., Wang, Z., et al. (2021). Genetically determined tobacco and
+alcohol use and risk of atrial fibrillation. BMC Medical Genomics, 14(1), 1-7.
+[15] Nishii, R. (1984). Asymptotic properties of criteria for selection of variables in multiple
+regression. The Annals of Statistics, 758-765.
+[16] Orihara, S., Goto, A., and Taguri, M. (2024). Valid instrumental variables selection
+methods using auxiliary variable and constructing efficient estimator. Biometrical Jour-
+nal, accepted.
+[17] Pan, A., Wang, Y., Talaei, M., Hu, F. B., et al. (2015). Relation of active, passive, and
+quitting smoking with incident type 2 diabetes: a systematic review and meta-analysis.
+The Lancet Diabetes & Endocrinology, 3(12), 958-967.
+23
+
+[18] Pearl, J. (2022). Direct and indirect effects. In Probabilistic and Causal Inference: The
+Works of Judea Pearl (pp. 373-392).
+[19] Robins, J. M., and Greenland, S. (1992). Identifiability and exchangeability for direct
+and indirect effects. Epidemiology, 3(2), 143-155.
+[20] Rudolph, K. E., Williams, N., and Diaz, I. (2021). Causal mediation with instrumental
+variables. arXiv preprint arXiv:2112.13898.
+[21] Shao, J. (1997). An asymptotic theory for linear model selection. Statistica sinica, 221-
+242.
+[22] Sun, B., Liu, Z., and Tchetgen, E. T. (2023). Semiparametric efficient G-estimation
+with invalid instrumental variables. Biometrika, 110(4), 953-971.
+[23] Sun, B., and Ye, T. (2020). Semiparametric causal mediation analysis with unmeasured
+mediator-outcome confounding. arXiv preprint arXiv:2012.06762.
+[24] Ten Have, T. R., Joffe, M. M., Lynch, K. G., Brown, G. K., et al. (2007). Causal
+mediation analyses with rank preserving models. Biometrics, 63(3), 926-934.
+[25] VanderWeele, T. J. (2009). Marginal structural models for the estimation of direct and
+indirect effects. Epidemiology, 18-26.
+[26] VanderWeele, T. (2015). Explanation in Causal Inference: Methods for Mediation and
+Interaction. Oxford University Press.
+[27] Vansteelandt, S., and Joffe, M. (2014). Structural nested models and G-estimation: the
+partially realized promise. Statistical Science, 29(4), 707-731.
+[28] Vaquero, A. R., Ferreira, N. E., Omae, S. V., Rodrigues, M. V., Teixeira, S. K., Krieger,
+J. E., and Pereira, A. C. (2012). Using gene-network landscape to dissect genotype effects
+of TCF7L2 genetic variant on diabetes and cardiovascular risk. Physiological Genomics,
+44(19), 903-914.
+24
+
+[29] Wang, L., and Tchetgen Tchetgen, E. (2018). Bounded, efficient and multiply robust
+estimation of average treatment effects using instrumental variables. Journal of the
+Royal Statistical Society Series B: Statistical Methodology, 80(3), 531-550.
+[30] Wang, L., Tchetgen Tchetgen, E., Martinussen, T., and Vansteelandt, S. (2022). In-
+strumental variable estimation of the causal hazard ratio. Biometrics.
+[31] Wickramarachchi, D. S., Lim, L. H. M., and Sun, B. (2023). Mediation analysis
+with multiple mediators under unmeasured mediator-outcome confounding. Statistics
+in Medicine, 42(4), 422-432.
+[32] Will, J. C., Galuska, D. A., Ford, E. S., Mokdad, A., et al. (2001). Cigarette smoking
+and diabetes mellitus: evidence of a positive association from a large prospective cohort
+study. International Journal of Epidemiology, 30(3), 540-546.
+[33] Yu, G. H., Li, S. F., Wei, R., and Jiang, Z. (2022). Diabetes and colorectal cancer risk:
+clinical and therapeutic implications. Journal of Diabetes Research. Article ID 1747326.
+25
+
+Table 1: Summary of estimates: The iteration time is 1000, and the true value of CDE(0), CDE(10), and CDE(20) is 2. Mean,
+empirical standard error (ESE), %bias, and root mean squared error (RMSE) of estimated causal effects in 1000 iterations by
+estimating methods (“Estimating Method” column) and the type of model selection criterions (“Model Selection Method”
+column) are summarized.
+Estimating
+Model Selection
+Parameters
+Sample size: n = 1000
+Sample size: n = 10000
+Method
+Method
+Mean
+ESE
+|%bias|
+RMSE
+Mean
+ESE
+|%bias|
+RMSE
+Proposed
+GIC-type
+CDE(0)
+1.908
+0.366
+4.577
+0.377
+1.990
+0.052
+0.497
+0.053
+CDE(10)
+2.010
+0.140
+0.517
+0.140
+2.000
+0.029
+0.019
+0.029
+CDE(20)
+2.112
+0.429
+5.610
+0.443
+2.011
+0.051
+0.534
+0.052
+Ordinary SMM
+AIC-type
+CDE(0)
+1.981
+0.148
+0.954
+0.150
+1.987
+0.045
+0.634
+0.047
+CDE(10)
+6.226
+0.131
+211.296
+4.228
+6.231
+0.040
+211.572
+4.232
+CDE(20)
+10.471
+0.151
+423.546
+8.472
+10.476
+0.046
+423.777
+8.476
+GIC-type
+CDE(0)
+1.981
+0.148
+0.954
+0.150
+1.987
+0.045
+0.634
+0.047
+CDE(10)
+6.226
+0.131
+211.296
+4.228
+6.231
+0.040
+211.572
+4.232
+CDE(20)
+10.471
+0.151
+423.546
+8.472
+10.476
+0.046
+423.777
+8.476
+2SLS
+-
+CDE(0)
+2.238
+0.249
+11.908
+0.345
+2.230
+0.077
+11.495
+0.242
+CDE(10)
+2.037
+0.094
+1.857
+0.101
+2.037
+0.029
+1.841
+0.047
+CDE(20)
+1.836
+0.255
+8.194
+0.303
+1.844
+0.078
+7.812
+0.175
+Ordinary SMM: Structural mean model with the model selection criterion proposed by Wallace et al. (2019),
+2SLS: 2SLS procedure regarding the mediator and the outcome model considered in Joffe and Grreene (2009),
+AIC-type: AIC type model selection criterion; the coefficient of the penalty term is set as “2”,
+GIC-type: GIC type model selection criterion; the coefficient of the penalty term is set as “log(n)”,
+CDE(0): the value of the controlled direct effect (CDE) when the potential mediator value is 0; m = 0,
+CDE(10): the value of CDE when the potential mediator value is 10; m = 10
+CDE(20): the value of CDE when the potential mediator value is 20; m = 20
+26
+
+Table 2: Summary of the number and proportion of selecting valid models: The iteration time is 1000. The number and
+proportion of selections that correctly identify the true model, or include the true model in 1000 iterations by estimating
+methods (“Estimating Method” column) and the type of model selection criterions (“Model Selection Method” column) are
+summarized.
+Estimating
+Model Selection
+Sample size: n = 1000
+Sample size: n = 10000
+Method
+Method
+Including
+Including
+Correct Model
+Correct Model
+Correct Model
+Correct Model
+Proposed
+GIC-type
+747 (74.7)
+919 (91.9)
+914 (91.4)
+1000 (100)
+Ordinary
+AIC-type
+0 (0.0)
+0 (0.0)
+0 (0.0)
+0 (0.0)
+SMM
+GIC-type
+0 (0.0)
+0 (0.0)
+0 (0.0)
+0 (0.0)
+Reference: Proposed with
+Unmeasured Confounder
+GIC-type
+760 (76.0)
+925 (92.5)
+967 (96.7)
+1000 (100)
+Ordinary SMM: Structural mean model with the model selection criterion proposed by Wallace et al. (2019),
+AIC-type: AIC type model selection criterion; the coefficient of the penalty term is set as “2”,
+GIC-type: GIC-type model selection criterion; the coefficient of the penalty term is set as “log(n)”
+27
+
+Table 3: Summary of demographic characteristics
+Exposure group
+Non-exposure group
+Total
+N1 = 227965
+N0 = 232808
+N = 460773
+Sex
+104620 (45.9%)
+106121 (45.6%)
+210741 (45.7%)
+Age
+56.6 (8.10)
+56.5 (8.09)
+56.5 (8.09)
+BMI
+27.4 (4.74)
+27.5 (4.82)
+27.4 (4.78)
+NCPD
+3.96 (7.80)
+3.97 (7.82)
+3.97 (7.81)
+Continuous variables are summarized as: Mean (SD).
+Category variables are summarized as: Frequence (Percent).
+NCPD: The number of cigarettes per day
+28
+
+Figure 1: Relationship of interested variables in this study with unmeasured confounders
+and instrumental variables
+29
+
+Figure 2: Boxplots of estimates in 1000 iterations: The left panel: CDE(0); the center panel: CDE(10); The right panel:
+CDE(20). Red dash line is the true value (CDE(m) = 2)
+Ordinary SMM: Structural mean model with the model selection criterion proposed by Wallace et al. (2019),
+2SLS: 2SLS procedure regarding the mediator and the outcome model considered in Joffe and Grreene (2009),
+AIC-type: AIC type model selection criterion; the coefficient of the penalty term is set as “2”,
+GIC-type: GIC type model selection criterion; the coefficient of the penalty term is set as “log(n)”,
+CDE(0): the value of the controlled direct effect (CDE) when the potential mediator value is 0; m = 0,
+CDE(10): the value of CDE when the potential mediator value is 10; m = 10
+CDE(20): the value of CDE when the potential mediator value is 20; m = 20
+Regarding the results of the proposed method, there are some outliers. When n = 1000, there are 8 results where the absolute value of CDE(0) over
+5; 1 result where the absolute value of CDE(10) over 10; and there are 6 results where the absolute value of CDE(20) over 15.
+30
+
+Figure 3: Summary statistics of estimates: Empirical Standard Error (ESE), Absolute value
+of percent bias (|%bias|), and Root Mean Squared Error (RMSE) in 1000 iterations were sum-
+marized. The left panel: CDE(0); the center panel: CDE(10); The right panel: CDE(20).
+Ordinary SMM: Structural mean model with the model selection criterion proposed by Wallace et al. (2019),
+2SLS: 2SLS procedure regarding the mediator and the outcome model considered in Joffe and Grreene (2009),
+AIC-type: AIC type model selection criterion; the coefficient of the penalty term is set as “2”,
+GIC-type: GIC type model selection criterion; the coefficient of the penalty term is set as “log(n)”,
+CDE(0): the value of the controlled direct effect (CDE) when the potential mediator value is 0; m = 0,
+CDE(10): the value of CDE when the potential mediator value is 10; m = 10
+CDE(20): the value of CDE when the potential mediator value is 20; m = 20
+Since there are so large values, |%bias| of CDE(10) and CDE(20) for ordinary SMM are not shown.
+31

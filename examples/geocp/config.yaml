@@ -11,29 +11,29 @@ log_level: "INFO"                     # Logging level (DEBUG, INFO, WARNING, ERR
 
 # Evolution settings
 diff_based_evolution: true            # Use diff-based evolution (true) or full rewrites (false)
-#allow_full_rewrites: true            # Allow occasional full rewrites even in diff-based mode
-max_code_length: 10000                # Maximum allowed code length in characters
+allow_full_rewrites: false            # Allow occasional full rewrites even in diff-based mode
+max_code_length: 12000                # Maximum allowed code length in characters
 
 # LLM configuration
 llm:
-  primary_model: "gpt-4o"
+  primary_model: "openai/gpt-4o"
   primary_model_weight: 0.8
-  secondary_model: "gpt-4.1"
+  secondary_model: "openai/gpt-4.1"
   secondary_model_weight: 0.2
-  api_base: "https://api.openai.com/v1/"
-  api_key: "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"
+  api_base: "https://openrouter.ai/api/v1"
+  api_key: "YOUR_API_KEY"
   temperature: 0.7
   top_p: 0.95
-  max_tokens: 4096
+  max_tokens: 8192
 
 # Prompt configuration
 prompt:
   template_dir: null                  # Custom directory for prompt templates
   system_message: "You are an expert in GIS and an experienced coder. 
-  Your task is to improve the GeoConformal Prediction algorithm in Python. 
-  The target is to minimize interval_score. The best algorithm should have smallest values for both average interval (avg_interval_length) and distance to user-defined coverage (dist_to_coverage). 
-  You should not to optimize the model fitted on the training set."
-  evaluator_system_message: "You are an expert code reviewer."
+  Your task is to improve the GeoConformal Prediction algorithm in Python, making it universal to any geospatial datasets. 
+  The target is to minimize interval_score. The best algorithm should have smallest values for both average interval (avg_interval_length) and distance to user-defined coverage (dist_to_coverage).
+  You should not to change the model fitted on the training set and only optimize the algorithm."
+  evaluator_system_message: "You are an expert specialized in coding, GIS, statistics."
 
   # Number of examples to include in the prompt
   num_top_programs: 3                 # Number of top-performing programs to include
@@ -58,7 +58,7 @@ database:
   # Evolutionary parameters
   population_size: 50               # Maximum number of programs to keep in memory
   archive_size: 20                   # Size of elite archive
-  num_islands: 3                      # Number of islands for island model (separate populations)
+  num_islands: 5                      # Number of islands for island model (separate populations)
 
   # Island-based evolution parameters
   # Islands provide diversity by maintaining separate populations that evolve independently.
@@ -88,10 +88,10 @@ evaluator:
 
   # Evaluation strategies
   cascade_evaluation: false            # Use cascade evaluation to filter bad solutions early
-  cascade_thresholds: # Thresholds for advancing to next evaluation stage
-    - 0.5                             # First stage threshold
-    - 0.75                            # Second stage threshold
-    - 0.9                             # Third stage threshold
+#  cascade_thresholds: # Thresholds for advancing to next evaluation stage
+#    - 0.5                             # First stage threshold
+#    - 0.75                            # Second stage threshold
+#    - 0.9                             # Third stage threshold
 
   # Parallel evaluation
   parallel_evaluations: 4             # Number of parallel evaluations

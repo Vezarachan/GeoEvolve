@@ -1,0 +1,1972 @@
+arXiv:1501.03654v2  [cs.IT]  25 Sep 2015
+Spatial Wireless Channel Prediction
+under Location Uncertainty
+L. Srikar Muppirisetty, Tommy Svensson, Senior Member, IEEE, and Henk Wymeersch, Member, IEEE
+Abstract—Spatial wireless channel prediction is important for
+future wireless networks, and in particular for proactive resource
+allocation at different layers of the protocol stack. Various sources
+of uncertainty must be accounted for during modeling and to
+provide robust predictions. We investigate two channel prediction
+frameworks, classical Gaussian processes (cGP) and uncertain
+Gaussian processes (uGP), and analyze the impact of location
+uncertainty during learning/training and prediction/testing, for
+scenarios where measurements uncertainty are dominated by
+large-scale fading. We observe that cGP generally fails both in
+terms of learning the channel parameters and in predicting the
+channel in the presence of location uncertainties. In contrast,
+uGP explicitly considers the location uncertainty. Using simulated
+data, we show that uGP is able to learn and predict the wireless
+channel.
+Index Terms—Gaussian processes, uncertain inputs, location
+uncertainty, spatial predictability of wireless channels.
+I. INTRODUCTION
+L
+OCATION-based resource allocation schemes are ex-
+pected to become an essential element of emerging
+5G networks, as 5G devices will have the capability to
+accurately self-localize and predict relevant channel quality
+metrics (CQM) [1]–[3] based on crowd-sourced databases.
+The geo-tagged CQM (including, e.g., received signal strength,
+delay spread, and interference levels) from users enables the
+construction of a dynamic database, which in turn allows the
+prediction of CQM at arbitrary locations and future times. Cur-
+rent standards are already moving in this direction through the
+so-called minimization of drive test (MDT) feature in 3GPPP
+Release 10 [4]. In MDT, users collect radio measurements
+and associated location information in order to assess network
+performance. In terms of applications, prediction of spatial
+wireless channels (e.g., through radio environment maps) and
+its utilization in resource allocation can reduce overheads and
+delays due to the ability to predict channel quality beyond
+traditional time scales [2]. Exploitation of location-aware
+CQM is relevant for interference management in two-tier
+cellular networks [5], coverage hole detection and prediction
+[6], cooperative spectrum sensing in cognitive radios [7],
+anticipatory networks for predictive resource allocation [3],
+and proactive caching [8].
+In order to predict location-dependent radio propagation
+channels, we rely on mathematical models, in which the
+The authors are with the Department of Signals and Systems, Chalmers
+University of Technology, Gothenburg, Sweden, e-mail: {srikar.muppirisetty,
+henkw, tommy.svensson}@chalmers.se.
+This research was supported, in part, by the European Research Council,
+under Grant No. 258418 (COOPNET), and the Swedish Research Council VR
+under the project Grant No. 621-2009-4555 (Dynamic Multipoint Wireless
+Transmission).
+physical environment, including the locations of transmitter
+and receiver, play an important role. The received signal
+power in a wireless channel is mainly affected by three major
+dynamics, which occur at different length scales: path-loss,
+shadowing, and small-scale fading [9]. Small-scale fading
+decorrelates within tens of centimeters (depending on the
+carrier frequency), making it infeasible to predict based on
+location information. On the other hand, shadowing is cor-
+related up to tens of meters, depending on the propagation
+environment (e.g., 50–100 m for outdoor [9] and 1–2 m for in-
+door environments [10]). Finally, path-loss, which captures the
+deterministic decay of power with distance, is a deterministic
+function of the distance to the transmitter. In rich scattering
+environments, the measurements average small-scale fading
+either in frequency or space provided sufﬁcient bandwidth
+or number of antennas [10]. Thus, provided that measure-
+ments are dominated by large-scale fading, location-dependent
+models for path-loss and shadowing can be developed based
+on the physical properties of the wireless channel. With the
+help of spatial regression tools, these large-scale channel
+components can be predicted at other locations and used for
+resource allocation [1]. However, since localization is subject
+to various error sources (e.g., the global positioning system
+(GPS) gives an accuracy of around 10 m [11] in outdoor
+scenarios, while ultra-wide band (UWB) systems can give sub-
+meter accuracy), there is a fundamental need to account for
+location uncertainties when developing spatial regression tools.
+Spatial
+regression
+tools
+generally
+comprise
+a
+train-
+ing/learning phase, in which the underlying channel param-
+eters are estimated based on the available training database,
+and a testing/prediction phase, in which predictions are made
+at test locations, given learned parameters and the training
+database. Among such tools, Gaussian processes (GP) is a
+powerful and commonly used regression framework, since it
+is generally considered to be the most ﬂexible and provides
+prediction uncertainty information [12]. Two important limita-
+tions of GP are its computational complexity [13]–[16] and its
+sensitivity to uncertain inputs [14], [17]–[21]. To alleviate the
+computational complexity, various sparse GP techniques have
+been proposed in [13]–[15], while online and distributed GP
+were treated in [16], [22], [23] and [24]–[26], respectively. The
+impact of input uncertainty was studied in [17], [18], which
+showed that GP was adversely affected, both in training and
+testing, by input uncertainties. The input uncertainty in our
+case corresponds to location uncertainty.
+No framework has yet been developed to mathematically
+characterize and understand the spatial predictability of wire-
+less channels with location uncertainty. In this paper, we build
+
+on and adapt the framework from [17], [18] to CQM prediction
+in wireless networks. Our main contributions are as follows:
+• We show that not considering location uncertainty leads
+to poor learning of the channel parameters and poor
+prediction of CQM values at other locations, especially
+when location uncertainties are heterogeneous;
+• We relate and unify existing GP methods that account
+for uncertainty during both learning and prediction, by
+operating directly on an input set of distributions, rather
+than an input set of locations;
+• We describe and delimit proper choices for mean func-
+tions and covariance functions in this uniﬁed framework,
+so as to incorporate location uncertainty in both learning
+and prediction; and
+• We demonstrate the use of the proposed framework for
+simulated data and apply it to a spatial resource allocation
+application.
+The remainder of the paper is structured as follows. Section III
+presents the channel model and details the problem descrip-
+tion for location-dependent channel prediction with location
+uncertainty. In Section IV, we review channel learning and
+prediction in the classical GP (cGP) setup with no localization
+errors. Section V details learning and prediction procedures
+using the proposed GP framework that accounts for uncertainty
+on training and test locations, termed uncertain GP (uGP).
+Finally, numerical results are given in Section VI in addition
+to a resource allocation example, followed by our conclusions
+in Section VII.
+Notation: Vectors and matrices are written in bold (e.g.,
+a vector k and a matrix K); KT denotes transpose of K;
+|K| denotes determinant of K; [K]ij denotes entry (i, j) of
+K; I denotes identity matrix of appropriate size; 1 and 0 are
+vectors of ones and zeros, respectively, of appropriate size;
+∥.∥denotes L2-norm unless otherwise stated; E[.] denotes the
+expectation operator; Cov[.] denotes covariance operator (i.e.,
+Cov[y1, y2] = E[y1yT
+2 ]−E[y1] E[y2]T); N(x; m, Σ) denotes
+a Gaussian distribution evaluated in x with mean vector m
+and covariance matrix Σ and x ∼N(m, Σ) denotes that x is
+drawn from a Gaussian distribution with mean vector m and
+covariance matrix Σ. Important symbols used in the paper
+are: xi ∈R2 is an exact, true location; ui ∈RD, D > 2
+is a vector that describes (e.g., in the form of moments) the
+location distribution p(xi). For example in the case of Gaus-
+sian distributed localization error, p(x) = N(x; z, Σ), then a
+possible choice is u = [zT, vec[Σ]]T, where vec[Σ] stacks all
+the elements of Σ in a vector. Finally, zi = φ(ui) ∈R2 is
+a location estimate extracted from ui through a function φ(·)
+(e.g., the mean or mode).
+II. RELATED WORK
+First, we give an overview of the literature on GP with un-
+certain inputs. One way to deal with the input noise is through
+linearizing the output around the mean of the input [19], [21].
+In [21], the input noise was viewed as extra output noise by lin-
+earization at each point and this is proportional to the squared
+gradient of the GP posterior mean. However, the proposed
+method works under the condition of constant-variance input
+noise. In [19], a Delta method was used for linearization under
+the assumption of Gaussian distributed inputs and proposed
+a corrected covariance function that accounts for the input
+noise variance. For Gaussian distributed test inputs and known
+training inputs, the exact and approximate moments of the
+GP posterior was examined for various forms of covariance
+functions [18]. Training on Gaussian distributed input points
+by calculating the expected covariance matrix was studied in
+[17], [18]. Two approximations were evaluated in [27], ﬁrst a
+joint maximization of joint posterior on uncertain inputs and
+hyperparameters (leading to over-ﬁtting), and second using
+a stochastic expectation–maximization algorithm (at a high
+computational cost).
+We now review previous works on GP for channel pre-
+diction, which include spatial correlation of shadowing in
+cellular [28] and ad-hoc networks [29], as well as tracking
+of transmit powers of primary users in a cognitive network
+[23]. In [28], GP was shown to model spatially correlated
+shadowing to predict shadowing and path-loss at any arbi-
+trary location. A multi-hop network scenario was considered
+[29], and shadowing was modeled using a spatial loss ﬁeld,
+integrated along a line between transmitter and receiver. In
+[23], a cognitive network setting was evaluated, in which
+the transmit powers of the primary users were tracked with
+cooperation among the secondary users. For this purpose a
+distributed radio channel tracking framework using Kriged
+Kalman ﬁlter was developed with location information. A
+study on the impact of underlying channel parameters on the
+spatial channel prediction variance using GP was presented
+in [30]. A common assumption in [23], [28]–[30] was the
+presence of perfect location information. This assumption was
+partially removed in [31], which extends [30] to include the
+effect of localization errors on spatial channel prediction. It
+was found that channel prediction performance was degraded
+when location errors were present, in particular when either
+the shadowing standard deviation or the shadowing correlation
+were large. However, [31] did not tackle combined learning
+and prediction under location uncertainty. The only work that
+explicitly accounts for location uncertainty was [20], in which
+the Laplace approximation was used to obtain a closed-form
+analytical solution for the posterior predictive distribution.
+However, [20] did not consider learning of parameters in
+presence of location uncertainty.
+III. SYSTEM MODEL
+A. Channel Model
+Consider a geographical region A ⊆R2, where a source
+node is located at the origin and transmits a signal with power
+PTX to a receiver located at xi ∈A through a wireless
+propagation channel. The received radio signal is affected
+mainly by distance-dependent path-loss, shadowing due to
+obstacles in the propagation medium, and small-scale fading
+due to multipath effects. The received power PRX(xi) can be
+expressed as [32, Chap. 2]
+PRX(xi) = PTX g0 ∥xi∥−η ψ(xi) |h(xi)|2,
+(1)
+
+where g0 is a constant that captures antenna and other propa-
+gation gains, η is the path-loss exponent, ψ(xi) is the location-
+dependent shadowing and h(xi) is the small-scale fading. We
+assume measurements average1 small-scale fading, either in
+time (measurements taken over a time window), frequency
+(measurements represent average power over a large frequency
+band), or space (measurements taken over multiple antennas)
+[10], [33]. Therefore, the resulting received signal power from
+the source node to a receiver node i can be expressed in dB
+scale as
+PRX(xi)[dBm] = L0 −10 η log10(∥xi∥) + Ψ(xi),
+(2)
+where L0 = PTX[dBm] + G0 with G0 = 10 log10(g0) and
+Ψ(xi) = 10 log10(ψ(xi)). A common choice for modeling
+shadowing in wireless systems is through a log-normal distri-
+bution, i.e., Ψ(xi) ∼N(0, σ2
+Ψ), where σ2
+Ψ is the shadowing
+variance. Shadowing Ψ(xi) is spatially correlated, with well-
+established correlation models [34], among which the Gud-
+mundson model is widely used [35]. Let yi be the scalar2
+observation of the received power at node i, which is written
+as yi = PRX(xi)+ni, where ni is a zero mean additive white
+Gaussian noise with variance σ2
+n. For the sake of notational
+simplicity, we do not consider a three-dimensional layout,
+the impact of non-uniform antenna gain patterns, or distance-
+dependent path-loss exponents.
+B. Location Error Model
+In practice, nodes may not have access to their true location
+xi, but only to a distribution p(xi)3. The distribution p(xi) is
+obtained from the positioning algorithm in the devices, and
+depends on the speciﬁc positioning technology (e.g., for GPS
+the distribution p(xi) can be modeled as a Gaussian). We will
+assume that all distributions p(xi) come from a given family of
+distributions (e.g., all bivariate Gaussian distributions). These
+distributions can be described by a ﬁnite set of parameters,
+ui ∈RD, D > 2, e.g., a mean and a covariance matrix
+for Gaussian distributions. The set of descriptions of all
+distributions from the given family is denoted by U ⊂RD.
+Within this set, the set of all delta Dirac distributions over
+locations is denoted by X ⊂U. Note that X is equivalent
+to the set A of possible locations. Finally, we introduce a
+function φ : U →A that extracts a position estimate from
+the distribution (in our case chosen as the mean), and denote
+zi = φ(ui) ∈A. We will generally make no distinction
+between a distribution p(xi) and its representation ui.
+C. Problem Statement
+We assume a central coordinator, which collects a set
+of received power measurements y = [y1, . . . , yN]T with
+respect to a common source from N nodes, along with their
+corresponding location distributions U = [uT
+1 , uT
+2 , . . . , uT
+N]T.
+Our goals are to perform
+1If measurements cannot average over small-scale fading, the proposed
+framework from this paper cannot be applied.
+2Vector measurements are also possible (e.g., from multiple base stations),
+but not considered here for the sake of clarity.
+3p(xi) is used for p(x = xi) for notational simplicity.
+classical GP
+uncertain GP
+{Z, y}, z∗
+{U, y}, u∗
+Figure 1.
+High-level comparison between cGP and uGP. The inputs to cGP
+during learning are observations Y and estimates Z of the (unobserved) actual
+locations X where those observations have been taken. Z is obtained through
+a positioning system. The true locations X are marked with a triangle and are
+generally different from the estimated locations Z, marked with a blue and
+red dot. During prediction, cGP predicts received power at an estimated test
+location, z∗. In contrast, uGP considers the distribution of the locations X,
+described by U (and depicted by the red and blue circle), during learning.
+During prediction, uGP utilizes the distribution u∗of the test location. Note
+that the amount of uncertainty (radius of the circle) can change.
+1) Learning: construct a spatial model (through estimating
+model parameters θ, to be deﬁned later) of the received
+power based on the measurements;
+2) Prediction:
+determine
+the
+predictive
+distribution
+p(PRX(x∗)|y, U, ˆθ, x∗) of the power in test locations
+x∗and the distribution of the expected4 received power,
+p(PRX(u∗)|y, U, ˆθ, u∗), for test location distributions
+u∗.
+We will consider two methods for learning and prediction:
+classical GP (Section IV), which ignores location uncertainty
+and only considers zi = φ(ui), and uncertain GP (Section
+V), which is a method that explicitly accounts for loca-
+tion uncertainty. We introduce X = [xT
+1 , xT
+2 , . . . , xT
+N]T and
+Z = [zT
+1 , zT
+2 , . . . , zT
+N]T as the collection of true and estimated
+locations respectively. A high level comparison of cGP and
+uGP is shown in Fig. 1, where cGP operates on Z and Y,
+while uGP operates on U and Y.
+IV. CHANNEL PREDICTION WITH CLASSICAL GP
+We ﬁrst present cGP under the assumption that all locations
+during learning and prediction are known exactly, based on
+[12], [36]. Later in this section, we will discuss the impact
+of location uncertainties on cGP in learning/training and
+prediction/testing.
+A. cGP without Location Uncertainty
+We designate xi ∈A as the input variable, and PRX(xi)
+as the output variable. We model PRX(xi) as a GP with
+mean function µ(xi) : A →R and a positive semideﬁnite
+covariance function C(xi, xj) : A × A →R+, and we write
+PRX(xi) ∼GP(µ(xi), C(xi, xj)),
+(3)
+4Here, PRX(u∗) should be interpreted as the expected received power,
+p(PRX(u∗)|y, U, ˆθ, u∗) = R p(PRX(x∗)|y, U, ˆθ, x∗)p(x∗)dx∗, where
+p(x∗) is described by u∗
+
+where GP stands for a Gaussian process. The mean func-
+tion5 is deﬁned as µ(xi) =
+EΨ(xi)[PRX(xi)]
+= L0 −
+10 η
+log10(∥xi∥), due to (2). The covariance function is
+deﬁned as C(xi, xj) = Cov[PRX(xi), PRX(xj)]. We will
+consider a class of covariance functions of the form:
+C(xi, xj) = σ2
+Ψ exp
+
+−∥xi −xj∥p
+d p
+c
+
++ δij σ2
+proc,
+(4)
+where δij = 1 for i = j and zero otherwise, p ≥1, dc is
+the correlation distance of the shadowing, and σproc captures
+any noise variance term that is not due to measurement noise
+(more on this later). Setting p = 1 in (4), gives the exponential
+covariance function that is commonly used to describe the
+covariance properties of shadowing [35], and p = 2, gives the
+squared exponential covariance function that will turn out to
+be useful in Section V.C. Note that the mean and covariance
+depend on
+θ = [σn, σproc, dc, L0, η, σΨ],
+(5)
+which may not be known a priori.
+1) Learning: The objective during learning is to infer the
+model parameters θ from observations y of the received power
+at N known locations X. The resulting training database is
+thus {X, y}. Due to the GP model, the joint distribution of
+the N training observations exhibits a Gaussian distribution
+p(y|X, θ)=N(y; µ(X), K),
+(6)
+where µ(X)
+= [µ(x1), µ(x2), . . . , µ(xN)]T is the mean
+vector and K is the covariance matrix of the measured
+received powers, with entries [K]ij = C(xi, xj)+ σ2
+n δij. The
+model parameters can be learned through maximum likelihood
+estimation, given the training database {X, y}, by minimizing
+the negative log-likelihood function with respect to θ:
+ˆθ = arg min
+θ {−log(p(y|X, θ))}.
+(7)
+The negative log-likelihood function is usually not convex and
+may contain multiple local optima. Additional details on the
+learning process are provided later. Once ˆθ is determined from
+{X, y}, the training process is complete.
+2) Prediction: After learning, we can determine the pre-
+dictive distribution of PRX(x∗) at a new and arbitrary test
+location x∗, given the training database {X, y} and ˆθ. We
+ﬁrst form the joint distribution
+
+y
+PRX(x∗)
+
+∼N
+ µ(X)
+µ(x∗)
+
+,
+ K
+k∗
+kT
+∗
+k∗∗
+
+,
+(8)
+where k∗is the N × 1 vector of cross-covariances C(x∗, xi)
+between the received power at x∗and at the training locations
+xi, and k∗∗= C(x∗, x∗) is the prior variance (i.e., the
+variance in the absence of measurements), given by C(x∗, x∗).
+Conditioning on the observations y, we obtain the Gaussian
+posterior distribution p(PRX(x∗)|X, y, ˆθ, x∗) for the test lo-
+cation x∗. The mean ( ¯PRX(x∗)) and variance (VRX(x∗)) of
+5Other ways of including the mean function in the model are possible, such
+as to include it in the covariance structure, and transform the prior model to
+a zero-mean GP prior [12].
+Distance from BS in m
+Received power in dBm
+0
+50
+100
+150
+200
+−80
+−70
+−60
+−50
+−40
+−30
+−20
+−10
+Figure 2.
+Impact of location uncertainty for a one-dimensional example:
+the red curve depicts the received signal power PRX(x) as a function of x
+(or equivalently, the distance to the base station), while the markers show
+PRX(xi) as a function of zi = φ(ui). Training measurements are grouped
+into three regions: (+) corresponds to high uncertainty, (·) corresponds to
+low uncertainty, and (*) corresponds to medium uncertainty, respectively. The
+location uncertainty results in output noise.
+this distribution turn out to be [12]
+¯PRX(x∗) =µ(x∗) + kT
+∗K−1 (y −µ(X))
+(9)
+=µ(x∗) +
+N
+X
+i,j=1
+[K−1]ij (yj −µ(xj)) C(x∗, xi)
+=µ(x∗) +
+N
+X
+i=1
+βi C(x∗, xi).
+VRX(x∗) =k∗∗−kT
+∗K−1 k∗
+(10)
+=k∗∗−
+N
+X
+i,j=1
+[K−1]ij C(x∗, xi) C(x∗, xj),
+where βi = PN
+j=1[K−1]ij(yj −µ(xj)). In (9), µ(x∗) cor-
+responds to the deterministic path-loss component at x∗,
+which is corrected by a term involving the database and the
+correlation between the measurements at the training locations
+and the test location. In (10), we see that the prior variance
+k∗∗is reduced by a term that accounts for the correlation of
+nearby measurements.
+B. cGP with Location Uncertainty
+Now let us consider the case when the nodes do not have
+access to their true location xi, but only to a distribution p(xi),
+which is described by ui ∈U. Fig. 2 illustrates the impact of
+location uncertainties assuming Gaussian location errors for
+a one-dimensional example. The ﬁgure shows (in red) the
+true received power PRX(x) as a function of x as well as
+the measured power PRX(xi) as a function of zi = φ(ui)
+for a discrete number of values of u, shown as markers. To
+clearly illustrate the impact of different amounts on uncertainty
+on the position, we have artiﬁcially created three regions:
+high location uncertainty close to the transmitter, medium
+
+location uncertainty far away, and low location uncertainty for
+intermediate distances. When there is no location uncertainty
+(70 m until 140 m from the transmitter), zi
+≈xi, so
+PRX(zi) ≈PRX(xi), and hence the black dots coincide
+with the red curve. For medium and high uncertainty, zi can
+differ signiﬁcantly from xi, so the data point with coordinates
+[zi, PRX(xi)] can lie far away from the red curve, especially
+for high location uncertainty (distances below 70 m). From
+Fig. 2 it is clear that the input uncertainty manifests itself
+as output noise, with a variance that grows with increasing
+location uncertainty6. This output noise must be accounted
+for in the model during learning and prediction. When these
+uncertainties are ignored, both learning and prediction will be
+of poor quality, as described below.
+1) Learning from uncertain training locations: In this case,
+the training database {Z, y} comprises locations zi = φ(ui)
+and power measurements yi = PRX(xi) + ni at the true (but
+unknown) locations xi. The measurements will be of the form
+shown in Fig. 2. The estimated model parameters ˆθ can take
+two forms: (i) assign very short correlation distances ˆdc, large
+ˆσΨ, and small ˆσproc, as some seemingly nearby events will
+appear uncorrelated: or (ii) assign larger correlation distances
+ˆdc, smaller ˆσΨ, and explain the measurements by assigning
+a higher value to ˆσproc [21]. In the ﬁrst case, correlations
+between measurement cannot be exploited, so that during
+prediction, the posterior mean will be close to the prior mean
+and the posterior variance will be close to the prior variance.
+In the second case, predictions will be better, as correlations
+can be exploited to reduce the posterior variance. However, the
+model must explain different levels of input uncertainty with
+a single covariance function, which can make no distinctions
+between locations with low, medium, or high uncertainty. This
+will lead to poor performance when location error statistics
+differ from node to node.
+2) Prediction at an uncertain test location: In the case
+where training locations are exactly known (i.e., zi = xi, ∀i),
+we may want to predict the power at an uncertain test location
+u∗, made available to cGP in the form z∗= φ(u∗), while the
+true test location x∗is not known. This scenario can occur
+when a mobile user relies on a low-quality localization system
+and reports an erroneous location estimate to the base station.
+The wrong location has impact on the predicted posterior
+distribution since the predicted mean µ(z∗) will differ from
+the correct mean µ(x∗). In addition, k∗will contain erroneous
+entries: the j-th entry will be too small when ∥z∗−xj∥>
+∥x∗−xj∥and too large when ∥z∗−xj∥< ∥x∗−xj∥. This
+will affect both the posterior mean (9) and variance (10). In the
+case were training locations are also unknown, i.e., Z ̸= X,
+and z∗̸= x∗, these effects are further exacerbated by the
+improper learning of θ.
+V. CHANNEL PREDICTION WITH UNCERTAIN GP
+In the previous section, we have argued that cGP is unable
+to learn and predict properly when training or test locations are
+6In fact, the output noise induced by location uncertainty will also depend
+on the slope of PRX(xi) around xi, since a locally ﬂat function will lead to
+less output noise than a steep function, under the same location uncertainty.
+not known exactly, especially when location error statistics are
+heterogeneous. In this section, we explore several possibilities
+to explicitly incorporate location uncertainty. We recall that
+U denotes the set of all distributions over the locations in
+the environment A, while X ⊂U represents the delta Dirac
+distributions over the positions and has a one-to-one mapping
+to A.
+We will describe three approaches. First, a Bayesian ap-
+proach where the uncertain input (i.e., the uncertain location)
+is marginalized, leading to a non-Gaussian output (i.e., the
+received power) distribution. Second, we derive a Gaussian
+approximation of the output distribution through moment
+matching and detail the corresponding learning and prediction
+expressions. From these expressions, the concepts of expected
+mean function and expected covariance function naturally
+appear. Finally, we discuss uncertain GP, which is a Gaussian
+process with input u from input set U and output y. We
+will relate these three approaches in a uniﬁed view. For
+each approach, we detail the quality of the solution and
+the computational complexity. We note that other approaches
+exist, e.g., through linearizing the output around the mean of
+the input [19], [21], but they are limited to mildly non-linear
+scenarios.
+A. Bayesian Approach
+In a Bayesian context, we learn and predict by integrating
+the respective distributions over the uncertainty of the training
+and test locations. As this method will involve Monte Carlo
+integration, we will refer to it as Monte Carlo GP (MCGP).
+1) Learning: Given the training database {U, y}, the like-
+lihood function with uncertain training locations p(y|U, θ) is
+obtained by integrating7 p(y|X, θ) over the random training
+locations:
+p(y|U, θ) =
+Z
+p(y|X, θ) p(X) dX,
+(11)
+where p(X) = QN
+i=1 p(xi). As there is generally no closed-
+form expression for the integral (11), we resort to a Monte
+Carlo approach by drawing M i.i.d. samples X(m) ∼p(X),
+1 ≤m ≤M so that
+p(y|U, θ) ≈1
+M
+M
+X
+m=1
+p(y|X(m), θ)
+= 1
+M
+M
+X
+m=1
+N(y; µ(X(m)), K(m)),
+(12)
+where [K(m)]ij = C(x(m)
+i
+, x(m)
+j
+) + σ2
+n δij and µ(X(m)) =
+[µ(x(m)
+1
+), µ(x(m)
+2
+), . . . , µ(x(m)
+N )]T. Finally, an estimate of θ
+can be found by minimizing the negative log-likelihood func-
+tion
+ˆθ = arg min
+θ {−log(p(y|U, θ))},
+(13)
+which has to be solved numerically.
+7For the sake of notation, all integrals in this section are written as
+indeﬁnite integrals, however they should be understood as deﬁnite integrals
+over appropriate sets.
+
+Remark 1. This optimization involves high computational
+complexity and possibly numerical instability (due to the sum
+of exponentials). More importantly, a good estimate of θ can
+only be found if a sample X(m) is generated that is close
+to the true locations X. Due to the high dimensionality [37,
+Section 29.2], this is unlikely, even for large M. Hence, (13)
+will lead to poor estimates of ˆθ.
+2) Prediction: Given the training database {U, y} and
+ˆθ,
+we
+wish
+to
+determine
+p(PRX(u∗)|U, y, ˆθ, u∗)
+for
+an
+uncertain
+test
+location
+with
+associated
+distribution
+p(x∗), described by u∗. The posterior predictive distri-
+bution p(PRX(u∗)|U, y, ˆθ, u∗) is obtained by integrating
+p(PRX(x∗)|X, y, ˆθ, x∗) with respect to X and x∗:
+p(PRX(u∗)|U, y, ˆθ, u∗)
+=
+Z
+p(PRX(x∗)|X, y, ˆθ, x∗) p(X) p(x∗) dX dx∗.
+(14)
+This integral is again analytically intractable. The Laplace
+approximation was utilized in [20] to solve (14), while here
+we again resort to a Monte Carlo method by drawing M
+i.i.d. samples X(m) ∼p(X) and x(m)
+∗
+∼p(x∗), so that
+p(PRX(u∗)|U, y, ˆθ, u∗)
+≈1
+M
+M
+X
+m=1
+p(PRX(x(m)
+∗
+)|X(m), y, ˆθ, x(m)
+∗
+)
+= 1
+M
+M
+X
+m=1
+N(PRX(x(m)
+∗
+); ¯PRX(x(m)
+∗
+), VRX(x(m)
+∗
+)).
+(15)
+As M increases, the approximate distribution will tend to the
+true distribution. We refer to (13) and (15) as Monte Carlo GP
+(MCGP). From (15), we can compute the mean ( ¯P MC
+RX (u∗))
+and the variance (V MC
+RX (u∗)) [38, Eq. (14.10) and Eq. (14.11)]
+as
+¯P MC
+RX (u∗) = 1
+M
+M
+X
+m=1
+¯PRX(x(m)
+∗
+)
+(16)
+V MC
+RX (u∗) = 1
+M
+M
+X
+m=1
+
+¯PRX(x(m)
+∗
+) −¯P MC
+RX (u∗)
+2
++ 1
+M
+M
+X
+m=1
+VRX(x(m)
+∗
+).
+(17)
+Remark 2. Prediction is numerically straightforward, though
+it involves the inversion of an N × N matrix K for each
+of the M samples X(m). In the case training locations are
+known, we can utilize cGP to obtain a good estimate of θ and
+efﬁciently and accurately compute ¯P MC
+RX (u∗) and V MC
+RX (u∗).
+When both training and test locations are known, the above
+procedure reverts to cGP.
+B. Gaussian Approximation
+We have seen that while MCGP can account for location
+uncertainty during prediction, it will fail to deliver adequate
+estimates of θ during learning (see Remark 1). To address this,
+we can modify p(y|U, θ) from (11) using a Gaussian approx-
+imation through moment matching. In addition, we can also
+form a Gaussian approximation of p(PRX(u∗)|U, y, ˆθ, u∗)
+for prediction. We will term this approach Gaussian ap-
+proximation GP (GAGP). The expressions that are obtained
+in the learning of GAGP, namely the expectation of mean
+and covariance functions will be used later in the design of
+uncertain GP (described in Section V.C).
+1) Learning: Given the training database {U, y}, the mean
+of p(y|U, θ) is given by
+E[y|U, θ] =
+ZZ
+y p(y|X, θ) p(X) dX dy
+=
+ZZ
+(y p(y|X, θ) dy) p(X) dX
+=
+Z
+µ(X) p(X) dX
+= µ(U),
+(18)
+where µ(U) = [µ(u1), µ(u2), . . . , µ(uN)]T and µ(ui) =
+R
+µ(xi) p(xi) dxi. The covariance matrix of p(y|U, θ) can
+be expressed as
+Cov[y, y|U, θ]
+=
+Z
+yyT p(y|X, θ) p(X) dX dy −µ(U)µ(U)T
+=
+Z  K + µ(X)µ(X)T
+p(X) dX −µ(U)µ(U)T
+= Ku + ∆,
+(19)
+where [Ku]ij = Cu(ui, uj) + σ2
+n δij in which
+Cu(ui, uj) =
+Z
+C(xi, xj) p(xi) p(xj) dxi dxj
+(20)
+and ∆is a diagonal matrix with entries
+[∆]ii =
+Z
+µ2(xi)p(xi) dxi −µ2(ui).
+(21)
+We will refer to µ(ui) and Cu(ui, uj) as the expected mean
+and expected covariance function. We can now express the
+likelihood function as p(y|U, θ)≈N(y; µ(U), Ku + ∆), so
+that θ can be estimated by minimizing the negative log-
+likelihood function
+ˆθ = arg min
+θ
+n
+−log(N(y; µ(U), Ku + ∆))
+o
+.
+(22)
+Remark 3. Learning in GAGP involves computation of the
+expected mean in (18) and (21), as well as the expected
+covariance function in (20). These integrals are generally again
+intractable, but there are cases where closed-form expression
+exist [17], [18]. These will be discussed in detail in Section
+V.C. GAGP avoids the numerical problems present in MCGP
+and will hence generally be able to provide a good estimate
+of θ.
+2) Prediction:
+Given
+the
+training
+database
+{U, y}
+and
+ˆθ,
+we
+approximate
+the
+predictive
+distribution
+p(PRX(u∗)|U, y, ˆθ, u∗) by a Gaussian with mean ¯P GA
+RX (u∗)
+
+and variance V GA
+RX (u∗). These are given by
+¯P GA
+RX (u∗)
+= E[PRX(u∗)|U, y, ˆθ, u∗]
+=
+Z
+¯PRX(x∗) p(X) p(x∗) dX dx∗
+= µ(u∗) +
+N
+X
+i=1
+Z
+βi C(x∗, xi) p(X) p(x∗) dX dx∗.
+(23)
+Note that βi is itself a function of all X’s and x∗. Similarly
+V GA
+RX (u∗) is calculated as
+V GA
+RX (u∗)
+= E[P 2
+RX(u∗)|U, y, ˆθ, u∗] −¯P GA
+RX (u∗)2
+(24)
+=
+Z 
+VRX(x∗) + ¯PRX(x∗)2
+p(X) p(x∗) dX dx∗
+−¯P GA
+RX (u∗)2.
+(25)
+Note that both ¯PRX(x∗) and VRX(x∗) are functions of X (see
+(9)–(10)).
+Remark 4. Prediction in GAGP requires complex integrals
+to be solved in (23)–(25) for which no general closed-form
+expressions are known. Hence, a reasonable approach is to
+use GAGP to learn ˆθ and MCGP for prediction.
+Remark 5. In case training locations are known, i.e., U ∈X,
+(23) reverts to
+¯P GA
+RX (u∗) = µ(u∗) +
+N
+X
+i=1
+βi
+Z
+C(x∗, xi) p(x∗) dx∗
+(26)
+and (25) becomes
+V GA
+RX (u∗)
+= k∗∗−
+N
+X
+i,j=1
+[K−1]ij
+Z
+C(x∗, xi) C(x∗, xj) p(x∗) dx∗
++
+Z
+µ(x∗)2 p(x∗) dx∗+ 2
+N
+X
+i=1
+βi
+Z
+µ(x∗) C(x∗, xi)
+× p(x∗) dx∗
+
++
+N
+X
+i,j=1
+βiβj
+Z
+C(x∗, xi) C(x∗, xj) p(x∗) dx∗
+−¯P GA
+RX (u∗)2,
+(27)
+both of which can be computed in closed form, under some
+conditions, when µ(x) is constant in x [18, Section 3.4]. When
+both U ∈X and u∗∈X, GAGP reverts to cGP.
+C. Uncertain GP
+While GAGP avoids the learning problems inherent to
+MCGP, prediction is generally intractable. Hence, GAGP is
+not a fully coherent approach to deal with location uncertainty.
+To address this, we consider a new type of GP (uGP), which
+operates directly on the location distributions, rather than
+on the locations. uGP involves a mean function µuGP(ui) :
+U
+→R and a positive semideﬁnite covariance function
+CuGP(ui, uj) : U × U →R+, which considers as inputs
+u ∈U and as outputs y ∈R. In other words,
+PRX(ui) ∼GP(µuGP(ui), CuGP(ui, uj)).
+(28)
+The
+mean
+function
+is
+given
+by
+µuGP(ui)
+=
+Exi[EΨ(xi)[PRX(xi)]], already introduced as the expected
+mean function in (18). However, for the mean function to
+be useful in a GP context, it should be available in closed
+form. As in cGP, we have signiﬁcant freedom in our choice
+of covariance function. Apart from all technical conditions
+on the covariance function as described in [12], it is desirable
+to have a covariance function that (i) is available in closed
+form; (ii) leads to decreasing correlation with increasing input
+uncertainty (even when both inputs have same mean); (iii)
+can account for varying amounts of input uncertainty; (iv)
+reverts to a covariance function of the form (4) when u ∈X,
+(v) does not depend on the mean function µ(x). We will
+now describe the mean function µuGP(ui) and covariance
+function CuGP(ui, uj) in detail.
+The mean function: According to law of iterated expecta-
+tions, the mean function µ(ui) is expressed as
+µ(ui) = L0 −10 η Exi[log10(∥xi∥)].
+(29)
+While there is no closed-form expression available for (29),
+we can form a polynomial approximation PJ
+j=0 aj∥xi∥j ≈
+log10(∥xi∥), where the coefﬁcients aj are found by least
+squares minimization. For a given range of ∥xi∥, this approxi-
+mation can be made arbitrarily close by increasing the order J.
+When p(∥xi∥) is approximately Gaussian (which may be the
+case for ∥xi∥≫0), µ(ui) ≈L0 −10 η PJ
+j=0 aj Exi[∥xi∥j]
+can be evaluated in closed form, since all Gaussian moments
+are known. See Appendix A for details on the approximation.
+The covariance function: While any covariance function
+meeting the criteria (i)–(v) listed above can be chosen, a
+natural choice is (see Section IV.A)
+CuGP(ui, uj) = Cov[PRX(xi), PRX(xj)|ui, uj]
+= Cov[yi, yj|U, θ] −δijσ2
+n.
+(30)
+Unfortunately, as we can see from (19), this choice does not
+satisfy criterion (v). An alternative choice is the expected
+covariance function Cu(ui, uj) from (20). This choice clearly
+satisﬁes criteria (ii), (iii), (iv), and (v). To satisfy (i), we
+can select appropriate covariance functions, tailored to the
+distributions p(xi), or appropriate distributions p(xi) for a
+given covariance function. Examples include:
+• Polynomial covariance functions for Gaussian p(xi) [17],
+[18].
+• Covariance functions of the form (4) with p = 1, xi ∈R,
+for Laplacian p(xi).
+• Covariance functions of the form (4) with p = 2, xi ∈R2,
+for Gaussian p(xi) (i.e., p(xi) = N(xi; zi, Σi)). The
+expected covariance function is then given by [17], [18]
+CuGP(ui, uj) = Cu(ui, uj) = δij σ2
+proc
+(31)
++ σ2
+Ψ
+I + d−2
+c (Σi + Σj)(1 −δij)
+
+−1/2
+× exp
+
+−1
+d2c
+(zi −zj)T(I + d−2
+c (Σi + Σj))−1(zi −zj)
+
+.
+
+Note that the factor |I + d−2
+c (Σi + Σj)(1 −δij)|−1/2
+ensures that inputs i ̸= j with the same mean (i.e.,
+zi = zj) exhibit lower correlation with increasing un-
+certainty. The factor (I + d−2
+c (Σi + Σj))−1 ensures that
+the measurements taken at locations with low uncertainty
+(smaller than dc) can be explained by a large value of
+dc, while for measurements taken at locations with high
+uncertainty, Cu(ui, uj) will be small and decreasing with
+increasing uncertainty.
+1) Learning:
+Given the training database {U, y} and
+choosing µuGP(ui) = µ(ui) and CuGP(ui, uj) = Cu(ui, uj),
+the model parameters are found by minimizing the log-
+likelihood function
+ˆθ = arg min
+θ {−log(p(y|U, θ)}
+= arg min
+θ {−log(N(y; µ(U), Ku)}.
+(32)
+Note that in contrast to GAGP, we have constructed uGP
+so that µ(U) and Ku are available in closed form, making
+numerical minimization tractable.
+Remark 6. Learning of uGP (32) corresponds to the case of
+learning (22) in GAGP for ∆= 0 (e.g., for constant mean
+processes).
+2) Prediction: Let ¯PRX(u∗) be the mean and VRX(u∗)
+be the variance of the posterior predictive distribution
+p(PRX(u∗)|U, y, ˆθ, u∗)
+of
+uGP
+with
+uncertain
+training
+and
+test
+locations,
+then
+p(PRX(u∗)|U, y, ˆθ, u∗)
+=
+N(PRX(u∗); ¯PRX(u∗), VRX(u∗)).
+The
+expressions
+for
+¯PRX(u∗) and VRX(u∗) are now in standard GP form:
+¯PRX(u∗) = µ(u∗) + kT
+u∗K−1
+u (y −µ(U))
+(33)
+VRX(u∗) = ku∗∗−kT
+u∗K−1
+u ku∗,
+(34)
+where ku∗is the N ×1 vector of cross-covariances Cu(u∗, ui)
+between the received power at the test distribution u∗and at
+the training distribution ui, and ku∗∗is the a priori variance
+Cu(u∗, u∗).
+Remark 7. In case the training locations are known, i.e.,
+U ∈X, the mean ¯PRX(u∗) and the variance VRX(u∗) can be
+obtained from the expressions (33) and (34), respectively, by
+setting Σi = 0, ∀i ∈{1, 2, . . ., N}. Furthermore, the resulting
+mean ¯PRX(u∗) is exactly the same as (26), obtained in GAGP.
+However, due to a different choice of covariance function, the
+predicted variance VRX(u∗) is different from (27).
+Remark 8. When the test location is known, i.e., u∗∈X, the
+mean ¯PRX(x∗) and the variance VRX(x∗) are obtained from
+(33) and (34) by setting Σ∗= 0.
+D. Uniﬁed View
+We are now ready to recap the main differences between
+cGP and uGP, and to provide a uniﬁed view of the four
+methods (cGP, MCGP, GAGP, and uGP). Fig. 3 describes the
+main processes in uGP and cGP, along with the inputs and
+outputs during the learning and prediction processes. The four
+methods are depicted in Fig. 4: all four methods revert to cGP
+when training and predictions occur in X, i.e., when there is
+no uncertainty about the locations. MCGP is able to consider
+{zi = φ(ui), yi}N
+i=1
+ˆθ
+{zi = φ(ui), yi}N
+i=1
+z∗= φ(u∗)
+( ¯
+PRX(z∗), VRX(z∗))
+( ¯
+PRX(u∗), VRX(u∗))
+u∗
+{ui, yi}N
+i=1
+{ui, yi}N
+i=1
+ˆθ
+Learn
+Learn
+Predict
+Predict
+cGP
+uGP
+Database
+{ui, yi}N
+i=1
+Figure 3.
+Learning and prediction phases of cGP and uGP. The difference in
+learning in uGP compared to cGP is that it considers location uncertainty
+of the nodes. The estimated model parameters ˆθ are derived during the
+learning phase and are generally different in cGP compared to uGP. The
+mean ¯PRX(z∗) and variance VRX(z∗) of the posterior predictive distribution
+in cGP corresponds to a location z∗extracted from u∗, which in turn
+represents p(x∗). In contrast, the mean ¯PRX(u∗) and variance VRX(u∗)
+of the posterior predictive distribution in uGP pertains to the entire location
+distribution represented by u∗.
+U
+X
+Gaussian output dist.
+all output dist.
+cGP
+φ
+MCGP
+GA
+GAGP
+uGP
+input set
+output set
+Figure 4.
+Relation between cGP, MCGP, GAGP, and uGP. All methods are
+equivalent when the input is limited to X (grey shaded area).
+general input distributions in U, but leads to non-Gaussian
+output distributions. Through a Gaussian approximation of
+these output distributions, GAGP can consider general inputs
+and directly determine a Gaussian output distribution. Both
+of these approaches (MCGP and GAGP) have in common
+that they treat the process with input x ∈A as a GP. In
+contrast, uGP treats the process with input u ∈U as a GP.
+This allows for a direct mapping from inputs in U to Gaussian
+output distributions. In terms of tractability for learning and
+prediction, the four methods are compared in Table I. We see
+that among all four methods, uGP combines tractability with
+good performance.
+VI. NUMERICAL RESULTS AND DISCUSSION
+In this section, we show learning and prediction results
+of cGP, uGP, and MCGP with uncertainty in training or test
+
+Table I
+COMPARISON OF TRACTABILITY FOR CGP, MCGP, GAGP, AND UGP IN
+LEARNING AND PREDICTION.
+Method
+Learning
+Prediction
+cGP
+tractable, poor quality
+closed-form, poor quality
+MCGP
+complex, poor quality
+tractable
+GAGP
+tractable in some cases
+intractable
+uGP
+tractable by design
+closed-form
+locations. In Section VI.D, we describe a resource allocation
+problem, where communication rates are predicted at future
+locations using cGP and uGP, in the presence of location
+uncertainty during training. The numerical analysis carried
+in this section is based on simulated channel measurements
+according to the model outlined in Section III.
+Table II
+SIMULATION PARAMETERS
+Parameter
+Value
+η
+2.5
+σn
+0.01
+dc
+15 m
+Parameter
+Value
+M
+300
+L0
+-10 dBm
+σΨ
+10 dB
+A. Simulation Setup
+A geographical region A is considered and a base station
+is placed at the origin. A one dimensional radio propaga-
+tion ﬁeld is generated with sampling locations at a reso-
+lution of 0.25 m using an exponential covariance function
+Cref(xi, xj) = σ2
+Ψ exp
+
+−∥xi −xj∥/dc
+
+, corresponding to
+the Gudmundson model. Small-scale fading is assumed to
+have been averaged out8. The simulation parameters used to
+obtain the numerical results are given in Table II. We assume
+isotropic localization errors, so that Σi = σ2
+i I. To capture the
+effect of heterogeneous location errors, we draw the location
+error standard deviations from an exponential distribution,
+i.e., σi
+i.i.d.
+∼
+Exp(λ), where λ is the average location error
+standard deviation. For cGP and MCGP, in order to not provide
+any unfair advantage to uGP, we use a covariance function
+of the form (4) with p = 1, in order to match the true
+covariance function Cref(xi, xj). For uGP, we use (31). Since
+uGP exhibits a mismatch in the covariance function, we absorb
+this mismatch in σproc, which is learned ofﬂine (more on this
+in Appendix B). We assume nodes know σn and L0, which
+be inferred using standard methods [36], [39], [40], so they
+are not included in the learning process.
+B. Learning Under Location Uncertainty
+Fig. 5 depicts the impact of location uncertainty on the
+learning of hyperparameters [dc, σΨ, σproc, η] for cGP, uGP,
+and MCGP. The learning of the hyperparameters is detailed in
+Appendix B.
+8In the case small-scale fading is not averaged out, the proposed framework
+cannot be applied.
+1) cGP: We ﬁrst consider a variant of cGP, denoted as
+cGP-no-proc, in which σproc is ﬁxed to zero. In cGP-no-proc,
+when λ = 0, the estimate ˆdc is non-zero. However, it can be
+observed in Fig. 5 (a), that with increase in λ, ˆdc decreases
+quickly to zero. Hence, cGP-no-proc will model the GP as a
+white process with high variance ˆσ2
+Ψ and thus cannot handle
+the location uncertainty. On the other hand, in cGP where we
+estimate σproc, ˆσproc absorbs part of location uncertainty (see
+Fig. 5 (c)). Consequently, the part of the observations that must
+be explained through σΨ is reduced, leading to a reduction
+of ˆσΨ with λ. Due to this, cGP considers the measurements
+constitute a slowly varying process, therefore ˆdc increases with
+λ. An interesting observation is that the error bars for ˆdc also
+increase with λ. Hence, among cGP-no-proc and cGP, only
+cGP can reasonably deal with location uncertainty.
+2) MCGP: The behavior is similar to that of cGP, i.e.,
+an increase in ˆdc, and a decrease in ˆσΨ, when increasing λ.
+However, ˆσΨ decreases more quickly with λ when compared
+to cGP. These effects can be attributed to two causes: ﬁrst
+of all, the inherent problem of drawing a ﬁnite number of
+samples as detailed at the end of Section V.A1; secondly,
+the ﬂuctuations in the estimated path loss exponent ˆη with
+increasing λ (see Fig. 5 (d)). The error bars of the estimates
+in this case are even higher than in cGP. As expected, MCGP
+is not suitable for learning.
+3) uGP: As mentioned before, in uGP σproc is determined
+ofﬂine. The uGP model has the capability to absorb the
+location uncertainty into the covariance function. Due to this
+ﬂexibility, it can handle higher values of λ and still maintain
+an almost constant ˆdc and ˆσΨ with increase in λ. For fair
+comparison with cGP, we also consider the case where σproc
+is estimated as part of the learning, referred to as uGP-proc.
+It can be observed in Fig. 5 (c) that ˆσproc increases with
+increase in λ. When comparing uGP-proc to uGP, we observe
+a lower value of ˆσΨ and higher values of ˆdc and ˆσproc for a
+particular value of λ. From this, we conclude that uGP should
+be preferred over uGP-proc, as it can explain the observations
+with smaller ˆσproc and leads to simpler optimization. Finally,
+note that the error bars of the uGP estimates are relatively
+small when compared to cGP.
+C. Prediction Under Location Uncertainty
+Four cases can be considered, depending on whether train-
+ing or testing inputs are in X or U. We will focus on the case
+where either training or test locations are uncertain, but not
+both. From these, the behavior when both training and testing
+inputs are in U can be easily understood: only uGP can give
+reasonable performance among cGP, MCGP, and uGP, as the
+estimates of θ in cGP and MCGP are of poor quality.
+1) Uncertain training locations and certain testing loca-
+tions: In this case ui ∈U and u∗∈X. Fig. 6 (a) depicts
+the prediction results in terms of the predictive mean and
+predictive standard deviation (shown as shaded areas) for a
+particular realization of the channel ﬁeld. It can be observed
+that uGP is able to predict the received power comparatively
+better than cGP and MCGP. uGP is able to estimate the under-
+lying channel parameters better with the expected covariance
+
+Average location error standard deviation λ in m
+ˆdc
+0
+2
+4
+6
+8
+10
+10
+20
+30
+40
+50
+(a)
+Average location error standard deviation λ in m
+ˆσΨ
+0
+2
+4
+6
+8
+10
+4
+6
+8
+10
+12
+14
+(b)
+Average location error standard deviation λ in m
+ˆσproc
+0
+2
+4
+6
+8
+10
+0
+2
+4
+6
+8
+10
+(c)
+Average location error standard deviation λ in m
+ˆη
+0
+2
+4
+6
+8
+10
+2.2
+2.4
+2.6
+2.8
+3
+3.2
+3.4
+3.6
+(d)
+cGP
+cGP-no-proc
+uGP
+uGP-proc
+MCGP
+Figure 5.
+Impact of location uncertainty on learning the hyperparameters using cGP, uGP, and MCGP. The hyperparameters are estimated for each value of
+the mean location error standard deviation and for 40 realizations of the channel ﬁeld. Results shown are the mean estimate of the hyperparameters and error
+bars with one standard deviation. Impact of location uncertainty in shown when estimating: (a) dc, (b) σΨ, (c) σproc, (d) η.
+function, which takes in to account the location uncertainty of
+the nodes. In turn, this means that uGP can track the faster
+variations in the channel. cGP tries to model the true function
+with a slow varying process due to very high ˆdc. Furthermore,
+cGP has higher uncertainty in predictions due to high ˆσproc
+(see Fig. 5 (c)). On the other hand, MCGP has slightly better
+prediction performance (the standard deviation is not shown,
+but is slightly smaller than for cGP) compared to cGP due
+to the averaging by drawing samples from the distribution of
+the uncertain training locations. Averaging the prediction error
+over multiple channel realizations, Fig. 6 (b) shows the mean
+squared error (MSE) of the received power prediction of cGP
+and uGP with respect to λ (MCGP is not shown due to its
+similar performance to cGP). uGP clearly outperforms cGP
+(except fo λ = 0) due to its better tracking of the true channel
+(see Fig. 6 (a)) despite uncertainty on the training locations.
+The reason for higher MSE in the case of λ = 0 for uGP is
+due to its kernel mismatch.
+2) Certain training locations and uncertain testing loca-
+tions: In this case ui ∈X and u∗∈U (with a constant
+location error standard deviation σ m). Now the perfor-
+mance must be assessed with respect to the expected received
+power PRX,avg(u∗) = R PRX(x∗) p(x∗) dx∗, where p(x∗) =
+N(z∗, σ2 I), in which z∗is the mean of distribution described
+by u∗. An example is shown in Fig. 7 (a), depicting PRX,avg as
+a function of z∗, as well as the predictions from cGP, MCGP,
+and uGP. It can be observed that uGP and MCGP follow well
+PRX,avg. Speciﬁcally, MCGP tracks PRX,avg quite closely as
+it is near-optimal in this case. In contrast, cGP follows the
+actual received power at z∗, rather than the averaged power.
+This leads to fast variations in cGP, which are not present in
+uGP and MCGP. Fig. 7 (b) shows the MSE of the received
+power prediction of cGP, MCGP, and uGP with respect to
+σ when averaging the prediction error over multiple channel
+realizations. As expected, MCGP has the lower MSE than
+uGP and cGP. However, uGP performs better than cGP for
+all considered σ, except σ = 0 (due to kernel mismatch).
+
+Distance from BS in m
+Received power in dBm
+True function
+cGP
+uGP
+MCGP
+50
+100
+150
+200
+−80
+−70
+−60
+−50
+−40
+−30
+−20
+−10
+(a)
+Average location error standard deviation λ in m
+Mean squared error (MSE)
+cGP
+uGP
+0
+2
+4
+6
+8
+10
+0
+5
+10
+15
+20
+25
+30
+35
+(b)
+Figure 6.
+Performance comparison of cGP, MCGP, and uGP under uncertain training and certain testing locations. Inset (a) received power prediction using
+uncertain training locations with average location error of λ = 8 m and certain test locations for single realization of a channel ﬁeld. The shaded area (grey
+for cGP and blue for uGP) depicts point wise predictive mean plus and minus the predictive standard deviation, and (b) MSE performance of cGP and uGP
+as a function of average location error standard deviation λ. The MSE is averaged for each value of λ and for 50 realizations of the channel ﬁeld is shown
+are the mean of the MSE and error bars with one standard deviation. The MSE is calculated as
+1
+|T |
+P
+x∗∈T (PRX(x∗) −¯PRX(x∗))2, where T is the set
+of test locations and |T | denotes its cardinality.
+∥z∗∥in m
+Received power in dBm
+True func. with avg
+cGP
+uGP
+MCGP
+50
+100
+150
+200
+−80
+−70
+−60
+−50
+−40
+−30
+−20
+(a)
+Location error standard deviation σ in m
+Mean squared error (MSE)
+cGP
+uGP
+MCGP
+0
+2
+4
+6
+8
+10
+5
+10
+15
+20
+25
+30
+(b)
+Figure 7.
+Performance comparison of cGP, MCGP, and uGP under certain training and uncertain testing locations. Inset (a) received power prediction using
+certain training and uncertain test locations with a constant location error standard deviation σ = 5 m for single realization of channel ﬁeld, and (b) MSE
+performance of cGP, MCGP and uGP as a function of constant location error standard deviation σ on test locations. The MSE is averaged for each value
+of σ and for 50 realizations of the channel ﬁeld is shown are the mean of the MSE and error bars with one standard deviation. The MSE is calculated as
+1
+|T u|
+P
+u∗∈T u(PRX,avg(u∗) −¯PRX(u∗))2, where T u is the set of test location distributions and |T u| denotes its cardinality.
+Furthermore, the performance of uGP is very close to that of
+MCGP.
+D. Resource Allocation Example
+1) Scenario: In this section, we compare cGP and uGP for
+a simple proactive resource allocation scenario. We consider a
+user moving through a region A and predict the CQM at each
+location. The supported rate, expressed in bits per channel use
+(bpu), for a user at location x∗is deﬁned as
+r(x∗) = log2
+ 1 + SNR(x∗)
+
+,
+(35)
+where SNR(x∗) = P lin
+RX(x∗)/W lin, is the signal-to-noise ratio
+at location x∗, W lin is the receiver thermal noise and P lin
+RX(x∗)
+is the received power, both measured in linear scale. The
+average rate in the region A, denoted as ¯rref
+A , is deﬁned as
+¯rref
+A =
+1
+|A|
+Z
+A
+r(x∗)dx∗,
+(36)
+where |A| denotes area of the region A. The predicted rate for
+a user at a future location x∗, based on the predicted CQM
+values ( ¯PRX(x∗), VRX(x∗)), is deﬁned as
+r(x∗, α) = log2
+ 1 + SNR(x∗, α)
+
+,
+(37)
+where
+α
+≥
+0
+is
+a
+conﬁdence
+parameter,
+SNR(x∗, α)
+=
+P lin
+RX(x∗, α)/W lin
+and
+PRX(x∗, α)
+=
+10 log10
+ P lin
+RX(x∗, α)
+
+= ¯PRX(x∗) −α
+ VRX(x∗)
+ 1
+2 .
+
+Conﬁdence parameter α
+Communication rate in bpu
+λ=0 m
+λ=10 m
+¯rref
+A
+¯reﬀ
+A (α), cGP
+¯reﬀ
+A (α), uGP
+0
+0.5
+1
+1.5
+2
+2.5
+3
+4
+6
+8
+10
+12
+14
+16
+(a)
+Conﬁdence parameter α
+The fraction of undelivered bits U(α)
+λ=0 m
+λ=10 m
+cGP
+uGP
+0
+0.5
+1
+1.5
+2
+2.5
+3
+0
+0.01
+0.02
+0.03
+0.04
+0.05
+(b)
+Figure 8.
+Resource allocation example for cGP, and uGP with two different values of localization error standard deviations (λ ∈{0, 10} m) and for different
+values of the conﬁdence parameter α. The results are averaged for each value of λ with 50 channel realizations. Inset (a) the effective rate ¯reﬀ
+A (α), and (b)
+the fraction of undelivered bits U(α).
+2) Performance measure: The user moves through the
+environment according to a known trajectory. The base station
+allocates bits to each future location, proportional to r(x∗, α).
+When the user is at location x∗, only a fraction of the
+bits, proportional to min(r(x∗, α), r(x∗)) would be delivered.
+Therefore, the effective rate reﬀ(x∗, α) for the user at location
+x∗is
+reﬀ(x∗, α) = min(r(x∗, α), r(x∗)).
+(38)
+The average effective rate ¯reﬀ
+A (α) for a given conﬁdence level
+α is then computed by spatial average of reﬀ(x∗, α) over
+region A as
+¯reﬀ
+A (α) =
+1
+|A|
+Z
+A
+reﬀ(x∗, α) dx∗∈[0, ¯rref
+A ].
+(39)
+When r(x∗, α) > r(x∗), a part of the allocated bits cannot
+be delivered. The total fraction of undelivered bits over the
+environment is given by
+U(α) =
+R
+A (r(x∗, α) −reﬀ(x∗, α)) dx∗
+R
+A r(x∗, α) dx∗
+∈[0, 1).
+(40)
+Hence, ¯reﬀ
+A (α) describes the rate that the user will receive
+(penalizing under-estimation of the rate), while U(α) describes
+the loss due to lost bits (penalizing over-estimating of the rate).
+3) Predicted communication rates with uncertain training
+locations: We predict the CQM at known test locations x∗∈
+X, based on training with uncertain locations (considering
+λ ∈{0, 10} m), all within a one-dimensional region A. The
+average effective rate ¯reﬀ
+A (α) and the fraction of undelivered
+bits U(α), as a function of α, are shown in Fig 8 (a)–
+(b), respectively. As expected, increasing α leads to a more
+conservative allocation, thus reducing both ¯reﬀ
+A (α) and U(α).
+For a speciﬁc value of α, increase in λ decreases ¯reﬀ
+A (α). This
+is due to the fact that with increase in λ, the mean ¯PRX(x∗)
+is of poor quality and the variance VRX(x∗) is high for CQM
+predictions.
+It is evident that when λ = 0, uGP and cGP attain similar
+performance, both in terms of ¯reﬀ
+A (α) and U(α). When λ is
+increased to 10 m, cGP suffers from a signiﬁcant reduction in
+effective rate ¯reﬀ
+A (α), while at the same time dropping up to
+4.5 % of the bits. This is due to cGP’s poor predictions, which
+are either too low (leading to a reduction in ¯reﬀ
+A (α)) or too
+high (leading to an increase in U(α)). In contrast, uGP, which
+is able to track the channel well despite uncertain training,
+achieves a higher effective rate, especially for high conﬁdence
+values (e.g., around 2 times higher rate for α = 3, for U(α)
+less than 0.1%).
+VII. CONCLUSION
+Channel quality metrics can be predicted using spatial
+regression tools such as Gaussian processes (GP). We have
+studied the impact of location uncertainties on GP and have
+demonstrated that, when heterogeneous location uncertainties
+are present, the classical GP framework is unable to (i)
+learn the underlying channel parameters properly; (ii) predict
+the expected channel quality metric. By introducing a GP
+that operates directly on the location distribution, we ﬁnd
+uncertain GP (uGP), which is able to both learn and predict
+in the presence of location uncertainties. This translates in
+better performance when using uGP for predictive resource
+allocation.
+Possible avenues of future research include validation using
+real measurements, modeling correlation of shadowing in
+the temporal dimension, study of better approximations for
+learning with uncertain locations, and the extension to ad-hoc
+networks.
+APPENDIX A
+APPROXIMATION OF EXPECTED MEAN FUNCTION
+Let di = ∥xi∥and recall from random variable transforma-
+tion theory that
+Z
+log10(∥xi∥) p(xi) dxi =
+Z
+log10(di) p(di) ddi.
+(41)
+
+We assume p(xi) = N(zi, σ2
+i I), so p(di) follows a Rician
+distribution
+p(di) = di
+σ2
+i
+exp
+
+−∥zi∥2 + d2
+i
+2 σ2
+i
+
+I0
+∥zi∥di
+σ2
+i
+
+di > 0,
+(42)
+where I0(.) is a modiﬁed Bessel function of zero-th order.
+For ∥zi∥/σi ≥3, p(di) can be approximated as a Gaussian
+distribution
+pGauss(di) =
+1
+p
+2 πσ2
+i
+exp
+
+−(∥zi∥−di)2
+2 σ2
+i
+
+.
+(43)
+The integral (41) still does not have a closed form expression
+with pGauss(di). Now approximating the log10(.) function with
+a polynomial function of the form w(di) = PJ
+j=0 aj dj
+i then
+(41) can be written as
+Z
+log10(∥xi∥) p(xi) dxi ≈
+Z +∞
+−∞
+w(di) pGauss(di) ddi,
+(44)
+which can be computed exactly.
+APPENDIX B
+LEARNING PROCEDURE
+In
+this
+appendix,
+we
+detail
+the
+learning
+of
+θ
+=
+[σn, σproc, dc, L0, η, σΨ] for cGP, uGP, and MCGP. We con-
+sider nodes know σn and L0, therefore they are not estimated
+as part of the learning process. Let the remaining set of
+hyperparameters be θ = [σproc, dc, σΨ] and η .
+cGP
+Based on Section III, we can write the received measure-
+ments y with their corresponding training locations X in
+matrix form as
+y = 1TL0 + hc η + Ψ + n,
+(45)
+where Ψ = [Ψ(x1), . . . Ψ(xN)]T, n = [n1, . . . , nN]T, and
+hc = −10 [ log10(∥x1∥), . . . , log10(∥xN∥)]T. Assuming the
+measurements are uncorrelated, then the least squares estimate
+of the path-loss exponent can be computed as
+ˆη =
+ hT
+c hc
+−1 hT
+c
+ y −1TL0
+
+.
+(46)
+Once the path-loss exponent is estimated, the mean com-
+ponent of the received measurements can be subtracted as,
+Υc = y −1TL0 −hc ˆη. Then, Υc becomes a zero-mean
+Gaussian process. Now the likelihood function (6) becomes
+l(θ) = p(Υc|X, θ) = N(Υc; 0, K). The hyperparameters θ
+are estimated by minimizing negative logarithm of l(θ)
+ˆθ = arg min
+θ {−log(p(Υc|X, θ)}
+= arg min
+θ
+n
+log |K| + ΥT
+c K−1 Υc
+o
+.
+(47)
+We calculate the variance of the process Υc as σ2
+Tot =
+1/N PN
+i=1[Υc]2
+i . The variance of the process should be cap-
+tured by the hyperparameters σproc, σn, and σΨ. We deﬁne
+σ2
+proc = σ2
+Tot −σ2
+n −σ2
+Ψ, as a result l(θ) becomes a function
+of only dc and σΨ. We solve (47) and ﬁnd ˆdc and ˆσΨ by an
+exhaustive grid search. Once ˆdc and ˆσΨ are found, then ˆσproc
+can be calculated as ˆσ2
+proc = ˆσ2
+Tot −σ2
+n −ˆσ2
+Ψ.
+uGP
+In this case, the path-loss exponent is estimated as
+ˆη =
+ hT
+u hu
+−1 hT
+u
+ y −1TL0
+
+,
+(48)
+where hu = −10 [Ex1[log10(∥x1∥), . . . , ExN[log10(∥xN∥)]T.
+Once again removing the mean from the measurements, we
+obtain Υu = y −1TL0 −hu ˆη. The hyperparameters θ are
+estimated by minimizing the modiﬁed negative log-likelihood
+function
+ˆθ = arg min
+θ {−log(p(Υu|U, θ)}
+= arg min
+θ
+n
+log |Ku| + ΥT
+u Ku−1 Υu
+o
+.
+(49)
+Again, σ2
+Tot = 1/N PN
+i=1[Υu]2
+i , is the variance of the process.
+As a result, ˆσΨ becomes ˆσ2
+Ψ = σ2
+Tot −σ2
+n −ˆσ2
+proc and due to
+this l(θ) is now only a function of dc. We solve (49) and ﬁnd
+ˆdc by an exhaustive grid search.
+The learning process can be simpliﬁed for uGP: since σproc
+only captures kernel mismatch irrespective of the location un-
+certainty and path loss, the value of ˆσproc can be obtained off-
+line with noise-free training locations by performing learning
+as in the case of cGP, but with a covariance function of the
+form (4) for p = 2. This approach gives an advantage to cGP
+and thus makes the comparison between uGP and cGP more
+fair for all values of λ ≥0.
+MCGP
+It is no longer feasible to estimate η ﬁrst and subtract
+to make the process zero mean, because of summation in
+the Monte Carlo integration (12). Therefore, we optimize
+(13) with respect to the hyperparameters η and θ using
+fminsearch function of Matlab.
+ACKNOWLEDGMENT
+The authors would like to thank Ido Nevat, Lennart Svens-
+son, Ilaria Malanchini, and Vinay Suryaprakash for their
+feedback on the manuscript.
+REFERENCES
+[1] S. Sand, R. Tanbourgi, C. Mensing, and R. Raulefs, “Position aware
+adaptive communication systems,” in Forty-Third Asilomar Conference
+on Signals, Systems and Computers, 2009, pp. 73–77.
+[2] R. Di Taranto, S. Muppirisetty, R. Raulefs, D. Slock, T. Svensson,
+and H. Wymeersch, “Location-aware communications for 5G networks,”
+IEEE Signal Processing Magazine, vol. 31, no. 6, pp. 102–112, Nov
+2014.
+[3] H. Abou-zeid, H. Hassanein, and S. Valentin, “Optimal predictive
+resource allocation: Exploiting mobility patterns and radio maps,” in
+IEEE Globecom Workshops, Dec 2013, pp. 4877–4882.
+[4] J. Johansson, W. Hapsari, S. Kelley, and G. Bodog, “Minimization
+of drive tests in 3GPP release 11,” IEEE Communications Magazine,
+vol. 50, no. 11, pp. 36–43, 2012.
+[5] A. Zalonis, N. Dimitriou, A. Polydoros, J. Nasreddine, and P. Mahonen,
+“Femtocell downlink power control based on radio environment maps,”
+in IEEE Wireless Communications and Networking Conference, April
+2012, pp. 1224–1228.
+[6] A. Galindo-Serrano, B. Sayrac, S. Ben Jemaa, J. Riihijarvi, and P. Ma-
+honen, “Harvesting MDT data: Radio environment maps for coverage
+analysis in cellular networks,” in International Conference on Cognitive
+Radio Oriented Wireless Networks, July 2013, pp. 37–42.
+
+[7] I. Nevat, G. Peters, and I. Collings, “Location-aware cooperative spec-
+trum sensing via Gaussian processes,” in Australian Communications
+Theory Workshop, Jan 2012, pp. 19–24.
+[8] J. Tadrous, A. Eryilmaz, and H. El Gamal, “Proactive resource alloca-
+tion: Harnessing the diversity and multicast gains,” IEEE Transactions
+on Information Theory, vol. 59, no. 8, pp. 4833–4854, Aug 2013.
+[9] A. Goldsmith, Wireless communications.
+Cambridge university press,
+2005.
+[10] N. Jalden, P. Zetterberg, B. Ottersten, A. Hong, and R. Thoma, “Corre-
+lation properties of large scale fading based on indoor measurements,”
+in IEEE Wireless Communications and Networking Conference, March
+2007, pp. 1894–1899.
+[11] M. S. Grewal, L. R. Weill, and A. P. Andrews, Global positioning
+systems, inertial navigation, and integration. John Wiley & Sons, 2001.
+[12] C. Rasmussen and C. Williams, Gaussian processes for machine learn-
+ing.
+MIT Press, 2006.
+[13] L. Csató and M. Opper, “Sparse on-line Gaussian processes,” Neural
+computation, vol. 14, no. 3, pp. 641–668, 2002.
+[14] J. Quiñonero-Candela and C. E. Rasmussen, “A unifying view of sparse
+approximate Gaussian process regression,” The Journal of Machine
+Learning Research, vol. 6, pp. 1939–1959, 2005.
+[15] E. Snelson and Z. Ghahramani, “Sparse Gaussian processes using
+pseudo-inputs,” Advances in neural information processing systems,
+vol. 18, p. 1257, 2006.
+[16] S. Sarkka, A. Solin, and J. Hartikainen, “Spatiotemporal learning
+via inﬁnite-dimensional bayesian ﬁltering and smoothing: A look at
+Gaussian process regression through Kalman ﬁltering,” IEEE Signal
+Processing Magazine, vol. 30, no. 4, pp. 51–61, 2013.
+[17] P. Dallaire, C. Besse, and B. Chaib-draa, “An approximate inference
+with Gaussian process to latent functions from uncertain data,” Neuro-
+computing, vol. 74, no. 11, pp. 1945–1955, 2011.
+[18] A. Girard, “Approximate methods for propagation of uncertainty with
+Gaussian process models,” Ph.D. dissertation, University of Glasgow,
+2004.
+[19] A. Girard and R. Murray-Smith, “Learning a Gaussian process model
+with uncertain inputs,” Department of Computing Science, University
+of Glasgow, Tech. Rep. TR-2003-144, June 2003.
+[20] M. Jadaliha, Y. Xu, J. Choi, N. Johnson, and W. Li, “Gaussian process
+regression for sensor networks under localization uncertainty,” IEEE
+Transactions on Signal Processing, vol. 61, no. 2, pp. 223–237, 2013.
+[21] A. McHutchon and C. E. Rasmussen, “Gaussian process training with
+input noise,” in Advances in Neural Information Processing Systems,
+2011, pp. 1341–1349.
+[22] A. Ranganathan, M.-H. Yang, and J. Ho, “Online sparse Gaussian
+process regression and its applications,” IEEE Transactions on Image
+Processing, vol. 20, no. 2, pp. 391–404, Feb 2011.
+[23] S.-J. Kim, E. Dall’Anese, and G. Giannakis, “Cooperative spectrum
+sensing for cognitive radios using kriged Kalman ﬁltering,” IEEE
+Journal of Selected Topics in Signal Processing, vol. 5, no. 1, pp. 24–36,
+2011.
+[24] D. Gu and H. Hu, “Spatial Gaussian process regression with mobile
+sensor networks,” Neural Networks and Learning Systems, IEEE Trans-
+actions on, vol. 23, no. 8, pp. 1279–1290, Aug 2012.
+[25] M. P. Deisenroth and J. W. Ng, “Distributed Gaussian processes,” arXiv
+preprint arXiv:1502.02843, 2015.
+[26] S. Choi, M. Jadaliha, J. Choi, and S. Oh, “Distributed Gaussian process
+regression for mobile sensor networks under localization uncertainty,”
+in 52nd Annual Conference on Decision and Control, Dec 2013, pp.
+4766–4771.
+[27] J. Quinonero Candela, “Learning with uncertainty-Gaussian processes
+and relevance vector machines,” Ph.D. dissertation, Technical University
+of Denmark, 2004.
+[28] J. Fink, “Communication for teams of networked robots,” Ph.D. dis-
+sertation, Elect. Syst. Eng., Univ. Pennsylvania, Philadelphia, PA, Aug
+2011.
+[29] P. Agrawal and N. Patwari, “Correlated link shadow fading in multi-hop
+wireless networks,” IEEE Transactions on Wireless Communications,
+vol. 8, no. 8, pp. 4024–4036, 2009.
+[30] M. Malmirchegini and Y. Mostoﬁ, “On the spatial predictability of com-
+munication channels,” IEEE Transactions on Wireless Communications,
+vol. 11, no. 3, pp. 964–978, 2012.
+[31] Y. Yan and Y. Mostoﬁ, “Impact of localization errors on wireless channel
+prediction in mobile robotic networks,” in IEEE Globecom, Workshop
+on Wireless Networking for Unmanned Autonomous Vehicles, Dec. 2013.
+[32] G. L. Stüber, Principles of Mobile Communication (2nd Ed.).
+Kluwer
+Academic Publishers, 2001.
+[33] A. Goldsmith, L. Greenstein, and G. Foschini, “Error statistics of
+real-time power measurements in cellular channels with multipath and
+shadowing,” IEEE Transactions on Vehicular Technology, vol. 43, no. 3,
+pp. 439–446, Aug 1994.
+[34] S. S. Szyszkowicz, H. Yanikomeroglu, and J. S. Thompson, “On the
+feasibility of wireless shadowing correlation models,” IEEE Transactions
+on Vehicular Technology, vol. 59, no. 9, pp. 4222–4236, 2010.
+[35] M. Gudmundson, “Correlation model for shadow fading in mobile radio
+systems,” Electronics letters, vol. 27, no. 23, pp. 2145–2146, 1991.
+[36] Y. Mostoﬁ, M. Malmirchegini, and A. Ghaffarkhah, “Estimation of com-
+munication signal strength in robotic networks,” in IEEE International
+Conference on Robotics and Automation, 2010, pp. 1946–1951.
+[37] D. J. MacKay, Information theory, inference, and learning algorithms.
+Cambridge University Press, 2003.
+[38] D. Koller and N. Friedman, Probabilistic graphical models: principles
+and techniques.
+MIT press, 2009.
+[39] K. V. Mardia and R. Marshall, “Maximum likelihood estimation of
+models for residual covariance in spatial regression,” Biometrika, vol. 71,
+no. 1, pp. 135–146, 1984.
+[40] P. K. Kitanidis, “Statistical estimation of polynomial generalized covari-
+ance functions and hydrologic applications,” Water Resources Research,
+vol. 19, no. 4, pp. 909–921, 1983.

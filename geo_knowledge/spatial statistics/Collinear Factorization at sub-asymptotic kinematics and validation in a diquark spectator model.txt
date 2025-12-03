@@ -1,0 +1,4534 @@
+JLAB-THY-20-3254
+Collinear Factorization at sub-asymptotic kinematics
+and validation in a diquark spectator model
+Juan V. Guerrero∗
+Jeﬀerson Lab, Newport News, VA 23606, USA
+and
+Department of Physics, Old Dominion University, Norfolk, Virginia 23529, USA
+Alberto Accardi†
+Hampton University, Hampton, VA 23668, USA and
+Jeﬀerson Lab, Newport News, VA 23606, USA
+(Dated: January 27, 2023)
+We revisit the derivation of collinear factorization for Deep Inelastic Scattering at sub-asymptotic
+values of the four momentum transfer squared, where the masses of the particles participating in the
+interaction cannot be neglected. By using an inclusive jet function to describe the scattered quark
+ﬁnal state, we can restrict the needed parton kinematic approximations just to the four-momentum
+conservation of the hard scattering process, and explicitly expand the rest of the diagram in powers
+of the unobserved parton transverse momenta rather than neglecting those. This procedure provides
+one with more ﬂexibility in ﬁxing the virtuality of the scattered and recoiling partons than in the
+standard derivation, and naturally leads to scaling variables that more faithfully represent the
+partonic kinematic at sub-asymptotic energy than the Bjorken’s xB variable.
+We then verify the validity of the obtained factorization formula by considering a diquark spec-
+tator model designed to reproduce the main features of electron-proton scattering at large xB in
+Quantum Chromo-Dynamics. In the model, the Deep Inelastic Scattering contribution to the cross
+section can be explicitly isolated and analytically calculated, then compared to the factorized ap-
+proximation. Limiting ourselves to the leading twist contribution, we then show that use of the new
+scaling variables maximizes the kinematic range of validity of collinear factorization, and highlight
+the intrinsic limitations of this approach due to the unavoidably approximate treatment of four
+momentum conservation in factorized diagrams. Finally, we brieﬂy discuss how these limitations
+may be overcome by including higher-twist corrections to the factorized calculation.
+∗e-mail: juanvg@jlab.org
+† e-mail: accardi@jlab.org, ORCID: 0000-0002-2077-6557
+arXiv:2010.07339v2  [hep-ph]  25 Jan 2023
+
+2
+CONTENTS
+I. Introduction
+3
+A. Motivation
+3
+B. Paper organization and overview of results
+4
+II. Collinear factorization at sub-asymptotic momentum transfer
+5
+A. Kinematics
+6
+B. The DIS hadronic tensor at LO
+7
+C. Factorization at asymptotic Q2
+8
+D. Factorization at ﬁnite Q2
+9
+E. Kinematic approximations in QCD
+12
+1. Choice of ¯v ′ 2
+12
+2. Choice of ¯v 2
+12
+3. Light cone fraction ¯x
+13
+F. Discussion
+14
+III. Validation framework: the diquark spectator model
+15
+A. Calculation of the hadronic tensor
+16
+B. Gauge invariant decomposition into DIS, resonance, and interference processes
+17
+C. Kinematics
+19
+D. Transverse structure function
+20
+E. Longitudinal structure function
+22
+IV. Testing the kinematic approximations
+23
+A. Kinematic approximations in the model
+24
+B. Numerical validation
+25
+V. Testing the limits of factorization
+26
+A. Validity of the factorization approximations
+29
+B. Breaking of Collinear Factorization
+29
+VI. Theory and phenomenology beyond the leading twist
+33
+VII. Summary and conclusions
+34
+A. Collinear Factorization in DIS at sub-asymptotic Q2
+34
+B. Validation at Leading Twist
+34
+C. Transverse momentum eﬀects beyond leading twist
+35
+D. Beyond Deep Inelastic Scattering
+35
+Acknowledgments
+35
+A. Invariant and helicity structure functions, and symmetry constraints at small xB
+36
+B. Sub-asymptotic kinematics in detail
+38
+1. Limits on xB
+38
+2. Limits on k 2
+T
+38
+3. Internal variables: parton fractional momentum and virtuality
+39
+C. Resonant scattering in the spectator model
+41
+D. Structure function scaling at small xB
+42
+1. Small-xB scaling of FL
+42
+2. Small-xB scaling of FT
+44
+E. Model systematics
+45
+References
+48
+
+3
+I.
+INTRODUCTION
+A.
+Motivation
+Unraveling the quark and gluon structure of the nucleon still remains a major challenge in hadronic and particle
+physics, notwithstanding the signiﬁcant experimental and theoretical advances made in this area throughout the last
+decade [1–5].
+The Large Hadron Collider can measure a large variety of observables, especially at the energy frontier, and access
+the proton structure at the smallest spatial scales. However utilizing its data remains challenging due to tensions
+between various observables, and its impact on the determination of unpolarized Parton Distribution Functions
+(PDFs) is so far somewhat statistically limited [6–8]. Proton-proton collisions at the Relativistic Heavy Ion Collider
+(RHIC) provide complementary access to PDFs at lower energy scale and higher parton fractional momentum, most
+notably in polarized collisions [9–11]. Use of RHIC data in unpolarized PDF ﬁts has however not received much
+attention until very recently, despite its potential for ﬂavor separation of sea quarks via weak boson production data
+[12, 13] and gluon PDF determination through jet observables. Lowering the collision energy and changing reaction
+to electron-proton collisions, recent data from the Jeﬀerson Lab 6 GeV program and those being collected at its 12
+GeV upgrade [14, 15], as well as those expected from the future Electron Ion Collider [16, 17] will enable us to access
+quarks and gluons in unprecedented ways, and to build an accurate, 3-dimensional picture of the inner structure of
+the proton.
+In order to use high-energy scattering data to describe the proton’s structure in terms of quark and gluon PDFs
+one relies on QCD factorization theorems, such as Collinear Factorization (CF) [18]. These theorems allow one to
+write the cross sections of large momentum transfer scattering processes such as Deep Inelastic Scattering (DIS) as
+a convolution of a short distance matrix element, which can be computed perturbatively and describes the quark
+and gluon “hard” interaction with a probe, and long distance non perturbative matrix elements – the PDFs – that
+describe the quark and gluon momentum distribution within the proton.
+In this paper we are interested in assessing the viability of Collinear Factorization in describing DIS events with
+large enough 4-momentum transfer to justify a perturbative QCD analysis of the cross sections in terms of quark and
+gluon interactions, but not large enough to neglect any other mass or dynamical momentum scale characterizing the
+process. For example, experiments at Jeﬀerson Lab with a 6 GeV energy beam involve low photon virtualities Q2 that
+require control of 1/Q2 power corrections to the calculation of cross sections. With the 12 GeV beam the accessible Q2
+increases, without, however, reaching asymptotic values where other scales can be neglected. In this sub-asymptotic
+regime, the mass of the proton target and the mass of an observed hadron, collectively denoted by µ, induce ﬁnite-Q2
+corrections of order µ2/Q2 which we call “Hadron Mass Corrections” (HMCs). These can compete with experimental
+uncertainties at Jeﬀerson Lab energy and can also aﬀect higher-energy experiments such as HERMES and COMPASS,
+see Refs. [19–22]. These papers take into account into account the mass of the target and of the observed hadron
+through a rescaling of the Bjorken variable xB, as already discussed for example in [23–25]1. Refs. [19–21] go a step
+further, and argue that one also needs to take into account the fact that the (unobserved) scattered parton needs
+to have a virtuality substantially diﬀerent from 0 in order to fragment into a massive hadron, and show that this
+requirement can be implemented in a gauge invariant way through a modiﬁed scaling variable. Numerical estimates
+at JLab kinematics suggest large eﬀects for semi-inclusive pion production [19], and even more for kaons or heavier
+hadrons [20]. In fact, HMCs implemented in this way may even explain [21] the apparent large discrepancy between
+the measurements of transverse momentum integrated kaon multiplicities performed at HERMES [34] and COMPASS
+[35, 36].
+Two subsequent papers from the COMPASS collaboration have furthermore analyzed kaons and protons produced at
+even larger hadron momentum fractions than reported before, highlighting strong departures from pQCD calculations
+[37, 38]. This discrepancy between theory and experiment seems too large to be only due to the phase space limitations
+induced by ﬁnite mass eﬀects (which, as argued in Refs. [20, 21], can be treated as a correction to the usual collinear
+pQCD calculations) and may indicate that the factorization formalism is being applied in a kinematic region where this
+is not a good approximation to the semi-inclusive cross section. If the correct treatment of the partonic kinematics
+and the very validity of QCD factorization are under question at high-energy experiments such as HERMES and
+COMPASS – and already for transverse momentum integrated observables!
+– investigating these issues becomes
+essential for a correct interpretation of the upcoming semi-inclusive measurements at the JLab 12 GeV upgraded
+facility [14, 15], that are largely focused on the 3D imaging of nucleons and nuclei. Indeed, the transverse momentum
+1 And many other papers starting from the seminal inclusive DIS analysis by Nachtmann [26] and Georgi, Politzer and De Rujula in the
+operator product expansion (OPE) formalism [27, 28], and by Ellis, Furmanski and Petronzio in collinear factorization [29]; see [30] for
+a review, and [31] for a comparison of mass corrections methods. See also Refs [32, 33] for recent proposals to address the “threshold”
+problem within collinear and OPE approaches to target mass corrections.
+
+4
+dependent cross sections are naturally more sensitive to HMCs than their integrated counterparts, and factorization
+encounters novel challenges of its own [22, 39–41].
+Motivated by these considerations, in this paper we revisit the “standard” derivation of collinear factorization in
+DIS processes [42, 43] with the goal of identifying under what conditions this can be extended to the sub-asymptotic
+kinematic region, and how one can maximize its regime of applicability. As a ﬁrst step, we will discuss inclusive DIS
+scattering, where we can avoid purely technical complications due to the interplay of initial and ﬁnal state kinematics
+[20], and limit ourselves to Leading-Order (LO) perturbative calculations, that do not require renormalization of the
+quark ﬁelds and limit the ﬁnal state to 2 particles. Nonetheless, we will be able to address in full the need for, and
+means of, an improved kinematic approximation. The use of an inclusive jet function [32, 44–46] to describe the
+scattered quark ﬁnal state will prove essential to our goals. We will then validate the obtained factorization formula
+in the framework of a QCD-like idealized ﬁeld-theoretical model describing a spin 1/2 idealized nucleon, which
+contains an active quark as well as a scalar diquark spectator that does not participate in the interaction [47, 48],
+and complete the analysis presented in Refs. [49, 50]. In the chosen “diquark spectator model”, one can perform
+fully analytic calculations of the DIS cross section, as well as collinear factorization with or without HMCs. The
+model is designed to reproduce the main feature of the QCD process at large xB, and a comparison of the full and
+collinearly factorized cross sections will determine the validity of the proposed HMC scheme, as well as test the limits
+of collinear factorization itself. Furthermore, working within an explicit model we will be able to investigate the role
+of the parton’s transverse momentum, that is by necessity neglected in the Leading-Twist calculation of the inclusive
+DIS cross section, but contributes to Higher-twist (HT) O(⟨k 2
+T ⟩/Q2) corrections. As we will very brieﬂy discuss in
+the closing section, we believe that an extension of our HMC scheme to Next-to-Leading Order (NLO) – and, in fact,
+also to Semi-Inclusive DIS (SIDIS) processes – should not encounter essential diﬃculties.
+B.
+Paper organization and overview of results
+As this paper is quite long, it is worthwhile to provide the readers with an overview of its structure, the philosophy
+behind our approach and the novelties compared to the standard derivation, and the main results of each Section,
+before delving into the details of calculations and derivations.
+In Section II, we discuss our proposal for performing Collinear Factorization of the DIS structure functions at
+sub-asymptotic hard scales Q2, and how one can account for hadron masses and non-zero parton virtualities in the
+treatment of partonic kinematics.
+Our central philosophy, adopted from Ref. [51], is to minimize the number of
+uncontrolled approximations needed to achieve the desired factorization formula. In particular, we conﬁne the needed
+“pure” kinematic approximations just to the external legs of the partonic hard-scattering, and perform a controlled
+“twist” expansion of the rest of the diagram. Gauge invariance is guaranteed by the use of an inclusive quark jet
+function [32, 44–46] to describe the scattered quark in the DIS handbag diagram, rather than utilizing an on-shell
+quark propagator as in standard derivations [42, 43]. In fact, our calculation parallels the analogous one for single
+inclusive hadron production in SIDIS [43, 52], and highlights how the parton’s transverse momentum needs not be
+altogether neglected, but can be instead dynamically included in higher-twist terms [29, 53].
+The end result is quite simple: at leading twist (LT), the factorized formula for the hadronic tensor, and therefore
+for the cross section and its structure functions, are given by their asymptotic (or massless) counterparts evaluated
+at a suitably deﬁned scaling variable ¯x instead of xB, see Eqs. (29)-(33). The choice of the ¯x scaling variable is not
+prescribed by the factorization procedure itself, but can be guided by kinematic consideration at the parton level and
+by respect of momentum and baryon number conservation laws, see Section II E and in particular Eq. (42).
+The use of a scaling variable is not a new concept, as it has been proposed in a similar context, for example, in
+Refs. [23, 24, 48, 54, 55] and even earlier in Refs. [26, 27, 29, 56]. Here we attempt, however, at a more systematic
+treatment that avoids a priori parton model considerations. In fact our end result cannot be interpreted in parton
+model terms except in a well deﬁned limit, but, conversely, gives one enhanced freedom in devising realistic kinematic
+approximations in the sub-asymptotic regime. In particular, it turns out that the light-cone virtualities v2 and v ′ 2
+of the partons participating in the initial and ﬁnal state of hard-scattering process need not be approximated to zero,
+and can be chosen diﬀerently for the incoming and scattered quarks without breaking gauge invariance. This added
+ﬂexibility may also facilitate the study of the transition from perturbative to non-perturbative degrees of freedom in
+data beyond the deep inelastic regime, where the virtual photon excites proton resonances [57] and may be sensitive
+to multi-parton nucleon substructures [58].
+The theoretical results outlined above are compelling, but call for a benchmark validation. To this end, in Section III
+we present the diquark spectator model adopted for our validation study, and use this to analytically calculate the
+inelastic lepton-proton cross section at LO. We then show how the cross section can be decomposed in a gauge
+invariant way into DIS, proton resonance, and interference contributions, and study in detail the proton’s FT and FL
+transverse and longitudinal structure functions, as well as their scaling properties with respect to the photon virtuality
+
+5
+Q2. The low-xB behavior of the model also turns out to be interesting, even if the model is not designed to provide
+one with a realistic description of experimental measurements in that regime. Indeed, our explicit calculation will
+highlight a quite diﬀerent Q2 scaling of the DIS component of FL compared to simple dimensional arguments and to
+what happens for FT . As we will explain, this is however a general consequence of gauge invariance rather than a
+model artifact. It may also explain the need for phenomenological O(1/Q2) corrections in order for CF calculation of
+FL to agree with recent HERA data at small values of the Bjorken invariant xB [59].
+Sections (IV) and (V) are devoted to the validation of the sub-asymptotic factorization formulae 29-33 for the DIS
+transverse structure function F DIS
+T
+. The goal is to verify: (i) to what extent the ”internal” (i.e., unobserved) partonic
+variables can be replaced in the factorized cross section by the proposed sub-asymptotic kinematic approximations
+and the use of a scaling variable; (ii) how large transverse momentum corrections of order O(⟨k 2
+T ⟩/Q2), with k 2
+T
+the parton’s transverse momentum, are since these cannot be kinematically included in the scaling variables and
+dynamically contribute to the factorized cross section starting only at next-to-leading twist; and (iii) explore the
+intrinsic limitations of collinear factorization. The conclusions we will reach are rather robust versus variations of
+model parameters, as demonstrated in the Appendix, and therefore indicative of what we may expect to happen in
+QCD.
+In Section IV, the accuracy to which the ¯x scaling variable describes the internal partonic kinematics is investigated,
+and this and the corresponding light-cone virtuality ¯v are compared to the average parton momentum fraction and
+virtuality values calculated in the full model. In particular, we ﬁnd that one can approximate at the 90% level the
+average parton fractional momentum by including all external mass scales in the quark-mass-corrected Nachtmann
+scaling variable ξq = ξ(1 + m2
+q/Q2), where mq is the quark mass and the Nachtmann variable ξ [26] accounts for the
+proton mass; small corrections of order O(⟨k 2
+T ⟩/Q2) account for the rest.
+These conclusions are conﬁrmed in Section V, where we compare the full and factorized transverse FT structure
+functions and show that only corrections of order O(⟨k 2
+T ⟩/Q2) are needed to describe the full structure functions after
+removing all mass corrections by using of the ξq in our sub-asymptotic CF formula. These additional corrections are
+not experimentally controllable in inclusive measurements, but given their small size one can hope to theoretically treat
+them in the twist expansion [29, 53] without resorting to the Transverse-Momentum Dependent (TMD) factorization
+formalism [42, 52], or phenomenologically by adding a power suppressed term to a PDF ﬁt analysis. A brief discussion
+of these issues is oﬀered in Section VI, and a detailed analysis is left for future work.
+In Section V we also demonstrate the inherent limits of collinear factorization, that breaks down at very large xB
+because the kinematical approximations needed to factorize the PDFs and the partonic hard scattering coeﬃcient
+do not respect four momentum conservation in transverse momentum, as already argued in Ref. [48]. Fortunately,
+this eﬀect can be circumscribed by simple kinematic cuts on the invariant mass W of the ﬁnal state, and our model
+estimate indicates that factorization breaks down only in the resonance region at W 2 ≲4 GeV2.
+Finally, in Section VII we summarize the many results of our paper and their implications, and in the Appendices
+we included a study of the dependence (or rather independence) of our conclusions on the model parameters. In
+the Appendix section, we also provide: a complete discussion of the structure function projectors and their small-xB
+limit; details of the sub-asymptotic kinematic limits; an analytic calculation of the small-xB scaling behaviour of the
+model structure functions; and an explicit illustration of resonant electron-nucleon scattering when the masses of the
+constituents are smaller than the mass of the target itself.
+II.
+COLLINEAR FACTORIZATION AT SUB-ASYMPTOTIC MOMENTUM TRANSFER
+Deeply inclusive lepton-nucleon scattering on a proton or neutron target is illustrated in Figure 1, where the incident
+lepton (with four-momentum momentum l) interacts with a nucleon (p) through the exchange of a virtual photon
+(q). At large values of the virtuality Q2 = −qµqµ, the virtual photon scatters, on a short time scale, on a quark of
+four momentum k belonging to the nucleon. In the ﬁnal state, one measures the recoil lepton momentum l′, while
+the recoiled quark with four momentum k′, as well as the remnant X of the proton are unobserved. The remnant
+is a system of many particles produced by the fragmentation of the target after the photon extracted one of its
+quarks. In fact, the colored quark and remnant are subject to QCD conﬁnement, and, on a much longer time scale
+compared to the photon-quark scattering process, hadronize into a system of color neutral hadrons. Far from kinematic
+thresholds, unitarity arguments show that color neutralization can be ignored in an inclusive measurement such as we
+are discussing, and the process calculated as if quarks where asymptotic states, see the left panel of Figure 1. However,
+closer to the pion production threshold the ﬁnal state phase space shrinks, and one needs to take into account the fact
+that on-shell quarks cannot be present in the ﬁnal state. In this regime, it is possible to consider the diagram on the
+right panel of Figure 1 where one includes a quark remnant Y to account for quark hadronization. Note that we are
+considering diagrams in which the ﬁnal state in the current direction, Y , does not interact with the target remnant
+X. This assumption is indeed justiﬁed at large enough values of the Bjorken invariant xB = Q2/2(pµqµ), which is the
+
+6
+l
+l0
+q
+k
+k0
+p
+l
+l0
+q
+k
+k0
+p
+}
+}
+pX
+pY
+pX
+pX
+pX
+FIG. 1. Electron-proton DIS at leading order in the strong coupling constant. Left: in the impulse approximation, far from
+kinematic thresholds. Right: in the impulse approximation, with a quark remnant Y accounting for the hadronization of the
+ﬁnal state quark.
+focus of this paper, because the ﬁnite value ﬁnal state invariant mass W 2 = (1 −1/xB)Q2 + M 2 kinematically limits
+the transverse momentum of particles produced in the quark’s direction, squeezing these in a jet-like conﬁguration
+aligned with the quark’s momentum [60, 61].
+A.
+Kinematics
+We parametrize the four-momenta of the proton, photon and incoming quark in Figure 1 in terms of light-cone unit
+vectors n and n, which satisfy n2 = n2 = 0 and n · n = 1 [29]. The “plus” and “minus” components of a four-vector
+aµ are deﬁned by a+ = a · n = (a0 + az)/
+√
+2 and a−= a · n = (a0 −az)/
+√
+2. Then, one can decompose
+aµ = a+nµ + a−nµ + a µ
+T ≡(a+, a−, aT ),
+(1)
+where aµ
+T is the vector’s transverse four-momentum, which satisﬁes aT · n = aT · n = 0, with norm a2
+T = −a 2
+T , and
+aT ≡(aT x, aT y) is the 2D Euclidean transverse momentum.
+We will work in the “(p, q) frames” class [19], in which the initial proton momentum and virtual photon are collinear
+in 3-dimensional space and oriented along the z−direction. We can thus decompose them as
+pµ = p+ nµ + M 2
+2p+ nµ,
+(2)
+qµ = −ξp+ nµ + Q2
+2ξp+ nµ,
+(3)
+where ξ is the so-called Nachtmann variable and is deﬁned as
+ξ ≡−q+
+p+ =
+2xB
+1 +
+p
+1 + 4x2
+BM 2/Q2 .
+(4)
+The p+ component of the nucleon’s momentum parametrizes the Lorentz boosts in the z direction, and interpolates
+between the nucleon rest frame (p+ = M/
+√
+2) and the inﬁnite momentum frame (p+ →∞). The use of a light-
+cone reference frame is justiﬁed for hard scattering at large Q2, where the proton and scattered quark momenta are
+dominated by their light-cone plus and minus components, respectively. For the same reason, this is also the frame
+used to perform collinear factorization, as discussed more extensively in the rest of this section.
+Both the target momentum p and the photon momentum q are “external” variables, namely they are experimentally
+measured in the process of interest.
+On the contrary, the incoming and outgoing quark momenta are not even
+in principle measurable and therefore we will consider them “internal” variables.
+The parton momenta can be
+
+7
+decomposed as
+kµ = xp+ ¯nµ +
+v2
+2xp+ nµ + kµ
+T ,
+(5)
+k′µ = v ′ 2
+2k′−¯nµ + k′−nµ + k′µ
+T
+(6)
+where x ≡k+
+p+ is the light cone momentum fraction carried by the parton. In Eq. (5), the struck quark’s “light-cone
+virtuality”
+v2 = k2 + k 2
+T
+(7)
+is a mass scale that will be relevant to our derivation of sub-asymptotic collinear factorization. The name is justiﬁed by
+noticing that k−= v2/(2k+), so that v2 quantiﬁes how far the quark momentum is from the light-cone plus direction.
+As we will discuss, it is this scale, rather than the quark’s virtuality k2 alone, that controls the partonic kinematics in
+the diagram and determines the applicability of collinear factorization assumptions. Similarly, the outgoing quark’s
+light-cone virtuality, v ′ 2, is deﬁned as
+v ′ 2 = k′2 + k′ 2
+T .
+(8)
+B.
+The DIS hadronic tensor at LO
+The diﬀerential cross section for the inelastic scattering of an unpolarized lepton from an unpolarized nucleon target
+can be written in the Born approximation as
+dσ
+dxBdQ2 = πα2y2
+Q6
+Lµν 2MW µν ,
+(9)
+where α = e2
+4π is the ﬁne structure constant, Q2 = −q · q is the photon’s virtuality, xB = Q2/(2p · q) is the Bjorken
+variable, and the Lorentz invariant y is deﬁned as y = p·l
+p·q (here and in the following we use the shorthand a·b ≡aµbµ for
+the Lorentz contraction of 2 four-vectors). The leptonic Lµν tensor for unpolarized leptons can be directly computed
+from QED and reads,
+Lµν(l, l′) = 2(lµl′
+ν + lνl′
+µ −l · l′gµν) .
+(10)
+The hadronic tensor W µν, on the other hand, is an inclusive tensor containing all the information on the structure of
+the nucleon target. It is deﬁned by summing the transition matrix elements of the electromagnetic current operator
+Jµ between the initial state nucleon and all possible unobserved ﬁnal states X,
+2MW µν(p, q) = 1
+2π
+X
+X
+Z
+d3pX
+(2π)32EX
+(2π)4δ(4) p + q −pX
+
+⟨N|Jµ(0)|X⟩⟨X|Jν(0)|N⟩,
+(11)
+where we have used the shorthand notation d3pX /(2π)32EX = Q
+i∈X d3pi/(2π)32Ei, with pX the total momentum of
+the unobserved hadrons. For a derivation of these formulae, see for example Ref. [43] and the works cited therein.
+We now wish to factorize the hadronic tensor in terms of a non-perturbative quark distribution function q(x), and
+a perturbatively calculable photon-quark hard scattering term Hµν, without relying on the assumption that Q2 is
+asymptotically large - as done in most derivations, see for example [42] - but still assuming that this is large enough
+to resolve individual quarks within the target.
+Working at LO in the coupling constant, we consider the DIS handbag diagram shown in Figure 2, where we have
+included the customary quark correlator Φ(p, k) in the bottom part [42], and an “inclusive quark jet correlator” Ξ(k′)
+in the top part [42, 45, 46, 62]. In the context of collinear factorization, the quark jet correlator was already used
+in Ref [32, 48, 51] in order to correctly handle the external, hadron-level kinematic constraints in the DIS endpoint
+region, while allowing one to perform the parton-level momentum approximations needed to prove the factorizability
+of the DIS hadronic tensor. As a ﬁeld theoretical object in its own right, the quark jet correlator has also been
+recently studied in Refs. [45, 46], where it was used to derive a complete set of fragmentation function sum rules and
+to provide a new way to study the dynamical breaking of chiral symmetry in QCD. In our derivation of factorization,
+we will incorporate insights from that analysis. In fact, using the jet correlator, we will be able to weaken the needed
+approximations on the quark’s transverse momentum compared to other collinear factorization derivations [42, 48].
+
+8
+q
+k
+k0
+⌅(k0)
+p
+Φ(p, k)
+FIG. 2. Leading order inclusive DIS scattering handbag diagram, including a jet correlator in the top part. The red circles
+indicate the hard scattering vertex, where kinematic approximations will be performed (see Section II D for details).
+One can then write the hadronic tensor Eq. (11) as
+2MW µν = (2π)3
+Z
+d4k d4k′ Tr
+
+Φ(p, k) γµ Ξ(k′)γν
+δ(4)(k + q −k′) ,
+(12)
+where the δ-function encodes 4-momentum conservation in the photon quark hard-scattering vertex, indicated by red
+circles in Figure 2, and the factor (2π)3 in front of the integral comes from the phase space over the momentum of
+the Y blob. Following Ref. [46], the quark-distribution correlator Φ is deﬁned as
+Φ(p, k) = Disc
+Z
+d4ξ
+(2π)4 eik·ξ ⟨N(p)| ¯ψ(0) ψ(ξ) |N(p)⟩,
+(13)
+where ψ is the quark ﬁeld operator and |N(p)⟩single nucleon state with momentum p. The quark-to-jet correlator
+Ξ(k′) is analogously deﬁned as
+Ξ(k′) = Disc
+Z
+d4η
+(2π)4 eik′·η ⟨Ω| ψ(η) ψ(0) |Ω⟩,
+(14)
+where |Ω⟩is the interacting vacuum state, and can be interpreted as the discontinuity of the quark propagator [45, 46].
+For simplicity, we work in light-cone gauge and therefore we can ignore the Wilson lines in the deﬁnition of either Φ
+or Ξ. Nonetheless, the sub-asymptotic kinematic assumptions we consider will only be made at the hard-scattering
+vertex, and will not change the derivation of the Wilson lines in QCD. Therefore, the results obtained in this work
+can be extended to any gauge.
+C.
+Factorization at asymptotic Q2
+We start the discussion on factorization, by reviewing the approximations taken in standard Collinear Factorization
+derivations, performed in the Bjorken limit at asymptotically high values of Q2 [42, 43, 48].
+This will help us
+understanding where the assumption can be weakened if one wants to extend the procedure to sub-asymptotic values
+of the scale.
+First of all, since the ﬁnal state invariant mass is large, one can sum Eq. (11) over a complete set of states X
+replacing the jet correlator with a single quark line that passes the cut and can be considered a particle of zero mass2:
+Ξ(k) −→k/′δ(k′2) .
+(15)
+2 For light quarks, m2
+q ≪Q2 and quarks can indeed be considered massless. However, this is not strictly necessary, and one can treat the
+“massless” m2
+q/Q2 limit independently of the Bjorken limit. Hence the quark mass can be retained in the δ function, see for example
+Ref. [48].
+
+9
+If one also immediately integrates over d4k′, this turns into (k/ + q/) δ
+ (k + q)2
+. We have thus arrived at the starting
+point of most standard CF derivations, which is only valid if one assumes asymptotic values of Q2 from the outset
+[42].
+Next, in order to decouple the hard scattering from the soft quark dynamics in the target, one needs a suitable set
+of kinematic approximations on the subleading components of the unobserved initial state quark momentum k. For
+an inclusive DIS cross section the goal is to reduce the remaining 4-dimensional integral over k to a 1-dimensional
+integral over the dominant k+ ∼Q component. This can be done in two independent steps. Firstly, one can neglect
+the quark’s transverse momentum and assume that kT ≈0. In other words, the incoming quark’s 3-momentum
+is assumed to be parallel, or “collinear” to the 3-momentum of the target’s nucleon . This “collinear (kinematic)
+approximation” is certainly a valid approximation at asymptotic Q2 values because |kT | ∼ΛQCD.
+Secondly, in
+order to preserve gauge invariance at the hard scattering vertex, one also needs to assume that k−≈0, i.e., to also
+consider the scattering quark to be on-shell with mq = 0. This is a justiﬁed kinematic approximation, as well, since
+k−∼Λ2
+QCD/Q, and moreover agrees with the intuitive DIS picture provided by Feynman’s parton model [63, 64]. We
+stress, nonetheless, that any assumption about the virtuality of the quark is in addition to its being or not collinear
+in 3-dimensional space to its parent hadron3.
+Finally, applying the collinear approximation and setting mq = 0, one ﬁnds Φ(k) ≈k+γ−and the hadronic tensor
+can be written as a 1-dimensional convolution:
+2MW µν =
+Z dx
+x q(x)
+1
+4xTr [n/ γµ n/ γν] δ(x −xB)
+
+,
+(16)
+where
+q(x) = 1
+2
+Z
+dk−d2kT Tr
+
+Φ(k)γ+
+k+=xp+
+(17)
+is the quark’s light-cone plus momentum distribution, usually called “collinear” quark PDF. As discussed above,
+this name involves a mild abuse of language, the essential feature being that it provides a 1-dimensional momentum
+distribution, integrated over the transverse and light-cone minus components. The rest of the integrand, enclosed in
+curly brackets, can be interpreted as the tensor describing the scattering of a virtual photon with a massless quark
+traveling in the direction of its parent hadron (i.e., a “collinear” parton) and Eq. (16) provides one with a ﬁeld-
+theoretical realization of Feynman’s parton model – or, more accurately, it shows how the parton model emerges in
+the large Q2 limit of QCD calculations.
+D.
+Factorization at ﬁnite Q2
+At sub-asymptotic values of Q2, we need to be more careful with the kinematic approximations since now have to
+deal with a set of hadrons in the ﬁnal state’s current region rather than a single on-shell quark. We then go back
+to the starting point, Eq. (12), before integrating over k′ at variance with what did in the previous subsection. In
+this, we proceed similarly to derivations of factorization in SIDIS processes [43], which we take as a template for our
+derivation.
+Since neither the k nor k′ momenta are directly measurable, see Fig. 2, we treat them as internal variables. We
+then need to approximate both the scattering and recoiled k and k′ quark momenta appearing in the 4-momentum
+conservation δ-function. Namely, we take
+δ(4)(k + q −k′) ≃δ(4)(ek + q −ek′) ,
+(18)
+with ek and ek′ deﬁned as,
+kµ ≈ekµ =
+
+xp+,
+¯v 2
+2xp+ , kT
+
+(19)
+k′µ ≈ek′µ =
+ 
+¯v ′ 2
+2k′−, k′−, k′
+T
+!
+,
+(20)
+3 In fact, collinear but virtuality-dependent quark distributions have been discussed in Ref. [65]
+
+10
+and the approximate light cone ¯v 2 and ¯v ′ 2 virtualities ideally chosen such that they approximate the respective
+averages, ¯v 2 ≈⟨v2⟩= ⟨k2 + k 2
+T ⟩and ¯v ′ 2 ≈⟨v ′ 2⟩= ⟨k′2 + k′ 2
+T ⟩. Note, that we are approximating only the sub-sub-
+leading momentum components of the scattering and recoiled partonic momenta, but we fully retain their individual
+transverse components.
+In this respect, we depart from the treatment of Refs [42, 48], and do not need further
+kinematic assumptions.
+Before carrying on with the derivation, it is important to remark that the approximation (18) is only made at the
+hard scattering vertex level, denoted with red circles in Figure 2, and that this is the only approximation we perform4.
+Next, instead of neglecting the transverse momenta as in the standard derivation, we will perform a twist expansion
+of the nonperturbative correlators, and only then we integrate over the transverse transverse momenta. Finally (as
+in the standard derivation) we will obtain the hadronic tensor written as a 1-dimensional integral over the light-cone
+plus direction. In this sense, with a mild abuse of language as also discussed in the previous subsection, the factorized
+result can still be considered “collinear”.
+We can now carry on. In the approximated delta function (18), the light-cone k+ and k′−momentum components
+decouple from the transverse momenta,
+δ(4)(ek + q −ek′) = δ(2)(kT −k′
+T ) δ
+
+k+ + q+ −¯v ′ 2
+2k′−
+
+δ
+ ¯v 2
+2k+ + q−−k′−
+(21)
+and the integrations over dk−and dk′ + in Eq. (12) can act directly on Φ(k) and Ξ(k′). Therefore, by deﬁning the
+Transverse-Momentum Dependent (TMD) quark correlator as
+Φ(x, kT ) ≡
+Z
+dk−Φ(k)
+(22)
+and the TMD inclusive jet correlator [45] as
+J(k′−, k′
+T ) ≡1
+2
+Z
+dk′ +Ξ(k′),
+(23)
+we can write the hadronic tensor as
+2MW µν = 2(2π)3
+Z
+dx dk′−δ
+
+x −ξ −
+¯v ′ 2
+2p+k′−
+
+δ
+ ¯v 2
+2xp+ + q−−k′− Z
+d2kT Tr
+
+Φ(x, kT ) γµ J(k′−, kT )γν
+.
+(24)
+Note that we have written the integral over dk+ in terms of dx, and that the integration over d2k′
+T has set k′
+T = kT .
+The remaining d2kT
+transverse momentum integration acts only over the trace term, and the plus- and minus-
+direction delta functions ﬁx the values of the light cone fraction x and of the dominant k′−component of the
+recoiled quark momentum, respectively. One can here appreciate the importance of approximating the quark light-
+cone virtualities rather than their mass in Eqs. (19)-(20): in that case, we would be able to achieve delta function
+transverse decoupling only if we also approximated to zero the quark transverse momenta. As it will become clear by
+the end of this subsection, this additional approximation on kT is not necessary to achieve factorization.
+We still need to decouple the quark and jet correlators in the trace appearing in Eq. (24). To this end, we introduce
+the “operational” twist expansion [43, 66] for the TMD correlators, Φ(x, kT ) and J(k′−, k′
+T ). As with the kinematic
+approximations discussed above, this dynamical expansion is predicated on the existence of a hard scale determining a
+large boost in the light cone direction such that the scattering quark momentum component satisfy k+ ≫|kT | ≫k−,
+and for the recoiled momentum k′−≫|k′
+T | ≫k′+. In DIS, such a scale is provided by the photon’s virtuality Q2,
+and one can consider p+ ∼k′−∼Q. The quark correlator can then be expressed as a power expansion in M/p+,
+where the power counting scale M can be identiﬁed with the proton mass [52]. Limiting ourselves to the unpolarized
+sector, we write
+Φ(x, kT ) = 1
+2q(x, k 2
+T ) n/ + M
+2p+
+h
+e(x, k 2
+T ) I + q⊥(x, k 2
+T )k/T
+M
+i
++ O
+ M 2
+(p+)2
+
+(25)
+where q(x, k 2
+T ) is the unintegrated unpolarized parton distribution function, while e(x, k 2
+T ) and q⊥(x, k 2
+T ) are twist-3
+level parton distributions. The latter describes the non-perturbative dynamics of the quark’s intrinsic transverse mo-
+mentum. For the TMD inclusive jet correlator, the power counting scale can be identiﬁed with the ΛQCD conﬁnement
+4 As already stressed in Refs. [51] and [42], working locally at the level of the hard scattering vertex instead of globally at the level of the
+whole Feynman diagram provides one with ﬂexibility to adjust the kinematic approximation to the situation under discussion. In this
+paper we exploit this ﬂexibility to address the factorization of DIS at sub-asymptotic Q2 values, and we make our approximations very
+explicit as recommended by Ref. [42].
+
+11
+scale and the correlator expanded in powers of ΛQCD/k′−[45, 61]:
+J(k′−, k′
+T ) = 1
+2α(k′−)n/ + ΛQCD
+2k′−
+h
+ζ(k′−) I + α(k′−) k/′
+T
+ΛQCD
+i
++ O
+ Λ2
+QCD
+(k′−)2
+
+.
+(26)
+The leading twist coeﬃcient α(k′−) = θ(k−)
+2(2π)3 , independent of k′
+T , is the analog of the unpolarized D1 fragmentation
+function in SIDIS [52] but integrated over the detected hadron momentum, and summed over all hadron ﬂavors (indeed
+we are considering inclusive DIS events, where the ﬁnal state remains undetected). The chiral-odd twist-3 coeﬃcient
+ζ(k′−) = θ(k−)
+2(2π)3 Mj/ΛQCD is also independent of k′
+T , and Mj = mq +mcorr includes perturbative and non-perturbative
+“jet mass” contributions [46, 61]; it is the analog of the chiral-odd fragmentation function E [52]. The transverse
+momentum thus appears explicitly as a kinematic factor in the twist expansion (26).
+We can now expand the trace appearing in Eq. (24), which reads
+2(2π)3
+Z
+d2kT Tr
+
+Φ(x, kT ) γµ J(k′−, kT )γν
+=
+Z
+d2kT
+1
+4q(x, k 2
+T )Tr[n/ γµ n/ γν] + MΛQCD
+4p+k′−
+ Mj
+ΛQCD
+e(x, k 2
+T ) Tr
+
+γµγν
++ q⊥(x, k 2
+T )Tr
+
+k/T γµ k/T γν
+MΛQCD
+
+= 1
+4 q(x) Tr[n/ γµ n/ γν]
+|
+{z
+}
+twist 2
++MΛQCD
+p+k′−
+ Mj
+ΛQCD
+e(x)gµν +
+2M
+ΛQCD
+q⊥(1)(x)¯n{µnν}
+|
+{z
+}
+twist 4
++O
+ M 2
+p+2
+
++ O
+ Λ2
+QCD
+k′−2
+
++ HT . (27)
+up to higher-twist (HT) terms. At twist-2 level, and analogously to the asymptotic derivation outlined in Section II C,
+the integration over d2kT acts only on the quark distribution and produces the standard collinear PDF
+q(x) ≡
+Z
+d2kT q(x, k 2
+T ) .
+(28)
+Gauge invariance is guaranteed by qµTr[ n/ γµ n/ γν] = 0 despite having assumed a diﬀerent light-cone virtuality ¯v 2
+and ¯v ′ 2 for the scattering and recoiled partons. This result is only possible thanks to the twist expansion of the jet
+correlator, introduced in the handbag diagram instead of a single ﬁnal-state quark line, and clearly goes beyond a
+naive parton-model treatment of the process.
+At twist-4, we ﬁnd a contribution from the collinear e(x) ≡
+R
+d2kT e(x, k 2
+T ) distribution multiplied by the jet mass
+Mj, as well as from the ﬁrst k 2
+T moment of the TMD q⊥(x, k 2
+T ) distribution, q⊥(1)(x) =
+R
+dk2
+T
+k 2
+T
+2M 2 q⊥(x, k 2
+T ) [43, 52].
+One can thus explicitly see that the dynamics of the parton transverse momentum is not neglected in this approach,
+but rather included in twist-4 terms. The twist-4 terms appearing in Eq. (27) are, however, not gauge invariant by
+themselves. Gauge invariance can nonetheless be restored by properly summing these to contributions stemming from
+the inclusion of 4-parton matrix elements in the handbag diagram [29, 53, 67]. This is left for future work.
+We would also like to remark that the approach we have followed here is not entirely new.
+In fact it closely
+corresponds to the treatment of SIDIS cross sections in terms of transverse-momentum-dependent PDFs [43, 52], and
+a detailed correspondence can be obtained through the use of the fragmentation function sum rules developed in
+[44–46]. The SIDIS formalism is, however, at present fully developed only up to twist-3 level.
+Finally, the factorized hadronic tensor at leading-twist (LT) can be written as a convolution of a hard scattering
+tensor Hµν and the collinear PDF q(x),
+2MW µν
+LT =
+Z dx
+x Hµν(x, ¯x) q(x)
+(29)
+with
+Hµν(x, ¯x) = 1
+4 x δ(x −¯x) Tr [n/ γµ n/ γν]
+1
+|Jx,k′−|
+(30)
+In this equation, ¯x arises from the manipulation of the delta function appearing in Eq. (24),
+¯x = ξ
+2
+ 
+1 + ¯v ′ 2 −¯v 2
+Q2
++
+s
+1 + ¯v ′ 2 −¯v 2
+Q2
+2
++ 4 ¯v 2
+Q2
+!
+(31)
+= ξ
+ 
+1 + ¯v ′ 2
+Q2 −¯v 2¯v ′ 2
+Q4
++ O
+ µ6
+Q6
+!
+,
+(32)
+
+12
+and depends on two mass scales, namely, the approximate incoming and outgoing light cone parton virtualities ¯v 2
+and ¯v ′ 2, collectively denoted by µ2. Note that the incoming parton’s virtuality ¯v 2 only contributes at O(1/Q4), and
+can be parametrically neglected. The Jacobian factor Jx,k′−= 1 −
+¯v 2¯v ′ 2
+4(xp+k′−)2 , which also arises from manipulations
+of the mentioned delta functions, reads
+1
+Jx,k′−= 1 + ¯v 2¯v ′ 2
+Q4
+ 
+1
+( x
+ξ + ¯v 2
+Q2 )2 −¯v 2¯v ′ 2
+Q4
+!
+,
+(33)
+and deviates from 1 by a term scaling as the fourth inverse power of Q. The (average) light-cone virtualities ¯v 2 and
+¯v ′ 2 are of non perturbative origin, so in general they follow ¯v 2 ∼¯v ′ 2 ∼Λ2
+had, where Λhad is some hadronic scale.
+Using this one ﬁnds that Jx,k′−= 1 + O
+  Λ4
+had
+Q4
+
+. Hence, the choice of virtualities will play a secondary role in Jx,k′−
+compared to the determination of ¯x. However, they play a very important role in the determination of ¯x.
+E.
+Kinematic approximations in QCD
+As discussed in Section II D, collinear factorization requires one to approximate the incoming and outgoing quark
+light-cone virtualities, namely to take v2 ≈¯v2 and v ′ 2 ≈¯v ′ 2. However, v2 and v ′ 2 are not observable and cannot be
+experimentally controlled. One needs therefore to resort to a physically or theoretically motivated Ansatz to choose
+suitable ¯v 2 and ¯v ′ 2 values. For this purpose, we will derive kinematic bounds on v2 and v ′ 2 valid at any order in
+perturbation theory, and use these to obtain good Ans¨atze for ¯v2 and ¯v ′ 2. We will then test these in Section IV.
+1.
+Choice of ¯v ′ 2
+We start by considering the jet subdiagram on top of Figure 2, in which the struck quark of momentum k′ is
+fragmenting in a number of particles. By fermion number conservation, the incoming quark line should also pass the
+cut and appear in the ﬁnal state. Thus, by 4-momentum conservation,
+v ′ 2 = k′2 + k′ 2
+T ≥m2
+q + k′ 2
+T .
+(34)
+In fact, the quark needs to fragment into at least one hadron and therefore one should take into account the mass of
+the lightest hadron the quark can quark hadronize into, that is, the pion. Hence, a tighter bound is
+v ′ 2 ≥m2
+π + k′ 2
+T .
+(35)
+We can then use the lower bound as a minimal approximation of the average ⟨v ′ 2⟩. However, in a fully inclusive
+scattering, the transverse k′ 2
+T momentum cannot be experimentally controlled. Therefore, we choose
+¯v ′ 2 = m2
+π .
+(36)
+Note that with this choice we depart from the standard derivations of collinear factorization, where ¯v ′ 2 is approximated
+to zero for light quarks. A similar argument for ﬂavor tagged inclusive measurements such as of the charm structure
+function F c
+2 would lead to ¯v ′ 2 = m2
+D ≈m2
+c, with mD the D meson mass and mc the c quark mass, and eventually to
+scaling variables such as advocated in [23, 55].
+As QCD transitions from perturbative to non-perturbative degrees of freedom at large xB it is also possible that the
+virtual photon couple not to a single quark but to a composite partonic substructure, and ¯v ′ 2 could also be considered
+to be the invariant mass of the latter [58]. Without a speciﬁc model to guide one’s choice, one could treat ¯v ′ 2 as
+a phenomenological parameter and determine this for example in a global QCD analysis of inelastic data. However,
+large values for this parameter, that Ref. [58] would interpret as evidence for nucleonic substructure, might instead
+emerge as the ﬁt eﬀectively subsumes the dynamics of the quark hadronization process or the kinematic shifts induced
+by the quark’s transverse momentum into an eﬀective ¯v ′ 2 ≈⟨m2
+Y ⟩+ ⟨k 2
+T ⟩parameter. We will come back to these
+considerations when we discuss the scaling variable ¯x at the end of this subsection.
+2.
+Choice of ¯v 2
+Considering now target fragmentation, i.e., the lower vertex in the DIS diagrams of Figure 1 right we ﬁnd that
+p2
+X = (p −k)2 = (1 −x)
+
+M 2 −k2 + k 2
+T
+x
+
+−k 2
+T ,
+(37)
+
+13
+hence the light cone virtuality v2 = k2 + k 2
+T reads
+v2 = −
+x
+1 −x
+h
+(p2
+X −M 2) + xM 2 + k 2
+T )
+i
+.
+(38)
+Note that the light-cone virtuality vanishes as x →0, and becomes negative as x →1. Imposing baryon number
+conservation in the right diagram of Figure 1 requires the presence of at least one baryon in the ﬁnal state. Assuming
+the baryon number ﬂows into the target jet, imposes that the remnant X minimally contains a nucleon, p2
+X ≥m2
+X ≥
+M 2. Hence,
+v2 ≤−
+x
+1 −x
+h
+xM 2 + k 2
+T
+i
+,
+(39)
+with the upper bound representing the case in which the target jet is made of just one nucleon. It is then reasonable
+to choose
+¯v 2 = −x2
+1 −xM 2
+(40)
+as a minimal approximation of the average ⟨v2⟩, where we also neglected the internal variable k 2
+T that cannot be
+experimentally controlled in inclusive lepton-proton scattering.
+A simpliﬁed choice can be obtained by noticing that in Eq. (32), the light-cone fraction ¯x = ξ(1 + ¯v ′ 2/Q2 −
+¯v 2¯v ′ 2/Q4) + O(µ6/Q6) depends on ¯v2 only starting at order O(µ4/Q4) and can be approximated in ﬁrst instance as
+¯x ≈ξ
+
+1 + ¯v ′ 2
+Q2
+
+. This is equivalent to eﬀectively choosing
+¯v 2 = 0
+(41)
+in Eq. (32). As one can expect from Eq. (38) and we will numerically conﬁrm in our model calculation, this is in fact
+a good approximation for ⟨v2⟩at not too large values of xB, and as long as one considers small enough light-cone
+virtualities ¯v ′ 2. It is also the approximation taken in the parton model, and in standard derivations of collinear
+factorization, where k2 ≈m2
+q ≈0 at the same time as kT ≈0.
+3.
+Light cone fraction ¯x
+Having discussed possible choices for Ans¨atze for ¯v2 and ¯v ′ 2, we can focus our attention on the light-cone fraction
+¯x derived in Eq. (32).
+Far from kinematic thresholds, namely for not too large values of xB, one can choose ¯v 2 = 0 for the scattering
+quark, see Eq. (41). Using furthermore ¯v ′ 2 = m2
+π from (36) for the recoiling quark, one obtains5
+¯x ≈ξ
+
+1 + m2
+π
+Q2
+
+≡ξπ ,
+(42)
+Note that with a non-zero ¯v ′ 2 like in Eq. (36) we are more closely respecting the internal kinematics of the handbag
+diagram than with ¯v ′ 2 = 0.
+Therefore, we can expect that ¯x = ξπ will provide a better approximation to the
+non-factorized diagram’s than in standard collinear factorization.
+At larger values of xB, i.e., closer to the kinematic threshold, the virtuality (38) diverges to minus inﬁnity, and
+a diﬀerent approximation may be needed. In this regime, a suitable approximation to v2 that is valid in both the
+small-xB and large-xB regimes is
+¯v 2(¯x) = −
+¯x2
+1 −¯xM 2,
+(43)
+where we replaced x = ¯x in Eq. (38). Substituting Eq. (43) in Eq. (32), solving the resulting equation for ¯x pertur-
+batively in powers of µ2/Q2, and ﬁnally setting ¯v ′ 2 = m2
+π as in Eq. (36), we ﬁnd
+¯x ≈ξ
+"
+1 + m2
+π
+Q2 +
+ξ2
+1 −ξ
+m2
+πM 2
+Q4
+#
+≡ξ∗
+π
+(44)
+5 The ξπ variable is in fact analogous to the χ scaling variable used in Ref. [23, 55] to study charm production in charged current W +s →c
+events. The derivation we oﬀer here translates naturally to charm production, by replacing π ⇝D and approximating the mass of the
+D meson with the mass of the charm quark, MD ≈mc.
+
+14
+up to corrections of O
+
+µ6
+Q6
+
+. Note that at small xB the fourth order term quickly vanishes, and one recovers Eq. (42).
+Closer to the kinematic threshold, this new scaling variables accounts for the non-vanishing of the scattering quark’s
+light-cone virtuality. The latter can be approximated by substituting Eq. (44) back in Eq. (43) we can also obtain an
+approximation for quark’s virtuality, and written purely in terms of the external variables:
+¯v 2
+∗≡¯v 2(ξ∗
+π) .
+(45)
+This is the best approximation to the unobserved scattering parton’s virtuality we can obtain without measuring the
+hadronic ﬁnal state. However, as we will verify in Section IV, using Eq. (44) instead of Eq. (42) has little eﬀect on
+calculations of the factorized cross section, and Eq. (42) is a suﬃcient approximation.
+As already noted earlier, the approximated ¯v ′ 2 virtuality could also be considered as a free parameter and deter-
+mined in a PDF ﬁt utilizing ¯x = ξ(1 + ¯v ′ 2/Q2) instead of the prescription (42). The interpretation of the obtained
+¯v ′ 2 value, however, may not be straightforward even if found to be substantially larger than m2
+π, which is, according
+to our analysis, the minimum expected value. On the one hand, Ref. [58] argues that any improvement in the ﬁt
+would signal the emergence of composite partonic substructure in the nucleon target. On the other hand, the quark
+can in general hadronize to more than one particle and the ﬁtted ¯v ′ 2 can naturally be expected to be larger than m2
+π.
+Furthermore, even apart from hadronization dynamics considerations, we will show in Section V that an improvement
+in the CF description of a DIS structure function can also emerge if the unobserved quark’s transverse momentum is
+kinematically accounted for by choosing ¯v ′ 2 = m2
+π +⟨k 2
+T ⟩, with ⟨k 2
+T ⟩a free parameter of O(Λ2
+QCD). Thus, large values
+of ¯v ′ 2 may not necessarily indicate the presence of nucleon substructures other than asymptotically free partons.
+F.
+Discussion
+Despite its simplicity, formula (30) is non-trivial and it is worthwhile summarizing under what conditions it has
+been obtained.
+First of all, we emphasize once more that the transverse momentum is not approximated but rather included in
+higher-order terms in the twist expansion, which provides a controlled dynamical approximation. In fact, using the
+quark ﬁeld’s equation of motion relations, one can show that the twist-3 PDF e can be decomposed as xe = x ee+ mq
+M q,
+where ee correspond to a “pure” twist-3 dynamical contribution [52]. Similarly, the jet mass can be decomposed as
+Mj = mq + mcorr, where mcorr is the dynamical mass of the jet [45, 46]. Thus the twist expansion (27) does not only
+provide an expansion in the transverse momentum eﬀects, but also in the quark mass contributions in a way that is
+reminiscent of Ref. [68]. The quark mass expansion is appropriate as long as the quarks are light enough, otherwise
+one might want to include the term proportional to m2
+q in the LT partonic tensor.
+The only uncontrolled approximation we have performed is a purely kinematic one. Namely, we have ﬁxed the
+value of the quark light-cone virtualities v and v′ of the initial and ﬁnal state quarks, such that their sub-dominant
+momentum components are approximated by k−≈¯v 2/2k+ and k′+ ≈¯v ′ 2/2k′−. But, crucially, this approximation
+is only taken inside the parton-level 4-momentum conservation delta function, which is part of the “hard scattering”
+graphically identiﬁed by red circles in Figure 2. Thus, following the philosophy of [42], we have conﬁned the only
+needed non-controlled approximation to the hard interaction and kept the parton momenta otherwise unapproximated.
+The price to be paid for this approximation – which is the minimal kinematic approximation compatible with collinear
+factorization! – is that transverse momentum conservation in the approximated hadronic tensor is eﬀectively broken,
+and this sets an inescapable limit to the validity of the CF formula at large xB [48]. We will numerically study this
+limit for the benchmark spectator model in Section V B.
+Clearly, Eq. (30) reduces to the parton model result for light quarks in the ¯v 2 →0 and ¯v ′ 2 →0 limit, in which the
+partons are taken to approximately travel on the light cone. But even then, the quarks need not be approximately
+on their k2 ≈k′2 ≈m2
+q ≈0 mass shell, as often stated in literature, unless one further assumes - with no need - that
+the quarks are real particles. For generic values of the approximated ¯v 2 and ¯v ′ 2 quark virtualities, a gauge invariant
+factorized hadronic tensor can only be obtained if one considers the jet diagram in Figure 2 and its twist expansion.
+Had we worked in the parton model from the outset, or even in QCD but with a perturbative quark line instead of a
+jet correlator in the top part of the handbag diagram of Figure 2, this would not have been possible.
+We have thus found in Eq. (29)-(32) a gauge invariant generalization of the standard collinear factorization procedure
+for the hadronic tensor (12), which is now also valid at sub-asymptotic values of Q2 and does not require one to
+approximate to zero the virtuality of the scattering and recoiling partons. With this added ﬂexibility, in Section IV
+we will study a range of choices for ¯v 2 and ¯v ′ 2 in order to maximally extend the range of validity of the LT factorization
+approximation towards large xB and low Q2 values.
+
+15
+l
+l0
+k
+q
+Y
+M
+& p
+pφ  mφ ⇠hmXi
+k0  mq
+FIG. 3. Electron-proton DIS at leading order in the strong coupling constant in the spectator model, where we replaced the
+remnant by a scalar diquark φ of mass mφ, assumed to be of the order of the average remnant mass mX, and Y is the model’s
+proton-quark-diquark vertex, with ultraviolet modes cut oﬀby a suitable form factor. The labels indicate the momenta of
+the particles involved in the collision: q is the momentum of the photon; p is the momentum target nucleon; k and k′ are
+the momenta of the incoming and scattered quark participating in the hard scattering; pφ is the momentum of the spectator
+diquark. The particle masses are also explicitly indicated.
+III.
+VALIDATION FRAMEWORK: THE DIQUARK SPECTATOR MODEL
+As we discussed in Section II, deeply inelastic lepton-nucleon scattering involves the fragmentation of the proton or
+neutron target, as illustrated in the left panel of Figure 1. Target fragmentation in QCD is a complex, non-perturbative
+process that cannot be computed exactly, as yet. Instead, we wish to mimic this with a suitable proton-quark-meson
+vertex in a model theory, where full analytical calculations of the structure functions can be compared to their collinear
+approximation and thus validate the sub-asymptotic CF procedure derived in the previous Section.
+We then consider an idealized ﬁeld-theoretical model describing an electrically charged spin 1/2 particle of mass M,
+that plays the role of a proton and contains a charged active quark of mass mq and a neutral scalar diquark spectator,
+φ, of mass mφ [47, 48]. In this model the proton’s remnant X is mimicked by the spectator φ, with mφ of the order of
+the average remnant’s invariant mass ⟨mX⟩, and we can simulate e+p collisions by studying the diagram in Figure 3.
+For the proton-quark-diquark vertex we choose the following structure:
+Y = ig(k2)11 ,
+(46)
+where g(k2) generically denotes a form factor which takes into account that a diquark is, in fact, a composite ﬁeld.
+In this paper, we choose for simplicity the dipolar form factor
+g(k2) = g k2 −m2
+q
+|k2 −Λ2|2 ,
+(47)
+where g is a dimensionful coupling constant and Λ a parameter. This vertex is infrared safe, and smoothly cuts oﬀ
+ultraviolet modes in the quark leg when k2 is much larger than Λ2. This is an eﬀective way of simulating conﬁnement
+in the proton target, since the cutoﬀimposes a length scale of order 1/Λ. The strong coupling constant g does not
+play a signiﬁcant role in our discussion, and we set this to g = 1 GeV2 for simplicity. The conﬁnement scale Λ and the
+spectator mass mφ, are considered free parameters of the model, and are meant to capture the salient non-perturbative
+features of the DIS process. Other possible choices of form factor, including an exponential form and a combination
+of scalar and axial diquarks to simulate up and down quarks have been discussed in Ref. [47].
+The model parameters can be determined by ﬁtting the analytic calculations of parton distribution functions, which
+are possible in the model due to the relative simplicity of the vertex, to phenomenological extractions from experimental
+data [1, 4]. Here we adopt the values ﬁtted in Ref. [47] to the PDFs determined by the ZEUS collaboration [69],
+namely,
+mφ = 0.822 GeV,
+Λ = 0.609 GeV,
+(48)
+with quark and proton masses kept ﬁxed at
+mq = 0.3 GeV,
+M = 0.939 GeV.
+(49)
+We will use these values as default, but we will also consider variations around these numbers in order to study the
+systematics of the sub-asymptotic collinear factorization scheme to be discussed later. We also note that with these
+mass parameters, mq + mφ > M and the proton is a stable particle as it happens in QCD.
+
+16
+µ
+⌫
+Y
+Y
+(a) DIS
+Y
+⌫
+Y
+µ
+(c) “Resonance”
++ h.c.
+µ
+Y
+⌫
+Y
+(b) Interference
+FIG. 4. Diagrams contributing to e + p scattering up to order O(g2) in the strong coupling constant. Left: DIS contribution.
+Center: Interference term. Right: Proton resonance.
+In this work, we consider mq ̸= 0 in order to study the kinematic dependence of the process on the mass generated
+in the ﬁnal state, and how to retain this in the collinear factorization of the DIS cross section. Similar studies for
+the inclusive DIS process have been performed in Refs. [23, 54, 55] with a focus on heavy-quark production; for
+semi-inclusive DIS in Refs [20, 21], that focused on kinematic corrections induced by the mass of the detected hadron;
+and in Ref. [58] with the aim of identifying “clustered” substructures within the target. In all these works, masses
+are taken into account by a suitable rescaling of the struck quark’s momentum light-cone fraction x. In this paper,
+we revisit the basis for these scaling approximations utilized and test these against the full analytic model calculation
+of the process. As in Ref. [48], we will restrict our analysis to light quarks with mass much smaller than the charm’s,
+mq ≪mc, and in particular consider values of the order of the strange quark mass, mq ∼ms.
+Lastly, we would like to stress that mφ and Λ are “internal”, unobservable parameters of the model, in the same
+way that the QCD conﬁnement scale or the remnant mass cannot be directly measured in electron-proton scattering.
+Conversely, even in an inclusive measurement, we treat the quark mass as a known “external” parameter. In QCD,
+this would be akin to what happens in measurements of the charmed structure function F c
+2 in DIS [70, 71], where the
+active charm quark can be tagged by identifying a heavy ﬂavor hadron in the hadronic ﬁnal state, without however
+measuring its momentum, or the momentum of any other hadron.
+A.
+Calculation of the hadronic tensor
+As opposed to QCD, where the matrix elements in Eq. (11) need to be parametrized because their non-perturbative
+nature, in the spectator model the nucleon-quark-diquark vertex is explicitly known, see Eqs. (46) and (47), and
+one can analytically compute the hadronic tensor. At leading order in the strong coupling constant, the involved
+diagrams are collected in Figure 4. Note that by electric charge conservation, as stressed in Ref. [48], we need not only
+to consider the coupling of the photon to the quark, which is expected to dominate at large values of the invariant
+mass squared W 2 = (p + q)2, but also the photon-proton coupling. The LO cross section is therefore composed of
+3 physical process that are observationally indistinguishable but theoretically separable, as we will discuss in the
+next subsection. The ﬁrst one is photon-quark scattering, and mimics deeply inelastic scattering on the proton, see
+Figure 4(a). The second one is the photo-induced excitation of the proton, that subsequently decays into into a quark
+and a diquark, see Figure 4(c). This is akin to resonance excitation and subsequent decay in QCD, except the model
+as it stands does not include hadrons of higher mass than the nucleon. Finally, the hadronic tensor also receives a
+contribution from the interference of these two, see Figure 4(b).
+The hadronic tensor can be written as a sum of these three contributions:
+W µν =
+X
+(j)
+W (j),µν =
+X
+(j)
+Z
+Ωk
+d4k W(j),µν(k)
+(j) = DIS, INT, RES
+(50)
+where Ωk indicates the 4-D integration region in k determined by four-momentum conservation and the external
+kinematics. The individual, fully unintegrated contribution of each diagram in Figure 4, W(j),µν(k), can be calculated
+
+17
+using the Feynman rules of the model, and at order O(g2) read:
+2MWDIS,µν(k) = 1
+2
+g2(k2)
+(2π)3
+Tr
+
+(p/ + M)(k/ + mq)γµ(k/ + q/ + mq)γν(k/ + mq)
+
+(k2 −m2q)2
+× δ((k + q)2 −m2
+q)δ((p −k)2 −m2
+φ) ,
+(51)
+2MWINT,µν(k) = 1
+2
+2 g2(k2)
+(2π)3
+Tr
+
+(p/ + M)(k/ + mq)γµ(k/ + q/ + mq)(p/ + q/ + M)γν
+((p + q)2 −M 2)(k2 −m2q)
+× δ((k + q)2 −m2
+q)δ((p −k)2 −m2
+φ) ,
+(52)
+2MWRES,µν(k) = 1
+2
+g2(k2)
+(2π)3
+Tr
+
+(p/ + M)γµ(p/ + q/ + M)(k/ + q/ + mq)(p/ + q/ + M)γν
+((p + q)2 −M 2)2
+× δ((k + q)2 −m2
+q)δ((p −k)2 −m2
+φ) .
+(53)
+Note that, following Ref. [48], in the second and third equations we took the liberty of shifting the integration variable
+in order for the δ-functions to match those appearing in the DIS diagram.
+We remark from Eq. (52) that the interference term contribution is nominally suppressed by a 1/(W 2 −M 2) factor
+compared to the DIS term (51), due to the presence of one proton propagator. Similarly, the resonance term (53)
+contains two proton propagators, and is nominally suppressed by one more power of W 2−M 2. As we will demonstrate
+explicitly in Section III D, this scaling holds to a very good degree for transverse structure functions – hence the DIS
+term dominates the process at asymptotically large Q2 or small Bjorken scaling variable xB = Q2/(2p · q), where
+W 2 ∼Q2/xB. However, this is not the case for the longitudinal structure function where, due to the oﬀ-shellness of
+the quark and proton propagators, all pieces are of similar magnitude and scale with 1/Q2.
+Finally, it is important to stress that the individual contributions of the 3 diagrams considered in Figure 4 to
+the hadronic tensor are not gauge invariant by themselves, but their sum (50) satisﬁes the electromagnetic Ward
+identities [48]. Since, however, these diagrams contain heuristically distinguishable processes, in the next subsection
+we propose a method to isolate their gauge invariant parts, and to obtain a unique and physically meaningful (although
+only theoretical) decomposition of the hadronic tensor into a DIS, resonance, and interference contributions. This
+decomposition will also allow us to test in Sections IV and V the validity of the collinear factorization procedure, that
+only purports to approximate the DIS component of the e + p scattering cross section. In this respect, we diﬀer from
+Ref. [48], where factorized calculations were compared to the full DIS+INT+RES model calculation.
+B.
+Gauge invariant decomposition into DIS, resonance, and interference processes
+The strategy we follow to uniquely decompose a rank-2 tensor into a gauge invariant and a gauge breaking part is to
+deﬁne a complete set of orthogonal rank-2 projectors, {P µν
+λ }, maximizing the number that satisfy the electromagnetic
+Ward identity, q ·Pλ ≡qµP µν
+λ
+= 0. Here we limit our treatment to the parity invariant tensors, such as those involved
+in unpolarized DIS, but will complete the discussion in Appendix A.
+Following [23, 32], we deﬁne longitudinal, transverse and scalar polarization vectors with respect to a longitudi-
+nal momentum p (in our case the proton’s momentum) and a reference vector q (in our case the virtual photon’s
+momentum) deﬁning the longitudinal direction and the transverse plane:
+εµ
+0(p, q) =
+ˆpµ
+p
+ˆp2
+εµ
+±(p, q) =
+1
+√
+2(0, ∓1, −i, 0)
+εµ
+q (p, q) =
+qµ
+p
+−q2 ,
+(54)
+where ˆpµ ≡pµ −p·q
+q2 qµ. We note that the transverse ε± polarization vectors indeed lie in the plane transverse to
+both p and q (since ˆp · ε± = q · ε± = 0) and that the “longitudinal” ε0 polarization vector is transverse to the photon
+momentum (q · ε0 = 0).
+The polarization vectors form an orthogonal basis in Minkowski space,
+ελ · ελ′ = 0
+for λ ̸= λ′
+ελ · ελ = 1
+for λ = 0, +, −
+(55)
+εq · εq = −1 ,
+
+18
+and can be used to deﬁne parity invariant “helicity projectors” for rank 2 tensors. In particular, we deﬁne longitudinal,
+transverse, scalar, and mixed projectors P µν
+λ
+, with λ = L, T, S, {LS}, as
+P µν
+L (p, q) = εµ
+0(p, q)εν∗
+0 (p, q)
+P µν
+T (p, q) = εµ
++(p, q)εν∗
++ (p, q) + εµ
+−(p, q)εν∗
+−(p, q)
+P µν
+S (p, q) = εµ
+q (p, q)εν∗
+q (p, q)
+P µν
+{LS}(p, q) = εµ
+0(p, q)εν∗
+q (p, q) + εµ
+q (p, q)εν∗
+0 (p, q) .
+(56)
+Taking advantage of
+εµ
++(p, q)εν∗
++ (p, q) + εµ
+−(p, q)εν∗
+−(p, q) = −gµν + εµ
+0(p, q)εν∗
+0 (p, q) −εµ
+q (p, q)εν∗
+q (p, q)
+(57)
+and of the polarization vectors deﬁnition (54), the helicity projectors can be written in a more compact and suggestive
+way as
+P µν
+L (p, q) = ˆpµˆpν
+ˆp2
+P µν
+T (p, q) = −ˆgµν + ˆpµˆpν
+ˆp2
+P µν
+S (p, q) = −qµqν
+q2
+P µν
+{LS}(p, q) = ˆpµqν + qµˆpν
+p
+−q2ˆp2
+,
+(58)
+where ˆgµν = gµν −qµqν
+q2
+is also transverse to the photon’s momentum. In either representation, it is straightforward
+to verify that these projectors are orthogonal. Indeed,
+Pλ · Pλ′ = 0
+for λ ̸= λ′
+Pλ · Pλ = 1
+for λ = L, S
+(59)
+PT · PT = 2
+P{LS} · P{LS} = −2 ,
+where we have extended the use of the dot-product symbol to rank-2 tensors: Pλ · Pλ′ ≡P µν
+λ Pλ′,µν. From Eq. (58),
+it is clear that the 4 deﬁned projectors are also a complete orthogonal basis for symmetric tensors T µν = T µν(p, q)
+that depend on the proton and photon momenta p and q, such as the hadronic tensor for inelastic e + p scattering.
+Given a generic symmetric tensor, T µν = T µν(p, q), we can now deﬁne its helicity structure functions Fλ as the
+projections of the tensor along the helicity basis deﬁned in Eq. (56) or (58):
+Fλ(xB, Q2) ≡cλPλ(p, q) · T(p, q) .
+(60)
+with cλ = 1/(Pλ · Pλ). Thanks to the orthogonality and completeness of the helicity projectors, the tensor T can
+then be decomposed as T µν(p, q) = P
+λ Fλ(xB, Q2)P µν
+λ (p, q). One can also go a step further, and separate this into a
+gauge invariant and gauge breaking components. Indeed, the longitudinal and transverse projectors satisfy the Ward
+identity,
+q · PL,T ≡qµP µν
+L,T = 0 ,
+(61)
+and it is immediate to verify that no linear combination of the scalar and mixed projectors can satisfy that condition,
+either. Hence the longitudinal and transverse projectors form a complete orthogonal basis for the space of gauge
+invariant hadronic tensors. Similarly, the scalar and mixed projectors form a complete orthogonal basis for maximally
+gauge breaking tensors. As a result,
+T µν(p, q) = T µν
+inv.(p, q) + T µν
+g.b.(p, q) ,
+(62)
+where
+T µν
+inv.(p, q) = P µν
+T FT (xB, Q2) + P µν
+L FL(xB, Q2)
+(63)
+T µν
+g.b.(p, q) = P µν
+S FS(xB, Q2) + P µν
+{LS}F{LS} ,
+(64)
+
+19
+are, respectively, the gauge invariant (inv.) and gauge breaking (g.b.) components of the tensor T µν. Accordingly, we
+also call FT and FL “gauge invariant structure functions”, and FS and F{LS} “gauge breaking structure functions”.
+Coming back to our model electron-proton scattering, we can apply this decomposition to each of the 3 processes
+represented in Figure 5, and deﬁne their gauge invariant and gauge breaking parts:
+2MW (j),µν
+inv.
+(p, q) = P µν
+T F (j)
+T (xB, Q2) + P µν
+L F (j)
+L (xB, Q2) ,
+(65)
+2MW (j),µν
+g.b
+(p, q) = P µν
+S F (j)
+S (xB, Q2) + P µν
+{LS}F (j)
+{LS} ,
+(66)
+for j = DIS, INT, RES. The gauge invariance of the hadronic tensor (50) ensures that the sum of the gauge breaking
+parts of each diagram in Figure 5 vanishes,
+W µν
+g.b =
+X
+(j)
+W (j),µν
+g.b
+= 0
+(j) = DIS, INT, RES
+(67)
+as one can also explicitly verify utilizing the algebraic manipulations discussed in [48], even though the individual
+terms in the sum are diﬀerent from zero.
+In summary, the gauge-invariant FT,L structure functions of each individual diagram in Figure 4 are physically
+meaningful, and allow one to theoretically decompose each e + p scattering structure functions into DIS, resonance
+and interference contributions. A more detailed discussion of this decomposition in the context of the scalar diquark
+model will be oﬀered in Sections III D and III E.
+C.
+Kinematics
+Like in e + p scattering in QCD, the Bjorken invariant in the model is bounded, as we discuss in more detail in
+Appendix B:
+0 < xB ≤
+1
+1 + (mφ+mq)2−M 2
+Q2
+≡xB,max .
+(68)
+The lower bound is due to the fact that in an electron-proton scattering the photon momentum is spacelike. The
+upper bound, xB,max, is determined by the on-shell condition for particles belonging to a minimal mass 2-particle
+ﬁnal state, and is analogous to the “pion threshold” xπ = 1/
+h
+1 + (M+mπ)2−M 2
+Q2
+i
+in inelastic e + p collisions in QCD.
+Likewise, the maximum transverse momentum squared for the scattered quark, k2
+T,max, is determined by the available
+invariant mass W 2 and the masses of the particles in the minimal mass ﬁnal state, see Appendix B for details:
+0 ≤k 2
+T ≤
+
+W 2 −(mφ + mq)2
+W 2 −(mφ −mq)2
+4W 2
+≡k2
+T,max .
+(69)
+It is interesting to note that the kinematic threshold in xB can only be reached at zero quark transverse momentum.
+Indeed, solving k2
+T,max = 0 for xB one recovers the upper limit in (68).
+We can now explicitly write each of the contributions to the hadronic tensor (50) as an integral over the parton’s
+transverse and longitudinal momentum and virtuality:
+W (j),µν(xB, Q2) =
+Z k2
+T,max
+0
+dk2
+T
+ZZ
+dx dk2 W(j),µν(x, k2, k 2
+T )
+(70)
+where
+W(j),µν(x, k2, k 2
+T ) = π
+2x W(j),µν(k)
+(71)
+is the fully unintegrated hadronic tensor in the x, k2 and k 2
+T variables, and the Wj(k) tensors on the right are deﬁned
+in Eqs. (51)-(53). It is important to note that the integral in dk2
+T appearing in Eq. (70) is limited from above by the
+maximum transverse momentum squared for the scattered quark deﬁned in Eq. (69).
+At LO, due to the δ−functions in the unintegrated hadronic tensors that originate, as mentioned, from the upper
+and lower cuts in the diagrams of Figure 4, the integrals over dx and dk2 can be explicitly calculated, and we can
+explicitly calculate the k 2
+T -unintegrated (but x- and k−-integrated) hadronic tensor W(k 2
+T ) =
+R
+dxdk2W(x, k2, k 2
+T ):
+W(j),µν(k 2
+T ) ≡π
+2x
+1
+|Jx,k2,k 2
+T |
+f
+W(j),µν(k)
+
+x=xex(k 2
+T ), k2=k2ex(k 2
+T )
+,
+(72)
+
+20
+where we notationally distinguished the integrated tensor from the unintegrated one only by their arguments. The
+Jacobian
+Jx,k2,k 2
+T = (ξ −1)(k2 + k 2
+T )
+x2
++
+
+1 −1
+x
+Q2
+ξ +
+
+1 −ξ
+x
+
+M 2
+(73)
+arises from the manipulation of the delta functions, and the tilde sign over the hadronic tensor symbol indicates the
+removal of these from Eqs. (51)-(53). The whole expression (72) is then evaluated at x = xex(k 2
+T ) and k = k2
+ex(k 2
+T ),
+which are the solutions of the said delta functions and are explicitly derived in Appendix B 3, see Eqs. (B11)-(B12).
+In Eq. (73) we have highlighted the role of the mass scales: beside the external proton mass M 2 and photon
+virtuality Q2, the Jacobian also depends on the “light-cone virtuality”
+v2 = k2 + k 2
+T
+(74)
+of the struck quark, already deﬁned in Eq. (7).
+It is now instructive to look in more detail at the internal kinematics of the process.
+In fact, in an inclusive
+scattering, the 4-momentum of the scattered quark is not measured, and therefore neither x, nor k2, nor k 2
+T can be
+experimentally determined. Nonetheless, in the spectator model we do have explicit control over these variables – a
+major theme of this article – in particular through the analysis of the momentum ﬂow through the cuts in Figure 4.
+For example, the light-cone fraction x is determined by the the cut of the quark line in the top part of the diagrams,
+that gives rise to the δ((k + q)2 −m2
+q) function in Eqs. (51)-(53). This delta function imposes
+x = ξ
+2
+ 
+1 + m2
+q −k2
+Q2
++
+s
+1 + m2q −k2
+Q2
+2
++ 4k2 + k 2
+T
+Q2
+!
+(75)
+= ξ
+ 
+1 + m2
+q + k 2
+T
+Q2
+−v2 (m2
+q + k 2
+T )
+Q4
++ O
+ µ6
+Q6
+!
+.
+(76)
+In the second line, the constraint is expanded in inverse powers of Q2 and acquires a suggestive form, that in fact
+holds at any order in the expansion. In detail, in Eq. (76), x depends only on two mass scales: the transverse mass
+m2
+qT ≡m2
+q + k 2
+T of the scattered quark and the quark’s light-cone virtuality v2, with no direct dependence on the
+diquark mass. The light-cone virtuality is, instead, ﬁxed by the bottom cuts in Figure 4:
+v2 = −
+x
+1 −x
+h
+(m2
+φ −M 2) + xM 2 + k 2
+T
+i
+,
+(77)
+which can be obtained by replacing p2
+X ⇝m2
+φ in Eq. (38) and depends on the target’s fragmentation dynamics,
+encapsulated in mφ. Notably, the light-cone virtuality vanishes when x →0, diverges to negative inﬁnity as x →1,
+and is negative over the whole range in x for physical choices of the mφ parameter as can be expected of a bound
+particle6. This also means that the quark is oﬀits k2 = m2
+q mass shell over the whole range of xB. This analysis will
+be substantiated in Section IV, with an explicit calculation of the average values of the internal kinematic variables
+as a function of Bjorken’s xB.
+It is ﬁnally important to note that the light-cone virtuality enters Eq. (76) only starting at order O(1/Q4). Therefore,
+x and v2 are coupled essentially only through the quark transverse momentum squared k 2
+T , which is the only variable
+left free in the loop integrations (51)-(53). Since, as discussed, v2 remains small except close to the kinematic threshold,
+where it can become substantially large and negative, truncating Eq. (76) to ﬁrst order in the 1/Q2 expansion appears
+to be a meaningful approximation over much of the inclusive scattering’s (xB, Q2) phase space. These considerations
+form the basis for the kinematic approximations needed to perform collinear factorization in DIS at sub-asymptotic
+energy, as discussed in Section II and numerically tested in Section IV.
+D.
+Transverse structure function
+Having discussed the hadronic and partonic kinematics, and isolated the gauge invariant part of the DIS, resonance,
+and interference diagrams in Figure 4 with the aid of Eqs. (65) and the projections (60), we can study their individual
+6 The only way the light-cone virtuality can become positive and large is if mφ ≪M, such that v2 ≈xM2 −k 2
+T /(1 −x). Evaluating this
+at k 2
+T ∼Λ2 ∼0.4M2, the maximum light-cone virtuality remains nonetheless small, only reaching v2
+max ∼0.1M2 at x ∼0.4 before
+dropping below 0 as x →1. This is, however, a quite unphysical choice of diquark mass because φ represents the proton’s remnant, and
+thus one would expect mφ ∼M.
+
+21
+role in the e + p scattering process. We focus ﬁrst on the transverse structure function FT , which, in our model, gives
+the dominant contribution to the inelastic cross section, and discuss FL in the next subsection.
+As discussed in Section III B, the individual DIS, interference and resonance structure functions can be obtained
+by projecting the respective hadronic tensors:
+F (j)
+T
+= M P µν
+T W (j)
+µν
+(j) = DIS, INT, RES .
+(78)
+In the case of the DIS contribution, F DIS
+T
+describes the scattering of a transversely polarized photon with a quark
+emitted by the proton (see Figure 4(a)). Analogously, the resonance F RES
+T
+structure function describes a transverse
+photon that scatters on the proton as a whole (see Figure 4(c)). Therefore we expect these structure functions to be
+non negative:
+F DIS
+T
+∝
+M q
+T
+2 ≥0
+(79)
+F RES
+T
+∝
+M p
+T
+2 ≥0
+(80)
+where M q,p
+T
+are the scattering amplitude of the transverse photon-quark and transverse photon-proton processes.
+This is conﬁrmed in Figure 5, where we numerically evaluate all components of FT in the spectator model at LO,
+and show that F DIS
+T
+and F RES
+T
+are indeed positive at all values of xB and Q2. In contrast, the interference structure
+function F INT
+T
+can have any sign, and in our model it turns out to be negative deﬁnite – and not too small, either.
+In the left panel of Figure 5, we use a value of Q2 = 4 GeV2 and notice that at small xB the DIS contribution is
+the dominant one. Nonetheless, the interference piece is large and non negligible even at intermediate and large xB,
+and is largely responsible for the visible diﬀerence between the DIS curve (blue) and the total contribution (black).
+The resonance piece has an extended but small tail at lower xB, and increases in magnitude as xB →1, where in
+principle it would diverge. However, this divergence is cut oﬀby the phase space, that limits xB < xmax
+B
+< 1 when
+mq + mφ > M, as in our model. The interplay of the resonance at xB = 1 and phase space limitations produces an
+asymmetric bump at xB ≲xmax
+B
+. This bump becomes visually more prominent and narrow in the total contribution,
+that seems separated into an inelastic contribution at xB ≲0.75 and a resonance peak at xB ≳0.75. However, the
+trough at xB ≈0.75 is actually a combined eﬀect of the resonance and interference pieces, whose inﬂuence extends
+beyond the edge of phase space, well into what one may consider to be the deep inelastic region. In Appendix C,
+we discuss for completeness the calculation for the mq + mφ < M case, where the resonant behavior of the proton
+excitation is in full display (see Figure 14).
+Total
+DIS
+Interference
+Resonance
+0.2
+0.4
+0.6
+0.8
+1.0
+-0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+xB
+(4π)2FT
+Q2 = 4 GeV2
+Total
+DIS
+Interference
+Resonance
+0.2
+0.4
+0.6
+0.8
+1.0
+-0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+xB
+(4π)2FT
+Q2 = 16 GeV2
+FIG. 5.
+Gauge invariant decomposition of the transverse structure function FT at Q2 = 4 GeV2 (left plot) and Q2 = 16 GeV2
+(right plot) for the model parameters speciﬁed in Section III [see Eqs. (48)-(49)]. The kinematic thresholds are xB,max = 0.913
+and 0.976, respectively.
+In e + p scattering, it is important to separate the DIS contribution from the rest, because it is this one that can
+be factorized into a perturbatively calculable photon-parton hard scattering coeﬃcient and a non-perturbative parton
+distribution function, thus giving one access to the partonic structure of the target:
+F DIS
+T
+≈F CF
+T
+= M P µν
+T W µν
+LT = q(¯x)
+(81)
+where W µν
+LT is given in Eq. (29).
+
+22
+What the model shows, however, is that the needed phenomenological separation of the DIS piece must be done
+carefully, and cannot rely only on phenomenological cuts (for example on W 2) to eliminate the apparent resonance
+“peak”. Instead, one needs to also exploit the Q2 dependence of the structure function, since, as already observed,
+the interference contribution is parametrically suppressed by a factor
+1
+W 2−M 2 ∼1/Q2 compared to DIS, and the
+resonance contribution is suppressed by
+1
+(W 2−M 2)2 ∼1/Q4.
+(In the latter case the parametric scaling does not
+fully hold numerically, although the resonance piece is still suppressed compared to the resonance contribution, see
+Appendix D.)
+To illustrate the Q2 suppression of the interference and resonance contributions, we show our calculations for
+Q2 = 16 GeV2 in the right panel of Figure 5. In this case the interference term contribution is suppressed compared
+to the plot in the left panel, but still still appreciable. The resonance contribution is negligible except at very high
+xB values closer to the kinematic threshold, that moved to the right compared to the left panel. There it becomes
+the dominant contribution, and, combined with the interference, again gives rise to a narrow, but now smaller,
+“peak”. Overall, the DIS piece dominates although a not yet necessarily negligible interference contribution is visible
+at intermediate xB. At yet higher Q2 values the DIS piece would become the dominant contribution over most of the
+available xB range, except right before the kinematic threshold.
+While an experimental measurement is only sensitive to the full structure function, the scaling just described
+allows to phenomenologically control, for example, just the DIS component in a ﬁt that includes power-suppressed
+H(x)/Q2 terms, with H(x) a suitable polynomial in x, and utilizes data in as large a (xB, Q2) range as possible. This
+was ﬁrst tried in Ref. [72], and more recently implemented in global ﬁts of parton distributions by the CTEQ-JLab
+collaboration [73–75], the JAM collaboration [76], and by Alekhin and collaborators [77, 78]. A similar ﬁt utilizing
+data generated from the spectator model goes beyond the scope of this paper, but will be presented elsewhere [79].
+Instead, in Sections IV and V we will compare the analytically isolated DIS component of the model’s structure
+function to its factorized approximation to validate the latter.
+E.
+Longitudinal structure function
+For completeness, in Figure 6 we present the model calculation of the longitudinal structure function FL, even
+though we will not discuss this further in the rest of the paper, since in collinear factorization F CF
+L
+= 0 at LO. The
+behavior of the longitudinal FL structure function, illustrated in Figure 6, changes drastically from what we have
+discussed for its transverse FT counterpart in at least two respects. Firstly, all 3 components scale approximately as
+1/Q2, instead of displaying the hierarchy discussed for the transverse case. Secondly, FL →0 also as xB →0; however,
+each one of the three components remains diﬀerent from zero, and, in fact, F DIS
+L
+→F RES
+L
+. We will analytically study
+the highlighted features of FL in Appendix D, and oﬀer here a heuristic explanation for these.
+For the DIS component, the 1/Q2 scaling behavior can be understood by noticing that, if the scattered quark was
+on its mass shell, the Callan-Gross relation would be satisﬁed and one would ﬁnd F DIS
+L
+= 0. However, the quark is
+virtual, and we can expect the Callan-Gross relation to be broken by an amount proportional to the quark’s average
+virtuality normalized by the scale of the process, which is provided by the invariant mass W 2: namely, F DIS
+L
+∝
+⟨k2⟩/W 2 ∝Λ2/Q2. Note that we have used ⟨k2⟩= O(Λ2), because this is the scale that determines the behavior of
+proton vertex’s form factor Y, and therefore determines the quark’s nonperturbative dynamics in the model. This
+argument also justiﬁes the much smaller size of the DIS component of FL compared to that of FT . For the resonance
+piece, the same argument can be applied to the scattered proton, whose virtuality is equal to W 2 by four-momentum
+conservation.
+The only scale left to neutralize this is Λ2, hence we can expect F RES
+L
+∝
+1
+W 4 × W 2
+Λ2
+∝1/(Λ2Q2),
+where the fourth inverse power of the invariant mass is due to the proton propagator, as evident from Eq. (53). The
+conﬁnement scale now appears at the denominator, enhancing the resonance piece relative to the DIS contribution
+(in the transverse case it was much suppressed, instead). The interference piece is a mixture of these two, and we can
+expect FL ∝
+1
+W 2 ×
+q
+Λ2
+Q2
+q
+W 2
+Λ2 ∝
+1
+Q2 . In all cases, the three components of the longitudinal structure function scale
+as 1/Q2, as we will analytically corroborate in Appendix D.
+The limiting behavior of the full FL, which vanishes as xB →0, is a general consequence of gauge invariance.
+Indeed, one can easily see that the longitudinal projector satisﬁes
+P µν
+L (p, q) −−−−→
+xB→0 P µν
+S (p, q) .
+(82)
+Noticing that PS is one of the two gauge-breaking operators discussed in Section III B, we obtain
+FL −−−−→
+xB→0 2M PS · W = 2M PS · Wg.b. = 0 .
+(83)
+
+23
+Total
+DIS
+Interference
+Resonance
+0.2
+0.4
+0.6
+0.8
+1.0
+-0.8
+-0.6
+-0.4
+-0.2
+0.0
+0.2
+0.4
+xB
+(4π)2FL
+Q2 = 4 GeV2
+Total
+DIS
+Interference
+Resonance
+0.2
+0.4
+0.6
+0.8
+1.0
+-0.8
+-0.6
+-0.4
+-0.2
+0.0
+0.2
+0.4
+xB
+(4π)2FL
+Q2 = 16 GeV2
+FIG. 6. Gauge invariant decomposition of the longitudinal FL structure function at Q2 = 4 GeV2 (left) and Q2 = 16 GeV2
+(right). The kinematic thresholds are xB,max = 0.913 and 0.976, respectively.
+The last equality is in fact valid for any gauge invariant tensor, see Eq. (67), and therefore also for inelastic scattering
+at LO in our model, as plotted in Figure 6. Unitarity then imposes speciﬁc small-xB constraints for the resonance
+and interference components of FL:
+F RES
+L
+−−−−→
+xB→0 F DIS
+L
+,
+(84)
+F INT
+L
+−−−−→
+xB→0 −2F DIS
+L
+.
+(85)
+Indeed, since the two individual e+p scattering amplitudes involving the longitudinal photon-quark and the longitudi-
+nal photon-proton interactions are imaginary, Mq,p
+L
+= iTq,p, the vanishing of FL in that limit imposes T 2
+q +T 2
+p −2TqTp =
+(Tq −Tp)2 →0.
+Let us stress that Eqs. (83)-(85), are consequence of electromagnetic gauge invariance rather than special features
+of the model we have considered. What is not constrained by general principles is the limiting behavior of the DIS
+contribution, that at small xB could as well tend to zero or diverge (in which case, we note that the interference term
+should also diverge but with opposite sign). The fact that it is, instead ﬁnite, is a feature of the chosen spectator
+model, as we will analytically demonstrate in Appendix D, where we will also prove the common 1/Q2 scaling behavior.
+In closing this section, we recall that the spectator model we are considering is only designed to account for the
+quark dynamics inside the proton, and therefore can only mimic electron-proton scattering in the “valence quark
+region” at large xB ≳0.2. In QCD, the DIS longitudinal structure function at small xB is instead dominated by
+photon-gluon fusion interactions, that the model as it stands cannot describe7. Nonetheless, the conclusion that
+FL →0 as xB →0 is a consequence of electromagnetic gauge invariance, and as such is model independent. Therefore
+we can also expect this to happen in nature. In fact, data on inelastic e+p scattering gathered at HERA [81–83] show
+that FL ﬁrst grows as xB decreases towards xB ∼10−4, then falls oﬀas xB becomes smaller than that value, contrary
+to expectations from perturbation theory. Many explanations have been advanced for this observation, including
+higher twist eﬀects [59, 78, 84–86] and deviations from perturbative QCD evolution [87–90]. Here, we are suggesting
+that a further source of deviation from perturbative calculations of FL is due to the limiting behavior of this structure
+function, that is forced by gauge symmetry to vanish at small xB.
+IV.
+TESTING THE KINEMATIC APPROXIMATIONS
+In deriving the factorized hadronic tensor (29) in Section II, we have distinguished dynamical and kinematical
+approximations, namely, the inclusion of the parton transverse momentum loop integral contribution into the twist
+expansion, and the choice of approximate light cone virtualities ¯v 2 and ¯v ′ 2 entering the calculation of the collinear
+hard scattering tensor Hµν.
+The twist expansion is controlled by powers of µ2/Q2 and can be calculated up to any desired order (although each
+order eventually needs the introduction of one or more new non-perturbative functions). The light cone virtualities,
+7 A generalization of the model to include gluon dynamics has been discussed in Ref. [80].
+
+24
+instead, are not observable nor can they be experimentally controlled. Thus, as discussed in Section II E, we can
+only resort to a physically or theoretically motivated Ansatz to choose suitable ¯v 2 and ¯v ′ 2 values. Contrary to the
+twist expansion, this approximation cannot be systematically improved. In the spectator model, however, one also
+has full control of the unobserved (or “internal”) variables, and our choices can be in fact veriﬁed by comparing the
+approximated internal variables with their average value.
+Let us then deﬁne the average of a generic function O = O(x, k2, k 2
+T ) of the internal variables as:
+⟨O⟩(xB, Q2) =
+R k2
+T,max
+0
+dk 2
+T dk2dx O(x, k2, k 2
+T )FDIS
+T
+(x, k2, k 2
+T )xB,Q2
+R k2
+T,max
+0
+dk 2
+T dk2dx FDIS
+T
+(x, k2, k 2
+T )xB,Q2
+,
+(86)
+where k2
+T,max was deﬁned in Eq. (69), and the fully unintegrated structure function FDIS
+T
+is deﬁned as the transverse
+projection of the fully unintegrated DIS hadronic tensor (51):
+FDIS
+T
+(x, k2, k 2
+T )xB,Q2 = M P µν
+T WDIS
+µν (x, k2, k 2
+T )xB,Q2 .
+(87)
+The dependence of ⟨O⟩on xB and Q2 is due to the hard scattering delta function inside FT , and is symbolically
+denoted in the subscript following the functional dependence on the internal variables. The denominator at the right
+hand side of Eq. (86) is easily recognized as the inclusive DIS transverse function F DIS
+T
+.
+Furthermore, in the model one can calculate not only the hard-scattering term, but also the PDFs themselves.
+Hence one can perform a detailed comparison of the factorized vs. full cross section test the range of validity of the
+collinear factorization approximation. This will be discussed in Section V. In the remaining of this Section we will
+focus on the validity of the kinematic approximations, to which we now turn our attention.
+A.
+Kinematic approximations in the model
+In Section II E, we discussed a theoretical Ansatz to justify the choice of the approximated ¯v2 ≈⟨v2⟩and v ′ 2 ≈
+⟨v′2⟩parton light-cone virtualities, and of the approximate ¯x scaling variable that enter the collinear factorization
+formula (29)-(32). That discussion, that was tailored to QCD, can be repeated for the spectator model with simple
+modiﬁcations.
+To start with, we consider the approximate light-cone virtuality of the scattered quark, ¯v ′ 2 ≈⟨k′2 + k′ 2
+T ⟩. In the
+model, isolated quarks exist as asymptotic states. Hence the virtuality k′2 must be at least as large as m2
+q, and since
+we do not measure the quark’s transverse momentum in an inclusive process we can only choose
+¯v ′ 2 = m2
+q .
+(88)
+Next, we consider the scattering quark’s virtuality ¯v 2, and notice that the target’s remnant is represented in the
+model by the spectator φ. Thus, we can substitute pX ⇝pφ and m2
+X ⇝m2
+φ in Eq. (38), repeat the ensuing derivation,
+and eventually ﬁnd
+¯v 2 = 0
+(89)
+as our standard choice. Analogously to the QCD case, we expect to be a good approximation for small enough xB
+and not too large quark masses.
+Finally, utilizing in Eq. (32) the light-cone virtuality choices (88) and (89), one obtains
+¯x ≈ξ
+
+1 + m2
+q
+Q2
+
+≡ξq .
+(90)
+With a non-zero ¯v ′ 2 like in Eq. (88) we are more closely respecting the internal kinematics of the handbag diagram
+than with ¯v ′ 2 = 0. Therefore, we can expect ¯x = ξq to provide a better approximation to the non-factorized diagram’s
+than in standard collinear factorization. In fact, our ξq is analogous to the χ scaling variable used for example in
+Ref. [23] to study charm production in charged current W + s →c events, which was indeed found to capture much
+of the heavy quark production kinematics even when setting the quark masses equal to zero in the calculation of the
+hard scattering coeﬃcient [55].
+As in QCD, the model’s virtuality diverges to minus inﬁnity at large values of xB, see Eq. (77), and a diﬀerent
+approximation may be needed. Analogously to the detailed discussion in Section II E, a suitable approximation to
+the model’s v2 that is valid in both the small and large-xB regimes is
+¯v 2(¯x) = −
+¯x
+1 −¯x
+ m2
+φ + (¯x −1)M 2
+,
+(91)
+
+25
+Substituting Eq. (91) in Eq. (32), solving the resulting equation for ¯x perturbatively in powers of µ2/Q2, and ﬁnally
+setting ¯v ′ 2 = m2
+q we ﬁnd
+¯x ≈ξ
+"
+1 + m2
+q
+Q2 +
+ξ
+1 −ξ
+m2
+q
+ m2
+φ + (ξ −1)M 2
+Q4
+#
+≡ξ∗
+q
+(92)
+up to corrections of O
+
+µ6
+Q6
+
+. Note that at small xB the fourth order term quickly vanishes, and one recovers Eq. (90).
+Closer to the kinematic threshold, this new scaling variables accounts for the non-vanishing of the scattered quark’s
+light-cone virtuality. Substituting this back in Eq. (91) we can also write the corresponding virtuality purely in terms
+of external variables:
+¯v 2
+∗≡¯v 2(ξ∗
+q) .
+(93)
+The scaling variable we just obtained are suitable for collinear factorization of inclusive scattering processes. By
+necessity, however, they neglect the kinematic eﬀect of the internal transverse momentum, because no particles other
+than the scattered lepton is measured in the ﬁnal state, so that no measured scale is available to control the size of
+⟨k 2
+T ⟩. Nonetheless, Eq. (76), shows that k 2
+T contributes to the scaling variables at the same order as m2
+q, and it would
+be desirable to estimate the size of its contribution.
+Contrary to the QCD case, an estimate of the average transverse momentum squared is actually possible in the
+model, where ⟨k 2
+T ⟩can be explicitly calculated using Eq. (86). The result is presented in Figure 7 as a function of xB
+at several values of Q2. The upper left panel utilizes the default model parameter choices discussed in Section III, and
+the other two panels increase, respectively, the values of the target mass and the quark mass8. A comprehensive study
+of the systematic dependence on the model parameters is presented in Appendix E. As one can expect, ⟨k 2
+T ⟩= O(Λ2)
+is of non perturbative origin and determined by the “conﬁnement” scale Λ, with a mild dependence on the model
+parameters (see also Figure 15). The average transverse momentum squared is independent of the scattering kinematics
+at small xB, then decreases at large xB, where four momentum conservation limits the amount of invariant energy in
+the ﬁnal state and forces this to vanish: ⟨k 2
+T ⟩→0 as xB →xmax
+B
+(see Appendix B for more detail). Leveraging the
+detailed calculations in Appendix B we can then deﬁne theoretical, transverse-momentum-improved scaling variables
+simply by substituting m2
+q ⇝m2
+q + ⟨k 2
+T ⟩and m2
+φ + (x −1)M 2 ⇝m2
+φ + (x −1)M 2 + ⟨k 2
+T ⟩in Eq. (92) and deﬁne:
+ξ∗
+qT ≡ξ
+ 
+1 + m2
+q + ⟨k 2
+T ⟩
+Q2
++
+ξ
+1 −ξ
+ m2
+q + ⟨k 2
+T ⟩
+  m2
+φ + (ξ −1)M 2 + ⟨k 2
+T ⟩
+
+Q4
+!
+(94)
+¯v 2
+∗T ≡v2(ξ∗
+qT ) ,
+(95)
+With these we will theoretically estimate the importance of including in the calculation the transverse momentum
+dynamics, that is not included in collinear factorization if one limits the analysis to leading twist level.
+B.
+Numerical validation
+In order to numerically study the validity of the kinematic approximations discussed in Section IV A, we will consider
+the sequence of ¯x scaling variables summarized in Table I. Starting with Eq. (90), we neglect at ﬁrst the scattered
+quark virtuality as well as all external mass scales (i.e., M = 0, mq = 0), then consecutively switch on the target mass
+and the quark mass. Subsequently, we consider the non-zero parton virtuality eﬀects captured in Eq. (92). Finally
+we analyze the kinematic impact of the parton transverse momentum by utilizing Eq. (94).
+We start from the average light-cone virtuality ⟨v2⟩= ⟨k2 + k 2
+T ⟩, shown as a black line in Figure 8 and compared
+to the 3 choices of approximated ¯v 2 deﬁned in Eqs. (89), (93) and (95). At small xB, all vanish and the parton can
+be eﬀectively considered collinear to the nucleon in the plus light-cone direction. As xB increases, however, the light
+cone virtuality becomes more and more negative until the kinematic threshold xB,max is reached. The only exception
+occurs at larger target mass values, for which a modest rise with xB is followed again by a fast dive as xB approaches
+its threshold. This behavior was already expected from the analysis of Eq. (77) oﬀered in Section III C. The deviation
+of ⟨v2⟩from ¯v 2 = 0 is qualitatively captured by ¯v 2
+∗, and the remaining small gap is closed if the transverse momentum
+is taken into account by including the calculated, but unobserved, ⟨k 2
+T ⟩into ¯v 2
+∗T .
+8 This layout will be used also when studying other internal variables in this Section, and for the study of factorized vs. full structure
+function in Section V.
+
+26
+¯x
+M mq
+¯v 2
+k 2
+T
+xB
+0
+0
+0
+0
+ξ
+✓
+0
+0
+0
+ξq
+✓
+✓
+0
+0
+ξ∗
+q
+✓
+✓
+¯v 2
+∗
+0
+ξ∗
+qT
+✓
+✓¯v 2
+∗T ⟨k 2
+T ⟩
+TABLE I. Sequence of kinematic approximations considered for the validation of the ¯x scaling variables choices discussed in
+Section IV A. A check mark indicates the inclusion of the particle masses M or mq in (90), and the approximation used for the
+internal v2 and k 2
+T variables is indicated in the last two columns. Below the thin horizontal line, we included an approximation
+that can be considered for benchmarking purposes in the spectator model, where the dynamics of internal degrees of freedom is
+explicitly known, but not in QCD. (The ¯v 2
+∗and ¯v 2
+∗T light-cone virtualities are deﬁned in Eqs. (93) and (95), respectively, and
+the corresponding scaling variables in Eqs. (92) and (94). The average transverse momentum ⟨k 2
+T ⟩is calculated in the model
+according to Eq. (86).)
+It is worthwhile remarking that the plots in Figs. 7-8, combined, also show that the incoming quark virtuality
+⟨k2⟩= ⟨v2⟩−⟨k 2
+T ⟩is negative and of order O(Λ2) at all xB values: the quark is indeed a bound state of the proton.
+Clearly, the k2 ≈0 approximation utilized in many parton model calculations and derivations of factorization formulas
+is not accurate, and should rather be replaced, by v2 ≈0. Remarkably, as we will see, this approximation is quite
+suﬃcient in describing the average value of the quark light-cone momentum fraction x and there will be no need to
+use a non-zero virtuality such as ¯v 2
+∗in the calculation of inclusive observables.
+The average light-cone fraction ⟨x⟩is another important internal variable that can be calculated in the model but
+can only be indirectly controlled experimentally by measuring the Bjorken invariant xB. The comparison to the 5
+approximations listed in Table I is performed for clarity by plotting the corresponding ¯x/⟨x⟩ratios as a function of
+xB in Figure 9, where we adopted the same choice of kinematics and model parameters as in the average light-cone
+virtuality just discussed. One can immediately see that the standard massless collinear approximation ¯x = xB (blue
+line) very poorly approximates the parton’s average fractional momentum, and results in a ¯x/⟨x⟩ratio that is very
+sensitive to the model parameters. While this is not a problem at small xB, where a small shift in the x value at
+which the PDFs are calculated does not signiﬁcantly alter the cross section, this can lead to signiﬁcant under- or
+over-estimation of the structure functions at larger xB. On the contrary, keeping into account the target’s mass
+inside the ¯x = ξ scaling variable stabilizes the large xB approximation, even though the new scaling variable can still
+signiﬁcantly underestimate ⟨x⟩, especially if the quark is heavy, see the green line. This is remedied by including the
+quark mass inside ¯x = ξq (red line), which produces a good approximation for the model parameter values considered
+in Figure 9. In fact, the approximation degrades for higher values of the “conﬁnement” scale Λ or the spectator mass
+mφ, see Appendix E. The latter case is particularly meaningful because, in reality, the proton’s remnant after the hard
+scattering is a multi-particle state with a distribution in invariant mass not fully captured by a ﬁxed mφ ∼⟨mX⟩.
+Finally, one can consider the eﬀects of a non-vanishing virtuality ¯v 2
+∗, which however are suppressed by 1/Q4 and do
+not improve much the approximation, see the purple line compared to the red one.
+In summary, there seems indeed to be a limit to what any experimentally controllable inclusive DIS kinematic
+approximation to ⟨x⟩can achieve. However, as it was the case for ⟨v2⟩, if one was able to control the partonic k 2
+T
+accessed in the hard scattering reaction, the approximation would become nearly perfect, as the orange dashed lines
+representing ξ∗
+qT /⟨x⟩shows. In Section VI we will brieﬂy discuss how this could in fact be achieved, either by utilizing
+the TMD factorization formalism, or including HT terms in the collinear calculation.
+V.
+TESTING THE LIMITS OF FACTORIZATION
+The model’s hadronic tensor can be factorized according to Eqs. (29)-(33). It is then possible to compute the
+factorized transverse structure function F CF
+T
+by contracting the tensor with the transverse projector PT of Eq. (58).
+One ﬁnds:
+F CF
+T
+(xB, Q2) = q(¯x) ,
+(96)
+which at LO coincides with the quark PDF evaluated at a suitable ¯x variable, that replaces xB as scaling variable away
+from the Bjorken limit. In the numerical analysis to follow, the ¯x scaling variable chosen as summarized in Table I.
+Working analogously with the longitudinal projector PL of Eq. (58), the longitudinal structure function vanishes at
+LO, F CF
+L
+= 0 and will not be further considered.
+
+27
+M = 0.939 GeV, mq = 0.3 GeV
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+〈kT2〉[GeV2]
+M = 1.2 GeV, mq = 0.3 GeV
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.8 GeV
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+〈kT2〉[GeV2]
+0.2
+0.4
+0.6
+0.8
+xB
+Q2= 4 GeV2
+Q2= 16 GeV2
+Q2= 100 GeV2
+ 	ϕ
+ Λ
+⟵mq ⟶
+⟵M ⟶
+FIG. 7.
+Average unobserved k 2
+T of the incoming quark calculated in the full model as a function of xB at various Q2 values
+and for diﬀerent values of the model parameters M and mq. For scale comparison, the orange dot-dashed line indicates the
+model’s value of m2
+φ, while the magenta dashed line indicates the model’s value of Λ2, see Eq. (48).
+M = 0.939 GeV, mq = 0.3 GeV
+-1.0
+-0.5
+0.0
+0.5
+v2[GeV2]
+M = 1.2 GeV, mq = 0.3 GeV
+-1.0
+-0.5
+0.0
+0.5
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.8 GeV
+-1.0
+-0.5
+0.0
+0.5
+v2[GeV2]
+0.2
+0.4
+0.6
+0.8
+xB
+〈v2〉
+v2 = 0
+v2 = v*
+2
+v2 = v*T
+2
+⟵mq ⟶
+⟵M ⟶
+FIG. 8.
+Average light cone virtuality v2 = k2 + k 2
+T calculated in the full model for Q2 = 4 GeV2, compared to the ¯v 2
+approximations discussed in the text. In the top left panel, the default model parameters are used, and the other panels show
+the eﬀect of increasing, respectively, M and mq.
+
+28
+M = 0.939 GeV, mq = 0.3 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10
+1.15
+x/〈x〉
+M = 1.2 GeV, mq = 0.3 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10
+1.15
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.8 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+1.10
+1.15
+x/〈x〉
+0.2
+0.4
+0.6
+0.8
+xB
+x=xB
+x=ξ
+x=ξq
+x=ξq
+*
+x=ξqT
+*
+⟵mq ⟶
+⟵M ⟶
+FIG. 9.
+Ratio of approximated ¯x parton light-cone momentum fraction to the full ⟨x⟩calculated in the model at Q2 = 4 GeV2.
+In the top left panel, the default model parameters are used, and the other panels show the eﬀect of increasing, respectively,
+M and mq.
+At variance with QCD, where q(x) is a non-perturbative quantity and needs to be extracted from the data or from
+lattice QCD measurements, the model’s quark PDF can be analytically calculated, see for example Refs [47, 91].
+From the deﬁnition (25), we ﬁnd
+q(x) =
+Z
+d2kT dk−Tr
+γ+
+2 Φ(p, k)
+
+k+=xp+ =
+Z d2kT dk−
+(2π)4
+Tr
+"
+Y
+Y
+γ+
+2
+#
+k+=xp+
+,
+(97)
+Using the model’s Feynman rules to calculate the contribution of the diagram inside the trace, we obtain
+q(x) =
+Z d2kT dk−
+(2π)4
+g2(k2)1
+2
+Tr
+
+(p/ + M)(k/ + mq) γ+
+2 (k/ + mq)
+
+(k2 −m2q)2
+(2π) δ((p −k)2 −m2
+φ)
+(98)
+=
+g2
+(2π)2
+
+2(mq + xM)2 + L2(Λ2)
+
+(1 −x)3
+24L6(Λ2)
+,
+(99)
+where
+L2(Λ2) = xm2
+φ + (1 −x)Λ2 −x(1 −x)M 2 .
+(100)
+In the model, we can therefore test the validity of the proposed sub-asymptotic collinear factorization by comparing
+the factorized and full calculations of the DIS transverse structure functions. By also comparing kT -unintegrated
+structure functions, we will furthermore be able to numerically explore the conditions for the breakdown of this
+approximation.
+
+29
+A.
+Validity of the factorization approximations
+We ﬁrst study to what degree collinear factorization provides a good approximation of the DIS process in the model
+by comparing the full F DIS
+T
+calculated as in Eq. (78) with the factorized F CF
+T
+calculated with the model PDF (99)
+according to Eq. (96). (The longitudinal structure function identically vanishes at LO, and an analogous test would
+require one to extend the model calculation to NLO, which goes beyond the scope of this article.)
+We do this ﬁrst in Figure 10, where F DIS
+T
+is plotted as a black line, and various factorized F CF
+T
+structure functions
+computed at Q2 = 4 GeV2 with the scaling variables collected in Table I are represented by colored lines. We adopt
+the same choice of model parameters as in the study of the internal kinematics performed in Section IV B, and present
+a more detailed study of model parameter variations in Appendix E.
+One can immediately notice the same pattern observed in Section IV B. Firstly, the asymptotic kinematic choice
+¯x = xB (blue line) is very unstable with respect to the model parameters, as already observed in Ref. [48] for kT -
+dependent structure functions. Secondly, taking into account mass corrections by using the ¯x = ξq or ¯x = ξ∗
+q scaling
+variables provides a much more stable and numerically closer approximation of F DIS
+T
+. Finally, the k 2
+T corrections
+theoretically estimated with ¯x = ξ∗
+qT (but not controllable experimentally) explain most of the remaining diﬀerences.
+One can also see that none of the factorized cross sections respect the kinematic xB ≤xB,max bound (unless one
+worked strictly in the Bjorken Q2 →∞limit), which is a ﬁrst illustration of the fact that the adopted factorization
+approximation breaks 4-momentum conservation, as already remarked in Section II.
+The hierarchy of approximations just discussed can be better appreciated in Figure 11, where we show the ratio of
+the F CF
+T
+collinear structure functions to their exact F DIS
+T
+counterpart. The fact that F CF
+T
+|¯x=xB does not approximate
+F DIS
+T
+in any accurate way, can be traced to the failure of xB to approximate the average partonic momentum fraction
+⟨x⟩.
+For example looking at the blue line in Figure 11(a), where the default model parameters are utilized, we
+see that the CF structure function overestimates the exact DIS calculation at small xB, then suddenly drops and
+underestimates it even down to the ∼50% level before surging again closer to the kinematic threshold. This behavior
+can be understood from Figure 9(a), where the choice ¯x = xB ﬁrst underestimates the average ⟨x⟩at xB ≲0.6
+then overestimates it at xB ≳0.6, right around the value where F CF
+T
+|¯x=xB becomes smaller than F DIS
+T
+. This clearly
+highlights the need of a more accurate kinematic approximation, which is indeed reached by fully taking into account
+the target and quark masses in ¯x = ξq. The order O(1/Q4) corrections included in ¯x = ξ∗
+q do not qualitatively improve
+the agreement of F CF
+T
+with F DIS
+T
+.
+In summary, it is clear that the use of the ¯x = ξq scaling variable eﬀectively provides the closest F CF
+T
+approximation
+to the real one, and extends the kinematic range of validity of CF to the largest xB value that can be achieved
+considering only external variables. The validity of CF is naturally extended at larger Q2, where mass eﬀects are
+suppressed by an inverse of power of the photon virtuality and become sizable only in an increasingly narrow region
+close to the kinematic threshold, see Figure 12.
+As observed many times, however, the CF cross section at leading twist misses transverse momentum eﬀects, which
+are of the same order of magnitude, parametrically, as the mass eﬀects successfully incorporated in ξq. The “missing”
+k 2
+T corrections can nonetheless be theoretically estimated by choosing ¯x = ξ∗
+q, and are shown as a dashed orange
+line in Figures 11 and 12. The model DIS calculation is largely reproduced in this way, showing that maximizing
+the range of validity of a factorized calculation requires one to control transverse-motion-induced power corrections.
+Even though these are beyond the scope of our leading twist calculation, one can handle their contribution to the
+cross section either by extending collinear factorization to higher-twist [29, 53] or by utilizing a TMD formalism,
+where these are taken into account at parton distribution level [42, 52]. We will discuss this point more extensively
+in Section VI.
+B.
+Breaking of Collinear Factorization
+Even after considering transverse momentum contributions, one can notice in Figures 11 and 12 that the ratio
+F CF
+T
+/F DIS
+T
+strongly deviates from 1 at a Bjorken momentum fraction xB larger than a scale-dependent, “factorization
+breaking” threshold xB,break = xB,break(Q2). Deﬁning breaking of factorization as a ∼10% deviation of the CF
+structure function from the exactly calculated one, we obtain the values of xB,break collected in Table II, where
+we also indicate the corresponding value of W 2 in parentheses, denoted by W 2
+break. A more complete study of the
+parameter systematics can be found in Appendix E.
+Phenomenologically, one can notice that the dependence of xB,break on Q2 and on the model parameters, both
+
+30
+M = 0.939 GeV, mq = 0.3 GeV
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+(4π)2FT
+M = 1.2 GeV, mq = 0.3 GeV
+0
+5
+10
+15
+20
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.8 GeV
+0
+2
+4
+6
+8
+(4π)2FT
+0.2
+0.4
+0.6
+0.8
+xB
+DIS (exact)
+x=xB
+x=ξ
+x=ξq
+x=ξq
+*
+x=ξqT
+*
+⟵mq ⟶
+⟵M ⟶
+FIG. 10.
+Transverse F DIS
+T
+structure function calculated in the model at Q2 = 4 GeV2 compared to sub-asymptotic collinear
+factorization F CF
+T
+calculations that utilize the kinematic ¯x approximations listed in Table I. In the top left panel, the default
+model parameters are used, and the other panels show the eﬀect of increasing, respectively, M and mq.
+M = 0.939 GeV, mq = 0.3 GeV
+0.0
+0.5
+1.0
+1.5
+FTCF/FTDIS
+M = 1.2 GeV, mq = 0.3 GeV
+0.0
+0.5
+1.0
+1.5
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.8 GeV
+0.0
+0.5
+1.0
+1.5
+FTCF/FTDIS
+0.2
+0.4
+0.6
+0.8
+xB
+x=xB
+x=ξ
+x=ξq
+x=ξq
+*
+x=ξqT
+*
+⟵mq ⟶
+⟵M ⟶
+FIG. 11.
+Ratio of the factorized to exact DIS transverse structure functions presented in Figure 10. In the top left panel, the
+default model parameters are used, and the other panels show the eﬀect of increasing, respectively, M and mq.
+
+31
+Q2= 4 GeV2
+0.0
+0.5
+1.0
+1.5
+FTCF/FTDIS
+0.2
+0.4
+0.6
+0.8
+xB
+Q2= 16 GeV2
+0.0
+0.5
+1.0
+1.5
+0.2
+0.4
+0.6
+0.8
+xB
+Q2= 25 GeV2
+x=xB
+x=ξ
+x=ξq
+x=ξq
+*
+x=ξqT
+*
+0.0
+0.5
+1.0
+1.5
+0.2
+0.4
+0.6
+0.8
+xB
+FIG. 12.
+Ratio of the factorized to exact DIS structure functions calculated in the model for several Q2 values, and the default
+model parameters. The sub-asymptotic collinear factorization calculation was performed utilizing the kinematic approximations
+listed in Table I.
+Q2 = 4 GeV2
+Q2 = 16 GeV2
+Q2 = 25 GeV2
+M [GeV] mq [GeV] xB,break W 2
+break [GeV2] Rbreak xB,break W 2
+break [GeV2] Rbreak xB,break W 2
+break [GeV2] Rbreak
+0.94
+0.3
+0.72
+(2.4)
+0.29
+0.89
+(2.9)
+0.29
+0.92
+(3.1)
+0.27
+1.2
+0.3
+0.82
+(2.3)
+0.21
+0.94
+0.8
+0.59
+(3.7)
+0.24
+TABLE II. Factorization breaking thresholds xB,break, the corresponding values of invariant mass W 2
+break (in parentheses) and
+of Rbreak for the choices of target mass M and quark mass mq discussed in the main text and a selection of Q2 values.
+internal and external, is largely determined by that of xB,max, derived in Appendix B:
+xB,max =
+1
+1 + (mφ+mq)2−M 2
+Q2
+.
+(101)
+Indeed, the larger the target mass M the higher the xB value where factorization breaks down, and the larger the
+quark mass mq (or indeed the remnant’s mφ) the smaller the breaking threshold. We can thus see that breaking of
+factorization is mostly a kinematic eﬀect, and occurs when the process is too close to the edge of phase space. As a
+rule of thumb, we can see that this happens when
+W 2 ≲4 GeV2 ,
+(102)
+with the quoted numerical value being a slight overestimate of the worst case combination of parameters shown here
+or in Appendix E. Even if this value was onained by a numerical analysis of calculations performed in the adopted
+spectator model, the parameters of latter have been chosen to phenomenologically reproduce the PDFs extracted in
+QCD by means of global ﬁts and thus we can take the model to be a fair proxy for the latter. This makes us hopeful
+that the region of applicability of collinear factorization may be controlled at least in ﬁrst approximation by a simple
+kinematic cuts even in QCD (and in that case, it looks like one would simply need to neglect the hadron resonance
+region, which is anyway removed from global QCD ﬁts).
+Theoretically, the breaking of factorization can be traced back to the violation of momentum conservation in
+the kinematic approximations (19)–(20), and in particular to the lack of transverse momentum conservation in the
+factorized diagram [48]. To see this explicitly, let us deﬁne the kT -unintegrated DIS structure function
+FDIS
+T
+(k 2
+T ) ≡
+ZZ
+dx dk2 FDIS
+T
+(x, k2, k 2
+T )xB,Q2 ,
+(103)
+where the fully unintegrated DIS structure function appearing in the integrand was deﬁned in Eqs. (87) as the
+P µν
+T WDIS
+µν (k) projection of the fully unintegrated DIS hadronic tensor. Similarly, we can deﬁne the kT -unintegrated
+CF structure function as
+FCF
+T (x, k2, k 2
+T )xB,Q2 ≡M P µν
+T WCF
+µν (x, k2, k 2
+T )xB,Q2 ,
+(104)
+
+32
+with the fully unintegrated collinearly factorized hadronic tensor deﬁned as
+2MWCF
+µν (x, k2, k 2
+T )xB,Q2 ≡π
+2x
+1
+2k+ Tr
+
+n/Φ(k)
+
+Hµν(x, ¯x) .
+(105)
+In either the DIS or the CF case, the structure function can then be obtained as an integral over dk 2
+T :
+F DIS
+T
+(xB, Q2) =
+Z k2
+T,max
+0
+dk2
+T FDIS
+T
+(k 2
+T )xB,Q2
+(106)
+F CF
+T
+(xB, Q2) =
+Z ∞
+0
+dk2
+T FCF
+T (k 2
+T )xB,Q2
+(107)
+The crucial diﬀerence is the limit of integration: in the DIS case, k 2
+T is limited by four momentum conservation
+at any ﬁxed value of the invariant mass W 2, and the integrand does not have support beyond k2
+T,max; in the CF
+calculation, k 2
+T can run up to inﬁnity after being eﬀectively decoupled from the light-cone plus and minus directions
+by the approximations (19)–(20).
+The diﬀerence between the handling of kT in the DIS and the CF calculations is evident from Figure 13, where the
+kT -dependent FT structure functions are plotted as a function of k 2
+T for xB = 0.6, Q2 = 4 GeV2, and nominal model
+parameter values.
+At small k 2
+T , we have a generally good enough approximation, except when using the ¯x = xB scaling variable (blue
+line) that consistently underestimates the transverse structure function. On the contrary, taking into account both
+the target and the quark mass in the ¯x = ξq scaling variable provides one with the best approximation achievable
+considering only external variables. Nonetheless, this calculation slightly overestimates the full one and displays a
+less steep slope. This cannot be remedied without handling the transverse motion of the quark in detail, which one
+cannot do at LT in collinear factorization; however, including the average ⟨k 2
+T ⟩in the theoretical ¯x = ξ∗
+qT scaling
+variable, one can obtain a good description on average of the full FDIS
+T
+, slightly underestimating it at small k 2
+T values,
+and slightly overestimating it at intermediate k 2
+T values. This is the reason why the ¯x = ξ∗
+qT choice gives the best
+approximation for the kT -integrated FT previously discussed.
+At even larger values of k 2
+T the factorized calculation is radically diﬀerent: the black DIS curve displays an integrable
+divergence at k2
+T,max, while the CF colored curves have noticeable tails beyond that. At high Q2 values, this happens
+at large enough k 2
+T that he unintegrated FT , dropping approximately as an inverse power of k 2
+T , does not contribute
+much to the integrated FT . However, at smaller Q2 values the CF tail exceeding the kinematic limit provides a non
+negligible contribution to FT . In order to quantify this contribution, we deﬁne the ratio
+R(xB, Q2) =
+R ∞
+k2
+T,max dk2
+T FCF
+T (k 2
+T )xB,Q2
+R ∞
+0
+dk2
+T FCF
+T (k 2
+T )xB,Q2
+,
+(108)
+that provides one with the relative amount of integrated F CF
+T
+coming from the 4-momentum non-conserving k 2
+T >
+k2
+T,max region. In Table II, we collect the R values corresponding to each xB,break and denote these by Rbreak. As a
+DIS (exact)
+x=xB
+x=ξ
+x=ξq
+x=ξqT
+*
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.01
+0.10
+1
+10
+kT
+2
+(4π)2 ℱT
+xB= 0.72, Q2= 4 GeV2
+DIS (exact)
+x=xB
+x=ξ
+x=ξq
+x=ξqT
+*
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.005
+0.010
+0.050
+0.100
+kT
+2
+(4π)2 ℱT
+xB= 0.89, Q2= 16 GeV2
+FIG. 13.
+kT -dependent transverse structure function for the default parameters of the model. The two panels correspond to
+a low Q2 = 4 GeV scale and a higher Q2 = 16 GeV2 scale. Their respective factorization breaking thresholds, xB,break = 0.72
+and xB,break = 0.89 are chosen to maximize the diﬀerence between the factorized and full model calculations.
+
+33
+rule of thumb we found that the CF calculation strongly deviates from the full calculation and factorization breaks
+down for (xB, Q2) values such that 20% or more of the integrated F CF
+T
+resides in the tail at k 2
+T > k2
+T,max.
+The breaking of factorization just described is unavoidable, as it is rooted in the very approximation that allows one
+to deﬁne the quark PDF as an integral of the quark correlator Φ over the sub-leading parton momentum components
+kT and k+, and to factorize these from the parton-level, hard scattering. Being rooted in kinematics, however, the
+values xB and Q2 at which the breakdown occurs can be at least qualitatively, if not semi-quantitatively, controlled by
+calculating the kinematic limits and estimating how far from these one should safely stay. As argued in the previous
+subsection in the context of our spectator model, a simple cut in W 2 may indeed be suﬃcient for inclusive structure
+functions. However, similar issues appear and are ampliﬁed in the case of semi-inclusive DIS measurements, and
+in particular when the hadron’s transverse momentum is also measured [39–41]. More reﬁned analyses are urgently
+called for, especially in the context of the Jeﬀerson Lab SIDIS program at the 12 GeV upgraded CEBAF facility [14],
+where the kinematics is inherently sub-asymptotic due to the relatively low beam energy.
+VI.
+THEORY AND PHENOMENOLOGY BEYOND THE LEADING TWIST
+Summarizing the numerical validation performed in the last 2 sections, there is a limit to the degree of accuracy
+with which a CF calculation can reproduce the inclusive DIS structure functions. We have identiﬁed 2 main drivers
+for this:
+• There is an intrinsic limitation in the approximation of high-kT scattering contributions, due to the neglect of
+transverse momentum conservation in the factorization of the non-perturbative parton correlator;
+• the kinematic ¯x scaling variable in inclusive processes can only be determined using external variables, and
+cannot incorporate the unobserved transverse momentum scale.
+The ﬁrst limitation is unavoidable, and one should try to identify in what region of phase space this occurs, in
+order to ensure that factorization is properly applied to describe experimental data and, conversely, to accurately
+extract parton distribution from these. In this paper, we suggest that, at least for inclusive observables, a measure
+of control over the validity of the factorized description of the scattering can be reached by kinematic considerations,
+and in particular by estimating xB,max. The latter can be calculated exactly in the model, where all masses are known
+and all particles are asymptotic states, but in QCD one would would need some phenomenological input to obtain
+useful estimates. Identifying the region of applicability of factorization in semi-inclusive measurements is, instead,
+signiﬁcantly more intricate [39–41]. In both cases, we believe this is an important endeavor and more detailed studies
+are needed to avoid interpreting as partonic features of the data that are not. This is of capital importance, for
+example, to fully exploit the vast mess of data expected from the Jeﬀerson Lab 12 GeV program [14].
+Even within the region of validity of factorization, an imperfect description of the DIS cross section at large xB
+arises due to the neglect of transverse momentum in the factorized calculation at leading twist, see Figures 11, 12
+and 18. However, after incorporating all external mass scales in the ¯x = ξq scaling variable, the diﬀerence between
+the LT and the full cross section is small, and quite independent of the Λ and mφ internal parameters that mimic
+the nonperturbative QCD dynamics of the target.
+As demonstrated by incorporating in the scaling variable the
+(unmeasured, but calculable in the model) ⟨k 2
+T ⟩/Q2 corrections, the calculation seems systematically improvable.
+The needed control of the partonic k 2
+T accessed in the hard scattering reaction can be theoretically achieved either
+by utilizing the TMD factorization formalism, where parton distributions themselves depend on kT [42, 52], or by
+performing collinear factorization up to higher twist level, in which case the transverse momentum dynamics is
+eﬀectively included in multi-parton matrix elements [53].
+Remaining in the context of collinear factorization, on can also try to absorb the contributions from the partonic
+transverse momentum into a phenomenological HT term to be ﬁtted to the data:
+F DIS
+T
+(xB, Q2) ≈F CF
+T
+(xB, Q2) + H(xB)/Q2 .
+(109)
+Given a large enough leverage in Q2, the H(x) coeﬃcient can clearly absorb the diﬀerence between the solid read and
+dashed orange curves in, say, Figure 12 and take care of the missing O(⟨k 2
+T ⟩/Q2) transverse momentum corrections.
+However, a ﬁt to model pseudo-data is needed to establish the accuracy to which PDFs can be extracted given the
+still imperfect, and not improvable, estimate of the internal partonic kinematic provided by the ξq scaling variable,
+see Figure 9. We leave this phenomenological investigation, as well as a determination of the level to which the DIS
+contribution to the lepton-nucleon cross section can be separated from the interference and resonance contributions
+discussed in Section III D, to future work [79].
+
+34
+VII.
+SUMMARY AND CONCLUSIONS
+In this work, we have revisited QCD factorization with the aim to maximally extending its validity to sub-asymptotic
+values of the hard scale Q2, where particle masses and other nonperturbative scales cannot be altogether neglected
+as customarily done in the Bjorken limit [23, 48, 55]. We have furthermore validated our ﬁndings by comparing
+factorized and analytically calculable structure functions in a spectator model designed to simulate the essential
+aspects of lepton-proton scattering in QCD. The focus of this paper has been on inclusive lepton-nucleon observables
+as a ﬁrst step towards collinear, and then transverse momentum dependent semi-inclusive scattering processes. The
+speciﬁc ﬁndings of our inclusive scattering analysis are many faceted, and it is worthwhile reviewing them in some
+detail before closing this paper.
+A.
+Collinear Factorization in DIS at sub-asymptotic Q2
+In the context of inclusive DIS, we have re-derived the QCD factorization formula with the aid of a ﬁnal state
+quark jet function, explicitly separating the partonic internal kinematics, which needs to be approximated, from
+the hard scattering dynamics, that can be systematically expanded in powers of |kT /Q| and, for light quarks, of
+mq/Q. In particular, we have obtained a gauge invariant factorized formula for the leading power (or “leading-twist”)
+contribution to the DIS cross section, that in fact coincides with the asymptotic formula evaluated at a rescaled
+variable ¯x instead of xB. Using a jet diagram proved essential for the gauge invariance of the result, and no change
+in the operator deﬁnition of parton distributions proved necessary.
+While our proof has been obtained at LO, a generalization to NLO should not present essential diﬃculties. Indeed,
+any diagram at any order can be written as a trace term multiplied by an overall 4-momentum conservation delta
+function, as we have done in Eq. (12), thus isolating the part of the cross section in need of kinematic approximation
+from the terms in which partonic dynamics comes into play. The latter can be expanded in a power series around
+collinear partons, and transverse momentum and parton virtuality contributions are included in higher-twist terms.
+Let us stress that this is the central idea of our approach: isolating the kinematics of the external legs of the hard
+scattering diagram from the rest, and performing a minimal set of (uncontrolled) approximations only there.
+B.
+Validation at Leading Twist
+Working at leading twist level, the goodness of the kinematic approximations was checked by utilizing a detailed
+spectator model calculation, were we could separate the DIS lepton-quark scattering contribution from resonance and
+interference contributions. The factorized model transverse function, fully calculable analytically, was the compared
+to the exact DIS model calculation.
+As shown by the theoretical factorization analysis, the choice of the scaling variable ¯x is arbitrary, in principle, but
+can be guided by considering the kinematics of the hard vertex. In particular, using the spectator model, we have
+veriﬁed that choosing ¯x = ξq with ξq ≡ξ
+ 1 +
+m2
+q
+Q2
+
+one can reproduce the DIS cross section with only a relatively
+small overestimation at the large values of xB close to the inelastic scattering kinematic threshold. The variable ξq,
+advocated for example in [23, 55] for heavy quark production and adapted here to scattering on light quarks, captures
+the kinematic eﬀect of the initial state target mass and of the ﬁnal state quark mass. It is also analogous to the
+SIDIS scaling variable ξh = ξ
+ 1+
+m2
+h
+ζhQ2
+
+proposed in [19, 20] and successfully utilized in [21] to incorporate corrections
+due to the mass of the observed h hadron in the ﬁnal state. The freedom of rescaling variable choice guaranteed
+by our approach has also allowed us to explore the eﬀects of O(µ4/Q4) mass corrections, which are not necessarily
+small due to the parton becoming more and more oﬀshell as one approaches the boundary of phase space at large xB.
+Fortunately, these corrections turn out to be small for inclusive processes, unless the mass of the quark is increased
+beyond the range suitable for our light-quark treatment.
+Finally, as already noticed by [48], we have explicitly illustrated an inherent limitation of collinear factorization, that
+breaks down at large xB due to the neglect of momentum conservation in the transverse direction. Here, we suggest
+that the region in xB and Q2 where this happens might be semi-quantitatively controlled by kinematic considerations,
+and in fact a cut in invariant mass of the order of W 2 ≳4 GeV2 might circumscribe the factorization breaking region.
+Given that in QCD the excluded region corresponds to resonance excitations, which are outside the scope of the DIS
+handbag diagram, such a requirement does not seem to be an unduly restrictive condition.
+
+35
+C.
+Transverse momentum eﬀects beyond leading twist
+The remaining diﬀerence between the CF and full calculation of the transverse structure function is mostly explained
+by incorporating the average ⟨k 2
+T ⟩in the scaling variable, and considering corrections only up to O(⟨k 2
+T ⟩/Q2). For
+inclusive observables, this study is only possible in the model but we found that the result is stable against variations
+of the internal conﬁnement parameter Λ and mass of the target remnant mφ. This strongly suggests that the range of
+validity of collinear factorization can be maximized in the large-xB and low-Q2 region by extending the calculations
+to twist-4 level, either theoretically (including contributions from multi-parton diagrams) or phenomenologically (by
+adding a ﬁtting a H(x)/Q2 term to the LT factorized calculation). A ﬁt of model pseudo-data is under way [79] to
+verify if a phenomenological extraction of PDFs can be pushed to as large values of xB as the factorized calculation,
+which is still underestimating by ∼10% the values of ⟨x⟩approximated by ξq.
+A ﬁner treatment of the partonic transverse momentum can only be obtained in SIDIS processes, where this can
+be controlled by a measurement of a ﬁnal state hadron but hadron mass corrections are more complex. Nevertheless,
+the results of our paper are very encouraging regarding the procedure advocated in Refs. [20, 21] for SIDIS and in
+Ref. [92] for semi-inclusive hadron annihilation in e+ + e−scattering. In those works the scattered quark virtuality
+is bound by v ′ 2 ≥m2
+h/ζ (with mh the identiﬁed hadron mass and ζ its light-cone fractional momentum) instead of
+v ′ 2 ≥m2
+q as in the DIS case. It remains an important exercise to perform a model validation for these two cases,
+and study the range of validity of collinear factorization for semi-inclusive processes, before extending our analysis to
+kinematically more complex case of transverse momentum dependent measurements [39–41].
+D.
+Beyond Deep Inelastic Scattering
+The model used in this study has richer structure than exploited in the validation of collinear factorization of
+the cross section’s DIS component. Indeed the model also includes e + p resonant quasi-elastic scattering and the
+interference between this and the DIS scattering. (Suitably generalized to higher mass resonances, the model may
+thus also prove to be an useful tool in the study of quark-hadron duality [57], potentially allowing one to access PDFs
+in lepton-proton scattering processes at even higher xB than currently possible.)
+With a gauge-invariant decomposition of the physical process into DIS, resonance and interference processes, we
+have shown that the interference and resonance contribution to the transverse FT structure function exhibit an
+approximate 1/Q2 and 1/Q4 scaling. Thus one can also envision using model pseudo-data to test how eﬀectively a
+phenomenological HT piece can decouple these from the DIS contribution in a PDF ﬁt [79].
+The longitudinal FL structure function, instead, is further constrained by gauge invariance and does not exhibit the
+strongly ordered power-law scaling observed in the case of FT . Rather, its DIS, resonance and interference components
+are all of the same order of magnitude – an eﬀect we traced back to the small-xB behavior of the longitudinal P µν
+L
+projector. This is therefore a model-independent result and may have a bearing also for a CF analysis of real FL
+measurements, with the factorized F CF
+L
+free to increase as an inverse power of xB at small values of the Bjorken
+invariant while the full FL →0 as xB →0. In fact, recent measurements at HERA [81–83] have revealed small-xB
+tensions between data and CF calculations, part of which may be explained by our observation. A more detailed CF
+analysis of FL at small xB would require a NLO model calculation that is outside of the scope of the present article
+but remains an interesting exercise for the future.
+ACKNOWLEDGMENTS
+We thank A. Bacchetta, L. Gamberg, M. Radici and A. Signori for helpful discussions and remarks. This work was
+supported in part by the U.S. Department of Energy contract DE-AC05-06OR23177, under which Jeﬀerson Science
+Associates LLC manages and operates Jeﬀerson Lab, and within the framework of the TMD Topical Collaboration.
+AA also acknowledges support from DOE contract DE-SC0008791. JVG also acknowledges partial support from the
+Jeﬀerson Science Associates (JSA) 2018-2019 Graduate Fellowship Program.
+
+36
+Appendix A: Invariant and helicity structure functions, and symmetry constraints at small xB
+In Section III A, we discussed how to uniquely decompose a rank-2 tensor, T µν, into a gauge invariant and a gauge
+breaking part. The procedure we adopted consists in deﬁning a complete set of orthogonal rank-2 projectors, {P µν
+λ },
+maximizing the number that satisfy the electromagnetic Ward identity, qµP µν
+λ
+= 0. For simplicity, in the main text
+we focused only on the parity invariant tensors, which are involved in neutral current exchanges such as in the model.
+In this appendix we complete that discussion by also consider the parity breaking tensors. We will also examine the
+xB →0 limit of the structure functions, completing the analysis initiated in Section III E for the longitudinal FL
+structure function.
+We can now use the polarization vectors (54) to deﬁne the parity breaking helicity projectors for rank two tensors
+as
+P µν
+A (p, q) = εµ
++(p, q)εν∗
++ (p, q) −εµ
+−(p, q)εν∗
+−(p, q)
+P µν
+[LS](p, q) = εµ
+0(p, q)εν∗
+q (p, q) −εµ
+q (p, q)εν∗
+0 (p, q).
+(A1)
+Using
+εµ
++(p, q)εν∗
++ (p, q) −εµ
+−(p, q)εν∗
+−(p, q) =
+−iεµναβpαqβ
+p
+(p · q)2 −p2q2
+(A2)
+and the explicit polarization vectors deﬁnition (54), the parity breaking projectors can be more compactly written in
+“Lorentz” representation as
+P µν
+A (p, q) = −iεµναβ ˆpαqβ
+p
+−q2ˆp2
+P µν
+[LS](p, q) = ˆpµqν −qµˆpν
+p
+−q2ˆp2
+(A3)
+where ˆpµ ≡pµ −p·q
+q2 qµ. In this form it is easy to verify that these two projectors are orthogonal to each other.
+Moreover, the parity breaking projectors are antisymmetric in the indices, and therefore also orthogonal to the parity
+invariant projectors (58), that are symmetric in the indices and we report here for reading convenience:
+P µν
+L (p, q) = ˆpµˆpν
+ˆp2
+P µν
+T (p, q) = −ˆgµν + ˆpµˆpν
+ˆp2
+P µν
+S (p, q) = −qµqν
+q2
+P µν
+{LS}(p, q) = ˆpµqν + qµˆpν
+p
+−q2ˆp2
+,
+(A4)
+with ˆgµν = gµν −qµqν
+q2 . In summary,
+Pλ · Pλ′ = 0
+for λ ̸= λ′
+Pλ · Pλ = 1
+for λ = L, S
+(A5)
+Pλ · Pλ = 2
+for λ = T
+Pλ · Pλ = −2
+for λ = A, {LS}, [LS]
+In the Lorentz representation (A3) and (A4), it is easy to convince oneself that these 6 deﬁned projectors are also a
+complete orthogonal basis for the space of rank-2 tensors T µν = T µν(p, q) built of the proton and photon momenta p
+and q, such as the hadronic tensor for inelastic e + p scattering.
+Exploiting the the completeness of this basis, and noticing that the axial projector satisfy the Ward identity,
+q · PA ≡qµP µν
+A = 0 ,
+(A6)
+we can extend to the anti-symmetric sector the decomposition (62) of a T µν tensor into a gauge invariant and
+maximally gauge breaking piece by deﬁning
+T µν = T µν
+inv. + T µν
+g.b. ,
+(A7)
+
+37
+with
+T µν
+inv.(p, q) = P µν
+T FT (xB, Q2) + P µν
+L FL(xB, Q2) + P µν
+A FA(xB, Q2)
+(A8)
+T µν
+g.b.(p, q) = P µν
+S FS(xB, Q2) + P µν
+{LS}F{LS}(xB, Q2) + P µν
+[LS]F[LS](xB, Q2) .
+(A9)
+The Fλ structure function are deﬁned as in Eq. (60), i.e.,
+Fλ(xB, Q2) ≡cλPλ(p, q) · T(p, q) ,
+(A10)
+but with the index now ranging over the full range λ = L, T, A, S, {LS}, [LS] and cλ = 1/Pλ · Pλ.
+As demonstrated in Section III E, it is instructive to study the xB →0 limit of the helicity projectors. Utilizing
+ˆpµ →−(p · q/q2)qµ = (1/2xB)qµ and ˆp2 →−(p · q)2/q2 = −q2/(2xB)2, it is easy to see that
+P µν
+T
+−−−−→
+xB→0 −gµν
+P µν
+L
+−−−−→
+xB→0 P µν
+S
+P µν
+{LS} −−−−→
+xB→0 −2P µν
+S
+(A11)
+P µν
+A −−−−→
+xB→0 0
+P µν
+[LS] −−−−→
+xB→0 0 .
+Therefore, all structure functions except FT are constrained at small xB:
+FL −−−−→
+xB→0 FS
+F{LS} −−−−→
+xB→0 FS
+(A12)
+FA −−−−→
+xB→0 0
+F[LS] −−−−→
+xB→0 0 .
+(A13)
+For gauge conserving interactions, such as electromagnetism, we furthermore ﬁnd that
+FL −−−−→
+xB→0 0 .
+(A14)
+An interesting consequence of this constraint, already discussed in Section III E, is that
+F DIS
+L
+−−−−→
+xB→0 −F non-DIS
+L
+,
+(A15)
+which alters the usual scaling expectations based on perturbative arguments, and introduces a novel source of “higher-
+twist”, or rather inverse Q2 power corrections. In particular, we have explicitly demonstrated for electromagnetic
+interactions in our model that F DIS
+L
+∝1/Q2 in the small xB limit, see also Appendix D. Let us stress that Eq. (A14)
+is purely a consequence of gauge invariance, and therefore we expect this remark to be important for the QCD
+interpretation of small-xB measurements of the proton’s FL. Similar considerations also apply to FA and F[LS].
+
+38
+Appendix B: Sub-asymptotic kinematics in detail
+We discuss here in some detail the kinematics of the model, and derive a number of bounds on relevant internal
+and external variables. Note that the derivation of the bounds does not rely on model peculiarities, nor it is conﬁned
+to LO diagrams. A generalization to QCD will also be presented.
+1.
+Limits on xB
+We start by considering the total invariant mass, W 2,
+W 2 = (p + q)2 = M 2 + Q2 1
+xB
+−1
+
+.
+(B1)
+In the model, by four momentum and lepton number conservation we can write
+W 2 ≥(pφ + k′)2 ,
+(B2)
+where we have exploited the fact that a quark and a meson are the minimal mass ﬁnal state that can be produced in
+an inelastic scattering. These particles are asymptotic states of the model, and we can use p2
+φ = m2
+φ, k′ 2 = m2
+q and
+pφ · k′ ≥mφmq to derive an upper limit for xB:
+xB ≤
+1
+1 + (mφ+mq)2−M 2
+Q2
+≡xB,max .
+(B3)
+The threshold xB,max corresponds to the production of the scattered quark and spectator meson at rest in the target
+rest frame. Note that the upper bound can be larger than 1 if the nucleon is unstable, that is, if mφ + mq < M. A
+resonance will then appear in the scattering cross section at xB = 1 as shown, for example, in Figure 14.
+In QCD, the quark needs to minimally hadronize into a pion, and by baryon number conservation a proton must
+also be minimally present in the ﬁnal state. The QCD threshold value can then be obtained from Eq. (B3) substituting
+mφ ⇝M and mq ⇝mπ, and is known as the “pion threshold” xπ:
+xB|QCD ≤
+1
+1 + 2mπM+m2π
+Q2
+≡xπ .
+(B4)
+The proton in QCD is a stable particle, and the phase space for inelastic scattering is indeed cut oﬀbefore xB|QCD
+can reach 1.
+2.
+Limits on k 2
+T
+Given a ﬁnite ﬁnal state invariant mass W 2, the transverse momentum squared of the scattered quark is also limited.
+To derive its bounds, we consider the center of mass frame, where k′ = −pφ and pφ,T = −k′
+T = −kT . Then,
+W 2 ≥(p0
+φ + k′0)2 =
+ q
+m2
+φ + k 2
+T + (pz
+φ)2 +
+q
+m2q + k 2
+T + (k′z)2
+2
+(B5)
+≥
+ q
+m2
+φ + k 2
+T +
+q
+m2q + k 2
+T
+2
+(B6)
+where we have used (pz
+φ)2 ≥0 and (k′z)2 ≥0. Now, solving the last inequality imposes an upper limit in k 2
+T ,
+k 2
+T ≤
+
+W 2 −(mφ + mq)2
+W 2 −(mφ −mq)2
+4W 2
+≡k2
+T,max
+(B7)
+Note that solving this for xB when k2
+T,max = 0 one recovers the upper limit Eq. (68). This is as it should, since xB,max
+corresponds to the production of the recoiled quark and spectator both at rest in the target rest frame.
+As with the derivation of xB,max, the transverse momentum bound in QCD can be obtained by substituting mφ ⇝M
+and mq ⇝mπ in Eq. (B7).
+
+39
+3.
+Internal variables: parton fractional momentum and virtuality
+At LO, the unintegrated hadronic tensor contains two delta functions, see Eqs. (51)-(53), which originate from the
+upper and lower cuts in the diagrams of Figure 4. These delta functions impose
+(k + q)2 −m2
+q = 0
+(B8)
+(p −k)2 −m2
+φ = 0
+(B9)
+and the exact solutions of this system of equations, denoted by xex and k2
+ex, enter in the calculation of the kT -
+unintegrated hadronic tensor (72). Note that Eqs. (B8) and (B9) are coupled. However, as we already discussed in
+the main text, the upper cut (B8) provides the main constraint on the light cone fraction x, since k2 only contributes
+to it at next to leading order in 1/Q4 (or rather 1/W 4). The lower cut (B9) then constraints k2 as a function of x.
+In order to highlight the role of the W 2 scale in determining the kinematics of the process, we can express the hard
+scattering invariant mass, (k + q)2, as
+(k + q)2 = W 2 + (k −p)2 + 2(p + q) · (k −p)
+= W 2 + (k −p)2 + (1 −ξ)
+k2 + k 2
+T
+x
+−M 2
++ x −1
+1 −ξ W 2
+(B10)
+where in the last line we have used W 2 = (1 −ξ)
+ M 2 + Q2
+ξ
+
+. Substituting this in Eq. (B8), and solving the resulting
+system, we obtain a relatively compact solution of Eqs. (B8)-(B9):
+xex = 1 + ξ
+2
+−1 −ξ
+2
+s
+4(k2
+T,max −k 2
+T )
+W 2
++
+(1 −ξ)(m2
+q −m2
+φ)
+2W 2
+(B11)
+k2
+ex = xexM 2 −
+W 2
+2(1 −ξ)
+"
+1 −
+s
+4(k2
+T,max −k 2
+T )
+W 2
+−
+m2
+q + (1 −2ξ)m2
+φ
+W 2
+#
+(B12)
+where k2
+T,max is given by Eq. (B7). Note that Eqs. (B11) and (B12) highlight the role of the k2
+T,max transverse
+momentum threshold, and explicitly show how the kinematics of the process is determined by the W 2 scale. It is
+therefore interesting to study their expansion in powers of 1/W 2. Using
+s
+4(k2
+T,max −k 2
+T )
+W 2
+= 1 −
+m2
+q + m2
+φ + 2k 2
+T
+W 2
+−
+2(m2
+q + k 2
+T )(m2
+φ + k 2
+T )
+W 4
++ O
+ 1
+W 6
+
+,
+(B13)
+we ﬁnd
+xex = ξ + (1 −ξ)m2
+q + k 2
+T
+W 2
++ (1 −ξ)
+(m2
+q + k 2
+T )(m2
+φ + k 2
+T )
+W 4
++ O
+ 1
+W 6
+
+(B14)
+k2
+ex = ξM 2 −
+ξm2
+φ + k 2
+T
+1 −ξ
++ O
+ 1
+W 2
+
+.
+(B15)
+We do not need to expand k2
+ex beyond the leading order because, as mentioned, the parton virtuality plays a role in
+the determination of xex only starting at O(1/W 4). In the high-energy W 2 →∞limit (reached, for example, when
+xB →0 at ﬁxed Q2, or when Q2 →∞at ﬁxed xB or ξ) one then easily sees that
+xex −−−−−→
+W 2→∞xB
+(B16)
+k2
+ex −−−−−→
+W 2→∞xBM 2 −
+xBm2
+φ + k 2
+T
+1 −xB
+.
+(B17)
+In other words, the quark’s light-cone momentum fraction becomes independent of the internal partonic kinematics,
+while the quark remains oﬀits mass shell at any value of xB (and by quite a large amount if xB ∼1).
+A more compact expansion of xex can be obtained in terms of a 1/Q2 instead of 1/W 2 power series, and in terms
+of the light-cone virtuality v2
+ex = k2
+ex + k2
+T instead of the virtuality k2
+ex. Indeed,
+xex = ξ
+
+1 + m2
+q + k 2
+T
+Q2
+−(m2
+q + k 2
+T )v2
+ex
+Q4
++ O
+ 1
+Q6
+
+,
+(B18)
+
+40
+where
+v2
+ex = −
+ξ
+1 −ξ
+h
+(m2
+φ −M 2) + ξM 2 + k 2
+T
+i
++ O
+ 1
+Q2
+
+.
+(B19)
+Eq. (B18) coincides with the expansion (76) discussed in the main text, and clearly shows that v2
+ex and therefore k2
+ex
+only play a role at O(1/Q4) or higher, as mentioned at the beginning of this Appendix.
+Finally, note that the light-cone virtuality vanishes at small Bjorken xB,
+v2
+ex −−−−→
+xB→0 0 ,
+(B20)
+while the ordinary virtuality k2, as becomes a bound particle, does not:
+k2
+ex −−−−→
+xB→0 −k 2
+T .
+(B21)
+
+41
+Appendix C: Resonant scattering in the spectator model
+In the main text, we focused on studying the case in which the target, as it also happens for a QCD proton, is a
+stable particle and cannot in particular decay into a quark-diquark pair.
+For completeness, in Figure 14, we show a calculation of the DIS, resonance and interference contributions to the
+structure function FT for a choice of parameters such that mq + mφ < M and the target is no longer stable. A peak
+then appears around xB →1 in both the resonance and interference contributions, corresponding to the W 2 →M 2
+photon-proton resonant scattering.
+When simulating a stable proton in the main text, we chose mq + mφ > M and the peaks were kinematically cut
+at xB,max, see Eq. (B3). The result was a small positive bump in the total FT , which should not be mistaken for a
+higher mass resonance such as the ∆(1232) in QCD. Nevertheless, it should not be diﬃcult to conceive an extension
+of the model that also takes into account such a possibility.
+Total
+DIS
+Interference
+Resonance
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+-10
+0
+10
+20
+30
+40
+50
+xB
+(4π)2FT
+Q2 = 4 GeV2, M = 1.2 GeV
+mϕ = 0.822 GeV, mq = 0.1 GeV
+FIG. 14.
+Same as Figure 5 but for a choice of parameters such that mq + mφ < M, which places the kinematic threshold
+at xB = xB,max = 1.173. In this case the proton is an unstable particle, and the FT structure function displays a resonance
+peak at xB = 1. This corresponds to a W 2 = M 2 four momentum squared exchanged in the s channel, see the diagram (c) in
+Figure 4. An analogous divergence can be seen for the interference contribution.
+
+42
+Appendix D: Structure function scaling at small xB
+In this appendix, we justify from an analytic point of view the Q2 scaling and limiting small-xB behavior observed
+numerically in Figures 5 and 6 for the model’s transverse and longitudinal structure functions. Namely, the DIS,
+interference and resonance components of the transverse FT are strongly ordered in the photon’s virtuality at all
+values of xB, i.e., F DIS
+T
+∼Q2F INT
+T
+∼Q4F RES
+T
+. On the contrary, all components of FL are of order 1/Q2. Moreover,
+FL →0 as xB →0, whereas FT shows no smal-xB constraint. As discussed in Appendix A, this behavior of the
+longitudinal structure function is a general consequence of gauge invariance, that ties together the components of FL
+but leaves FT unconstrained. Nonetheless, it is instructive to see how this explicitly arises from the analytical model
+calculations.
+1.
+Small-xB scaling of FL
+To compute F (j)
+L , we have to contract the longitudinal tensor PL with the individual contributions to the hadronic
+tensor,
+F (j)
+L
+= 2M P µν
+L W (j)
+µν
+=
+π
+4(2π)3
+Z k2
+T,max
+0
+dk2
+T
+ZZ dx
+x dk2 g2(k2)PL · Tr(j)
+Den(j)
+1
+|Jx,k2,k 2
+T |δ(x −xex)δ(k2 −k2
+ex)
+(D1)
+where Tr(j) = Tr[...γµ....γν...] are the traces appearing in Eqs. (51)-(53)) for each j =DIS, INT, RES, and Den(j) are
+the respective denominators. Jx,k2,k 2
+T is the Jacobian appearing after rewriting the ﬁnal state delta functions in terms
+of xex and k2
+ex, see Eq. (73) and Appendix B 3.
+We are now interested in studying Eq. (D1) as xB →0 at ﬁxed values of Q2. We will also expand our results in
+powers of 1/Q2 as needed. In this limit, we ﬁnd that
+k2 −→−k 2
+T
+(D2)
+xex −→xB
+
+1 + ω2
+Q2
+
+(D3)
+Jx,k2,k 2
+T −→−Q2
+x xB
+(D4)
+g(k2) −→−g m2
+q + k 2
+T
+|Λ2 + k 2
+T |2 ≡g(k 2
+T )
+(D5)
+k2
+T,max −→
+Q2
+4xB
+(D6)
+where we use ω2 = m2
+q −k2 ≈m2
+q + k 2
+T as a convenient shorthand. The longitudinal structure function contributions
+then read
+F (j)
+L
+−→
+π
+4(2π)3
+1
+Q2
+Z k2
+T,max
+0
+dk2
+T g2(k 2
+T )
+
+xB
+PL · Tr(j)
+Den(j)
+
+x=xB(1+ω2/Q2), k2=−k 2
+T
+.
+(D7)
+Since a factor
+1
+Q2 already appears explicitly in this equation, and the integrable g = g(k 2
+T ) does not contribute
+additional factors, the Q2 scaling behavior of F (j)
+L
+is determined by the scaling of xB PL · Tr(j) / Den(j), which we will
+study case by case.
+
+43
+We start with DIS contribution:
+PL · TrDIS = 1
+ˆp2 Tr
+
+(p/ + M)(k/ + mq)ˆp/(k/ + q/ + mq)ˆp/(k/ + mq)
+
+= 4ω2
+= ω2
+2xB +O(x0
+B)
+z
+}|
+{
+
+2k · ˆp −k · p −p · q
+
++ 4mqM
+
+2
+ k · ˆp
+2
+ˆp2
+−k · q
+
+|
+{z
+}
+O(x0
+B)
++4 (2k · p + Mmq)
+
+2
+ k · ˆp
+2
+ˆp2
+−k · q −(k2 −m2
+q)
+
+|
+{z
+}
+O(x0
+B)
+= 2 ω4
+xB
++ O(x0
+B) .
+(D8)
+Since the denominator in the DIS diagram is DenDIS = (k2 −m2
+q)2 = ω4, we obtain
+xB
+PL · TrDIS
+DenDIS
+= 2 + O(xB) .
+(D9)
+This term doesn’t introduce any additional Q2 dependence in Eq. (D7), therefore F DIS
+L
+scales as 1/Q2 at small xB as
+observed numerically.
+We can now repeat a similar calculation for the resonance contribution:
+PL · TrRES = 1
+ˆp2 Tr
+
+(p/ + M)ˆp/(p/ + q/ + M)(k/ + q/ + mq)(p/ + q/ + M)ˆp/
+
+= −4(W 2 −M 2)
+= ω2
+2xB +O(x0
+B)
+z
+}|
+{
+
+2k · ˆp −k · p −p · q
+
++4mqM
+
+2ˆp2 −p · q + W 2
+|
+{z
+}
+O(1/x2
+B)
++ 4
+ 2(k + q) · (p + q) + Mmq
+
+|
+{z
+}
+=W 2−M 2+O(x0
+B)
+ 2ˆp2 −p · q
+
+|
+{z
+}
+=
+1
+2xB (W 2−M 2)
+= 2(W 2 −M 2)2
+xB
++ O
+  1
+x2
+B
+
+,
+(D10)
+where (W 2 −M 2)2 = Q4/x2
+B + O(1/xB) in the leading term cancels exactly the denominator DenRES = (W 2 −M 2)2.
+We then obtain
+xB
+PL · TrRES
+DenRES
+= 2 + O(xB) ,
+(D11)
+which corroborates the fact that F DIS
+L
+→F RES
+L
+when xB →0.
+Inserting the trace terms (D9) and (D11) in Eq. (D7), we ﬁnd that
+F DIS,RES
+L
+−→
+π
+2(2π)3
+ξ
+xB
+1
+Q2
+Z ∞
+0
+dk2
+T g2(k 2
+T )
+(D12)
+which explains their common 1/Q2 scaling observed in Figure 5 at small xB. An analogous calculation can be done
+for the interference contribution to show that
+F INT
+L
+−→−
+π
+(2π)3
+ξ
+xB
+1
+Q2
+Z ∞
+0
+dk2
+T g2(k 2
+T ) ,
+(D13)
+that explains why FL →0 in the small-xB limit.
+
+44
+2.
+Small-xB scaling of FT
+The calculation for FT is analogous to the one just performed for FL, but we need to project the hadronic tensor
+with PT :
+F (j)
+T
+=
+π
+8(2π)3
+ξ
+Q2
+Z k2
+T,max
+0
+dk2
+T
+ZZ
+dx dk2 g2(k2)PT · Tr(j)
+Den(j)
+δ(x −xex)δ(k2 −k2
+ex)
+(D14)
+Again, we need to focus on the Q2 scaling of
+PL·Tr(j)
+Den(j) . These DIS, INT and RES contributions can be computed and
+expanded in xB, and read
+PT · TrDIS
+DenDIS
+= 4Q2
+ω2xB
++ O(x0
+B)
+(D15)
+PT · TrINT
+DenINT
+= −8m2
+q
+ω2 + O(xB)
+(D16)
+PT · TrRES
+DenRES
+= 4(ω2 −2M 2)
+Q2
++ O(x2
+B)
+(D17)
+Now, we can obtain the leading term for each of the contributions to the transverse structure function in the low−xB
+limit. The DIS and interference contributions to the transverse structure function read
+F DIS
+T
+−→
+π
+2(2π)3
+Z ∞
+0
+dk2
+T
+g2(k 2
+T )
+ω2
+(D18)
+F INT
+T
+−→−
+π
+(2π)3
+xB
+Q2 m2
+q
+Z ∞
+0
+dk2
+T
+g2(k 2
+T )
+ω2
+(D19)
+F RES
+T
+−→
+π
+2(2π)3
+x2
+B
+Q4
+ Z k2
+T,max
+0
+dk2
+T g2 (m2
+q + k 2
+T )3
+(Λ2 + k 2
+T )4 −2M 2
+Z ∞
+0
+dk2
+T g2(k 2
+T )
+
+(D20)
+The interference F INT
+T
+contribution is explicitly suppressed by a factor 1/Q2 compared to the DIS term, as we
+numerically observed in Figure 5 and expected from the structure of the hadronic tensor (52). Moreover, the factor
+xB in the interference contribution explains why F INT
+L
+→0 when xB →0.
+The resonance F RES
+T
+has an overall x2
+B/Q4 factor, which explains why this vanishes quicker than F INT
+T
+at small xB.
+However, the ﬁrst term in square brackets is proportional to log
+ Q2
+4xBΛ2
+
+and alters the naive
+1
+W 2−M 2 ∼1/Q4 scaling,
+as ﬁrst observed numerically in Figure 5. Note that this logarithmic term term is a direct consequence of the choice of
+dipole form factor used to simulate conﬁnement; had we used an exponential form factor the resonance contribution
+would have followed the naive expectation.
+
+45
+Appendix E: Model systematics
+In Secs. IV and V we tested the kinematic approximation and investigated the region of validity of collinear
+factorization for a selection of representative values of the target mass M and the quark mq, both “external” parameters
+of the model. In this Appendix, complete the analysis of the systematics of the model results, by also varying the
+“internal” parameters of the model, which mimic physics that can not be experimentally controlled in DIS: the
+conﬁnement scale Λ, and the proton remnant mass modeled by the spectator mass mφ ∼⟨mX⟩. The results are
+presented, in Figures 15-18, that share the same structure:
+• the central panel corresponds to the default model parameters, determined by a ﬁt of the model PDF to the quark
+PDFs of QCD phenomenologically ﬁtted to experimental data as discussed in Section III, and the parameters
+are varied one by one in the horizontal, vertical, and diagonal directions, respectively;
+• the horizontal and vertical rows show the variation of the spectator mass mφ, and conﬁnement scale Λ, respec-
+tively;
+• the two diagonal rows show variations of the external target mass M and quark mass mq.
+The plots in Figure 15 show the behavior of ⟨k 2
+T ⟩as a function of xB. As expected, ⟨k 2
+T ⟩≈O(Λ2) is not a priori
+negligible compared to the target and quark squared masses, M 2 and m2
+q.
+In Figure 16, we present a comparison between the average light-cone virtuality in the DIS process compared to
+the ¯v 2 = 0, ¯v 2 = ¯v 2
+∗[Eq. (45)], and ¯v 2 = ¯v 2
+∗T [Eq. (95)] approximations. Claerly, the last two approximate ⟨v2⟩
+at large x better. However, the light-cone virtuality only contributes at O(1/Q4) to the determination of the struck
+quark momentum fraction, see for example Eq. (32), and these non-zero choices for ¯v 2 have a minor impact on the
+calculation of the CF structure functions (see also below).
+In Figure 17, we compare the average light-cone fraction ⟨x⟩to the collinear choices collected in Table I. As
+already discussed in Section IV B, the choice ¯x = xB approximation provides an inaccurate description of the parton’s
+longitudinal kinematics, while x = ξq describes ∼95% of the light-cone fraction, with only minor improvements
+obtained when including non-zero virtuality O(1/Q4) corrections in ¯x = ξ∗
+q. Only keeping into account the partonic
+transverse dynamics through ⟨k 2
+T ⟩/Q2 corrections in ¯x = ξq can one obtain a fully accurate approximation.
+Finally, in Figure 18 we show the ratio of the collinear structure functions to the exact one. This plots illustrate
+that the conclusions made from Figure 11 are not very sensitive to the variation of Λ and mφ: a factorized calcula-
+tion utilizing ¯x = ξq provides nearly the best possible description of the full DIS structure function achievable only
+considering external variables, and the quality of this approximation is independent of the value of the internal (un-
+observable) model parameters. Taking into consideration the transverse momentum dynamics allows one to maximize
+the kinematic range of validity of the CF calculation before this unavoidably breaks down due to neglect of momentum
+conservation.
+In Table III we present for all cases discussed in this Appendix the xB,break factorization breaking thresholds, and the
+corresponding invariant mass value. We also present the corresponding Rbreak relative contribution of the k 2
+T > k2
+T,max
+tails to the factorized FT structure function. As a rough summary, factorization breaks down at W 2 ≲4 GeV2, which
+is when 20% or more of the CF structure functions originates from k 2
+T values beyond the kinematic k2
+T,max threshold
+imposed by four momentum conservation.
+xB,break W 2
+break [GeV2] Rbreak xB,break W 2
+break [GeV2] Rbreak xB,break W 2
+break [GeV2] Rbreak
+M = 0.75 GeV
+Λ = 0.45 GeV
+mq = 0.8 GeV
+0.67
+(2.5)
+0.34
+0.75
+(2.2)
+0.31
+0.59
+(3.7)
+0.24
+mφ = 0.65 GeV
+Default parameters
+mφ = 1 GeV
+0.83
+(1.7)
+0.24
+0.72
+(2.4)
+0.29
+0.61
+(3.4)
+0.34
+Λ = 0.8 GeV
+M = 1.2 GeV
+0.66
+(2.9)
+0.25
+0.82
+(2.3)
+0.21
+TABLE III. Factorization breaking thresholds xB,break calculated for Q2 = 4 GeV2 collisions, accompanied by the corresponding
+values of the invariant mass W 2
+break (in parentheses) and by the relative contribution Rbreak of the large k′ 2
+T > k2
+T,max tail to
+the factorized kT -integrated FT structure function. The table is organized in blocks that correspond to the parameter choices
+of the panels in Figs. 15-18. The central block reports values calculated with the default model parameters, and the other
+blocks modify the value of one parameter at a time as indicated.
+
+46
+M = 0.75 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+〈kT2〉[GeV2]
+Λ = 0.4 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+mq = 0.8 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+mϕ = 0.65 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+〈kT2〉[GeV2]
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.3 GeV
+mϕ = 0.822 GeV, Λ = 0.609 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+mϕ = 1 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Λ = 0.8 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+〈kT2〉[GeV2]
+0.2
+0.4
+0.6
+0.8
+xB
+M = 1.2 GeV
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.2
+0.4
+0.6
+0.8
+xB
+Q2= 4 GeV2
+Q2= 16 GeV2
+Q2= 100 GeV2
+ 	ϕ
+ Λ
+FIG. 15. Average unobserved k 2
+T of the incoming quark calculated in the full model as a function of xB for various choices of
+Q2 (black lines). For reference, the orange dot-dashed line marks the chosen model m2
+q value, and the magenta dashed line Λ2.
+The center plot corresponds to the default model parameters, while the others show variations of one parameter at a time.
+M = 0.75 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+v2[GeV2]
+Λ = 0.4 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+mq = 0.8 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+mϕ = 0.65 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+v2[GeV2]
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.3 GeV
+mϕ = 0.822 GeV, Λ = 0.609 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+mϕ = 1 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+Λ = 0.8 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+v2[GeV2]
+0.2
+0.4
+0.6
+0.8
+xB
+M = 1.2 GeV
+-1.0
+-0.5
+0.0
+0.5
+1.0
+0.2
+0.4
+0.6
+0.8
+xB
+〈v2〉
+v2 = 0
+v2 = v*
+2
+v2 = v*T
+2
+FIG. 16. Average light cone virtuality v2 = k2 + k 2
+T in the full model, compared to various collinear approximations. The
+center plot corresponds to the default model parameters, while the others show variations of one parameter at a time.
+
+47
+M = 0.75 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+x/〈x〉
+Λ = 0.4 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+mq = 0.8 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+mϕ = 0.65 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+x/〈x〉
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.3 GeV
+mϕ = 0.822 GeV, Λ = 0.609 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+mϕ = 1 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+Λ = 0.8 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+0.2
+0.4
+0.6
+0.8
+xB
+M = 1.2 GeV
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+1.05
+0.2
+0.4
+0.6
+0.8
+xB
+x=xB
+x=ξ
+x=ξq
+x=ξq
+*
+x=ξqT
+*
+FIG. 17.
+Ratio of approximated ¯x parton light-cone momentum fraction to the full ⟨x⟩calculated in the model at Q2 = 4 GeV2.
+In the center panel plot, the default model parameters are used, and the other panels show the eﬀect of varying one parameter
+at a time.
+M = 0.75 GeV
+0.0
+0.5
+1.0
+1.5
+FTCF/FTDIS
+Λ = 0.4 GeV
+0.0
+0.5
+1.0
+1.5
+mq = 0.8 GeV
+0.0
+0.5
+1.0
+1.5
+mϕ = 0.65 GeV
+0.0
+0.5
+1.0
+1.5
+FTCF/FTDIS
+0.2
+0.4
+0.6
+0.8
+xB
+M = 0.939 GeV, mq = 0.3 GeV
+mϕ = 0.822 GeV, Λ = 0.609 GeV
+0.0
+0.5
+1.0
+1.5
+mϕ = 1 GeV
+0.0
+0.5
+1.0
+1.5
+Λ = 0.8 GeV
+0.0
+0.5
+1.0
+1.5
+FTCF/FTDIS
+0.2
+0.4
+0.6
+0.8
+xB
+M = 1.2 GeV
+0.0
+0.5
+1.0
+1.5
+0.2
+0.4
+0.6
+0.8
+xB
+x=xB
+x=ξ
+x=ξq
+x=ξq
+*
+x=ξqT
+*
+FIG. 18. Ratio of the factorized to full DIS structure functions calculated in the model at Q2 = 4 GeV2. In the center panel
+plot, the default model parameters are used, and the other panels show the eﬀect of varying one parameter at a time.
+
+48
+[1] P. Jimenez-Delgado, W. Melnitchouk, and J. Owens, J. Phys. G 40, 093102 (2013), arXiv:1306.6515 [hep-ph].
+[2] J. Gao, L. Harland-Lang, and J. Rojo, Phys. Rept. 742, 1 (2018), arXiv:1709.04922 [hep-ph].
+[3] H.-W. Lin et al., Prog. Part. Nucl. Phys. 100, 107 (2018), arXiv:1711.07916 [hep-ph].
+[4] J. J. Ethier and E. R. Nocera, Ann. Rev. Nucl. Part. Sci. , 1 (2020), arXiv:2001.07722 [hep-ph].
+[5] M. Constantinou et al., (2020), arXiv:2006.08636 [hep-ph].
+[6] T.-J. Hou et al., (2019), arXiv:1912.10053 [hep-ph].
+[7] S. Bailey and L. Harland-Lang, Eur. Phys. J. C 80, 60 (2020), arXiv:1909.10541 [hep-ph].
+[8] R. Abdul Khalek et al., (2020), arXiv:2005.11327 [hep-ph].
+[9] D. de Florian, R. Sassot, M. Stratmann, and W. Vogelsang, Phys. Rev. Lett. 113, 012001 (2014), arXiv:1404.4293 [hep-ph].
+[10] E. R. Nocera, R. D. Ball, S. Forte, G. Ridolﬁ, and J. Rojo (NNPDF), Nucl. Phys. B 887, 276 (2014), arXiv:1406.5539
+[hep-ph].
+[11] D. De Florian, G. A. Lucero, R. Sassot, M. Stratmann,
+and W. Vogelsang, Phys. Rev. D 100, 114027 (2019),
+arXiv:1902.10548 [hep-ph].
+[12] S. Park, A. Accardi, X. Jing, and J. F. Owens, in DIS 2021 - The 28th International Workshop on Deep Inelastic Scattering
+and Related Subjects (2021) arXiv:2108.05786 [hep-ph].
+[13] C. Cocuzza, W. Melnitchouk, A. Metz,
+and N. Sato (Jeﬀerson Lab Angular Momentum (JAM)), Phys. Rev. D 104,
+074031 (2021), arXiv:2109.00677 [hep-ph].
+[14] J. Dudek et al., Eur. Phys. J. A 48, 187 (2012), arXiv:1208.1244 [hep-ex].
+[15] V. D. Burkert, Ann. Rev. Nucl. Part. Sci. 68, 405 (2018).
+[16] A. Accardi et al., Eur. Phys. J. A52, 268 (2016), arXiv:1212.1701 [nucl-ex].
+[17] C. A. Aidala et al., Probing Nucleons and Nuclei in High Energy Collisions (WSP, 2020) arXiv:2002.12333 [hep-ph].
+[18] J. C. Collins, D. E. Soper, and G. F. Sterman, “Factorization of Hard Processes in QCD,” (1989) pp. 1–91, arXiv:hep-
+ph/0409313.
+[19] A. Accardi, T. Hobbs, and W. Melnitchouk, JHEP 11, 084 (2009), arXiv:0907.2395 [hep-ph].
+[20] J. V. Guerrero, J. J. Ethier, A. Accardi, S. W. Casper,
+and W. Melnitchouk, JHEP 09, 169 (2015), arXiv:1505.02739
+[hep-ph].
+[21] J. V. Guerrero and A. Accardi, Phys. Rev. D97, 114012 (2018), arXiv:1711.04346 [hep-ph].
+[22] I. Scimemi and A. Vladimirov, JHEP 06, 137 (2020), arXiv:1912.06532 [hep-ph].
+[23] M. A. G. Aivazis, F. I. Olness, and W.-K. Tung, Phys. Rev. D50, 3085 (1994), arXiv:hep-ph/9312318 [hep-ph].
+[24] S. Kretzer and M. H. Reno, Phys. Rev. D69, 034002 (2004), arXiv:hep-ph/0307023 [hep-ph].
+[25] S. Albino, B. A. Kniehl, and G. Kramer, Nucl. Phys. B803, 42 (2008), arXiv:0803.2768 [hep-ph].
+[26] O. Nachtmann, Nucl. Phys. B63, 237 (1973).
+[27] H. Georgi and H. D. Politzer, Phys. Rev. D14, 1829 (1976).
+[28] A. De Rujula, H. Georgi, and H. D. Politzer, Annals Phys. 103, 315 (1977).
+[29] R. Ellis, W. Furmanski, and R. Petronzio, Nucl. Phys. B 212, 29 (1983).
+[30] I. Schienbein et al., J. Phys. G 35, 053101 (2008), arXiv:0709.1775 [hep-ph].
+[31] L. T. Brady, A. Accardi, W. Melnitchouk, and J. F. Owens, JHEP 06, 019 (2012), arXiv:1110.5398 [hep-ph].
+[32] A. Accardi and J.-W. Qiu, JHEP 07, 090 (2008), arXiv:0805.1496 [hep-ph].
+[33] F. M. Steﬀens, M. D. Brown, W. Melnitchouk, and S. Sanches, Phys. Rev. C 86, 065208 (2012), arXiv:1210.4398 [hep-ph].
+[34] A. Airapetian et al. (HERMES), Phys. Rev. D87, 074029 (2013), arXiv:1212.5407 [hep-ex].
+[35] C. Adolph et al. (COMPASS), Phys. Lett. B767, 133 (2017), arXiv:1608.06760 [hep-ex].
+[36] E. Seder (COMPASS), Proceedings, 23rd International Workshop on Deep-Inelastic Scattering and Related Subjects (DIS
+2015): Dallas, Texas, USA, April 27-May 01, 2015, PoS DIS2015, 214 (2015).
+[37] R. Akhunzyanov et al. (COMPASS), Phys. Lett. B786, 390 (2018), arXiv:1802.00584 [hep-ex].
+[38] G. D. Alexeev et al. (COMPASS), Phys. Lett. B807, 135600 (2020), arXiv:2003.11791 [hep-ex].
+[39] M. Boglione, J. Collins, L. Gamberg, J. O. Gonzalez-Hernandez, T. C. Rogers, and N. Sato, Phys. Lett. B 766, 245 (2017),
+arXiv:1611.10329 [hep-ph].
+[40] J. Gonzalez-Hernandez, T. Rogers, N. Sato, and B. Wang, Phys. Rev. D 98, 114005 (2018), arXiv:1808.04396 [hep-ph].
+[41] M. Boglione, A. Dotson, L. Gamberg, S. Gordon, J. Gonzalez-Hernandez, A. Prokudin, T. Rogers, and N. Sato, JHEP
+10, 122 (2019), arXiv:1904.12882 [hep-ph].
+[42] J. Collins, Foundations of perturbative QCD (Cambridge University Press, 2011).
+[43] A. Bacchetta, “Transverse momentum distributions,”
+(2012), http://www2.pv.infn.it/$\sim$bacchett/teaching/
+Bacchetta$_$Trento2012.pdf. Lecture Notes, Unpublished.
+[44] A. Accardi and A. Bacchetta, Phys. Lett. B773, 632 (2017), arXiv:1706.02000 [hep-ph].
+[45] A. Accardi and A. Signori, Phys. Lett. B798, 134993 (2019), arXiv:1903.04458 [hep-ph].
+[46] A. Accardi and A. Signori, (2020), arXiv:2005.11310 [hep-ph].
+[47] A. Bacchetta, F. Conti, and M. Radici, Phys. Rev. D78, 074010 (2008), arXiv:0807.0323 [hep-ph].
+[48] E. Moﬀat, W. Melnitchouk, T. C. Rogers, and N. Sato, Phys. Rev. D95, 096008 (2017), arXiv:1702.03955 [hep-ph].
+[49] J. V. Guerrero and A. Accardi, Proceedings, 27th International Workshop on Deep Inelastic Scattering and Related Subjects
+(DIS 2019): Torino, Italy, April 8-12, 2019, PoS DIS2019, 015 (2019), arXiv:1906.01191 [hep-ph].
+[50] J. V. Guerrero, Hadron Mass Corrections in Deep Inelastic Scattering, Ph.D. thesis, Hampton University (2019).
+
+49
+[51] J. C. Collins, T. C. Rogers, and A. M. Stasto, Phys. Rev. D77, 085009 (2008), arXiv:0708.2833 [hep-ph].
+[52] A. Bacchetta, M. Diehl, K. Goeke, A. Metz, P. J. Mulders, and M. Schlegel, JHEP 02, 093 (2007), arXiv:hep-ph/0611265
+[hep-ph].
+[53] J.-W. Qiu, Phys. Rev. D42, 30 (1990).
+[54] W.-K. Tung, S. Kretzer, and C. Schmidt, Proceedings, Ringberg Workshop on New Trends in HERA Physics 2001: Ringberg
+Castle, Tegernsee, Germany, June 17-22, 2001, J. Phys. G28, 983 (2002), arXiv:hep-ph/0110247 [hep-ph].
+[55] P. M. Nadolsky and W.-K. Tung, Phys. Rev. D79, 113014 (2009), arXiv:0903.2667 [hep-ph].
+[56] P. Frampton, Lett. Nuovo Cim. 17, 499 (1976).
+[57] W. Melnitchouk, R. Ent, and C. Keppel, Phys. Rept. 406, 127 (2005), arXiv:hep-ph/0501217 [hep-ph].
+[58] E. Moﬀat, T. C. Rogers, W. Melnitchouk, N. Sato,
+and F. Steﬀens, Phys. Rev. D99, 096008 (2019), arXiv:1901.09016
+[hep-ph].
+[59] I. Abt, A. M. Cooper-Sarkar, B. Foster, V. Myronenko, K. Wichmann, and M. Wing, Phys. Rev. D94, 034032 (2016),
+arXiv:1604.02299 [hep-ph].
+[60] A. V. Manohar, Phys. Lett. B 633, 729 (2006), arXiv:hep-ph/0512173.
+[61] A. Accardi and A. Signori, Proceedings, 26th International Workshop on Deep Inelastic Scattering and Related Subjects
+(DIS 2018): Port Island, Kobe, Japan, April 16-20, 2018, PoS DIS2018, 158 (2018), arXiv:1808.00565 [hep-ph].
+[62] M. Procura and I. W. Stewart, Phys. Rev. D 81, 074009 (2010), [Erratum: Phys.Rev.D 83, 039902 (2011)], arXiv:0911.4980
+[hep-ph].
+[63] R. P. Feynman, Phys. Rev. Lett. 23, 1415 (1969), [,494(1969)].
+[64] R. P. Feynman, Photon-hadron interactions (CRC Press, 1972).
+[65] A. V. Radyushkin, Phys. Rev. D 93, 056002 (2016), arXiv:1510.02517 [hep-ph].
+[66] R. L. Jaﬀe, in Lectures on QCD: Foundations and Applications, edited by F. Lenz, H. Griesshammer,
+and D. Stoll
+(Springer, 1997) arXiv:hep-ph/9602236.
+[67] R. Jaﬀe, Nucl. Phys. B 229, 205 (1983).
+[68] D. Boer and R. D. Tangerman, Phys. Lett. B 381, 305 (1996), arXiv:hep-ph/9603428.
+[69] S. Chekanov et al. (ZEUS), Phys. Rev. D67, 012007 (2003), arXiv:hep-ex/0208023 [hep-ex].
+[70] C. Adloﬀet al. (H1), Phys. Lett. B528, 199 (2002), arXiv:hep-ex/0108039 [hep-ex].
+[71] J. J. Aubert et al. (European Muon), Nucl. Phys. B213, 31 (1983).
+[72] M. Virchaux and A. Milsztajn, Phys. Lett. B274, 221 (1992).
+[73] A. Accardi, M. E. Christy, C. E. Keppel, W. Melnitchouk, P. Monaghan, J. G. Morf´ın, and J. F. Owens, Phys. Rev. D81,
+034016 (2010), arXiv:0911.2254 [hep-ph].
+[74] J. F. Owens, A. Accardi, and W. Melnitchouk, Phys. Rev. D87, 094012 (2013), arXiv:1212.1702 [hep-ph].
+[75] A. Accardi, L. T. Brady, W. Melnitchouk, J. F. Owens, and N. Sato, Phys. Rev. D93, 114017 (2016), arXiv:1602.03154
+[hep-ph].
+[76] C. Cocuzza, C. E. Keppel, H. Liu, W. Melnitchouk, A. Metz, N. Sato,
+and A. W. Thomas (Jeﬀerson Lab Angular
+Momentum (JAM)), Phys. Rev. Lett. 127, 242001 (2021), arXiv:2104.06946 [hep-ph].
+[77] S. I. Alekhin, S. A. Kulagin, and S. Liuti, Phys. Rev. D69, 114009 (2004), arXiv:hep-ph/0304210 [hep-ph].
+[78] S. Alekhin, J. Bl¨umlein, S. Moch, and R. Placakyte, Phys. Rev. D96, 014011 (2017), arXiv:1701.05838 [hep-ph].
+[79] A. Krause, A. Accardi, and J. Guerrero, in preparation.
+[80] A. Bacchetta, F. G. Celiberto, M. Radici, and P. Taels, (2020), arXiv:2005.02288 [hep-ph].
+[81] V. Andreev et al. (H1), Eur. Phys. J. C74, 2814 (2014), arXiv:1312.4821 [hep-ex].
+[82] H. Abramowicz et al. (ZEUS), Phys. Rev. D90, 072002 (2014), arXiv:1404.6376 [hep-ex].
+[83] H. Abramowicz et al. (H1, ZEUS), Eur. Phys. J. C75, 580 (2015), arXiv:1506.06042 [hep-ex].
+[84] J. Bartels, K. J. Golec-Biernat, and K. Peters, Eur. Phys. J. C17, 121 (2000), arXiv:hep-ph/0003042 [hep-ph].
+[85] L. A. Harland-Lang, A. D. Martin, P. Motylinski,
+and R. S. Thorne, Eur. Phys. J. C76, 186 (2016), arXiv:1601.03413
+[hep-ph].
+[86] L. Motyka, M. Sadzikowski, W. S lomi´nski, and K. Wichmann, Eur. Phys. J. C78, 80 (2018), arXiv:1707.05992 [hep-ph].
+[87] H. Abdolmaleki et al. (xFitter Developers’ Team), Eur. Phys. J. C78, 621 (2018), arXiv:1802.00064 [hep-ph].
+[88] R. D. Ball, V. Bertone, M. Bonvini, S. Marzani, J. Rojo, and L. Rottoli, Eur. Phys. J. C78, 321 (2018), arXiv:1710.05935
+[hep-ph].
+[89] J. Bartels, K. J. Golec-Biernat, and H. Kowalski, Phys. Rev. D66, 014001 (2002), arXiv:hep-ph/0203258 [hep-ph].
+[90] F. Gelis, E. Iancu, J. Jalilian-Marian, and R. Venugopalan, Ann. Rev. Nucl. Part. Sci. 60, 463 (2010), arXiv:1002.0333
+[hep-ph].
+[91] L. Gamberg, Z.-B. Kang, I. Vitev, and H. Xing, Phys. Lett. B743, 112 (2015), arXiv:1412.3401 [hep-ph].
+[92] A. Accardi, D. P. Anderle, and F. Ringer, Phys. Rev. D91, 034008 (2015), arXiv:1411.3649 [hep-ph].

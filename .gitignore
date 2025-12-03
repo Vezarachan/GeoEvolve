@@ -244,3 +244,13 @@ cython_debug/
 diff2video/
 
 diff2video.py
+
+outputs_*/
+
+github_temp/
+
+geoevolve_storage_*/
+
+geoevolve_logs/
+
+geo_knowledge/

@@ -1,0 +1,2761 @@
+(function(document) {
+    var metas = document.getElementsByTagName('meta'),
+        changeViewportContent = function(content) {
+            for (var i = 0; i < metas.length; i++) {
+                if (metas[i].name == "viewport") {
+                    metas[i].content = content;
+                }
+            }
+        },
+        initialize = function() {
+            changeViewportContent("width=device-width, minimum-scale=1.0, maximum-scale=1.0");
+        },
+        gestureStart = function() {
+            changeViewportContent("width=device-width, minimum-scale=0.25, maximum-scale=1.6");
+        },
+        gestureEnd = function() {
+            initialize();
+        };
+
+
+    if (navigator.userAgent.match(/iPhone/i)) {
+        initialize();
+
+        document.addEventListener("touchstart", gestureStart, false);
+        document.addEventListener("touchend", gestureEnd, false);
+    }
+})(document);
+
+
+#' Make a shiny app to interactively explore data
+#'
+#' @param pos Position
+#' @param gexp Gene expression
+#' @param results Dataframe of analysis results
+#' @param title Page title
+#' @param description Page description
+#' @param pal Color ramp palette
+#' @param scale Boolean of whether to scale and center expression values
+#' @param zlim Color range
+#' @param ... Additional plotting parameters
+#'
+#' @return Shiny app
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' gexp <- as.matrix(normalizeCounts(mOB$counts, log=FALSE))
+#' results <- mOB$results
+#' results[, 1:3] <- round(results[, 1:3], digits=3)
+#' makeApp(pos,
+#'         gexp,
+#'         results,
+#'         title='mOB',
+#'         description='Mouse Olfactory Bulb Spatial Transcriptomics Data')
+#'
+#' @export
+#'
+makeApp <- function(pos, gexp, results, title, description=NULL,
+                    pal=colorRampPalette(c('blue', 'grey', 'red'))(100),
+                    scale=TRUE,
+                    zlim=c(-1.5,1.5),
+                    ...) {
+
+  ## double check
+  gexp <- gexp[rownames(results), rownames(pos)]
+
+  if (interactive()) {
+    ui <- shiny::fluidPage(
+      title = title,
+      shiny::titlePanel(title),
+      shiny::fluidRow(
+        shiny::column(12, description, shiny::hr())
+      ),
+      shiny::sidebarLayout(
+        shiny::sidebarPanel(
+          DT::dataTableOutput('table')
+        ),
+        shiny::mainPanel(
+          shiny::plotOutput('plot')
+        )
+      )
+    )
+    server <- function(input, output) {
+      output$table = DT::renderDataTable(results, server = TRUE,
+                                      selection = 'single',
+                                      options = list(scrollX = TRUE))
+      output$plot = shiny::renderPlot({
+        shiny::validate(shiny::need(input$table_rows_selected, "Select a Gene (Click on a Data Table Row)"))
+        s = input$table_rows_selected
+        if(is.null(s)) { s = rownames(gexp)[1] }
+        g = rownames(results)[s]
+        ggexp = gexp[g, rownames(pos)]
+        if(scale) { ggexp = scale(ggexp)[,1] }
+        ggexp[ggexp > zlim[2]] <- zlim[2]
+        ggexp[ggexp < zlim[1]] <- zlim[1]
+        plot(pos, col=map2col(ggexp, pal=pal), pch=16, main=g,
+             xlab=NA, ylab=NA, axes=FALSE, ...)
+      })
+    }
+    shiny::shinyApp(ui = ui, server = server)
+  }
+}
+
+
+
+
+
+#' Get transcriptional clusters by graph-based clustering
+#'
+#' @description Get transcriptional clusters by graph-based clustering
+#'
+#' @param pcs A matrix of principal components or gene expression to assess transcriptional similarity
+#' @param k Number of nearest neighbors for clustering
+#' @param method igraph method for graph-based clustering (default: cluster_louvain)
+#' @param weight Whether to using weighting by transcriptional distance
+#' @param verbose Verbosity
+#' @param details Return detailed ouputs
+#'
+#' @return Factor of cluster annotations
+#'
+#' @examples
+#' # simulate 3 spatially but 2 transcriptionally distinct groups
+#' N <- 300
+#' M <- 30
+#' # Three spatially distinct groups
+#' pos1 <- cbind(rnorm(N/3), rnorm(N/3))
+#' pos2 <- cbind(rnorm(N/3, 10), rnorm(N/3))
+#' pos3 <- cbind(rnorm(N/3, 10), rnorm(N/3, 10))
+#' pos <- rbind(rbind(pos1, pos2), pos3)
+#' group <- c(rep(1, N/3), rep(2, N/3), rep(3, N/3))
+#' names(group) <- rownames(pos) <- paste0('cell', 1:N)
+#' # But two are transcriptionally identical
+#' pcs12 <- matrix(rnorm(N*2/3*M), N*2/3, M)
+#' pcs3 <- matrix(rnorm(N*1/3*M, 10), N*1/3, M)
+#' pcs <- rbind(pcs12, pcs3)
+#' pcs <- cbind(pcs, abs(10-pcs))
+#' colnames(pcs) <- paste0('PC:', 1:ncol(pcs))
+#' rownames(pcs) <- rownames(pos)
+#' com <- getClusters(pcs, k=50, verbose=TRUE)
+#'
+#' @export
+#'
+getClusters <- function (pcs, k,
+                         method = igraph::cluster_louvain,
+                         weight = FALSE,
+                         verbose = FALSE,
+                         details = FALSE) {
+  if (verbose) {
+    print("finding approximate nearest neighbors ...")
+  }
+  # nearest neighbors in PC space
+  nn = RANN::nn2(pcs, k = k) ## KNN
+  names(nn) <- c('idx', 'dists')
+
+  if(weight) {
+    if(verbose) {
+      print('using transcriptional distance weighting')
+    }
+    weight <- 1/(1+ as.vector(nn$dists))
+  } else {
+    if(verbose) {
+      print('using equal weighting')
+    }
+    weight <- rep(1, nrow(pcs))
+  }
+
+  if (verbose) {
+    print("calculating clustering ...")
+  }
+  nn.df = data.frame(from = rep(1:nrow(nn$idx), k),
+                     to = as.vector(nn$idx),
+                     weight = weight
+  )
+  g <- igraph::graph_from_data_frame(nn.df, directed = FALSE)
+  g <- igraph::simplify(g)
+  km <- method(g)
+  if (verbose) {
+    mod <- igraph::modularity(km)
+    if (mod < 0.3) {
+      print("WARNING")
+    }
+    print(paste0("graph modularity: ", mod))
+  }
+  com <- km$membership
+  names(com) <- rownames(pcs)
+  com <- factor(com)
+  if (verbose) {
+    print("identifying cluster membership ...")
+    print(table(com))
+  }
+  if (details) {
+    return(list(com = com, mod = mod, g = g))
+  }
+  else {
+    return(com)
+  }
+}
+
+#' Get spatially informed clusters by weighting graph-based clustering with spatial information
+#'
+#' @description Get spatially informed clusters by weighting graph-based clustering with spatial information
+#'
+#' @param pcs A matrix of principal components or gene expression to assess transcriptional similarity
+#' @param W Binary adjacency matrix
+#' @param k Number of nearest neighbors for clustering
+#' @param alpha Pseuodocount in edge weight 1/(alpha + as.vector(pweight)) + beta (default: 1)
+#' @param beta Pseudocount in edge weight 1/(alpha + as.vector(pweight)) + beta (default: 1)
+#' @param method igraph method for graph-based clustering (default: cluster_louvain)
+#' @param verbose Verbosity
+#' @param details Return detailed ouputs
+#'
+#' @return Factor of cluster annotations
+#'
+#' @examples
+#' # simulate 3 spatially but 2 transcriptionally distinct groups
+#' N <- 300
+#' M <- 30
+#' # Three spatially distinct groups
+#' pos1 <- cbind(rnorm(N/3), rnorm(N/3))
+#' pos2 <- cbind(rnorm(N/3, 10), rnorm(N/3))
+#' pos3 <- cbind(rnorm(N/3, 10), rnorm(N/3, 10))
+#' pos <- rbind(rbind(pos1, pos2), pos3)
+#' group <- c(rep(1, N/3), rep(2, N/3), rep(3, N/3))
+#' names(group) <- rownames(pos) <- paste0('cell', 1:N)
+#' # But two are transcriptionally identical
+#' pcs12 <- matrix(rnorm(N*2/3*M), N*2/3, M)
+#' pcs3 <- matrix(rnorm(N*1/3*M, 10), N*1/3, M)
+#' pcs <- rbind(pcs12, pcs3)
+#' pcs <- cbind(pcs, abs(10-pcs))
+#' colnames(pcs) <- paste0('PC:', 1:ncol(pcs))
+#' rownames(pcs) <- rownames(pos)
+#' W <- getSpatialNeighbors(pos, filterDist=5)
+#' com <- getSpatiallyInformedClusters(pcs, W, k=50, verbose=TRUE)
+#'
+#' @export
+#'
+getSpatiallyInformedClusters <- function(pcs, W, k,
+                                         alpha=1, beta=1,
+                                         method = igraph::cluster_louvain,
+                                         verbose=FALSE,
+                                         details=FALSE) {
+
+  if (verbose) {
+    print("finding approximate nearest neighbors ...")
+  }
+  # nearest neighbors in PC space
+  nn = RANN::nn2(pcs, k = k) ## KNN
+  names(nn) <- c('idx', 'dists')
+
+  if (verbose) {
+    print("using spatial weights ...")
+  }
+  # create weights from binary adjacency matrix W
+  nw.simple = igraph::graph_from_adjacency_matrix(W)
+  nw.simple = igraph::simplify(nw.simple)
+  pweight <- do.call(rbind, lapply(1:nrow(nn$idx), function(i) {
+    d <- unlist(lapply(nn$idx[i,], function(j) {
+      if(i==j) { return(0) }
+      else {
+        return(igraph::distances(nw.simple, rownames(W)[i], colnames(W)[j]))
+        #return(igraph::min_cut(nw.simple, rownames(W)[i], colnames(W)[j]))
+      }
+    }))
+    return(d)
+  }))
+
+  if (verbose) {
+    print(paste0("calculating weights with alpha:", alpha, " and beta:", beta))
+  }
+  weight <- 1/(alpha + as.vector(pweight)) + beta
+
+  if (verbose) {
+    print("calculating clustering ...")
+  }
+  # graph-based clustering with spatial weights
+  nn.df = data.frame(from = rep(1:nrow(nn$idx), k),
+                     to = as.vector(nn$idx),
+                     weight = weight
+  )
+  g <- igraph::graph_from_data_frame(nn.df, directed = FALSE)
+  g <- igraph::simplify(g)
+  km <- method(g)
+  if (verbose) {
+    mod <- igraph::modularity(km)
+    if (mod < 0.3) {
+      print("WARNING")
+    }
+    print(paste0("graph modularity: ", mod))
+  }
+  com <- km$membership
+  names(com) <- rownames(pcs)
+  com <- factor(com)
+  if (verbose) {
+    print("identifying cluster membership ...")
+    print(table(com))
+  }
+  if (details) {
+    return(list(com = com, mod = mod, g = g))
+  }
+  else {
+    return(com)
+  }
+}
+
+
+
+
+#' Helper function to get p-value from value and distribution mean and standard deviation
+#'
+#' @param obs Observed value
+#' @param ei Mean (Expected value)
+#' @param sdi Standard deviation
+#' @param alternative "two.sided", "less", or "greater"
+#'
+#' @return P-value
+#'
+#' @examples
+#' # Probability of observing 5 while expecting 0 with a standard deviation of 1
+#' getPv(5, 0, 1, 'greater')
+#'
+#' @export
+#'
+getPv <- function(obs, ei, sdi, alternative) {
+  alternative <- match.arg(alternative, c("two.sided", "less", "greater"))
+  pv <- pnorm(obs, mean = ei, sd = sdi)
+  if (alternative == "two.sided") {
+    if (obs <= ei) {
+      pv <- 2 * pv
+    } else {
+      pv <- 2 * (1 - pv)
+    }
+  }
+  if (alternative == "greater") {
+    pv <- 1 - pv
+  }
+  if (alternative == "lesser") {
+    pv <- pv
+  }
+  return(pv)
+}
+
+
+#' Spatialy autocorrelation by Moran's I in C++
+#'
+#' @param x Feature value
+#' @param weight Adjacency weight matrix
+#' @param alternative "two.sided", "less", or "greater"
+#'
+#' @return Observed Moran's I statistic, the expected statistic under the null hypothesis of no spatial autocorrelation, the standard deviation under the null hypothesis, and p-value
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' weight <- getSpatialNeighbors(pos)
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)['Camk4',]
+#' moranTest(gexp, weight)
+#'
+#' @export
+#'
+moranTest <- function (x, weight, alternative = "greater") {
+
+  if (nrow(weight) != ncol(weight)) {
+    stop("'weight' must be a square matrix")
+  }
+
+  N <- length(x)
+  if (nrow(weight) != N) {
+    stop("'weight' must have as many rows as observations in 'x'")
+  }
+
+  if(sum(rownames(weight) %in% names(x)) != nrow(weight)) {
+    stop('Names in feature vector and adjacency weight matrix do not agree.')
+  }
+  x <- x[rownames(weight)]
+
+  output <- moranTest_C(x, weight)
+  output <- output[,1]
+  names(output) <- c('observed', 'expected', 'sd')
+  output['p.value'] <- getPv(output[1], output[2], output[3], alternative)
+  return(output)
+}
+
+
+#' Spatialy autocorrelation by Moran's I
+#' DEPRECATED! Use moranTest()
+#'
+#' @param x Feature value
+#' @param weight Adjacency weight matrix
+#' @param alternative "two.sided", "less", or "greater"
+#'
+#' @return Observed Moran's I statistic, the expected statistic under the null hypothesis of no spatial autocorrelation, the standard deviation under the null hypothesis, and p-value
+#'
+moranTest_DEPRECATED <- function (x, weight, alternative = "greater") {
+
+  warning('DEPRECATED! Use the faster moranTest()')
+
+  if (nrow(weight) != ncol(weight)) {
+    stop("'weight' must be a square matrix")
+  }
+
+  N <- length(x)
+  if (nrow(weight) != N) {
+    stop("'weight' must have as many rows as observations in 'x'")
+  }
+
+  if(sum(rownames(weight) %in% names(x)) != nrow(weight)) {
+    stop('Names in feature vector and adjacency weight matrix do not agree.')
+  }
+  x <- x[rownames(weight)]
+
+  # first moment
+  ei <- -1/(N - 1)
+
+  # unitization
+  rs <- rowSums(weight)
+  rs[rs == 0] <- 1
+  weight <- weight/rs
+
+  # Moran's I
+  W <- sum(weight)
+  z <- x - mean(x)
+  cv <- sum(weight * z %o% z)
+  v <- sum(z^2)
+  obs <- (N/W) * (cv/v)
+
+  # second moment
+  W.sq <- W^2
+  N.sq <- N^2
+  S1 <- 0.5 * sum((weight + t(weight))^2)
+  S2 <- sum((apply(weight, 1, sum) + apply(weight, 2, sum))^2)
+  S3 <- (sum(z^4)/N)/(v/N)^2
+  S4 <- (N.sq - 3*N + 3)*S1 - N*S2 + 3*W.sq
+  S5 <- (N.sq - N)*S1 - 2*N*S2 + 6*W.sq
+  ei2 <- (N*S4 - S3*S5)/((N - 1)*(N - 2)*(N - 3) * W.sq)
+
+  # standard deviation
+  sdi <- sqrt(ei2 - (ei)^2)
+
+  # p-value
+  pv <- getPv(obs, ei, sdi, alternative)
+
+  return(c(observed = obs, expected = ei, sd = sdi, p.value=pv))
+}
+
+
+#' Derive Moran's I p-value using permutation testing
+#'
+#' @param z Feature value
+#' @param w Adjacency weight matrix
+#' @param alternative "two.sided", "less", or "greater"
+#' @param N Number of permutations
+#' @param seed Random seed
+#' @param ncores Number of cores for parallel processing
+#' @param plot Plot permutated distribution
+#' @param ... Additional parameters to pass to histogram plotting
+#'
+#' @return Observed Moran's I statistic, the expected statistic under the null hypothesis of no spatial autocorrelation, the standard deviation under the null hypothesis, permutation p-value, and number of permutations
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' weight <- getSpatialNeighbors(pos)
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)['Camk4',]
+#' moranPermutationTest(gexp, weight)
+#'
+#' @export
+#'
+moranPermutationTest <- function(z, w, alternative = "greater", N=1e4, seed=0, ncores=1, plot=FALSE, ...) {
+
+  # Set seed for reproducibility
+  set.seed(seed)
+
+  # Compute Moran's I
+  stat <- moranSimple(z, w)
+
+  # Simulate null distribution
+  sim <- unlist(parallel::mclapply(seq_len(N), function(i) {
+    foo <- sample(z, length(z), replace=TRUE)
+    names(foo) <- names(z)
+    moranSimple(foo, w)
+  }, mc.cores=ncores))
+  sim[is.nan(sim)] <- NA
+  sim <- na.omit(sim)
+  all <- c(stat, sim)
+
+  # Compute permutation p-value
+  alternative <- match.arg(alternative, c("two.sided", "less", "greater"))
+  if(alternative == 'greater') {
+    p.value <- mean(all >= stat)
+  }
+  if(alternative == 'less') {
+    p.value <- mean(all <= stat)
+  }
+  if(alternative == 'two.sided') {
+    p.value <- mean(abs(all) >= abs(stat))
+  }
+
+  # Plot null distribution
+  if(plot) {
+    hist(sim, sub=paste("p =", round(p.value, 4)), xlim=range(all), ...)
+    abline(v = stat, col="red", lty=3, lwd=2)
+  }
+
+  results <- c('observed'=stat, 'expected'=mean(sim), 'sd'=sd(sim), 'p.value'=p.value, 'N'=N)
+  return(results)
+}
+moranSimple <- function(x, weight) {
+  if (nrow(weight) != ncol(weight)) {
+    stop("'weight' must be a square matrix")
+  }
+
+  N <- length(x)
+  if (nrow(weight) != N) {
+    stop("'weight' must have as many rows as observations in 'x'")
+  }
+
+  if(sum(rownames(weight) %in% names(x)) != nrow(weight)) {
+    stop('Names in feature vector and adjacency weight matrix do not agree.')
+  }
+  x <- x[rownames(weight)]
+
+  # unitization
+  rs <- rowSums(weight)
+  rs[rs == 0] <- 1
+  weight <- weight/rs
+
+  # Moran's I
+  W <- sum(weight)
+  z <- x - mean(x)
+  cv <- sum(weight * z %o% z)
+  v <- sum(z^2)
+  obs <- (N/W) * (cv/v)
+
+  return(obs)
+}
+
+
+#' Calculates a spatial cross correlation for all pairs
+#'
+#' @param mat Matrix of feature values
+#' @param weight Adjacency weight matrix
+#'
+#' @return Matrix of spatial cross correlationf or all pairs
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' weight <- getSpatialNeighbors(pos)
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)
+#' sccMat <- spatialCrossCorMatrix(gexp[1:5,], weight)
+#'
+#' @export
+#'
+spatialCrossCorMatrix <- function(mat, weight) {
+
+  if (nrow(weight) != ncol(weight)) {
+    stop("'weight' must be a square matrix")
+  }
+
+  N <- ncol(mat)
+  if (nrow(weight) != N) {
+    stop("'weight' must have as many rows as observations in 'x'")
+  }
+
+  if(sum(rownames(weight) %in% colnames(mat)) != nrow(weight)) {
+    stop('Names in feature vector and adjacency weight matrix do not agree.')
+  }
+  mat <- mat[, rownames(weight)]
+
+  scor <- spatialCrossCorMatrix_C(as.matrix(mat), weight)
+  colnames(scor) <- rownames(scor) <- rownames(mat)
+  return(scor)
+}
+
+
+#' Calculates spatial cross correlation for two features
+#'
+#' @param x Feature 1 value
+#' @param y Feature 2 value
+#' @param weight Adjacency weight matrix
+#'
+#' @return Spatial cross correlation statistic
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' weight <- getSpatialNeighbors(pos)
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)
+#' scc <- spatialCrossCor(gexp[1,], gexp[2,], weight)
+#'
+#' @export
+#'
+spatialCrossCor <- function(x, y, weight) {
+  if(length(x) != length(y)) {
+    stop("'x', and 'y' must be equal in length")
+  }
+  if (nrow(weight) != ncol(weight)) {
+    stop("'weight' must be a square matrix")
+  }
+  N <- length(x)
+  if (nrow(weight) != N) {
+    stop("'weight' must have as many rows as observations in 'x' and 'y'")
+  }
+
+  if(sum(rownames(weight) %in% names(x)) != nrow(weight)) {
+    stop('Names in feature vector and adjacency weight matrix do not agree.')
+  }
+  x <- x[rownames(weight)]
+  y <- y[rownames(weight)]
+
+  # scale weights
+  rs <- rowSums(weight)
+  rs[rs == 0] <- 1
+  weight <- weight/rs
+
+  # compute spatial cross correlation
+  N <- length(x)
+  W <- sum(weight)
+  dx <- x - mean(x, na.rm=TRUE)
+  dy <- y - mean(y, na.rm=TRUE)
+
+  cv1 <- dx %o% dy
+  cv2 <- dy %o% dx
+  cv1[is.na(cv1)] <- 0
+  cv2[is.na(cv2)] <- 0
+
+  cv <- sum(weight * ( cv1 + cv2 ), na.rm=TRUE)
+  v <- sqrt(sum(dx^2, na.rm=TRUE) * sum(dy^2, na.rm=TRUE))
+  SCC <- (N/W) * (cv/v) / 2.0
+
+  return(SCC)
+}
+
+
+#' Tests for inter-cell-type spatial cross-correlation between gene A in group A and gene B in group B
+#'
+#' @param gexpA Expression for gene A
+#' @param gexpB Expression for gene B
+#' @param groupA Cells in group A
+#' @param groupB Cells in group B
+#' @param weight Adjacency weight matrix
+#'
+#' @return statistic of how well gene expression A in cells of group A are correlated in space with gene expression B in cells of group B
+#'
+#' @examples
+#' # Simulate data
+#' set.seed(0)
+#' N <- 100
+#' pos <- cbind(rnorm(N), rnorm(N))
+#' rownames(pos) <- paste0('cell', 1:N)
+#' colnames(pos) <- c('x', 'y')
+#' weight <- getSpatialNeighbors(pos)
+#' ctA <- sample(rownames(pos), N/2)
+#' ctB <- setdiff(rownames(pos), ctA)
+#' gexpA <- pos[,2]
+#' gexpA[ctB] <- 0
+#' gexpB <- pos[,2]
+#' gexpB[ctA] <- 0
+#' #plotEmbedding(pos, col=gexpA)
+#' #plotEmbedding(pos, col=gexpB)
+#' interCellTypeSpatialCrossCor(gexpA, gexpB, ctA, ctB, weight)
+#' cor(gexpA, gexpB) # compare
+#'
+#' @export
+#'
+interCellTypeSpatialCrossCor <- function(gexpA, gexpB, groupA, groupB, weight) {
+    # restrict to expression of gene A in group A
+    # and expression of gene B in group B
+    x <- gexpA
+    y <- gexpB
+    x[groupB] <- NA
+    y[groupA] <- NA
+
+    # scale weights
+    rs <- rowSums(weight)
+    rs[rs == 0] <- 1
+    weight <- weight/rs
+
+    # compute spatial cross correlation
+    N <- length(x)
+    W <- sum(weight)
+    dx <- x - mean(x, na.rm=TRUE)
+    dy <- y - mean(y, na.rm=TRUE)
+
+    cv1 <- dx %o% dy
+    cv2 <- dy %o% dx
+    cv1[is.na(cv1)] <- 0
+    cv2[is.na(cv2)] <- 0
+
+    cv <- sum(weight * ( cv1 + cv2 ), na.rm=TRUE)
+    v <- sqrt(sum(dx^2, na.rm=TRUE) * sum(dy^2, na.rm=TRUE))
+    SCI <- (N/W) * (cv/v) / 2.0
+
+    return(SCI)
+}
+
+
+#' Local indicators of spatial association
+#'
+#' @param x Feature value
+#' @param weight Adjacency weight matrix
+#' @param alternative "two.sided", "less", or "greater"
+#'
+#' @return Data frame of observed, expected, standard deviation, and p-value for each point
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' weight <- getSpatialNeighbors(pos)
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)['Camk4',]
+#' lisa <- lisaTest(gexp, weight)
+#'
+#' @export
+#'
+lisaTest <- function(x, weight, alternative = "greater") {
+
+  if (nrow(weight) != ncol(weight)) {
+    stop("'weight' must be a square matrix")
+  }
+
+  N <- length(x)
+  if (nrow(weight) != N) {
+    stop("'weight' must have as many rows as observations in 'x'")
+  }
+
+  if(sum(rownames(weight) %in% names(x)) != nrow(weight)) {
+    stop('Names in feature vector and adjacency weight matrix do not agree.')
+  }
+  x <- x[rownames(weight)]
+
+    # unitization
+    rs <- rowSums(weight)
+    rs[rs == 0] <- 1
+    weight <- weight/rs
+
+    # calculate Ii
+    n <- length(x)
+    xx <- mean(x, na.rm = TRUE)
+    z <- x - xx
+    s2 <- sum(z^2, na.rm = TRUE)/n
+    lz <- apply(weight, 1, function(w) sum(w*z))
+    Ii <- (z/s2) * lz
+
+    Wi <- rowSums(weight)
+    E.Ii <- -Wi/(n - 1)
+
+    b2 <- (sum(z^4, na.rm = TRUE)/n)/(s2^2)
+    Wi2 <- apply(weight, 1, function(w) sum(w^2))
+    A <- (n - b2)/(n - 1)
+    B <- (2 * b2 - n)/((n - 1) * (n - 2))
+    Sd.Ii <- sqrt(A * Wi2 + B * (Wi^2 - Wi2) - E.Ii^2)
+
+    # p-value
+    pv <- getPv(Ii, E.Ii, Sd.Ii, alternative)
+
+    return(data.frame(observed = Ii, expected = E.Ii, sd = Sd.Ii, p.value = pv))
+}
+
+
+#' Signed local indicators of spatial association to identify regions driving global autocorrelation
+#'
+#' @param x Feature value
+#' @param weight Adjacency weight matrix
+#' @param alternative "two.sided", "less", or "greater"
+#'
+#' @return Signed LISA statistic for each point
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' weight <- getSpatialNeighbors(pos)
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)['Camk4',]
+#' plotEmbedding(pos, colors=gexp, cex=3)
+#' slisa <- signedLisa(gexp, weight)
+#' plotEmbedding(pos, colors=slisa, cex=3,
+#'    gradientPalette=colorRampPalette(c('darkgreen', 'white', 'darkorange'))(100))
+#'
+#' @export
+#'
+signedLisa <- function(x, weight, alternative = "greater") {
+  lisa <- lisaTest(x, weight, alternative)
+  slisa <- sign(scale(x[rownames(lisa)], center=TRUE)[,1])*lisa$observed
+  slisa <- slisa[rownames(weight)]
+  return(slisa)
+}
+
+
+#' Tests for significance of spatial cross correlation for two features using toroidal shift null model
+#'
+#' @param x Feature 1 value
+#' @param y Feature 2 value
+#' @param pos Position
+#' @param k Toroidal shift boxes
+#' @param n Permutation iterations
+#' @param ncores Number of cores for parallel processing
+#' @param plot Plot permutated distribution
+#' @param ... Additional parameters to pass to histogram plotting
+#'
+#' @return P-value
+#'
+#' @examples
+#' \dontrun{
+#' data(mOB)
+#' pos <- mOB$pos
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)
+#' pv1 <- spatialCrossCorTorTest(gexp['Gpsm1',], gexp['Nrgn',], pos)
+#' pv2 <- spatialCrossCorTorTest(gexp['Gpsm1',], gexp['Glul',], pos)
+#' pv3 <- spatialCrossCorTorTest(gexp[1,], gexp[2,], pos)
+#' }
+#'
+#' @export
+#'
+spatialCrossCorTorTest <- function(x, y, pos, k=4, n=1000, ncores=1, plot=FALSE, ...) {
+  # compute statistic
+  w <- suppressMessages(suppressWarnings(getSpatialNeighbors(pos)))
+  I <- spatialCrossCor(x,y,w)
+
+  # compute background
+  bg <- unlist(parallel::mclapply(seq_len(n), function(i) {
+    # shift pos
+    randpos <- rtorShift(pos,k=k,seed=i)
+    w <- suppressMessages(suppressWarnings(getSpatialNeighbors(randpos)))
+    spatialCrossCor(x,y,w)
+  }, mc.cores=ncores))
+  bg <- c(bg, I)
+
+  if(plot) {
+    hist(bg, breaks=n/10, ...)
+    abline(v=I, col='red')
+  }
+
+  # P-value is the fraction of how many times the permuted difference is equal or more extreme than the observed difference
+  pvalue = sum(abs(bg) >= abs(I)) / (n+1)
+  return(pvalue)
+}
+
+
+#' Tests for significance of spatial cross correlation for two features using random label null model
+#'
+#' @param x Feature 1 value
+#' @param y Feature 2 value
+#' @param w Binary weight matrix
+#' @param n Permutation iterations
+#' @param ncores Number of cores for parallel processing
+#' @param plot Plot permutated distribution
+#' @param ... Additional parameters to pass to histogram plotting
+#'
+#' @return Two-sided test p-value
+#'
+#' @examples
+#' \dontrun{
+#' data(mOB)
+#' pos <- mOB$pos
+#' w <- getSpatialNeighbors(pos)
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)
+#' pv1 <- spatialCrossCorTest(gexp['Gpsm1',], gexp['Nrgn',], w)
+#' pv2 <- spatialCrossCorTest(gexp['Gpsm1',], gexp['Glul',], w)
+#' pv3 <- spatialCrossCorTest(gexp[1,], gexp[2,], w)
+#' }
+#' @export
+#'
+spatialCrossCorTest <- function(x, y, w, n=1000, ncores=1, plot=FALSE, ...) {
+  I <- spatialCrossCor(x,y,w)
+
+  # compute background
+  bg <- unlist(parallel::mclapply(seq_len(n), function(i) {
+    set.seed(i)
+    xbg <- sample(x)
+    names(xbg) <- names(x)
+    spatialCrossCor(xbg,y,w)
+  }, mc.cores=ncores))
+  bg <- c(bg, I)
+
+  if(plot) {
+    hist(bg, breaks=n/10, ...)
+    abline(v=I, col='red')
+  }
+
+  # P-value is the fraction of how many times the permuted difference is equal or more extreme than the observed difference
+  # two-sided test
+  pvalue = sum(abs(bg) >= abs(I)) / (n+1)
+  return(pvalue)
+}
+
+
+
+#' Spatial transcriptomics transcriptomics of the mouse olfactory bulb
+#'
+#' @format List where 'counts' is a sparse matrix with columns as voxels and rows as genes and
+#'                    'pos' is a data frame of x and y position values per voxel
+#'
+#' @source \url{https://science.sciencemag.org/content/353/6294/78}
+"mOB"
+
+#' MERFISH data of the mouse pre-optic region for a female naive animal (FN7)
+#'
+#' @format List where 'mat' is a sparse matrix with columns as cells and rows as genes
+#'                          where expression values have already been normalized by volume
+#'                    'pos' is a data frame of x, y, z position values per cell
+#'                          and brain position as 6 slice indices from anterior to posterior
+#'
+#' @source \url{https://science.sciencemag.org/content/362/6416/eaau5324/}
+"mPOA"
+
+#' Spatial transcriptomics transcriptomics of 4 breast cancer biopsy sections
+#'
+#' @format List where 'counts' is a sparse matrix with columns as voxels and rows as genes and
+#'                    'pos' is a data frame of x and y position values per voxel
+#'                          and slice index for 4 consecutive slices
+#'
+#' @source \url{https://science.sciencemag.org/content/353/6294/78}
+"BCL"
+
+#' Drosophila embryo aligned ISH from the in situ database (BDTNP).
+#'
+#' @format List where 'mat' is a matrix with columns as cells and rows as genes and
+#'                    'pos' is a data frame of x, y, and z position values per cells
+#'
+#' @source \url{https://shiny.mdc-berlin.de/DVEX/}
+"drosophila"
+
+#' SlideSeq data of the Purkinje layer of the mouse cerebellum for one puck (Puck_180819_12)
+#'
+#' @format List where 'counts' is a sparse matrix with columns as voxels and rows as genes and
+#'                    'pos' is a data frame of x and y position values per voxel
+#'                          and slice index for 4 consecutive slices
+#'
+#' @source \url{https://science.sciencemag.org/content/363/6434/1463}
+"purkinje"
+
+#' Receptor ligand list
+#'
+#' @format Data frame corresponding to ncomms8866-s3.xlsx in Ramilowski et al (Nature Communications 2015)
+#'
+#' @source \url{https://www.nature.com/articles/ncomms8866}
+#'
+#' @examples
+#' data(receptorLigandInfo)
+#' receptors <- unique(receptorLigandInfo$Receptor.ApprovedSymbol)
+#' receptorLigandList <- lapply(receptors, function(rp) {
+#'      vi <- receptorLigandInfo$Receptor.ApprovedSymbol == rp
+#'      return(receptorLigandInfo[vi,]$Ligand.ApprovedSymbol)
+#' })
+#' names(receptorLigandList) <- receptors
+#' ligands <- unique(receptorLigandInfo$Ligand.ApprovedSymbol)
+#' ligandReceptorList <- lapply(ligands, function(rp) {
+#'      vi <- receptorLigandInfo$Ligand.ApprovedSymbol == rp
+#'      return(receptorLigandInfo[vi,]$Receptor.ApprovedSymbol)
+#' })
+#' names(ligandReceptorList) <- ligands
+"receptorLigandInfo"
+
+#' Visium 10X Spatial Transcriptomics data of an adult mouse brain coronal section (P56)
+#'
+#' @format List where 'filteredGenes' is a sparse matrix with columns as genes and rows as spot IDs
+#'                          where expression values have already been normalized and genes filtered
+#'                          to 1263 genes whose expression variance across the 2702 spots is higher
+#'                          than transcriptome-wide expectations. mt genes also removed.
+#'                    'tissueSpotRotation' is a data frame of x, y position values per spot
+#'                          where the spot barcodes are the 2702 that overlap the tissue.
+#'                          Coordinated have been adjusted to match the high resolution PNG image
+#'                          and rotated such that they visually match the tissue image when plotted.
+#'                    'cluster6CorrMtx' is the cross correlation matrix of the significantly spatially
+#'                          variable expressed genes in cluster 6.
+#'
+#' @source \url{https://cf.10xgenomics.com/samples/spatial-exp/1.1.0/V1_Adult_Mouse_Brain/}
+"mouseCoronal"
+
+#' Differential expression analysis (adapted from PAGODA2)
+#'
+#' @param cd A read count matrix. The rows correspond to genes, columns correspond to individual cells
+#' @param cols Column/cell group annotations. Will perform one vs. all differential expression analysis.
+#' @param verbose Verbosity
+#'
+#' @export
+#'
+getDifferentialGenes <- function(cd, cols, verbose=TRUE) {
+  cm <- t(cd)
+
+  ## match matrix rownames (cells) and group annotations
+  if(!all(rownames(cm) %in% names(cols))) { warning("Cluster vector doesn't specify groups for all of the cells, dropping missing cells from comparison")}
+  ## determine a subset of cells that's in the cols and cols[cell]!=NA
+  valid.cells <- rownames(cm) %in% names(cols)[!is.na(cols)];
+  if(!all(valid.cells)) {
+    ## take a subset of the count matrix
+    cm <- cm[valid.cells,]
+  }
+  ## reorder cols
+  cols <- as.factor(cols[match(rownames(cm),names(cols))]);
+  cols <- as.factor(cols);
+
+  if(verbose) {
+    print(paste0("Running differential expression with ",length(levels(cols))," clusters ... "))
+  }
+
+  ## modified from pagoda2
+  ## run wilcoxon test comparing each group with the rest
+  ## calculate rank per column (per-gene) average rank matrix
+  xr <- apply(cm, 2, function(foo) {
+    #foo[foo==0] <- NA
+    bar <- rank(foo)
+    #bar[is.na(foo)] <- 0
+    bar[foo==0] <- 0
+    bar
+  }); rownames(xr) <- rownames(cm)
+  # xr <- sparse_matrix_column_ranks(cm);
+
+  ## calculate rank sums per group
+  grs <- do.call(rbind, lapply(levels(cols), function(g) Matrix::colSums(xr[cols==g,])))
+  rownames(grs) <- levels(cols); colnames(grs) <- colnames(xr)
+  # grs <- colSumByFac(xr,as.integer(cols))[-1,,drop=F]
+
+  ## calculate number of non-zero entries per group
+  gnzz <- do.call(rbind, lapply(levels(cols), function(g) Matrix::colSums(xr[cols==g,]>0)))
+  rownames(gnzz) <- levels(cols); colnames(gnzz) <- colnames(xr)
+  # xr@x <- numeric(length(xr@x))+1
+  # gnzz <- colSumByFac(xr,as.integer(cols))[-1,,drop=F]
+
+  # group.size <- as.numeric(tapply(cols,cols,length));
+  # group.size <- as.numeric(tapply(cols,cols,length))[1:nrow(gnzz)]; group.size[is.na(group.size)]<-0; # trailing empty levels are cut off by colSumByFac
+  group.size <- as.numeric(table(cols))
+
+  # add contribution of zero entries to the grs
+  gnz <- (group.size-gnzz)
+
+  ## rank of a 0 entry for each gene
+  # zero.ranks <- (nrow(xr)-diff(xr@p)+1)/2 # number of total zero entries per gene
+  zero.ranks <- apply(cm, 2, function(foo) {
+    bar <- rank(foo)
+    bar[foo==0][1]
+  })
+  # if nothing ranked 0, will be NA so fix
+  zero.ranks[is.na(zero.ranks)] <- 0
+
+  ustat <- t((t(gnz)*zero.ranks)) + grs - group.size*(group.size+1)/2
+
+  # standardize
+  n1n2 <- group.size*(nrow(cm)-group.size);
+  # usigma <- sqrt(n1n2*(nrow(cm)+1)/12) # without tie correction
+  ## correcting for 0 ties, of which there are plenty
+  # usigma <- sqrt(n1n2*(nrow(cm)+1)/12)
+  usigma <- sqrt((nrow(cm) +1 - (gnz^3 - gnz)/(nrow(cm)*(nrow(cm)-1)))*n1n2/12)
+  # standardized U value- z score
+  x <- t((ustat - n1n2/2)/usigma);
+
+  # correct for multiple hypothesis
+  y <- matrix(bh.adjust(pnorm(as.numeric(abs(x)), lower.tail = FALSE,
+                              log.p = TRUE), log = TRUE), ncol = ncol(x)) * sign(x)
+  #y <- matrix(pnorm(as.numeric(abs(x)), lower.tail = FALSE,
+  #                            log.p = TRUE), ncol = ncol(x)) * sign(x)
+  y <- exp(y) # log p-values are difficult to interpret
+  y[y>1] <- 1
+  x <- matrix(qnorm(bh.adjust(pnorm(as.numeric(abs(x)), lower.tail = FALSE,
+                                    log.p = TRUE), log = TRUE), lower.tail = FALSE, log.p = TRUE),
+              ncol = ncol(x)) * sign(x)
+  rownames(y) <- rownames(x) <- colnames(cm)
+  colnames(y) <- colnames(x) <- levels(cols)[1:ncol(x)]
+
+  # add fold change information
+  log.gene.av <- log2(Matrix::colMeans(cm));
+  group.gene.av <- do.call(rbind, lapply(levels(cols), function(g) Matrix::colSums(cm[cols==g,]>0))) / (group.size+1);
+  log2.fold.change <- log2(t(group.gene.av)) - log.gene.av;
+  # fraction of cells expressing
+  f.expressing <- t(gnzz / group.size);
+  max.group <- max.col(log2.fold.change)
+
+  if(verbose) {
+    print("Summarizing results ... ")
+  }
+
+  ## summarize
+  ds <- lapply(1:ncol(x),function(i) {
+    r <- data.frame(p.adj=y[,i],Z=x[,i],M=log2.fold.change[,i],highest=max.group==i,fe=f.expressing[,i])
+    #r <- data.frame(p.value=y[,i],Z=x[,i],M=log2.fold.change[,i],highest=max.group==i,fe=f.expressing[,i])
+    rownames(r) <- rownames(x)
+    r
+  })
+  names(ds)<-colnames(x)
+
+  return(ds)
+}
+## BH P-value adjustment with a log option
+bh.adjust <- function(x, log = FALSE) {
+  nai <- which(!is.na(x))
+  ox <- x
+  x <- x[nai]
+  id <- order(x, decreasing = FALSE)
+  if(log) {
+    q <- x[id] + log(length(x)/seq_along(x))
+  } else {
+    q <- x[id]*length(x)/seq_along(x)
+  }
+  a <- rev(cummin(rev(q)))[order(id)]
+  ox[nai] <- a
+  ox
+}
+
+
+#' Winsorize expression values to prevent outliers
+#'
+#' @param x Values
+#' @param qt Values below this quantile and above 1-this quantile will be set to the quantile value
+#'
+#' @export
+#'
+winsorize <- function (x, qt=.05) {
+  if(length(qt) != 1 || qt < 0 ||
+     qt > 0.5) {
+    stop("bad value for quantile threashold")
+  }
+  lim <- quantile(x, probs=c(qt, 1-qt))
+  x[ x < lim[1] ] <- lim[1]
+  x[ x > lim[2] ] <- lim[2]
+  x
+}
+
+
+#' Get overdispersed genes whose expression variance is higher than transcriptome-wide expectations
+#' (Modified from SCDE/PAGODA2 code)
+#'
+#' Normalizes gene expression magnitudes to with respect to its ratio to the
+#' transcriptome-wide expectation as determined by local regression on expression magnitude
+#'
+#' @param counts Read count matrix. The rows correspond to genes, columns correspond to individual cells
+#' @param gam.k Generalized additive model parameter; the dimension of the basis used to represent the smooth term (default: 5)
+#' @param alpha Significance threshold (default: 0.05)
+#' @param plot Whether to plot the results (default: FALSE)
+#' @param use.unadjusted.pvals If true, will apply BH correction (default: FALSE)
+#' @param do.par Whether to adjust par for plotting if plotting (default: TRUE)
+#' @param max.adjusted.variance Ceiling on maximum variance after normalization to prevent infinites (default: 1e3)
+#' @param min.adjusted.variance Floor on minimum variance after normalization (default: 1e-3)
+#' @param verbose Verbosity (default: TRUE)
+#' @param details If true, will return data frame of normalization parameters. Else will return normalized matrix.(default: FALSE)
+#'
+#' @return If details is true, will return data frame of normalization parameters. Else will return overdispersed genes.
+#'
+#' @examples
+#' data(mOB)
+#' ods <- getOverdispersedGenes(mOB$counts)
+#'
+#' @importFrom mgcv s
+#'
+#' @export
+#'
+getOverdispersedGenes <- function(counts, gam.k=5, alpha=0.05, plot=FALSE, use.unadjusted.pvals=FALSE, do.par=TRUE, max.adjusted.variance=1e3, min.adjusted.variance=1e-3, verbose=TRUE, details=FALSE) {
+
+  if (!any(class(counts) %in% c("dgCMatrix", "dgTMatrix"))) {
+    if(verbose) {
+      message('Converting to sparse matrix ...')
+    }
+    counts <- Matrix::Matrix(counts, sparse = TRUE)
+  }
+
+  mat <- Matrix::t(counts) ## make rows as cells, cols as genes
+
+  if(verbose) {
+    print("Calculating variance fit ...")
+  }
+  dfm <- log(Matrix::colMeans(mat))
+  dfv <- log(apply(mat, 2, var))
+  names(dfm) <- names(dfv) <- colnames(mat)
+  df <- data.frame(m=dfm, v=dfv)
+
+  vi <- which(is.finite(dfv))
+
+  if(length(vi)<gam.k*1.5) { gam.k=1 } ## too few genes
+
+  if(gam.k<2) {
+    if(verbose) {
+      print("Using lm ...")
+    }
+    m <- lm(v ~ m, data = df[vi,])
+  } else {
+    if(verbose) {
+      print(paste0("Using gam with k=", gam.k, "..."))
+    }
+    fm <- as.formula(sprintf("v ~ s(m, k = %s)", gam.k))
+    m <- mgcv::gam(fm, data = df[vi,])
+  }
+  df$res <- -Inf;  df$res[vi] <- resid(m,type='response')
+  n.cells <- ncol(mat)
+  n.obs <- nrow(mat)
+  df$lp <- as.numeric(pf(exp(df$res),n.obs,n.obs,lower.tail=F,log.p=T))
+  df$lpa <- bh.adjust(df$lp,log=TRUE)
+  df$qv <- as.numeric(qchisq(df$lp, n.cells-1, lower.tail = FALSE,log.p=TRUE)/n.cells)
+
+  if(use.unadjusted.pvals) {
+    ods <- which(df$lp<log(alpha))
+  } else {
+    ods <- which(df$lpa<log(alpha))
+  }
+  if(verbose) {
+    print(paste0(length(ods), ' overdispersed genes ... ' ))
+  }
+
+  df$gsf <- geneScaleFactors <- sqrt(pmax(min.adjusted.variance,pmin(max.adjusted.variance,df$qv))/exp(df$v));
+  df$gsf[!is.finite(df$gsf)] <- 0;
+
+  if(plot) {
+    if(do.par) {
+      par(mfrow=c(1,2), mar = c(3.5,3.5,2.0,0.5), mgp = c(2,0.65,0), cex = 1.0);
+    }
+    smoothScatter(df$m,df$v,main='',xlab='log10[ magnitude ]',ylab='log10[ variance ]')
+    grid <- seq(min(df$m[vi]),max(df$m[vi]),length.out=1000)
+    lines(grid,predict(m,newdata=data.frame(m=grid)),col="blue")
+    if(length(ods)>0) {
+      points(df$m[ods],df$v[ods],pch='.',col=2,cex=1)
+    }
+    smoothScatter(df$m[vi],df$qv[vi],xlab='log10[ magnitude ]',ylab='',main='adjusted')
+    abline(h=1,lty=2,col=8)
+    if(is.finite(max.adjusted.variance)) { abline(h=max.adjusted.variance,lty=2,col=1) }
+    points(df$m[ods],df$qv[ods],col=2,pch='.')
+  }
+
+  ## variance normalize
+  norm.mat <- counts*df$gsf
+  if(!details) {
+    return(rownames(mat)[ods])
+  } else {
+    ## return normalization factor
+    return(list(mat=norm.mat, ods=colnames(mat)[ods], df=df))
+  }
+}
+
+
+#' Adjacency weight matrix by Delaunay triangulations in 2D or 3D
+#'
+#' @description Adjacency weight matrix by Delaunay triangulations.
+#'
+#' @param pos Position
+#' @param filterDist Euclidean distance beyond which two cells cannot be considered neighbors
+#' @param binary Boolean of whether to binarize output; otherwise Euclidean distances provided
+#' @param verbose Verbosity
+#'
+#' @return Matrix where value represents distance between two spatially adjacent cells ie. neighbors
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' w <- getSpatialNeighbors(pos)
+#'
+#' @export
+#'
+getSpatialNeighbors <- function(pos, filterDist = NA, binary=TRUE, verbose=FALSE) {
+  if(is.null(rownames(pos))) {
+    rownames(pos) <- seq_len(nrow(pos))
+  }
+
+  ## shift duplicates slightly or else duplicates are lost
+  if(sum(duplicated(pos))>0) {
+    if(verbose) { message(paste0("Duplicated points found: ", sum(duplicated(pos)), "...")) }
+    pos[duplicated(pos),] <- pos[duplicated(pos),] + 1e-6
+  }
+
+  ## delaunay triangulation
+  tc <- geometry::delaunayn(pos, output.options=FALSE)
+
+  ## if 2D, trimesh
+  if(ncol(pos)==2) {
+    ni <- rbind(tc[, -1], tc[, -2], tc[, -3])
+  }
+  ## if 3D, tetramesh
+  if(ncol(pos)==3) {
+    nii <- rbind(tc[, -1], tc[, -2], tc[, -3], tc[, -4])
+    ni <- rbind(nii[, -1], nii[, -2], nii[, -3])
+  }
+
+  ## convert from neighbor indices to adjacency matrix
+  N <- nrow(pos)
+  D <- matrix(0, N, N)
+
+  ## Euclidean distance
+  d <- sapply(seq_len(nrow(ni)), function(i) dist(rbind(pos[ni[i,1],], pos[ni[i,2],])))
+  ## make symmetric
+  D[ni[,c(1,2)]] <- d
+  D[ni[,c(2,1)]] <- d
+  rownames(D) <- colnames(D) <- rownames(pos)
+
+  ## filter by distance
+  if (!is.na(filterDist)) {
+    if(verbose) { message(paste0("Filtering by distance: ", filterDist, "...")) }
+    D[D > filterDist] = 0
+  }
+
+  ## binarize
+  if(binary) {
+    if(verbose) { message(paste0("Binarizing adjacency weight matrix ...")) }
+    D[D > 0] <- 1
+  }
+
+  if(verbose) { message(paste0("Done!")) }
+  return(D)
+}
+
+
+#' Identify spatial clusters
+#'
+#' @description Identify spatially clustered genes using Moran's I
+#'
+#' @param mat Gene expression matrix. Must be normalized such that correlations
+#'     will not be driven by technical artifacts.
+#' @param weight Spatial weights such as a weighted adjacency matrix
+#' @param alternative a character string specifying the alternative hypothesis,
+#'     must be one of "greater" (default), "two.sided" or "less".
+#' @param verbose Verbosity
+#'
+#' @export
+#'
+getSpatialPatterns <- function(mat, weight, alternative='greater', verbose=TRUE) {
+
+  if (nrow(weight) != ncol(weight)) {
+    stop("'weight' must be a square matrix")
+  }
+
+  N <- ncol(mat)
+  if (nrow(weight) != N) {
+    stop("'weight' must have as many rows as observations in 'x'")
+  }
+
+  if(sum(rownames(weight) %in% colnames(mat)) != nrow(weight)) {
+    stop('Names in feature vector and adjacency weight matrix do not agree.')
+  }
+  mat <- mat[, rownames(weight)]
+
+  # Calculate Moran's I for each gene
+  results <- getSpatialPatterns_C(as.matrix(mat), as.matrix(weight), verbose)
+  colnames(results) <- c('observed', 'expected', 'sd')
+  rownames(results) <- rownames(mat)
+  results <- as.data.frame(results)
+
+  # Get p-value
+  # always assume we want greater autocorrelation
+  # pv <- 1 - pnorm(results$observed, mean = results$expected, sd = results$sd)
+  pv <- sapply(seq_len(nrow(results)), function(i) {
+    getPv(results$observed[i], results$expected[i], results$sd[i], alternative)
+  })
+  results$p.value <- pv;
+  # multiple testing correction
+  results$p.adj <- stats::p.adjust(results$p.value, method="BH")
+  # order by significance
+  #results <- results[order(results$p.adj),]
+
+  return(results)
+}
+
+#' Filter for spatial patterns
+#'
+#' @description Filter out spatial patterns driven by small number of cells using LISA
+#'
+#' @param mat Gene expression matrix.
+#' @param I Output of getSpatialPatterns
+#' @param w Weight adjacency matrix
+#' @param alpha P-value threshold for LISA score to be considered significant.
+#' @param adjustPv Whether to perform BH multiple testing correction
+#' @param minPercentCells Minimum percent of cells that must be driving spatial pattern
+#' @param verbose Verbosity
+#' @param details Return details
+#'
+#' @export
+#'
+filterSpatialPatterns <- function(mat, I, w, adjustPv=TRUE, alpha = 0.05, minPercentCells = 0.05, verbose=TRUE, details=FALSE) {
+  ## filter for significant based on p-value
+  if(adjustPv) {
+    vi <- I$p.adj < alpha
+  } else {
+    vi <- I$p.value < alpha
+  }
+  vi[is.na(vi)] <- FALSE
+  results.sig <- rownames(I)[vi]
+
+  if(verbose) {
+    message(paste0('Number of significantly autocorrelated genes: ', length(results.sig)))
+  }
+
+  if(alpha > 0 | minPercentCells > 0) {
+    ## use LISA to remove patterns driven by too few cells
+    lisa <- sapply(results.sig, function(g) {
+      gexp <- mat[g,]
+      Ii <- lisaTest(gexp, w)
+      lisa <- Ii$p.value
+      names(lisa) <- rownames(Ii)
+      sum(lisa < alpha)/length(lisa) ## percent significant
+    })
+    vi <- lisa > minPercentCells
+    if(verbose) {
+      message(paste0('...driven by > ', minPercentCells*ncol(mat), ' cells: ', sum(vi)))
+    }
+  }
+
+  if(details) {
+    df <- cbind(I[results.sig,], 'minPercentCells'=lisa)
+    df <- df[vi,]
+    return(df)
+  } else {
+    return(results.sig[vi])
+  }
+}
+
+
+#' Group significant spatial patterns
+#'
+#' @description Identify primary spatial patterns using hierarchical clustering and dynamic tree cutting
+#'
+#' @param pos Position matrix where each row is a cell, columns are
+#'     x, y, (optionally z) coordinations
+#' @param mat Gene expression matrix. Must be normalized such that correlations
+#'     will not be driven by technical artifacts
+#' @param scc Spatial cross-correlation matrix
+#' @param hclustMethod Linkage criteria for hclust()
+#' @param trim Winsorization trim
+#' @param deepSplit Tuning parameter for dynamic tree cutting cutreeDynamic()
+#' @param minClusterSize Smallest gene cluster size
+#' @param power Raise distance matrix to this power
+#' @param plot Whether to plot
+#' @param verbose Verbosity
+#' @param ... Additional plotting parameters
+#'
+#' @export
+#'
+groupSigSpatialPatterns <- function(pos, mat, scc, hclustMethod='complete', trim=0, deepSplit=0, minClusterSize=0, power = 1, plot=TRUE, verbose=TRUE, ...) {
+
+    d <- as.dist((-scc - min(-scc))^(power))
+
+    hc <- hclust(d, method=hclustMethod)
+    #if(plot) {
+    #    par(mfrow=c(1,1))
+    #    plot(hc)
+    #}
+
+    ## dynamic tree cut
+    groups <- dynamicTreeCut::cutreeDynamic(dendro=hc, distM=as.matrix(d), method='hybrid', minClusterSize=minClusterSize, deepSplit=deepSplit)
+    names(groups) <- hc$labels
+    groups <- factor(groups)
+    if(verbose) {
+        message('Patterns detected:')
+        print(table(groups))
+    }
+
+    prs <- lapply(levels(groups), function(g) {
+        # summarize as first pc if more than 1 gene in group
+        if(sum(groups==g)>1) {
+          m <- mat[names(groups)[which(groups==g)],]
+          m <- t(scale(t(m)))
+            m <- winsorize(m, trim)
+            ps <- colMeans(m)
+            pr <- scale(ps)[,1]
+        } else {
+            ps <- winsorize(mat[names(groups)[which(groups==g)],], trim)
+            pr <- scale(ps)[,1]
+        }
+        if(plot) {
+            interpolate(pos, pr, main=paste0("Pattern ", g, " : ", sum(groups==g), " genes"), plot=TRUE, trim=trim, ...)
+        }
+        return(pr)
+    })
+    names(prs) <- levels(groups)
+
+    return(list(hc=hc, groups=groups, prs=prs))
+}
+
+
+
+
+#' MERINGUE
+#'
+#' This package contains methods for spatially-resolved transcriptomics data analysis
+#'
+#' @name MERINGUE
+#' @docType package
+#'
+#' @useDynLib MERINGUE
+#' @importFrom Rcpp evalCpp
+NULL
+
+
+#' K nearest neighbors
+#'
+#' @description K nearest neighbors in space based on position
+#'
+#' @param pos Position
+#' @param k Number of nearest neighbors
+#'
+#' @return Boolean matrix where value = 1 if two cells are considered adjacency ie. neighbors, else 0
+#'
+#' @export
+#'
+getKnn <- function(pos, k) {
+  ## nearest neighbors include self so add 1
+  knn <- RANN::nn2(pos, k=k+1)[[1]]
+  knn <- knn[, -1]
+  ## convert to adjacency matrix
+  adj <- matrix(0, nrow(pos), nrow(pos))
+  rownames(adj) <- colnames(adj) <- rownames(pos)
+  invisible(lapply(seq_len(nrow(pos)), function(i) {
+    adj[i,rownames(pos)[knn[i,]]] <<- 1
+  }))
+  return(adj)
+}
+
+
+#' Mutual nearest neighbors
+#'
+#' @description Mutual nearest neighbors in space between group A and B based on position
+#'
+#' @param ctA vector of cell names in group A
+#' @param ctB vector of cell names in group B
+#' @param pos Position
+#' @param k Number of mutual nearest neighbors
+#'
+#' @return Boolean matrix where value = 1 if two cells are considered adjacency ie. neighbors, else 0
+#'
+#' @export
+#'
+getMnn <- function(ctA, ctB, pos, k) {
+    # ctB's nearest ctA neighbors
+    knnB <- RANN::nn2(pos[ctA,], pos[ctB,], k=k)[[1]]
+    knnB.named <- matrix(ctA[knnB], nrow=nrow(knnB), ncol=ncol(knnB))
+    rownames(knnB.named) <- ctB
+    # ctA's nearest ctB neighbors
+    knnA <- RANN::nn2(pos[ctB,], pos[ctA,], k=k)[[1]]
+    knnA.named <- matrix(ctB[knnA], nrow=nrow(knnA), ncol=ncol(knnA))
+    rownames(knnA.named) <- ctA
+
+    # mutual nearest neighbors
+    ## mnnB <- lapply(1:nrow(knnB.named), function(i) {
+    ##     vi <- sapply(1:k, function(j) {
+    ##         rownames(knnB.named)[i] %in% knnA.named[knnB.named[i,j],]
+    ##     })
+    ##     knnB.named[i,][vi]
+    ## })
+    ## names(mnnB) <- rownames(knnB.named)
+    mnnA <- lapply(seq_len(nrow(knnA.named)), function(i) {
+        vi <- sapply(seq_len(k), function(j) {
+            rownames(knnA.named)[i] %in% knnB.named[knnA.named[i,j],]
+        })
+        knnA.named[i,][vi]
+    })
+    names(mnnA) <- rownames(knnA.named)
+
+    # get adjacency matrix
+    mnn <- mnnA
+    adj <- matrix(0, length(c(ctA, ctB)), length(c(ctA, ctB)))
+    rownames(adj) <- colnames(adj) <- c(ctA, ctB)
+    invisible(lapply(seq_len(length(mnn)), function(i) {
+        # symmetric (if I'm your mutual nearest neighbor, you're mine)
+        adj[names(mnn)[i],
+            mnn[[i]]
+            ] <<- 1
+        adj[mnn[[i]],
+            names(mnn)[i]
+            ] <<- 1
+    }))
+
+    # reorder
+    adj <- adj[rownames(pos), rownames(pos)]
+    return(adj)
+}
+
+
+#' Nearest background neighbor
+#'
+#' @description Identify nearest neighbors in the background cell-type
+#'
+#' @param cct Vector of cell names from cell type of interest
+#' @param nct Vector of cell names from background
+#' @param pos Position
+#' @param k Number of nearest neighbors from background for each cell from cell type of interest
+#'
+#' @return Boolean matrix where value = 1 if two cells are considered adjacency ie. neighbors, else 0
+#'
+#' @export
+#'
+getBnn <- function(cct, nct, pos, k) {
+    knn <- RANN::nn2(pos[nct,], pos[cct,], k=k)[[1]]
+    adj <- matrix(0, nrow(pos), nrow(pos))
+    rownames(adj) <- colnames(adj) <- rownames(pos)
+    invisible(lapply(seq_len(length(cct)), function(i) {
+        adj[cct[i],nct[knn[i,]]] <<- 1
+    }))
+    return(adj)
+}
+
+
+
+#' Nearest neighbors across layers
+#'
+#' @param layers List of positions
+#' @param k Number of nearest neighbors
+#'
+#' @return Boolean matrix where value = 1 if two cells are considered adjacency ie. neighbors, else 0
+#'
+#' @export
+#'
+getCrossLayerNeighbors <- function(layers, k=3) {
+  subset <- unlist(lapply(layers, rownames))
+  between <- lapply(1:(length(layers)-1), function(i) {
+    pos1 <- layers[[i]]
+    pos2 <- layers[[i+1]]
+    ctA <- rownames(pos1)
+    ctB <- rownames(pos2)
+    pos <- rbind(pos1, pos2)
+    if(length(ctA)==0 | length(ctB)==0) {
+      wa1 <- NA
+    } else {
+      pos <- as.matrix(pos)
+      wa1 <- getMnn(ctA, ctB, pos=pos, k=k)
+    }
+    return(wa1)
+  })
+
+  w <- matrix(0, nrow=length(subset), ncol=length(subset))
+  rownames(w) <- colnames(w) <- subset
+  ## across layers
+  invisible(lapply(between, function(wa1) {
+    w[rownames(wa1), colnames(wa1)] <<- wa1
+  }))
+
+  return(w)
+}
+
+
+
+#' Filter adjacency weight matrix to between two subsets of points
+#'
+#' @description Restrict adjacency relationships to between two subsets of points
+#'
+#' @param cct Cells of cell-type 1
+#' @param nct Cells of cell-type 2 (assumed to be mutually exclusive with cct)
+#' @param weight Adjacency weight matrix
+#' @param pos Position
+#' @param plot Boolean of whether to plot
+#' @param ... Additional plotting parameters
+#'
+#' @return Boolean matrix where value = 1 if two cells are considered adjacency ie. neighbors, else 0
+#'
+#' @export
+#'
+getInterCellTypeWeight <- function(cct, nct, weight, pos=NULL, plot=FALSE, ...) {
+  weightIc <- weight[c(cct, nct), c(cct, nct)]
+  weightIc[nct,nct] <- 0
+  weightIc[cct,cct] <- 0
+  if(plot) {
+    plotNetwork(pos, weightIc, ...)
+    points(pos[nct,], col='blue', pch=16)
+    points(pos[cct,], col='green', pch=16)
+  }
+  return(weightIc)
+}
+
+
+## random gene expression
+getMinPercentCells <- function(weight, mat, alpha=0.05, M=10000, seed=0, plot=TRUE) {
+
+  ## show shuffle
+  set.seed(seed)
+  rand <- mat[,sample(ncol(mat))]
+  colnames(rand) <- colnames(mat)
+
+  ## assess significance of randomly permuted genes
+  I <- getSpatialPatterns(rand, weight)
+  falsePositives <- rownames(I)[I$p.adj < alpha]
+  print(falsePositives)
+
+  ## get lisa
+  lisa <- sapply(falsePositives, function(g) {
+    gexp <- rand[g,]
+    Ii <- lisaTest(gexp, weight)
+    lisa <- Ii$p.value
+    names(lisa) <- rownames(Ii)
+    sum(lisa < alpha)/length(lisa) ## percent significant
+  })
+
+  ## determine threshold to remove false positives
+  mpc <- quantile(lisa, 1-alpha)
+  #mpc
+  #print(sum(lisa > mpc)/length(lisa))
+
+  if(plot) {
+    par(mfrow=c(1,1), mar=rep(5,4))
+    plot(lisa, -log10(I[falsePositives,]$p.adj))
+    abline(h=-log10(alpha), col='red')
+    abline(v=mpc, col='red')
+  }
+
+  return(mpc)
+}
+
+
+#' @import stats grDevices graphics
+NULL
+
+#' Plot 2D embedding
+#'
+#' @param emb dataframe with x and y coordinates
+#' @param groups factor annotations for rows on emb for visualizing cluster annotations
+#' @param colors color or numeric values for rows on emb for visualizing gene expression
+#' @param cex point size
+#' @param alpha point opacity
+#' @param gradientPalette palette for colors if numeric values provided
+#' @param zlim range for colors
+#' @param s saturation of rainbow for group colors
+#' @param v value of rainbow for group colors
+#' @param min.group.size minimum size of group in order for group to be colored
+#' @param show.legend whether to show legend
+#' @param mark.clusters whether to mark clusters with name of cluster
+#' @param mark.cluster.cex cluster marker point size
+#' @param shuffle.colors whether to shuffle group colors
+#' @param legend.x legend position ie. 'topright', 'topleft', 'bottomleft', 'bottomright'
+#' @param gradient.range.quantile quantile for mapping colors to gradient palette
+#' @param verbose verbosity
+#' @param unclassified.cell.color cells not included in groups will be labeled in this color
+#' @param group.level.colors set group level colors. Default uses rainbow.
+#' @param xlab x-axis label.
+#' @param ylab y-axis label.
+#' @param ... Additional parameters to pass to BASE::plot
+#'
+#' @return None
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)['Camk4',]
+#' plotEmbedding(pos, colors=scale(gexp)[,1], zlim=c(-2,2), cex=3)
+#'
+#' @export
+#'
+plotEmbedding <- function(emb, groups=NULL, colors=NULL, cex=0.6, alpha=0.4, gradientPalette=NULL, zlim=NULL,
+                          s=1, v=0.8, min.group.size=1, show.legend=FALSE, mark.clusters=FALSE, mark.cluster.cex=2,
+                          shuffle.colors=FALSE, legend.x='topright', gradient.range.quantile=0.95, verbose=FALSE,
+                          unclassified.cell.color='lightgrey', group.level.colors=NULL, xlab=NA, ylab=NA, ...) {
+
+  if(!is.null(colors)) {
+    ## use clusters information
+    if(!all(rownames(emb) %in% names(colors))) { warning("provided cluster vector doesn't list colors for all of the cells; unmatched cells will be shown in gray. ")}
+    if(all(areColors(colors))) {
+      if(verbose) cat("using supplied colors as is\n")
+      cols <- colors[match(rownames(emb),names(colors))]; cols[is.na(cols)] <- unclassified.cell.color;
+      names(cols) <- rownames(emb)
+    } else {
+      if(is.numeric(colors)) { # treat as a gradient
+        if(verbose) cat("treating colors as a gradient")
+        if(is.null(gradientPalette)) { # set up default gradients
+          if(all(sign(colors)>=0)) {
+            gradientPalette <- colorRampPalette(c('grey','red'))(100)
+          } else {
+            gradientPalette <- colorRampPalette(c("blue", "grey", "red"))(100)
+          }
+        }
+        cols <- map2col(x=colors, pal=gradientPalette, limits=zlim)
+        names(cols) <- rownames(emb)
+      } else {
+        stop("colors argument must be a cell-named vector of either character colors or numeric values to be mapped to a gradient")
+      }
+    }
+  } else {
+    if(!is.null(groups)) {
+      if(min.group.size>1) { groups[groups %in% levels(groups)[unlist(tapply(groups,groups,length))<min.group.size]] <- NA; groups <- droplevels(groups); }
+      groups <- as.factor(groups)[rownames(emb)]
+      if(verbose) cat("using provided groups as a factor\n")
+      factor.mapping=TRUE;
+      ## set up a rainbow color on the factor
+      factor.colors <- fac2col(groups,s=s,v=v,shuffle=shuffle.colors,min.group.size=min.group.size,unclassified.cell.color=unclassified.cell.color,level.colors=group.level.colors,return.details=T)
+      cols <- factor.colors$colors;
+      names(cols) <- rownames(emb)
+    } else {
+      cols <- rep(unclassified.cell.color, nrow(emb))
+      names(cols) <- rownames(emb)
+    }
+  }
+
+  plot(emb,col=adjustcolor(cols,alpha.f=alpha),cex=cex,pch=19,axes=F,xlab=xlab,ylab=ylab, ...); box();
+  if(mark.clusters) {
+    if(!is.null(groups)) {
+      cent.pos <- do.call(rbind,tapply(1:nrow(emb),groups,function(ii) apply(emb[ii,,drop=F],2,median)))
+      cent.pos <- na.omit(cent.pos);
+      text(cent.pos[,1],cent.pos[,2],labels=rownames(cent.pos),cex=mark.cluster.cex)
+    }
+  }
+  if(show.legend) {
+    if(factor.mapping) {
+      legend(x=legend.x,pch=rep(19,length(levels(groups))),bty='n',col=factor.colors$palette,legend=names(factor.colors$palette))
+    }
+  }
+}
+# Helper function to translate factor into colors
+fac2col <- function(x,s=1,v=1,shuffle=FALSE,min.group.size=1,return.details=F,unclassified.cell.color='lightgrey',level.colors=NULL) {
+  x <- as.factor(x);
+  if(min.group.size>1) {
+    x <- factor(x,exclude=levels(x)[unlist(tapply(rep(1,length(x)),x,length))<min.group.size])
+    x <- droplevels(x)
+  }
+  if(is.null(level.colors)) {
+    col <- rainbow(length(levels(x)),s=s,v=v);
+  } else {
+    col <- level.colors[1:length(levels(x))];
+  }
+  names(col) <- levels(x);
+
+  if(shuffle) col <- sample(col);
+
+  y <- col[as.integer(x)]; names(y) <- names(x);
+  y[is.na(y)] <- unclassified.cell.color;
+  if(return.details) {
+    return(list(colors=y,palette=col))
+  } else {
+    return(y);
+  }
+}
+# Quick utility to check if given character vector is colors
+# Thanks to Josh O'Brien: http://stackoverflow.com/questions/13289009/check-if-character-string-is-a-valid-color-representation
+areColors <- function(x) {
+  is.character(x) &
+  sapply(x, function(X) {
+    tryCatch(is.matrix(col2rgb(X)), error = function(e) FALSE)
+  })
+}
+# Helper function to map values to colors
+# Source: https://stackoverflow.com/questions/15006211/how-do-i-generate-a-mapping-from-numbers-to-colors-in-r
+map2col <- function(x, pal=colorRampPalette(c('blue', 'grey', 'red'))(100), na.col='lightgrey', limits=NULL){
+  original <- x
+  x <- na.omit(x)
+  if(is.null(limits)) limits=range(x)
+  y <- pal[findInterval(x,seq(limits[1],limits[2],length.out=length(pal)+1), all.inside=TRUE)]
+  names(y) <- names(x)
+
+  colors <- rep(na.col, length(original))
+  names(colors) <- names(original)
+  colors[names(y)] <- y
+
+  return(colors)
+}
+
+
+#' Plot an adjacency weight matrix as a network
+#' Adapted from https://stackoverflow.com/questions/43879347/plotting-a-adjacency-matrix-using-pure-r
+#'
+#' @param pos Position matrix
+#' @param adj Adjacency weight matrix
+#' @param col Color of points
+#' @param line.col Color of line
+#' @param line.power Thickness of lines
+#' @param ... Additional plotting parameters
+#'
+#' @return None
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' w <- getSpatialNeighbors(pos)
+#' plotNetwork(pos, w)
+#'
+#' @export
+#'
+plotNetwork <- function(pos, adj, col='black', line.col='grey', line.power=1, ...) {
+  if(nrow(pos) != nrow(adj)) {
+    warning('Position and Adjacency matrix dimensions inconsistent')
+  }
+  pos <- pos[rownames(adj),]
+  plot(pos, pch=16, col=col, axes=FALSE, xlab=NA, ylab=NA, ...)
+  box()
+  idx <- which(adj>0, arr.ind = T)
+  for(i in seq_len(nrow(idx))) {
+    lines(
+      c(pos[idx[i,1],1], pos[idx[i,2],1]),
+      c(pos[idx[i,1],2], pos[idx[i,2],2]),
+      col=line.col,
+      lwd=adj[idx]^line.power
+    )
+  }
+}
+
+#' Plot an adjacency weight matrix as a network in 3D
+#'
+#' @param pos 3D position information
+#' @param adj Adjacency weight matrix
+#' @param col Color of points
+#' @param line.col Color of line
+#' @param alpha Line color transparency
+#' @param line.power Thickness of lines
+#' @param ... Additional plotting parameters
+#'
+#' @return None
+#'
+#' @examples
+#' \dontrun{
+#' data(drosophila)
+#' pos <- drosophila$pos
+#' N <- getSpatialNeighbors(pos, filterDist = 10, verbose=TRUE)
+#' plotNetwork3D(pos, N, size=1)
+#' }
+#'
+#' @export
+#'
+plotNetwork3D <- function(pos, adj, col='black', line.col='grey', alpha=0.5, line.power=1, ...) {
+  rgl::rgl.open()
+  rgl::bg3d("white")
+  tc <- geometry::delaunayn(pos, output.options=FALSE)
+  ## 3D
+  rgl::rgl.viewpoint(45, fov=0, phi = 30)
+  rgl::points3d(pos, color=col, alpha=1, ...)
+  idx <- which(adj > 0, arr.ind = T)
+  message("drawing adjacent point edges...")
+  for (i in seq_len(nrow(idx))) {
+    #message(paste0(i, "/", nrow(idx)))
+    rgl::lines3d(c(pos[idx[i, 1], 1], pos[idx[i, 2], 1]),
+            c(pos[idx[i, 1], 2], pos[idx[i, 2], 2]),
+            c(pos[idx[i, 1], 3], pos[idx[i, 2], 3]),
+            col = line.col, alpha=alpha, lwd=line.power)
+  }
+}
+
+
+#' Gridded bivariate interpolation
+#' For interpolating primary spatial patterns
+#'
+#' @param pos Position matrix
+#' @param gexp Feature value
+#' @param scale Boolean of whether to scale feature value
+#' @param trim Winsorization trim
+#' @param zlim Feature value range
+#' @param fill Boolean of whether to interpolate regions with no expression value
+#' @param binSize Size of interpolated bins
+#' @param col Color palette
+#' @param plot Boolean of whether to plot
+#' @param ... Additional parameters for plotting
+#'
+#' @return 2D matrix of interpolated feature values
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)['Camk4',]
+#' invisible(interpolate(pos, gexp, zlim=c(-2,2)))
+#'
+#' @export
+#'
+interpolate <- function(pos, gexp, scale=TRUE, trim=0, zlim=range(gexp), fill=TRUE, binSize=100, col=colorRampPalette(c('blue', 'white', 'red'))(100), plot=TRUE, ...) {
+
+  if(nrow(pos) > length(gexp)) {
+    if(fill) {
+      print('Filling ...')
+    } else {
+      print('Removing regions with no feature value ...')
+    }
+  }
+  if(scale) {
+    z <- scale(gexp)[,1]
+  }
+  z <- winsorize(z, trim)
+  names(z) <- names(gexp)
+
+  z[z < zlim[1]] <- zlim[1]
+  z[z > zlim[2]] <- zlim[2]
+  x <- pos[,1]
+  y <- pos[,2]
+  names(x) <- names(y) <- rownames(pos)
+
+  if(fill) {
+        zb <- rep(0, nrow(pos))
+        names(zb) <- rownames(pos)
+        zb[names(gexp)] <- z
+  } else {
+        x <- x[names(gexp)]
+        y <- y[names(gexp)]
+        zb <- z
+  }
+
+  int <- akima::interp(x, y, zb, nx=binSize, ny=binSize, linear=TRUE)
+
+  if(plot) {
+        image(int, col=col, axes=FALSE, frame.plot=TRUE, ...)
+  }
+
+  return(int)
+}
+
+
+#' Expression correlation between cells of group A expressing gene A with neighbors of cells of group A in group B expressing gene B
+#'
+#' @param gexpA Expression of gene A
+#' @param gexpB Expression of gene B
+#' @param groupA Cells of group A
+#' @param groupB Cells of group B
+#' @param weight Adjacency weight matrix
+#' @param fun Function for combining multiple gene expression values (ex. mean, median, max)
+#' @param ... Additional plotting parameters
+#'
+#' @return None
+#'
+#' @examples
+#' # Simulate data
+#' set.seed(0)
+#' N <- 100
+#' pos <- cbind(rnorm(N), rnorm(N))
+#' rownames(pos) <- paste0('cell', 1:N)
+#' colnames(pos) <- c('x', 'y')
+#' weight <- getSpatialNeighbors(pos)
+#' ctA <- sample(rownames(pos), N/2)
+#' ctB <- setdiff(rownames(pos), ctA)
+#' gexpA <- pos[,2]
+#' gexpA[ctB] <- 0
+#' gexpB <- -pos[,2]
+#' gexpB[ctA] <- 0
+#' plotEmbedding(pos, col=gexpA)
+#' plotEmbedding(pos, col=gexpB)
+#' plotInterCellTypeSpatialCrossCor(gexpA, gexpB, ctA, ctB, weight)
+#' plotInterCellTypeSpatialCrossCor(gexpB, gexpA, ctB, ctA, weight)
+#'
+#' @export
+#'
+plotInterCellTypeSpatialCrossCor <- function(gexpA, gexpB, groupA, groupB, weight, fun=mean, ...) {
+    ## plot correlation between groupA cells and neighbors
+    nbs <- lapply(groupA, function(x) names(which(weight[x,]==1)))
+    names(nbs) <- groupA
+    ## gene A expression in group A
+    foo <- gexpA[groupA]
+    ## average gene B expression for neighbors from group B
+    bar <- unlist(lapply(nbs, function(y) fun(gexpB[y])))
+    ## plot
+    plot(foo, bar,
+         xlab='gene A expression for cells in group A',
+         ylab='gene B expression for neighbors in group B',
+         ...)
+}
+
+
+#' Rotate position by angle theta in radians
+#'
+#' @param pos Position matrix of x-y coordinates
+#' @param theta Angle of rotation in radians
+#'
+#' @return Position matrix with x-y coordinates rotated
+#'
+#' @examples
+#' pos <- cbind(rnorm(10), rnorm(10))
+#' posRotated <- rotatePos(pos, pi/2)
+#'
+#' @export
+#'
+rotatePos <- function(pos, theta) {
+  rotMat <- matrix(c(cos(theta), sin(theta), -sin(theta), cos(theta)), nrow=2)
+  pos2 <- t(rotMat %*% t(pos))
+  colnames(pos2) <- colnames(pos)
+  return(pos2)
+}
+
+
+#' Signed LISA plot
+#'
+#' @param gexp Feature value
+#' @param pos Position matrix
+#' @param weight Adjacency weight matrix
+#' @param zlim Range for expression (default = c(-2,2))
+#' @param ... Additional plotting parameters
+#'
+#' @return signed LISA scores
+#'
+#' @examples
+#' data(mOB)
+#' pos <- mOB$pos
+#' gexp <- normalizeCounts(mOB$counts, log=FALSE, verbose=FALSE)['Camk4',]
+#' W <- getSpatialNeighbors(pos)
+#' signedLisaPlot(gexp, pos, W)
+#'
+#' @export
+#'
+signedLisaPlot <- function(gexp, pos, weight, zlim=c(-2,2), ...) {
+  lisa <- lisaTest(gexp, weight)$observed;
+  names(lisa) <- names(gexp)
+  sgexp <- scale(gexp)[,1]
+  sgexp[sgexp <= zlim[1]] <- zlim[1]
+  sgexp[sgexp > zlim[2]] <- zlim[2]
+  lisa <- sign(sgexp)*lisa
+  #par(mfrow=c(1,2))
+  #plotEmbedding(pos, col=sgexp)
+  plotEmbedding(pos,
+                colors=lisa[rownames(pos)],
+                gradientPalette = colorRampPalette(c('darkgreen', 'white', 'darkorange'))(100),
+       ...)
+}
+
+
+#' Filter a counts matrix
+#'
+#' @description Filter a counts matrix based on gene (row) and cell (column)
+#'      requirements.
+#'
+#' @param counts A sparse read count matrix. The rows correspond to genes,
+#'      columns correspond to individual cells
+#' @param min.lib.size Minimum number of genes detected in a cell. Cells with
+#'      fewer genes will be removed (default: 1)
+#' @param max.lib.size Maximum number of genes detected in a cell. Cells with
+#'      more genes will be removed (default: Inf)
+#' @param min.reads Minimum number of reads per gene. Genes with fewer reads
+#'      will be removed (default: 1)
+#' @param min.detected Minimum number of cells a gene must be seen in. Genes
+#'      not seen in a sufficient number of cells will be removed (default: 1)
+#' @param verbose Verbosity (default: FALSE)
+#' @param plot Whether to plot (default: TRUE)
+#'
+#' @return a filtered read count matrix
+#'
+#' @export
+#'
+#' @importFrom Matrix Matrix colSums rowSums
+#'
+cleanCounts <- function (counts, min.lib.size = 1, max.lib.size = Inf, min.reads = 1, min.detected = 1, verbose = FALSE, plot=TRUE) {
+  if (!any(class(counts) %in% c("dgCMatrix", "dgTMatrix"))) {
+    if (verbose) {
+      message("Converting to sparse matrix ...")
+    }
+    counts <- Matrix::Matrix(counts, sparse = TRUE)
+  }
+  if (verbose) {
+    message("Filtering matrix with ", ncol(counts), " cells and ",
+            nrow(counts), " genes ...")
+  }
+  ix_col <- Matrix::colSums(counts)
+  ix_col <- ix_col > min.lib.size & ix_col < max.lib.size
+  counts <- counts[, ix_col]
+  counts <- counts[Matrix::rowSums(counts) > min.reads, ]
+  counts <- counts[Matrix::rowSums(counts > 0) > min.detected, ]
+  if (verbose) {
+    message("Resulting matrix has ", ncol(counts), " cells and ", nrow(counts), " genes")
+  }
+  if (plot) {
+    par(mfrow=c(1,2), mar=rep(5,4))
+    hist(log10(Matrix::colSums(counts)+1), breaks=20, main='Genes Per Dataset')
+    hist(log10(Matrix::rowSums(counts)+1), breaks=20, main='Datasets Per Gene')
+  }
+  return(counts)
+}
+
+
+#' Normalizes counts to CPM
+#'
+#' @description Normalizes raw counts to log10 counts per million with pseudocount
+#'
+#' @param counts Read count matrix. The rows correspond to genes, columns
+#'      correspond to individual cells
+#' @param normFactor Normalization factor such as cell size. If not provided
+#'      column sum as proxy for library size will be used
+#' @param depthScale Depth scaling. Using a million for CPM (default: 1e6)
+#' @param pseudo Pseudocount for log transform (default: 1)
+#' @param log Whether to apply log transform
+#' @param verbose Verbosity (default: TRUE)
+#'
+#' @return a normalized matrix
+#'
+#' @export
+#'
+#' @importFrom Matrix Matrix colSums t
+#'
+normalizeCounts <- function (counts, normFactor = NULL, depthScale = 1e+06, pseudo=1, log=TRUE, verbose = TRUE) {
+  if (!any(class(counts) %in% c("dgCMatrix", "dgTMatrix"))) {
+    if (verbose) {
+      message("Converting to sparse matrix ...")
+    }
+    counts <- Matrix::Matrix(counts, sparse = TRUE)
+  }
+  if (verbose) {
+    message("Normalizing matrix with ", ncol(counts), " cells and ", nrow(counts), " genes.")
+  }
+  if(is.null(normFactor)) {
+    if (verbose) {
+      message('normFactor not provided. Normalizing by library size.')
+    }
+    normFactor <- Matrix::colSums(counts)
+  }
+  if (verbose) {
+    message(paste0("Using depthScale ", depthScale))
+  }
+  counts <- Matrix::t(Matrix::t(counts)/normFactor)
+  counts <- counts * depthScale
+  if(log) {
+    if (verbose) {
+      message("Log10 transforming with pseudocount ", pseudo,".")
+    }
+    counts <- log10(counts + pseudo)
+  }
+
+  return(counts)
+}
+
+
+# Generated by using Rcpp::compileAttributes() -> do not edit by hand
+# Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
+
+unitize_C <- function(weight) {
+    .Call('_MERINGUE_unitize_C', PACKAGE = 'MERINGUE', weight)
+}
+
+spatialCrossCor_C <- function(x, y, weight) {
+    .Call('_MERINGUE_spatialCrossCor_C', PACKAGE = 'MERINGUE', x, y, weight)
+}
+
+spatialCrossCorMatrix_C <- function(sigMat, weight, display_progress = TRUE) {
+    .Call('_MERINGUE_spatialCrossCorMatrix_C', PACKAGE = 'MERINGUE', sigMat, weight, display_progress)
+}
+
+moranTest_C <- function(x, weight) {
+    .Call('_MERINGUE_moranTest_C', PACKAGE = 'MERINGUE', x, weight)
+}
+
+getSpatialPatterns_C <- function(mat, adj, display_progress = TRUE) {
+    .Call('_MERINGUE_getSpatialPatterns_C', PACKAGE = 'MERINGUE', mat, adj, display_progress)
+}
+
+
+
+# Code to support Toroidal shift model (TSM) as null model
+
+# Code mofied from http://www.is.titech.ac.jp/~mase/mase/splancs/
+
+# Copyright Barry Rowlingson <b.rowlingson@lancaster.ac.uk> and
+# Peter Diggle (c) 1991-3; http://www.maths.lancs.ac.uk/~rowlings/Splancs/
+# R port: copyright 1998-2000 by Roger S. Bivand
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+
+bbox <- function(pts)
+{
+
+  xr <- range(pts[,1],na.rm=T)
+  yr <- range(pts[,2],na.rm=T)
+
+  cbind(c(xr[1],xr[2],xr[2],xr[1]),c(yr[1],yr[1],yr[2],yr[2]))
+}
+
+shift <- function(pts,xsh=0.0,ysh=0.0)
+{
+  pts[,1] <- pts[,1]+xsh
+  pts[,2] <- pts[,2]+ysh
+  pts
+}
+
+torShift <- function(pts,xsh,ysh,rect=NULL)
+{
+  if(is.null(rect)) { rect <- bbox(pts) }
+
+  xoff <- min(rect[,1])
+  yoff <- min(rect[,2])
+
+  xsc <- (max(rect[,1])-xoff)
+  ysc <- (max(rect[,2])-yoff)
+
+  pts[,1] <- pts[,1]-xoff
+  pts[,2] <- pts[,2]-yoff
+  pts <- shift(pts,xsh,ysh)
+  pts[,1] <- (pts[,1] %% xsc )+xoff
+  pts[,2] <- (pts[,2] %% ysc )+yoff
+  pts
+}
+
+
+rtorShift <- function(pts, rect=NULL, k=4, seed=0)
+{
+  set.seed(seed)
+  if(is.null(rect)) { rect <- bbox(pts)/k }
+  xsc <- max(rect[,1])-min(rect[,1])
+  ysc <- max(rect[,2])-min(rect[,2])
+  xsh <- runif(1)*xsc
+  ysh <- runif(1)*ysc
+  torShift(pts,xsh,ysh,rect)
+}
+
+
+// [[Rcpp::depends(RcppArmadillo)]]
+#include <RcppArmadillo.h>
+// [[Rcpp::depends(RcppProgress)]]
+#include <progress.hpp>
+#include <progress_bar.hpp>
+
+using namespace arma;
+using namespace Rcpp;
+
+// [[Rcpp::export]]
+arma::mat unitize_C(arma::mat weight) {
+
+  int N = weight.n_cols;
+
+  // scale weights
+  int i;
+  int j;
+  arma::vec rs = sum(weight, 1);
+  for (i = 0; i < N; i++) {
+    if(rs.at(i) == 0) {
+      rs.at(i) = 1;
+    }
+  }
+  for (i = 0; i < N; i++) {
+    for (j = 0; j < N; j++) {
+      weight.at(i,j) = weight.at(i,j) / rs.at(i);
+    }
+  }
+
+  return weight;
+}
+
+
+// [[Rcpp::export]]
+double spatialCrossCor_C(arma::vec x,
+                            arma::vec y,
+                            arma::mat weight) {
+  int N = weight.n_cols;
+  weight = unitize_C(weight);
+
+  // compute spatial cross correlation
+  double W = sum(sum(weight));
+  arma::vec dx = x - mean(x);
+  arma::vec dy = y - mean(y);
+
+  arma::mat cv1 = dx * dy.t(); // outer product
+  arma::mat cv2 = dy * dx.t();
+
+  double cv = sum(sum(weight % ( cv1 + cv2 ))); // element-wise product
+
+  arma::vec v1 = pow(dx, 2);
+  arma::vec v2 = pow(dy, 2);
+  double v = sqrt(sum(v1) * sum(v2));
+  double SCI = (N/W) * (cv/v) * (0.5);
+
+  return SCI;
+}
+
+
+// [[Rcpp::export]]
+arma::mat spatialCrossCorMatrix_C(arma::mat sigMat, arma::mat weight, bool display_progress=true) {
+  int N = sigMat.n_rows;
+
+  arma::mat scor;
+  scor.set_size(N, N);
+
+  int i;
+  int j;
+  arma::vec x;
+  arma::vec y;
+  double SCI;
+
+  Progress p(N*N, display_progress);
+  for (i = 0; i < N; i++) {
+    for (j = 0; j < N; j++) {
+      if (Progress::check_abort() ) {
+        return scor;
+      }
+      p.increment();
+      x = conv_to<arma::vec>::from(sigMat.row(i)); // convert from rowvec to vec
+      y = conv_to<arma::vec>::from(sigMat.row(j));
+      SCI = spatialCrossCor_C(x, y, weight);
+      scor.at(i,j) = SCI;
+    }
+  }
+
+  return scor;
+}
+
+
+// [[Rcpp::export]]
+arma::vec moranTest_C(arma::vec x, arma::mat weight) {
+  double N = weight.n_rows;
+
+  // first moment
+  double ei = -1/(N - 1);
+
+  // unitization
+  weight = unitize_C(weight);
+
+  // Moran's I
+  double W = sum(sum(weight));
+  arma::vec z = x - mean(x);
+  double cv = sum(sum(weight % (z * z.t()))); // weight * (z %o% z)
+  NumericVector zbar = wrap(z); // convert to numeric vector to use power
+  double v = sum(pow(zbar, 2));
+  double obs = (N/W) * (cv/v);
+
+  // second moment
+  double Wsq = pow(W, 2);
+  double Nsq = pow(N, 2);
+  NumericMatrix wbar = wrap(weight + weight.t());
+  arma::mat wbarbar = pow(wbar, 2);
+  double S1 = 0.5 * sum(sum(wbarbar));
+  arma::vec rs = conv_to<arma::vec>::from(sum(weight, 1));
+  arma::vec cs = conv_to<arma::vec>::from(sum(weight, 0));
+  arma::vec sg =  rs + cs;
+  NumericVector sgbar = wrap(sg);
+  arma::vec sbarbar = pow(sgbar, 2);
+  double S2 = sum(sbarbar); //sg^2
+  arma::vec zbarbar = pow(zbar, 4);
+  double S3 = (sum(zbarbar)/N)/pow(v/N, 2);
+  double S4 = (Nsq - 3*N + 3)*S1 - N*S2 + 3*Wsq;
+  double S5 = (Nsq - N)*S1 - 2*N*S2 + 6*Wsq;
+  double ei2 = (N*S4 - S3*S5)/((N - 1)*(N - 2)*(N - 3) * Wsq);
+
+  // standard deviation
+  double sdi = sqrt(ei2 - pow(ei, 2));
+
+  // return results as vector
+  arma::vec results;
+  results.set_size(3);
+  results.at(0) = obs; // Moran's I
+  results.at(1) = ei; // Expected
+  results.at(2) = sdi; // SD
+
+  return results;
+}
+
+
+// [[Rcpp::export]]
+arma::mat getSpatialPatterns_C(arma::mat mat, arma::mat adj, bool display_progress=true) {
+  double N = mat.n_rows;
+
+  arma::mat results;
+  results.set_size(N, 3);
+
+  int i;
+  arma::vec value;
+  arma::vec Ir;
+
+  Progress p(N, display_progress);
+  for (i = 0; i < N; i++) {
+    if (Progress::check_abort() ) {
+      return results;
+    }
+    p.increment();
+    value = conv_to<arma::vec>::from(mat.row(i));
+    Ir = moranTest_C(value, adj);
+    results.row(i) = Ir.t();
+  }
+
+  return results;
+}
+
+
+
+
+// Generated by using Rcpp::compileAttributes() -> do not edit by hand
+// Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
+
+#include <RcppArmadillo.h>
+#include <Rcpp.h>
+
+using namespace Rcpp;
+
+// unitize_C
+arma::mat unitize_C(arma::mat weight);
+RcppExport SEXP _MERINGUE_unitize_C(SEXP weightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type weight(weightSEXP);
+    rcpp_result_gen = Rcpp::wrap(unitize_C(weight));
+    return rcpp_result_gen;
+END_RCPP
+}
+// spatialCrossCor_C
+double spatialCrossCor_C(arma::vec x, arma::vec y, arma::mat weight);
+RcppExport SEXP _MERINGUE_spatialCrossCor_C(SEXP xSEXP, SEXP ySEXP, SEXP weightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type weight(weightSEXP);
+    rcpp_result_gen = Rcpp::wrap(spatialCrossCor_C(x, y, weight));
+    return rcpp_result_gen;
+END_RCPP
+}
+// spatialCrossCorMatrix_C
+arma::mat spatialCrossCorMatrix_C(arma::mat sigMat, arma::mat weight, bool display_progress);
+RcppExport SEXP _MERINGUE_spatialCrossCorMatrix_C(SEXP sigMatSEXP, SEXP weightSEXP, SEXP display_progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type sigMat(sigMatSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type weight(weightSEXP);
+    Rcpp::traits::input_parameter< bool >::type display_progress(display_progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(spatialCrossCorMatrix_C(sigMat, weight, display_progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+// moranTest_C
+arma::vec moranTest_C(arma::vec x, arma::mat weight);
+RcppExport SEXP _MERINGUE_moranTest_C(SEXP xSEXP, SEXP weightSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec >::type x(xSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type weight(weightSEXP);
+    rcpp_result_gen = Rcpp::wrap(moranTest_C(x, weight));
+    return rcpp_result_gen;
+END_RCPP
+}
+// getSpatialPatterns_C
+arma::mat getSpatialPatterns_C(arma::mat mat, arma::mat adj, bool display_progress);
+RcppExport SEXP _MERINGUE_getSpatialPatterns_C(SEXP matSEXP, SEXP adjSEXP, SEXP display_progressSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type mat(matSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type adj(adjSEXP);
+    Rcpp::traits::input_parameter< bool >::type display_progress(display_progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(getSpatialPatterns_C(mat, adj, display_progress));
+    return rcpp_result_gen;
+END_RCPP
+}
+
+static const R_CallMethodDef CallEntries[] = {
+    {"_MERINGUE_unitize_C", (DL_FUNC) &_MERINGUE_unitize_C, 1},
+    {"_MERINGUE_spatialCrossCor_C", (DL_FUNC) &_MERINGUE_spatialCrossCor_C, 3},
+    {"_MERINGUE_spatialCrossCorMatrix_C", (DL_FUNC) &_MERINGUE_spatialCrossCorMatrix_C, 3},
+    {"_MERINGUE_moranTest_C", (DL_FUNC) &_MERINGUE_moranTest_C, 2},
+    {"_MERINGUE_getSpatialPatterns_C", (DL_FUNC) &_MERINGUE_getSpatialPatterns_C, 3},
+    {NULL, NULL, 0}
+};
+
+RcppExport void R_init_MERINGUE(DllInfo *dll) {
+    R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
+    R_useDynamicSymbols(dll, FALSE);
+}
+
+
+library(testthat)
+library(MERINGUE)
+
+test_check("MERINGUE")
+
+
+library(testthat)
+
+test_that("Simulate inter cell-type spatial cross-correlation tests", {
+  library(MERINGUE)
+
+  # Simulate data
+  set.seed(0)
+  N <- 100
+  pos <- cbind(rnorm(N), rnorm(N))
+  rownames(pos) <- paste0('cell', 1:N)
+  colnames(pos) <- c('x', 'y')
+  ctA <- sample(rownames(pos), N/2)
+  ctB <- setdiff(rownames(pos), ctA)
+  gexpA <- pos[,2]
+  gexpA[ctB] <- 0
+  gexpB <- pos[,2]
+  gexpB[ctA] <- 0
+  #plotEmbedding(pos, col=gexpA)
+  #plotEmbedding(pos, col=gexpB)
+
+  #weight <- getSpatialNeighbors(ctA, ctB, pos, k=6)
+  weight <- getSpatialNeighbors(pos, filterDist = 1)
+  weightIc <- getInterCellTypeWeight(ctA, ctB,
+                                     weight, pos,
+                                     plot=TRUE,
+                                     main='Adjacency Weight Matrix\nBetween Cell-Types')
+
+  cor <- cor(gexpA, gexpB)
+  scor <- spatialCrossCor(gexpA, gexpB, weightIc)
+
+  # Test plotting
+  plotEmbedding(pos, col=gexpA)
+  plotEmbedding(pos, col=gexpB)
+  invisible(interpolate(pos, gexpA))
+  invisible(interpolate(pos, gexpB))
+  plotInterCellTypeSpatialCrossCor(gexpA, gexpB, ctA, ctB, weight)
+
+  # random label model
+  nullmodel <- sapply(1:1000, function(i) {
+    set.seed(i)
+    gexpAr <- gexpA
+    gexpBr <- gexpB
+    names(gexpAr) <- sample(names(gexpA), length(gexpA), replace = FALSE)
+    names(gexpBr) <- sample(names(gexpB), length(gexpB), replace = FALSE)
+    #plotEmbedding(pos, col=gexpAr)
+    #plotEmbedding(pos, col=gexpBr)
+    scorr <- spatialCrossCor(gexpAr, gexpBr, weightIc)
+    #scorr <- interCellTypeSpatialCrossCor(gexpAr, gexpBr, ctA, ctB, weight)
+    return(scorr)
+  })
+  hist(nullmodel)
+  abline(v = scor, col='red')
+  scorr <- mean(nullmodel)
+
+  expect_equal(scor > cor, TRUE) # regular correlation
+  expect_equal(scor > scorr, TRUE) # random label
+})
+
+
+library(testthat)
+
+test_that("Moran's I C++ functions compiled and works as expected", {
+  library(MERINGUE)
+  data(mOB)
+  pos <- mOB$pos
+  cd <- mOB$counts
+  mat <- normalizeCounts(cd, verbose=FALSE)
+  w <- getSpatialNeighbors(pos)
+
+  set.seed(0)
+  is <- sample(1:nrow(mat), 100)
+
+  start_time <- Sys.time()
+  moran <- do.call(cbind, lapply(is, function(i) {
+    MERINGUE:::moranTest_DEPRECATED(mat[i,], w)
+  }))
+  end_time <- Sys.time()
+  moranTime <- end_time - start_time
+
+  start_time <- Sys.time()
+  moranC <- do.call(cbind, lapply(is, function(i) {
+    moranTest(mat[i,], w)
+  }))
+  end_time <- Sys.time()
+  moranCTime <- end_time - start_time
+
+  #expect_equal(moranCTime < moranTime, TRUE)
+  expect_equal(all.equal(moran[1,], moranC[1,]), TRUE)
+  expect_equal(all.equal(moran[2,], moranC[2,]), TRUE)
+  expect_equal(all.equal(moran[3,], moranC[3,]), TRUE)
+  expect_equal(all.equal(moran[4,], moranC[4,]), TRUE)
+
+  #x <- moranP <- moranPermutationTest(mat[is[1],], w)
+  #y <- moranTest(mat[is[1],], w)
+  #all.equal(x[1], y[1])
+  #all.equal(x[4], y[4])
+})
+
+test_that("Spatial cross correlation C++ functions compiled and works as expected", {
+  library(MERINGUE)
+  data(mOB)
+  pos <- mOB$pos
+  cd <- mOB$counts
+  mat <- normalizeCounts(cd, verbose=FALSE)
+  w <- getSpatialNeighbors(pos)
+
+  set.seed(1)
+  is <- sample(1:nrow(mat), 100)
+
+  scc <- spatialCrossCorMatrix(as.matrix(mat[is,]), w)
+  moran <- sapply(is, function(i) {
+    moranTest(mat[i,], w)[1]
+  })
+  names(moran) <- rownames(mat)[is]
+
+  expect_equal(all.equal(moran, diag(scc)), TRUE)
+  expect_equal(all.equal(spatialCrossCor(mat[is[1],], mat[is[2],], w), scc[1,2]), TRUE)
+  expect_equal(all.equal(spatialCrossCor(mat[is[2],], mat[is[3],], w), scc[2,3]), TRUE)
+  expect_equal(all.equal(spatialCrossCor(mat[is[20],], mat[is[10],], w), scc[20,10]), TRUE)
+})
+
+test_that("LISA works as expected", {
+  library(MERINGUE)
+  data(mOB)
+  pos <- mOB$pos
+  cd <- mOB$counts
+  mat <- normalizeCounts(cd, verbose=FALSE)
+  w <- getSpatialNeighbors(pos)
+
+  set.seed(0)
+  is <- sample(1:nrow(mat), 10)
+
+  moranC <- sapply(is, function(i) {
+    moranTest(mat[i,], w)[1]
+  })
+  mLisa <- sapply(is, function(i) {
+    mean(lisaTest(mat[i,], w)[,1])
+  })
+  names(moranC) <- names(mLisa) <- rownames(mat)[is]
+
+  expect_equal(all.equal(moranC, mLisa), TRUE)
+})
+
+test_that("getSpatialPatterns works", {
+  library(MERINGUE)
+  data(mOB)
+  pos <- mOB$pos
+  cd <- mOB$counts
+  mat <- normalizeCounts(cd, log=FALSE, verbose=FALSE)
+  w <- getSpatialNeighbors(pos)
+
+  set.seed(0)
+  is <- rownames(mat)[sample(1:nrow(mat), 10)]
+
+  # gold standard
+  start_time <- Sys.time()
+  I1 <- do.call(rbind, lapply(is, function(g) { moranTest(mat[g,], w) }))
+  rownames(I1) <- is
+  end_time <- Sys.time()
+  moranTime <- end_time - start_time
+
+  # test
+  start_time <- Sys.time()
+  I2 <- getSpatialPatterns(mat[is,], w)
+  end_time <- Sys.time()
+  moranCTime <- end_time - start_time
+
+  expect_equal(moranCTime < moranTime, TRUE)
+  expect_equal(all.equal(as.numeric(I1[,1]), as.numeric(I2[,1])), TRUE)
+
+})
+
+
+library(testthat)
+
+test_that("Test winsorization", {
+
+  library(MERINGUE)
+  x <- rnorm(100,0,1)
+  x <- c(x, 10)
+  xw <- winsorize(x, 0.01)
+  expect_equal(max(x[1:100]), xw[101])
+})
+
+test_that("Test differential expression", {
+
+  library(MERINGUE)
+
+  set.seed(0)
+  G <- 2
+  N <- 30
+  M <- 1000
+  initmean <- 5
+  initvar <- 10
+  mat <- matrix(rnorm(N*M*G, initmean, initvar), M, N*G)
+  mat <- abs(mat)
+  rownames(mat) <- paste0('gene', 1:M)
+  colnames(mat) <- paste0('cell', 1:(N*G))
+  group <- factor(sapply(1:G, function(x) rep(paste0('group', x), N)))
+  names(group) <- colnames(mat)
+  #heatmap(mat, Rowv=NA, Colv=NA, col=colorRampPalette(c('blue', 'white', 'red'))(100), scale="none", ColSideColors=rainbow(G)[group], labCol=FALSE, labRow=FALSE)
+
+  set.seed(0)
+  upreg <- 100
+  upregvar <- 10
+  ng <- 100
+
+  diff <- lapply(1:G, function(x) {
+    diff <- rownames(mat)[(((x-1)*ng)+1):(((x-1)*ng)+ng)]
+    mat[diff, group==paste0('group', x)] <<- mat[diff, group==paste0('group', x)] + rnorm(ng, upreg, upregvar)
+    return(diff)
+  })
+  names(diff) <- paste0('group', 1:G)
+
+  mat <- round(mat)
+  #heatmap(mat, Rowv=NA, Colv=NA, col=colorRampPalette(c('blue', 'white', 'red'))(100), scale="none", ColSideColors=rainbow(G)[group], labCol=FALSE, labRow=FALSE)
+
+  dg <- getDifferentialGenes(mat, group)
+  dg.sig <- lapply(dg, function(x) {
+    na.omit(rownames(x)[which(x$Z>3)])
+  })
+
+  expect_equal(length(intersect(dg.sig[[1]], diff[[1]])), upreg)
+  expect_equal(length(intersect(dg.sig[[2]], diff[[2]])), upreg)
+})

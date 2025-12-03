@@ -1,0 +1,131 @@
+arXiv:1412.1914v1  [stat.ME]  5 Dec 2014
+A parametric variogram model bridging between stationary
+and intrinsically stationary processes
+Martin Schlather
+Institut f¨ur Mathematik, Universit¨at Mannheim
+A5, 6, D-68131 Mannheim
+schlather@math.uni-mannheim.de
+29th May 2022
+Abstract: A simple variogram model with two parameters is presented that includes the power var-
+iogram for the fractional Brownian motion, a modiﬁed De Wijsian model, the generalized Cauchy
+model and the multiquadrics model. One parameter controls the smoothness of the process. The
+other parameter allows for a smooth parametrization between stationary and intrinsically station-
+ary second order processes in a Gaussian framework, or between mixing and non-ergodic max-stable
+processes when modeling spatial extremes by a Brown-Resnick process.
+Keywords: Brown-Resnick process; Cauchy model; fractional Brownian motion; Gaussian process;
+variogram
+1
+Introduction
+A Gaussian random ﬁeld Z is a popular process to model spatial data in Rd, mostly assuming
+some kind of at least underlying stationarity and isotropy of the ﬁeld. A weakly stationary random
+ﬁeld can be characterized by a bounded variogram γ, where γ(h) = 1
+2E{Z(h) −Z(0)}2, h ∈Rd
+(Gneiting and Guttorp, 2010). In contrast, the variogram of an intrinsically stationary random
+ﬁeld might be unbounded. Although any unbounded variogram can be approximated arbitrarily
+closely on any compact set by a bounded variogram (Schlather and Gneiting, 2006), models that
+bridge between bounded and unbounded models seem to be used only rarely in statistics if at all,
+as appealing models are missing.
+The Brown-Resnick process on Rd (Brown and Resnick, 1977; Kabluchko et al., 2009) is a max-
+stable random ﬁeld that is based on intrinsically stationary Gaussian random ﬁelds and is used to
+model spatial extreme values, such as heavy rainfall (Fawcett and Walshaw, 2014; Thibaud et al.,
+2013), avalanches (Blanchet and Davison, 2011), extreme temperature (Davison et al., 2013) or
+extreme wind (Zhang et al., 2014). If the underlying variogram model is bounded, then the corre-
+sponding Brown-Resnick ﬁeld is not ergodic whilst a one-dimensional process has been shown to
+be mixing when the variogram model γ(h), h ∈R, grows faster that 4 log |h| (Wang and Stoev,
+2010; Kabluchko and Schlather, 2010). Ergodicity might be assumed if the extremes are caused by
+local events, e.g., storm events, while non-ergodic models are suitable for spatially extended events
+such as cyclonic rainfall. When the kind of causative process for spatial extremes is not clear, a
+parametric model that allows for both ergodic and non-ergodic ﬁelds is advantageous.
+For lack of awareness of suitable parametric models that bridge between stationary and intrinsically
+stationary Gaussian random ﬁelds, studies in both traditional geostatistics and spatial extreme
+value analysis using the Brown-Resnick model include two classes of models to cover the cases of
+bounded and unbounded variograms models, cf. Thibaud et al. (2013) or Wadsworth and Tawn
+(2014), for instance.
+1
+
+Here, we present an easily accessible, rotation invariant variogram model with two parameters
+that bridges between the class of bounded variograms and the class of unbounded ones. It includes
+several well-known models, but contains also novel parameter combinations. Hence, the model
+might be particularly useful in any application of spatial statistics.
+2
+The model
+For 0 < α ≤2 and −∞< β ≤2 let the function γα,β : Rd →[0, ∞) be deﬁned as
+γα,β(h) = (1 + ∥h∥α)β/α −1
+2β/α −1
+,
+where the limiting function is log(1 + ∥h∥α)/log 2 as β →0.
+Proposition 1 The function γα,β is a variogram in Rd for any d ∈N, 0 < α ≤2 and −∞< β ≤2.
+Proof. A positive constant and the identity being complete Bernstein functions, Corollary 7.12
+and Proposition 7.10 in Schilling et al. (2010) yield that f(λ) = (1 + λδ)ε/δ is a Bernstein function
+for any 0 < ε ≤1 and 0 < |δ| ≤1. Now f(g) is a negative deﬁnite function for any negative deﬁnite
+function g and any Bernstein function f (Schilling et al., 2010, Chapter 4). Choosing g(h) = ∥h∥2,
+ε = β/2 and δ = α/2, we get the assertion for positive values of β. For negative values of β we
+refer to the fact that (1 + γ)β is a positive deﬁnite function for any variogram γ, see (Schlather,
+2012, p. 36), for instance. By the basic properties of negative deﬁnite functions the limiting cases
+obtained by point-wise convergence are included.
+The parameter α models the smoothness of both the variogram and the corresponding (Gaussian)
+random ﬁeld (Adler, 1981; Scheuerer, 2010) whereas β indicates the long range behavior (Gneiting,
+2000). For negative values of β the model is bounded and heavy tailed, whereas for 0 ≤β ≤2 the
+variogram γα,β is unbounded. The normalizing factor is chosen such that γα,β(1) = 1.
+The model simpliﬁes for β = α to the power model of a fractional Brownian random ﬁeld
+(Chil`es and Delﬁner, 1999), for 0 < β ≤α to a generalization of the fractional Brownian model
+described in Gneiting (2002) and Schlather (2010), and for β < 0 to the generalized Cauchy model
+(Gneiting, 2000). It also generalizes partially the multiquadrics and inverse multiquadrics used in
+approximation theory where α = 2 and β/α ∈R\N0, see, for instance, Buhmann (1990), Wendland
+(2005) or Lin and Yuan (2006). As β →0, the limiting model equals a modiﬁed version of the De
+Wijsian model (Wackernagel, 2003; Matheron, 1962). The case 0 < α < β ≤2 is novel.
+The presented variogram model can be generalized. Indeed, the proof of the proposition shows
+that γδ,g = {(1 + g)δ −1}/(2δ −1) is a variogram in Rd for any variogram g and −∞< δ ≤1 with
+limiting case γ0,g = log(1 + g)/ log(2).
+References
+R. Adler. The Geometry of Random Fields. John Wiley & Sons, Chichester, 1981.
+J. Blanchet and A.C. Davison. Spatial modelling of extreme snow depth. Ann. Appl. Statist., 5:
+1699–1725, 2011.
+B.M. Brown and S.I. Resnick. Extreme values of independent stochastic processes. J. Appl. Probab.,
+14:732–739, 1977.
+MD Buhmann. Multivariate interpolation in odd-dimensional euclidean spaces using multiquadrics.
+Constr. Approx., 6(1):21–34, 1990.
+J.-P. Chil`es and P. Delﬁner. Geostatistics. Modeling Spatial Uncertainty. John Wiley & Sons, New
+York, 1999.
+2
+
+Anthony C Davison, Rapha¨el Huser, and Emeric Thibaud. Geostatistics of dependent and asymp-
+totically independent extremes. Math. Geosci., 45(5):511–529, 2013.
+L. Fawcett and D. Walshaw. Estimating the probability of simultaneous rainfall extremes within
+a region: a spatial approach. J. Appl. Statist., 41:959–976, 2014.
+T. Gneiting. Power-law correlations, related models for long-range dependence and fast simulation.
+J. Appl. Probab., 37:1104–1109, 2000.
+T. Gneiting. Nonseparable, stationary covariance functions for space-time data. J. Amer. Statist.
+Assoc., 97:590–600, 2002.
+Tilmann Gneiting and Peter Guttorp. Continuous parameter stochastic process theory. In A.E.
+Gelfand, P.J. Diggle, M. Fuentes, and P. Guttorp, editors, Handbook of Spatial Statistics, chap-
+ter 2, pages 17–28. Chapman & Hall/CRC, 2010.
+Z. Kabluchko and M. Schlather. Ergodic properties of max-inﬁnitely divisible processes. Stochastic
+Process. Appl., 120:281–295, 2010.
+Z. Kabluchko, M. Schlather, and L. de Haan. Stationary max-stable ﬁelds associated to negative
+deﬁnite functions. Ann. Probab., 37:2042–2065, 2009.
+Yi Lin and Ming Yuan. Convergence rates of compactly supported radial basis function regular-
+ization. Statist. Sinica, 16(2):425, 2006.
+G. Matheron. Trait´e de G´eostatistique Appliqu´ee, volume 1. Technip, Paris, 1962.
+M. Scheuerer. Regularity of the sample paths of a general second order random ﬁeld. Stochastic
+Process. Appl., 120:1879–1897, 2010.
+R. Schilling, R. Song, and Z. Vondracek. Bernstein Functions. de Gruyter, Berlin, 2010.
+M. Schlather. Some covariance models based on normal scale mixtures. Bernoulli, 16:780–797,
+2010.
+M. Schlather. Construction of covariance functions and unconditional simulation of random ﬁelds.
+In E. Porcu, J.M. Montero, and M. Schlather, editors, Advances and Challenges in Space-time
+Modelling of Natural Events, Berlin, 2012. Springer.
+M. Schlather and T. Gneiting. Local approximation of variograms by covariance functions. Statist.
+Probab. Lett., 76:1303–1304, 2006.
+E Thibaud, R Mutzner, and AC Davison. Threshold modeling of extreme spatial rainfall. Water
+Resour. Res., 49(8):4633–4644, 2013.
+H. Wackernagel. Multivariate Geostatistics. Springer, Berlin, 3rd edition, 2003.
+Jennifer L Wadsworth and Jonathan A Tawn. Eﬃcient inference for spatial extreme value processes
+associated to log-gaussian random functions. Biometrika, 101:1–15, 2014.
+Y. Wang and S.A. Stoev. On the structure and representations of max-stable processes. Adv. Appl.
+Probab., 42:855–877, 2010.
+H. Wendland. Scattered Data Approximation. Cambridge University Press, Cambridge, 2005.
+Qiang Zhang, Mingzhong Xiao, Jianfeng Li, Vijay P Singh, and Zongzhi Wang. Topography-based
+spatial patterns of precipitation extremes in the poyang lake basin, china: Changing properties
+and causes. J. Hydrol., 512:229–239, 2014.
+3

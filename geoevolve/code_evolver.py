@@ -1,10 +1,9 @@
 import os
-
 import tqdm
 from openevolve import OpenEvolve
 from openevolve.database import Program
 from ruamel.yaml.scalarstring import LiteralScalarString
-
+from geoevolve.llm import get_embeddings, get_llm
 from geoevolve.geo_knowledge_rag import GeoKnowledgeRAG, obtain_new_geo_knowledge_from_outside
 from geoevolve.prompt_generator import analyze_evolved_code, retrieve_geo_knowledge_via_rag, \
     generate_geo_knowledge_informed_prompt
@@ -13,7 +12,7 @@ from geoevolve.utils import load_config, dump_config, save_round_level_logs, cle
 
 class GeoEvolve:
     """
-    GeoEvolve: Automatic GeoAI Modeling with Multi-Agent Large Language Models.
+    geoevolve: Automatic GeoAI Modeling with Multi-Agent Large Language Models.
     """
 
     def __init__(self,
@@ -21,21 +20,28 @@ class GeoEvolve:
                  evaluator_file: str,
                  config_path: str, output_path: str,
                  rag_working_dir: str = './geoevolve_storage',
-                 rag_log_dir: str = './geoevolve_logs',
+                 log_dir: str = './geoevolve_logs',
                  geo_knowledge_dir: str = './geo_knowledge',
                  log_name: str = 'geoevolve',
-                 is_compressed: bool = False,
-                 max_arxiv_papers: int = 3):
+                 max_arxiv_papers: int = 3,
+                 embedding_model_name: str = 'openrouter-openai/text-embedding-3-large',
+                 llm_model_name: str = 'openrouter-openai/gpt-4.1',
+                 chunk_overlap: int = 50):
         self.initial_program_file = initial_program_file
         self.evaluator_file = evaluator_file
         self.output_path = output_path
         self.config_path = config_path
-        self.log_dir = rag_log_dir
-        self.rag = GeoKnowledgeRAG(persist_dir=rag_working_dir, is_compressed=is_compressed)
+        self.log_dir = log_dir
+        self.llm_model = get_llm(llm_model_name)
+        self.rag = GeoKnowledgeRAG(persist_dir=rag_working_dir,
+                                   rag_embedding_model_name=embedding_model_name,
+                                   rag_llm_model_name=llm_model_name,
+                                   chunk_overlap=chunk_overlap)
         self.rag_chain = self.rag.make_rag_chain()
         self.log_name = log_name
         self.geo_knowledge_dir = geo_knowledge_dir
         self.max_arxiv_papers = max_arxiv_papers
+
 
     async def _run_iterations(self, evolver: OpenEvolve, num_iterations: int) -> Program:
         """
@@ -49,7 +55,7 @@ class GeoEvolve:
 
     async def evolve(self, rounds: int, iterations_per_round: int = 10):
         """
-        Run GeoEvolve
+        Run geoevolve
         :param rounds:
         :param iterations_per_round:
         :return:
@@ -73,12 +79,14 @@ class GeoEvolve:
                     output_dir=f'{self.output_path}/round_{r + 1}')
                 config = load_config(f'{self.output_path}/config_round_{r}.yaml')
             best_program = await self._run_iterations(evolver, num_iterations=iterations_per_round)
+            if r == rounds - 1:
+                break
             code = best_program.code
             metrics = best_program.metrics
 
             current_prompt = config['prompt']['system_message']
             # Analysis evolved code
-            knowledge_needed = analyze_evolved_code(code, metrics)
+            knowledge_needed = analyze_evolved_code(self.llm_model, code, metrics)
             # RAG knowledge retrieval
             queries = knowledge_needed['search_queries']
             # Check if new geographical knowledge should be introduced
@@ -99,7 +107,7 @@ class GeoEvolve:
                 knowledge = retrieve_geo_knowledge_via_rag(self.rag_chain, query)
                 all_knowledge.append(knowledge)
             # update prompt
-            updated_prompt = generate_geo_knowledge_informed_prompt(current_prompt, code, all_knowledge)
+            updated_prompt = generate_geo_knowledge_informed_prompt(self.llm_model, current_prompt, code, all_knowledge)
             # updated_prompt = generate_prompt_without_geo_knowledge(current_prompt, code)
             updated_prompt = clean_markdown_labels_in_prompt(updated_prompt)
 

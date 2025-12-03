@@ -1,0 +1,5057 @@
+Bootstrap based uncertainty bands for
+prediction in functional kriging
+Maria Franco-Villoria∗and Rosaria Ignaccolo
+Department of Economics and Statistics “Cognetti de Martiis”,
+University of Torino
+June 23, 2017
+Abstract
+The increasing interest in spatially correlated functional data has led to the de-
+velopment of appropriate geostatistical techniques that allow to predict a curve at an
+unmonitored location using a functional kriging with external drift model that takes
+into account the eﬀect of exogenous variables (either scalar or functional). Neverthe-
+less uncertainty evaluation for functional spatial prediction remains an open issue.
+We propose a semi-parametric bootstrap for spatially correlated functional data that
+allows to evaluate the uncertainty of a predicted curve, ensuring that the spatial de-
+pendence structure is maintained in the bootstrap samples. The performance of the
+proposed methodology is assessed via a simulation study. Moreover, the approach is
+illustrated on a well known data set of Canadian temperature and on a real data set
+of PM10 concentration in the Piemonte region, Italy. Based on the results it can be
+concluded that the method is computationally feasible and suitable for quantifying
+the uncertainty around a predicted curve. Supplementary material including R code
+is available upon request.
+Keywords: B-splines; band depth; functional data modelling; generalized additive models;
+geostatistics; trace-variogram
+∗Corresponding author, email: maria.francovilloria@unito.it
+1
+arXiv:1505.06966v3  [stat.ME]  22 Jun 2017
+
+1
+Introduction
+Kriging is a well known prediction method in the geostatistics community (see e.g. Chiles
+and Delﬁner (2012)); it allows to predict a (scalar) random ﬁeld or spatial process {Z(s), s ∈
+D ⊆R2} in a new spatial location s0 given a set of observed values Z = (Z(s1), . . . , Z(sn)),
+taking into account the underlying correlation structure. Spatially dependent functional
+data (see e.g. the last two chapters of the book by Horv´ath and Kokoszka (2012)) have
+received increasing interest over the last few years. Geostatistical techniques for functional
+data were ﬁrst introduced in the pioneering work of Goulard and Voltz (1993), but the
+development of such techniques is rather recent. The simplest case would be that of ordinary
+kriging, which allows to predict a curve at an unmonitored site under the assumption of a
+constant mean (see e.g. Delicado et al. (2010); Giraldo et al. (2011); Nerini et al. (2010)).
+The case of a mean function that depends on longitude and latitude was considered in
+Caballero et al. (2013); Menafoglio et al. (2013); Reyes et al. (2015). In their work, Ignaccolo
+et al. (2014) consider more complex forms of non-stationarity, where the mean function may
+depend on exogenous variables (either scalar or functional), developing the so called kriging
+with external drift - or regression kriging - in a functional data setting.
+While much eﬀort has been put in prediction, the uncertainty of a predicted curve
+remains an open issue, since there is no functional version of the kriging variance. The
+lack of a distribution function in the functional framework leads to the use of resampling
+methods for conﬁdence band calculation. In this context, Cuevas et al. (2006) consider the
+standard bootstrap and a smoothed version of it to obtain conﬁdence intervals for location
+estimators; an informal discussion on the asymptotic validity of the bootstrap approach
+in a functional framework can also be found in their paper. Goldsmith et al. (2013) use
+a bootstrap approach to account for the uncertainty in Functional Principal Components
+decomposition in estimanting the functional mean and constructing a conﬁdence band for
+it.
+Further, Ferraty et al. (2010) propose using “wild bootstrapping” in the case of a
+nonparametric regression model with scalar response and functional covariate and derive
+asymptotic results; Rana et al. (2016) extend this last work to the case of α−mixing depen-
+dence. The recent paper by Gonz´alez-Rodr´ıguez and Colubi (2017) shows the consistency
+of some bootstrap approaches for separable Hilbert-valued random elements but under the
+2
+
+assumption of independence.
+While the bootstrap theory is well established for independent data, in the spatial data
+setting a bootstrap procedure needs to mimic the data generating mechanism in order to
+reproduce the spatial dependence structure in the bootstrap samples. Mostly by extending
+bootstrap for time series, several variants of spatial subsampling and spatial block boot-
+strap methods have been proposed in the literature (see chapter 12 in Lahiri (2003) for a
+good overview on resampling methods for spatial data). In classical geostatistics, it is com-
+mon to assume a decomposition of data variability in large- and small-scale components,
+so that a “semi-parametric” bootstrap method as described in Cressie (1993) (p.493) - and
+inspired by Freedman and Peters (1984) and Solow (1985) - seems appropriate. The latter
+consists in transforming the residuals of a regression model (i.e. after estimation of the
+large-scale component) to remove the spatial dependence structure (small-scale) so that re-
+sampling can be done on uncorrelated data, to then re-introduce the spatial correlation on
+bootstrapped samples and ﬁnally add up the large-scale component. Recently, Iranpanah
+et al. (2011) compare the semi-parametric bootstrap with a moving block bootstrap for
+variance estimation of estimators in a simulation study, and point out some advantages of
+the semi-parametric approach in terms of precision and accuracy of the estimator. A semi-
+parametric bootstrap approach has also been considered in Schelin and de Luna (2010),
+where the focus is on the ordinary kriging predictor for data whose distribution is not nec-
+essarily Gaussian, and indeed their proposal does not need any distributional assumptions
+about the data generating process. While Iranpanah et al. (2011) consider the presence
+of a non-constant mean structure too, the main diﬀerence between the two proposals is
+related to the considered statistics: Iranpanah et al. (2011) suggest to create the bootstrap
+distribution of the spatial predictor, while Schelin and de Luna (2010) construct a boot-
+strap distribution for the contrast deﬁned as the diﬀerence between the spatial predictor
+and the unknown value (the one we want to predict).
+The literature available considers either prediction bands for functional data in the
+case of independent observations or prediction intervals for spatially correlated data but
+in a scalar framework. In this sense, we ﬁll the gap by providing a solution for spatially
+correlated functional data. In this framework, however, mimicking the data generating
+3
+
+process is expected to be more diﬃcult than in the scalar case. In this paper, we consider
+the case of functional kriging with external drift (FKED) developed in Ignaccolo et al.
+(2014) and extend it to take into account spatial correlation when estimating the drift
+functional coeﬃcients by means of an iterative algorithm. To evaluate the uncertainty of a
+predicted curve, we propose to extend the semi-parametric bootstrap approach for spatially
+correlated data introduced by Schelin and de Luna (2010) to the case of functional data,
+with the addition of a functional drift in the kriging model (a scalar drift was considered
+in Iranpanah et al. (2011)). Concurrently, Pigoli et al. (2016) have proposed a similar
+approach to evaluate the kriging prediction error for manifold valued data, but always in
+terms of a unique value for each location. The extension of the semi-parametric bootstrap
+to the functional data setting is not straightforward and implies dealing with two main
+issues: i) the speciﬁcation and estimation of the spatial dependence structure and ii) the
+ordering of curves to obtain functional quantiles. In lack of theoretical results about the
+asymptotic validity of the proposed bootstrap, we rely on a simulation study to evaluate
+the performance of the proposed method by analysing widths of the functional prediction
+bands and coverages deﬁned for functional data.
+The paper is organized as follows. In Section 2, we summarize the kriging with external
+drift methodology whereas in Section 3 we illustrate the proposed method for deriving
+prediction bands in the general FKED setting. A simulation study is presented in Section 4,
+followed by an application to two real data sets. All computations are coded in R (R Core
+Team, 2015). A discussion completes the paper.
+2
+Functional kriging with external drift (FKED)
+Let Υs = {Ys(t); t ∈T} be a functional random variable observed at location s ∈D ⊆Rd,
+whose realization is a function of t ∈T, where T is a compact subset of R. Assume that
+we observe a sample of curves Υsi, for si ∈D, i = 1, . . . , n, taking values in a separable
+Hilbert space of square integrable functions. The set {Υs, s ∈D} constitutes a functional
+random ﬁeld or a spatial functional process (Delicado et al., 2010) that is not necessarily
+4
+
+stationary. The following model is assumed:
+Υs = µs + ϵs,
+(1)
+where µs is the drift describing a spatial trend and ϵs is a zero-mean, second-order stationary
+and isotropic residual random ﬁeld, with covariance function Cov(ϵsi, ϵsj) = C(h), ∀si, sj ∈
+D with h = ∥si −sj∥, where h = ||si −sj|| represents the Euclidean distance between
+locations si and sj. At a ﬁxed site si, i = 1, . . . , n, and domain point t, the model can be
+rewritten as a functional concurrent linear model (Ignaccolo et al., 2014)
+Ysi(t) = µsi(t) + ϵsi(t)
+(2)
+where ϵsi(t) represents the residual spatial functional process {ϵs(t), t ∈T, s ∈D} at site
+si. The drift term can be expressed in terms of a set of scalar and functional covariates:
+µsi(t) = α(t) +
+X
+p
+γp(t)Cp,i +
+X
+q
+βq(t)Xq,i(t)
+(3)
+where α(t) is a functional intercept, Cp,i is the pth scalar covariate at site si, Xq,i is the qth
+functional covariate at site si and γp(t) and βq(t) are the covariate functional coeﬃcients.
+Model (3) parameters can be estimated by means of a generalized additive model (GAM)
+representation using the R package mgcv (see Ignaccolo et al. (2014), Wood (2006) and
+Wood (2015) for details). The generalized additive model representation of Model (2) can
+be re-expressed as a mixed eﬀects model (Robinson, 1991; Speed, 1991) whose parameters
+are estimated using REstricted Maximum Likelihood (REML) (Wood, 2011) under the
+assumption of Gaussianity for ϵsi(t) with a longitudinal point of view.
+To take into account the spatial correlation between functional observations when esti-
+mating the drift term, we propose an iterative algorithm that considers the term ϵsi(t) as a
+functional random intercept (i.e. a location speciﬁc smooth residual) with a given covari-
+ance structure, similarly to Scheipl et al. (2015). An iterative algorithm is also proposed
+in Menafoglio et al. (2013) to estimate drift coeﬃcients for scalar covariates in universal
+kriging, as well as in Ignaccolo et al. (2015) to take into account the heteroskedasticity of
+functional residuals. The algorithm can be summarized as follows:
+1. Fit a standard functional concurrent linear model; estimate the drift term µsi(t)
+following Model (3) assuming independent functional observations and obtain the
+functional residuals esi(t) = Ysi(t) −ˆµsi(t) .
+5
+
+2. Estimate the correlation matrix K =
+
+Corr(ϵsi(t), ϵsj(t))
+	
+i,j=1,...,n of the residual spa-
+tial functional process using the trace-semivariogram (Giraldo et al., 2011). This is de-
+ﬁned, for a zero-mean weakly-stationary isotropic process, as υ(h) =
+R
+T
+1
+2V ar
+ ϵsi(t) −ϵsj(t)
+
+dt.
+The trace-semivariogram can be estimated as:
+ˆυ(h) =
+1
+2 |N(h)|
+X
+i,j∈N(h)
+Z
+T
+ esi(t) −esj(t)
+2 dt
+where N(h) = {(si, sj) : ∥si −sj∥= h}. The estimate becomes computationally
+eﬃcient when data are expressed using cubic B-splines, as integration can be avoided
+by re-expressing the integral in terms of the spline coeﬃcients and basis (Giraldo et al.,
+2011). Once estimated, the empirical trace-semivariogram provides a cloud of points
+(hg, ˆυ(hg)), g = 1, . . . , G to which a parametric model (e.g. exponential, spherical,
+Mat´ern) can be ﬁtted as in classical geostatistics using, for example, weighted least
+squares (Cressie, 1993).
+3. Fit Model (2) considering the term ϵsi(t) as a functional random eﬀect, where the
+inverse of the estimated correlation matrix ˆK (dim( ˆK) = n×n) is used as the precision
+matrix of a random ﬁeld across locations, as proposed in Scheipl et al. (2015). In
+practice this can be implemented using the function gamm in the mgcv package.
+The algorithm’s convergence is determined based on the Akaike Information Criterion
+AIC, since the eﬀective degrees of freedom may change from iteration to iteration. The
+algorithm stops when the AIC rate is smaller than 0.1%, where the criterion rate at the
+jth iteration is calculated as
+AICrate =
+
+AICj −AICj−1
+AICj−1
+ .
+The resulting functional residuals (at the last iteration) esi(t) = Ysi(t) −ˆµsi(t) can
+be used to predict the residual curve at an unmonitored site s0 via one of three kriging
+options: 1) ordinary kriging for functional data (Giraldo et al., 2011), according to which
+ˆes0(t) = Pn
+i=1 λiesi(t), with kriging coeﬃcients λi ∈R; 2) continuous time-varying kriging
+(Giraldo et al., 2010), where the kriging coeﬃcients λi(t) now depend on t and 3) functional
+kriging total model (Giraldo et al., 2009; Nerini et al., 2010), where the kriging coeﬃcients
+6
+
+are deﬁned on T × T and ˆes0(t) = Pn
+i=1
+R
+T λi(τ, t)esi(τ)dτ. Prediction at the unmonitored
+site s0 is obtained by adding up, as in the classical regression kriging, the two terms, i.e.
+ˆYs0(t) = ˆµs0(t) + ˆes0(t),
+where
+ˆµs0(t) = ˆα(t) +
+X
+p
+ˆγp(t)Cp,0 +
+X
+q
+ˆβq(t)Xq,0(t)
+depends on the covariate values Cp,0 and Xq,0(·) at site s0.
+From now on we focus on the ordinary kriging case for the residual ﬁeld; this contributes
+to keep a moderate computational complexity in what follows (the two other cases will
+be considered in the discussion). Indeed, the ordinary case turns to be computationally
+convenient because of the trace-variogram’s use. Not only integration can be avoided when
+using B-splines, but also it is possible to show (see appendix) that the trace-variogram
+induces a covariance structure that is separable with respect to space and the domain of
+the functional data (e.g. time or depth). Moreover, Menafoglio and Petris (2016) show that
+the solution to the Ordinary Kriging Problem via the trace-covariogram turns out to be the
+best ﬁnite-dimensional approximation of the operatorial kriging predictor for Hilbert-space
+valued random ﬁelds.
+Note that, in practice, data are gathered as a ﬁnite discrete set of observations (tj, yij),
+tj ∈T, j = 1, . . . , M, i = 1, . . . , n.
+Thus, before ﬁtting Model (2), raw data can be
+transformed into functional observations assuming yij = Ysi(tj) + δij, where δij represents
+measurement error and Ysi(·) is a continuous function that corresponds to a realization of
+the functional random ﬁeld {Υs, s ∈D} at site si. The conversion from discrete data to
+curves involves smoothing; we use cubic B-splines and the R package fda (Ramsay et al.,
+2014), choosing the number of basis functions and penalty parameter using functional
+cross-validation (Ignaccolo et al., 2014).
+3
+Bootstrap uncertainty bands for functional kriging
+To evaluate the uncertainty of a predicted curve ˆYs0(t) at a new site s0, we propose a
+semi-parametic bootstrap approach for spatially correlated functional data that builds on
+the work done by Schelin and de Luna (2010) and Iranpanah et al. (2011) for scalar data.
+The main idea is to decorrelate the data so that resampling can be done on independent
+observations and then transform back, ensuring that the spatial dependence structure is
+7
+
+maintained in the bootstrapped samples. After removing the drift as in Iranpanah et al.
+(2011), we propose to follow Schelin and de Luna (2010) according to which in the following
+algorithm a sample of size n + 1 is drawn and an augmented covariance matrix created,
+such that a bootstrap datum Y ∗j
+s0 is generated at the unmonitored location s0.
+Suppose that ˆYs0(t) −Ys0(t) follows the distribution Fn, a 1 −α prediction interval
+for Ys0(t) can be built as (ˆYs0(t) −q1−α/2, ˆYs0(t) −qα/2), with qα the αth quantile of the
+unknown distribution Fn. The idea is to construct B bootstrap replicates {ˆY ∗j
+s0 , Y ∗j
+s0 }B
+j=1
+and approximate Fn by ˆF ∗
+n, the empirical distribution of {ˆY ∗j
+s0 −Y ∗j
+s0 }B
+j=1. The bootstrapping
+algorithm can be summarized as follows:
+1. Iteratively estimate the drift following Model (3) as proposed in steps 1-3 of the
+FKED algorithm to take into account the spatial correlation and take the functional
+residuals esi(t) = Ysi(t) −ˆµsi(t).
+2. Estimate the functional residuals covariance matrix Σ through the estimated trace-
+semivariogram. Resampling directly from the functional residuals is not appropriate
+due to spatial dependence; instead, we can transform them ﬁrst as it is usual practice
+when bootstrapping spatial data. Using Cholesky decomposition, ˆΣn×n = ˆLn×n ˆLT
+n×n
+and the functional residuals can be transformed so that they become (spatially) un-
+correlated:
+ζn×M = (ζ(s1), . . . , ζ(sn))′ = ˆL−1
+n×n (Yn×M −ˆµn×M) .
+3. Generate B bootstrap samples with size n + 1, ζ∗
+n+1 = (ζ∗(s1), . . . , ζ∗(sn), ζ∗(sn+1))′
+by sampling with replacement from ζ(s1), . . . , ζ(sn).
+4. Create the augmented covariance matrix ˆΛ =
+
+
+ˆΣ
+ˆcT
+n
+ˆcn
+ˆσ2
+
+, where ˆcn = { ˆC(si −s0)}n
+i=1,
+ˆC is the estimated covariance function and ˆσ2 = ˆC(0) is the estimated scale. Use
+Cholesky decomposition so that ˆΛ = ˆR ˆRT and transform the bootstrap samples ζ∗
+n+1
+as
+(e∗(s1), . . . , e∗(sn), e∗(s0))′ = ˆR(n+1)×(n+1)ζ∗
+(n+1)×M.
+5. The ﬁnal bootstrap sample is determined as Y ∗
+si(t) = ˆµsi(t) + e∗
+si(t), i = 1, . . . , n and
+Y ∗
+s0(t) = ˆµs0(t) + e∗
+s0(t).
+8
+
+The bootstrap samples {Y ∗j
+s1 , . . . , Y ∗j
+sn }B
+j=1 are then fed into the FKED model to obtain
+B prediction curves ˆY ∗j
+s0 and the diﬀerences {ˆY ∗j
+s0 −Y ∗j
+s0 }B
+j=1 are considered. The prediction
+interval for Ys0(t) can be written as
+
+ˆYs0(t) −q∗
+1−α/2, ˆYs0(t) −q∗
+α/2
+
+,
+with q∗
+α the αth percentile of ˆF ∗
+n, that can be obtained ordering the set of curves {ˆY ∗j
+s0 −
+Y ∗j
+s0 }B
+j=1. However, the idea of ordering curves is not as straightforward as ordering scalar
+values, and to our knowledge there is no gold standard for doing so. We consider two
+diﬀerent ordering techniques available in the literature.
+The ﬁrst one builds on the idea of band depth (Lopez-Pintado and Romo, 2009), that
+can be deﬁned for any set of k curves. In their paper, Lopez-Pintado and Romo (2009)
+suggest using k=3, stating that there is no need to increase k as “the band depth induced
+order is very stable in k”. Even for k=2, the computational cost is considerable when the
+sample includes a large number of functional curves; to improve computation times, we
+have adopted the fast algorithm proposed in Sun and Genton (2011) and Sun et al. (2012)
+with k=2. The band in R2 delimited by the curves yi1, yi2 is deﬁned as
+B(yi1, yi2) = {(t, y(t)) : t ∈T, minr=1,2 yir(t) ≤y(t) ≤maxr=1,2 yir(t)} .
+The sample band depth (BD) of a curve y(t) in a set of n curves can be calculated as
+BDn,2(y) =
+
+n
+2
+
+
+−1
+X
+1≤i1<i2≤n
+I {G(y) ⊆B(yi1, yi2)}
+where I is the indicator function and G(y) is the graph of a curve y(t) deﬁned as the subset
+of the plane G(y) = {(t, y(t)) : t ∈I}. Potential problems of using k = 2 include ties (i.e.
+more than one curve with the same depth value) and crossing over of the curves delimiting
+the band (in which case the band “is degenerated in a point and, with probability one, no
+other curve will be inside this band”; see Lopez-Pintado and Romo (2009)). To avoid these
+problems and still count with the computational advantage of using k = 2, band depth can
+be modiﬁed to take into account whether a portion of the curve is in the band, giving rise
+to the modiﬁed band depth (MBD), deﬁned as
+MBDn,2(y) =
+
+n
+2
+
+
+−1
+X
+1≤i1<i2≤n
+λ ({t ∈T : minr=i1,i2yr(t) ≤y(t) ≤maxr=i1,i2yr(t)})
+λ (T)
+9
+
+where λ is the Lebesgue measure on T (for further details see Lopez-Pintado and Romo
+(2009)). With this scheme, the bigger the band depth value, the more central the curve is.
+The second ordering scheme is based on L2 distance between curves (Cuevas et al.,
+2006). In this case, the bootstrap-based predicted curves are ordered based on how distant
+they are from the zero curve, according to the L2 distance deﬁnition:
+||x −y|| =
+Z
+T
+(x(t) −y(t))2 dt
+1/2
+.
+With this scheme, the smaller the distance, the more central the curve is.
+For a conﬁdence level 1−α, the lower/upper limits of a 100(1−α)% prediction band are
+obtained by taking either the pointwise (w.r.t. t) minimum/maximum of the 100(1 −α)%
+deepest curves using band depth (i.e. those closest to the center of the distribution) (Sun
+and Genton, 2011) or of the 100(1 −α)% curves closest to the zero curve using L2 distance
+(Cuevas et al., 2006).
+To evaluate the performance of the bootstrap method proposed, we can use diﬀerent
+indicators. First of all, we consider the width of the resulting 100(1 −α)% prediction band
+Bs0(α) at the unmonitored site s0. Then we evaluate the “domain coverage” DCs0(α),
+deﬁned as the proportion over the domain T of the simulated curve within the prediction
+band, calculated as
+DCs0(α) = 1
+M
+M
+X
+j=1
+I {(tj, Ys0(tj)) ∈Bs0(α)} ,
+(4)
+where M is the number of points used for discretizing the curve Ys0(t). The latter should
+not be understood as coverage in the classical sense, and thus we propose a “functional
+coverage” FCs0(α) deﬁned as the percentage of times that the prediction band contains
+the true curve in a set of S simulations, and calculated as
+FCs0(α) = 1
+S
+S
+X
+sim=1
+I
+
+(t, Ys0(t)) ∈B(sim)
+s0
+(α)
+	
+= 1
+S
+S
+X
+sim=1
+I
+
+DC(sim)
+s0
+(α) = 1
+	
+,
+where B(sim)
+s0
+(α) and DC(sim)
+s0
+(α) represent the prediction band and domain coverage for
+the simth simulation, sim = 1, . . . , S; in the simulation study that follows S = 100. In
+practice, the functional coverage depends somehow on the discretization that one makes of
+the corresponding curve Ys0(t), in the sense that the ﬁner the discretizing grid, the more
+10
+
+diﬃcult it is for the whole curve to be contained in the band, and indeed the functional
+coverage varies slightly depending on the number of points chosen to represent the curve.
+That said, we opt for a ﬁne discretization (101 points) but allow for a small tolerance ς in
+the functional coverage, in the sense that rather than requiring the whole true curve to be
+contained in the band, we require at least 100(1 −ς)% of the true curve to be contained
+in the band.
+This modiﬁed version of the functional coverage with tolerance ς can be
+evaluated as
+FCς
+s0(α) = 1
+S
+S
+X
+s=1
+I
+
+DC(sim)
+s0
+(α) ≥1 −ς
+	
+.
+(5)
+Obviously, FCς
+s0(α) coincides with FCs0(α) when ς = 0.
+4
+Simulation Study
+The performance of the bootstrapping method proposed in Section 3 is evaluated here
+through a simulation study. Our aim is to analyse the impact of the spatial structure of
+the functional residual random ﬁeld, by means of the covariance function parameters (scale
+and range), as well as that of the ordering technique chosen to derive the uncertainty bands
+when increasing the number of sites.
+Data were simulated using cubic B-splines on a spatial irregular grid (n locations) on
+D = [0, 2]×[0, 3] and curve domain T = [0, 1]. We used a B-spline basis on T with 10 basis
+functions. The residual functional random ﬁeld was built as es(t) = P10
+j=1 ξj(s)Bj(t), where
+Bj(t) is the jth basis function evaluated at t ∈T (i.e. a curve) and {ξj(s), s ∈D} are the
+spatially correlated spline coeﬃcients. These were generated independently for each j =
+1, . . . , 10 using the same exponential covariance function with range and scale parameters
+φ ∈(0.5, 1, 1.5) and σ2 ∈(0.25, 0.50, 0.75) respectively, resulting in 9 diﬀerent scenarios.
+As already mentioned in Section 2 and shown in the appendix, the trace-variogram of
+{es(·), s ∈D} turns out to be proportional to the variogram of the spline coeﬃcients
+{ξj(s), s ∈D}. The drift was obtained as
+ms(t) = α(t) + β1(t)lon + β2(t)lat
+where lon and lat are the spatial coordinates, α(t) is a functional intercept and β1(t), β2(t)
+are functional coeﬃcients. The functional coeﬃcients α(t), β1(t) and β2(t) can be expressed
+11
+
+in terms of the same B-spline basis with scalar spline coeﬃcients (common for all sites)
+that are drawn from normal distributions as follows: for α(t) we draw 10 splines coef-
+ﬁcients from N10(1, 0.05 I10×10); for β1(t) and β2(t) we draw 10 splines coeﬃcients from
+N10(ϑ, 0.05 I10×10) with ϑ = (0.2, 0.2, 0.4, 0.4, 0.6, 0.6, 0.8, 0.8, 1, 1)T, where I10×10 repre-
+sents the identity matrix with dimension 10 × 10. Finally, simulated observations were
+built as
+Y sim
+s
+(t) = ms(t) + es(t) + ηs(t)
+where η(t) = {ηs1(t), . . . , ηsn(t)} ∼Nn(0, 0.09 In×n) is a vector of random errors for each
+ﬁxed t ∈[0, 1]; in practice we consider M =101 equally spaced points in [0, 1].
+For each simulation scenario, we generated functional data at n = 25, 50 and 90 nested
+locations. Additionally, data were generated at 10 more sites (always the same for all three
+sample sizes) used as validation stations. Note that these validation stations, numbered
+1 to 10 throughout the paper, represent a number of diﬀerent situations that could be
+found in real applications, ranging from isolated locations with no information nearby (e.g.
+number 3) to locations situated very close to sites where data are available (e.g. number
+9). The locations can be seen in Figure 1, while the simulated data can be seen in Figure 2
+for n = 90 (note that the cases n = 25 and n = 50 are just subsets of this).
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0.0
+0.5
+1.0
+1.5
+2.0
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+n=25
+x
+y
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0.0
+0.5
+1.0
+1.5
+2.0
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+n=50
+x
+y
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+0.0
+0.5
+1.0
+1.5
+2.0
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+n=90
+x
+y
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+Figure 1: Locations of the 25, 50 and 90 sites used for model ﬁtting. Validation sites
+numbered 1 to 10.
+For each of the three sample sizes, and each simulation scenario, the FKED model
+12
+
+φ=0.5
+0
+2
+4
+6
+σ2=0.25
+φ=1
+φ=1.5
+0
+2
+4
+6
+σ2=0.5
+t
+0
+2
+4
+6
+0
+0.2
+0.4
+0.6
+0.8
+1
+σ2=0.75
+t
+0
+0.2
+0.4
+0.6
+0.8
+1
+t
+0
+0.2
+0.4
+0.6
+0.8
+1
+Figure 2: Simulated data (n=90) with 10 validation stations curves in color, for each
+simulation scenario.
+presented in Section 2 was applied to the corresponding data set to predict curves at the
+10 validation sites. In particular, a drift term depending on longitude and latitude was
+considered and ordinary kriging was used to obtain the predicted residuals. In practice,
+the variogram model is chosen automatically among exponential, gaussian and spherical
+based on minimum SSE. Computational times ranged from 2 seconds (n=25) up to 16
+seconds (n=90). The resulting predicted curves, along with the observed data, can be seen
+in Figure 3 in the case of n = 90 and range and scale parameters φ = 0.5 and σ2=0.25,
+respectively.
+The estimated range and scale parameters ˆφ and ˆσ2 for all 9 simulation
+13
+
+Y(t)
+0
+2
+4
+6
+Station 1
+GG
+GG
+GG
+GGGGG
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GGGGG
+G
+G
+G
+G
+GGGG
+G
+GG
+G
+GG
+GGGG
+G
+G
+GGGGG
+GGGGGG
+GGG
+G
+GG
+GGG
+G
+GGGG
+GGGG
+G
+GG
+GG
+GG
+GG
+GGGGGG
+G
+G
+G
+G
+G
+G
+GG
+GGG
+Station 2
+GG
+G
+G
+GGGGGGGGG
+GGG
+G
+GG
+GG
+G
+G
+G
+GGGGG
+G
+G
+G
+G
+GGGGGGGGGGGG
+GGGG
+GG
+GG
+G
+GG
+G
+G
+G
+G
+GG
+GG
+GG
+G
+G
+G
+GGGG
+G
+G
+G
+G
+G
+G
+GGGGGG
+G
+G
+G
+G
+GG
+GG
+G
+G
+GGGG
+GG
+Y(t)
+0
+2
+4
+6
+Station 3
+GGGGGG
+GGGGG
+GG
+G
+GGG
+G
+G
+GG
+GG
+GGG
+G
+G
+GGG
+G
+G
+G
+GGG
+GGG
+GGG
+GGG
+G
+GG
+G
+G
+GG
+GG
+G
+G
+GG
+G
+G
+G
+GGGG
+G
+GG
+G
+G
+GGG
+GGG
+G
+GGG
+GGG
+GGGGG
+GG
+GGGG
+GG
+G
+G
+G
+G
+Station 4
+G
+G
+GG
+G
+G
+GGGGG
+G
+GGG
+G
+G
+G
+GG
+GGG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GGGG
+GGG
+G
+GG
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+GG
+GGGGG
+GGG
+G
+GG
+G
+G
+GGGG
+G
+GG
+G
+G
+G
+G
+GG
+GGGG
+G
+GG
+G
+GG
+G
+G
+Y(t)
+0
+2
+4
+6
+Station 5
+GGG
+GGGG
+GGGG
+G
+G
+GGGGGG
+G
+G
+G
+GG
+GG
+G
+GG
+GG
+GGGG
+G
+G
+G
+G
+GG
+G
+GGGGG
+G
+G
+GG
+G
+G
+G
+GGGG
+GG
+GGGGGG
+G
+G
+G
+G
+G
+GGG
+G
+GGGGG
+G
+G
+G
+G
+GG
+G
+G
+GG
+GG
+GG
+G
+GGGGG
+G
+Station 6
+G
+G
+G
+G
+G
+GGGG
+G
+G
+G
+GGG
+G
+G
+GG
+GGGGGG
+G
+GG
+G
+GG
+GG
+G
+G
+G
+G
+GG
+G
+GGGGG
+G
+GGG
+G
+GG
+G
+GG
+G
+GGGGG
+G
+G
+GG
+G
+G
+G
+GG
+GG
+G
+G
+G
+GGGGGGG
+G
+GG
+GG
+GG
+G
+GGGG
+G
+G
+G
+GG
+G
+G
+Y(t)
+0
+2
+4
+6
+Station 7
+GG
+GG
+G
+GGG
+GG
+GGG
+G
+GG
+G
+G
+G
+G
+GG
+GG
+G
+GG
+G
+GG
+G
+GG
+G
+G
+G
+GGG
+G
+G
+G
+G
+G
+GG
+GG
+GGG
+GGG
+G
+GGG
+G
+GG
+G
+GG
+GGGG
+G
+G
+G
+GGGG
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+GGG
+GG
+G
+G
+G
+G
+GGGG
+G
+Station 8
+G
+G
+GG
+G
+G
+G
+G
+GGG
+G
+G
+GGGGGG
+G
+GG
+G
+G
+G
+GGG
+GG
+G
+G
+GGGG
+G
+GG
+GGG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GG
+G
+GGG
+G
+GGG
+GGGGGGG
+GG
+GG
+G
+G
+GG
+GGG
+GGG
+G
+G
+G
+G
+GG
+GG
+G
+GGG
+G
+GGG
+G
+Y(t)
+0
+2
+4
+6
+Station 9
+GG
+G
+GG
+G
+GGGGGG
+G
+G
+GGGG
+G
+G
+G
+G
+GG
+GG
+G
+GGGG
+G
+G
+G
+G
+GGG
+G
+GG
+GGG
+G
+GGGG
+G
+GGGG
+G
+G
+G
+GGGGG
+GGGG
+GGG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GGG
+G
+GG
+GG
+G
+G
+G
+GG
+GG
+GG
+GG
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Station 10
+G
+GGG
+GG
+G
+G
+GGG
+G
+GG
+GG
+GGGGG
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GGGG
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GGGGG
+G
+GGG
+G
+GGG
+G
+G
+G
+GGG
+GG
+GGG
+G
+G
+G
+G
+G
+G
+GG
+G
+GG
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+GGG
+GG
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+t
+t
+Figure 3: Original data (black dots), FKED predicted curve (solid red line), 95% prediction
+band based on L2 distance (pink) and on MBD (blue) for n=90, σ2 = 0.25, φ = 0.5.
+scenarios are in agreement with what one would expect given the values set for φ and σ2 in
+the simulation design and the relationship between the trace-variogram and the variogram
+described in the appendix. It appears that there is good accordance between simulated and
+predicted observations. Similar ﬁgures for the remaining cases are available upon request
+as supplementary material. Following the algorithm illustrated in Section 3, a bootstrap
+sample of size B = 500 was obtained for each validation station. These 500 curves were
+ordered using both distance and band depth, where the latter was calculated using the
+modiﬁed version MBD. The resulting 95% prediction bands are shown in Figure 3. Overall,
+the two uncertainty measures provide very similar prediction bands.
+In Figure 4 (top), we show the depth based band width corresponding to a sample size
+of n = 25 and all simulation scenarios, while Figure 4 (bottom) summarizes the diﬀerence
+in width when using band depth and distance for the same sample size. The remaining
+ﬁgures (for n = 50, 90) are not shown here due to space limitations but are available upon
+request as supplementary material. Greater values of the scale parameter σ2 lead to wider
+14
+
+prediction bands, while for a ﬁxed value of the scale parameter, the width of the band
+decreases slightly with increasing range φ.
+When comparing band depth and distance
+(Figure 4 (bottom)) it is interesting to see that the depth based interval is predominantly
+wider than the distance based one, regardless of the value of σ2 and φ. Figure 5 shows the
+depth based prediction band width for a ﬁxed simulation scenario (σ2 = 0.5 and φ = 1.5)
+and all three samples sizes; here it can be seen that as n increases, the width of the interval
+decreases and it becomes slightly more stable on T.
+On the other hand, the median domain coverage (see Eq. (4)) over S = 100 simulations
+is summarized in Figure 6 for all simulation scenarios and sample sizes. Looking at the
+empirical distribution of DCs0(α) over S = 100 simulations the maximum is always 100%,
+whereas the minimum varies from 78.2% to 100%. This coverage is linked to the width
+of the interval (the larger the width the larger the coverage) but also to the goodness of
+FKED prediction because the uncertainty band is built around the predicted curve: if
+the prediction is far from the original data, the corresponding coverage will be poor, and
+viceversa. We can see in Figure 6 that median domain coverage improves as n increases
+and it is slightly better for small values of σ2. Overall, median coverage ranges from 85.2%
+to 100% and is highly dependent on validation site. In particular, it can be seen that when
+n = 90 all locations apart from validation stations numbered 4 and 7 have a median domain
+coverage greater than 95%. Station 3 seems to perform particularly badly when n = 25 but
+this is explained by the fact that it is located on the border of the spatial region considered
+(see Figure 1(left)) and has no neighbouring sites.
+Following the earlier discussion at the end of Section 3, we allow for a small tolerance
+when calculating functional coverage (see Eq. (5)), and this is shown in Figure 7 for ς = 0.05
+and ς = 0.10. It can be seen that FCς
+s0(0.05) decreases as σ2 increases but improves with
+increasing values of φ (i.e. when the dependence structure becomes stronger) and varies
+greatly with validation site. Once again, when ς = 0.05 (Figure 7 top) sites 4 and 7 show
+a lower functional coverage for n = 90; if we disregard these two, FC0.05
+s0 (0.05) for the
+remaining stations is very close to 100% in the best scenario (σ2 = 0.25, φ = 1.5). Given
+the empirical distribution of domain coverage discussed above, it is intuitive to see that
+we cannot expect a functional coverage around the nominal level 95% for all validation
+15
+
+φ=0.5
+width
+2
+4
+6
+σ2=0.25
+φ=1
+φ=1.5
+width
+2
+4
+6
+σ2=0.5
+t
+width
+2
+4
+6
+0
+0.2
+0.4
+0.6
+0.8
+1
+σ2=0.75
+t
+0
+0.2
+0.4
+0.6
+0.8
+1
+t
+0
+0.2
+0.4
+0.6
+0.8
+1
+φ=0.5
+width
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+σ2=0.25
+φ=1
+φ=1.5
+width
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+σ2=0.5
+t
+width
+−0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+0
+0.2
+0.4
+0.6
+0.8
+1
+σ2=0.75
+t
+0
+0.2
+0.4
+0.6
+0.8
+1
+t
+0
+0.2
+0.4
+0.6
+0.8
+1
+Figure 4: Prediction band width according to band depth (top) and width (depth-distance)
+diﬀerence (bottom) for 10 validation stations and diﬀerent simulation scenarios when n =
+25.
+16
+
+0
+20
+40
+60
+80
+100
+1
+2
+3
+4
+5
+6
+n=25
+t
+width
+0
+20
+40
+60
+80
+100
+1
+2
+3
+4
+5
+6
+n=50
+t
+width
+0
+20
+40
+60
+80
+100
+1
+2
+3
+4
+5
+6
+n=90
+t
+width
+Figure 5: Prediction band width, when using band depth for ordering curves, for a ﬁxed
+simulation scenario (σ2 = 0.5 and φ = 1.5) and all three samples sizes.
+stations.
+For example, the minimum and median domain coverage for station 4 when
+n = 90, σ2 = 0.75, φ = 0.25 are 82.2% and 90.1% respectively, while the 5th percentile
+is 84.2%; this means that if we set the tolerance ς = 0.05 the nominal level 95% cannot
+be reached. If instead we allow for a tolerance ς = 0.10 (see Section 6 for a discussion),
+the functional coverage improves considerably as shown in Figure 7(bottom). Moreover, if
+rather than discretizing the curve to 101 points we use M = 50, the results on coverage
+improve; for example, median domain coverage ranges from 90% to 100%.
+5
+Real data analysis
+5.1
+Canadian temperature data
+As ﬁrst case study, we have chosen the well known data set of Canadian temperature. This
+has been repeatedly used in the functional data literature (see, for example, Menafoglio
+et al. (2013); Giraldo et al. (2010); Ramsay and Silverman (2006); Scheipl et al. (2015)).
+The data set consists of daily annual mean temperature collected at 35 meteorological
+stations in Canada’s Maritimes Provinces: Nova Scotia, New Brunswick and Prince Edward
+Island, over the period 1960 to 1994. Note that the data set used here (available in the
+geofd R package; Giraldo et al. (2012)), which is the same as in Menafoglio et al. (2013);
+Giraldo et al. (2010), covers a smaller geographical area than that in Ramsay and Silverman
+17
+
+(2006). While other papers have been devoted to prediction of these temperature curves,
+our objective is to provide uncertainty bands for the predicted curves. Therefore, discussing
+the ﬁtted model is out of the scope of this paper. For this aim, we selected ﬁve stations at
+random to use as validation stations for which we will provide prediction bands according to
+our proposal in Section 3. These are marked in red in Figure 8 (left). Data were converted
+to functional observations through smoothing by using penalized cubic B-splines with 120
+basis functions and penalty parameter equal to zero.
+These values were chosen using
+functional cross-validation. The FKED model, with longitude and latitude as covariates,
+was then ﬁtted to the remaining 30 stations and predicted temperature curves were obtained
+using ordinary functional kriging with an exponential variogram model for the 5 validation
+stations. From the empirical trace-variogram, there was no evidence of a discontinuity at
+the origin and hence we ﬁxed the nugget equal to zero. For each of the validation sites,
+a bootstrap sample of size B = 1000 was obtained.
+Band depth was calculated using
+the modiﬁed version MBD. The resulting 95% prediction bands are shown in Figure 9.
+The uncertainty bands are fairly narrow, as expected when observing the small variability
+among curves in Figure 8 (right) but they become slightly wider in winter. Overall, the
+two uncertainty measures seem to agree well, although in some cases the distance based
+prediction band appears to be slightly narrower than the depth based one. Domain coverage
+percentages for all 5 validation sites range from 98.9% to 100%.
+5.2
+Air pollution data
+The second case study considered consists of daily PM10 concentrations (in µg/m3) mea-
+sured in 24 sites (red triangles in Figure 10) from October 2005 to March 2006 by the
+monitoring network of Piemonte region (Italy). Measurements were also available at 10
+additional locations (blue dots in Figure 10) that are used as validation stations. Apart
+from geographical information, i.e. longitude, latitude and altitude of each station, which
+were considered as scalar covariates, information was available on daily maximum mixing
+height, daily total precipitation, daily mean wind speed, daily mean temperature and daily
+emission rates of primary aerosols, which were taken as functional covariates. These are
+available as a result of a nested system of deterministic computer-based models imple-
+18
+
+mented by the environmental agency ARPA Piemonte (Finardi et al., 2008). This data set
+had already been analyzed in Cameletti et al. (2011). For further details on the model the
+reader is referred to Ignaccolo et al. (2014). A log transformation was used on the response
+variable to achieve normality and stabilize within-station variability. Prior to modelling,
+data (both response and functional covariates) were smoothed by means of cubic B-splines
+with 146 basis functions and penalty parameter equal to 0. These values were chosen using
+functional cross-validation (Ignaccolo et al., 2014).
+The functional kriging with external drift model described in Section 2 was applied
+to the air pollution data, including the (standardized) scalar and functional covariates
+mentioned above, to obtain prediction curves (via ordinary kriging for functional data with
+an exponential variogram model and zero nugget) at the 10 validation sites. To obtain
+95% prediction bands for each of the predicted curves, a bootstrap sample of size 1000
+was obtained for each site following the algorithm proposed in Section 3. We obtained
+prediction bands according to both the modiﬁed band depth (with k = 2) and distance
+induced order. Prediction bands for the ten validation sites are shown in Figure 11. Overall,
+the two uncertainty measures seem to agree well, although in some cases the depth based
+band appears to be slightly wider than the distance based one. The domain coverage varies
+from 97.3% to 100%.
+6
+Discussion
+The functional kriging with external drift model allows to predict a whole curve - regardless
+of the domain of the functional observations - taking into account exogenous covariates and
+the underlying spatial dependence. Nevertheless, uncertainty evaluation in the functional
+kriging context has hardly ever been addressed in the literature. The classic functional
+kriging variance provides a unique value over the whole domain T, while our aim is to pro-
+vide an uncertainty measure whose value may change along the predicted curve. Given the
+lack of an analytic expression of a domain-varying kriging variance for a curve, we propose
+a semiparametric bootstrap approach that not only allows the uncertainty to change over
+the domain T but also takes into account the uncertainty due to drift estimation. The
+contrast considered to build the uncertainty band, deﬁned as the diﬀerence between the
+19
+
+spatial prediction and the unknown value, could be thought of as a sort of pivotal quantity,
+the distribution of which is unknown. The use of a pivotal quantity is recalled to improve
+the performance of the bootstrap in the parametric framework (Canty et al., 2006).
+We considered two diﬀerent techniques proposed in the literature for ordering the boot-
+strapped curves, namely functional depth and L2 distance, but we did not ﬁnd great diﬀer-
+ences in the results for either the simulations or the two case studies. To be conservative,
+one could argue that it is safer to use the band depth as this criterion gives larger bands
+on average.
+Overall, using the known data at validation sites in both simulations and real case
+studies, it can be concluded that the proposed method is a valid approach in evaluating
+uncertainty for a predicted curve. In particular, the simulation study shows that the width
+of the bands depends on the scale and range parameters of the covariance structure, at
+least for the exponential case, and becomes more stable over the domain T with increasing
+sample size.
+In terms of functional coverage, we can conclude that once we allow for a small tolerance
+the method performs generally well. If for a nominal domain coverage we are willing to
+accept an eﬀective coverage of 90%, then it seems reasonable to assume a tolerance ς = 0.10,
+in which case results are satisfactory. Note that, in practice, when the method is applied
+to a real dataset, the functional coverage cannot be calculated and assessment would have
+to be done based solely on domain coverage, whose median in the simulation study was
+not far from the nominal level of 95%.
+Data in the two case studies considered in this paper were regularly spaced over the
+domain T; however, that is not always the case (see e.g. atmospheric proﬁles in Ignaccolo
+et al. (2015)). For irregularly spaced data, curves could be aligned at the initial smoothing
+step before ﬁtting the functional kriging with external drift model, as it is straightforward
+to evaluate the curves for every t ∈T in a common grid for all curves.
+The algorithm proposed for uncertainty evaluation of spatially correlated curves is com-
+putationally feasible (running times with B = 1000: 4 hours for the PM10 case study and
+2.35 hours for the Canadian temperature case study using an Intel Core i7-4770 CPU
+3.40GHz 16GB RAM) and applies to a wide range of practical situations, as it can be used
+20
+
+regardless of the complexity of the drift term, or even in the absence of the latter. Our
+proposal has been speciﬁed in the case of ordinary kriging where the weight coeﬃcients are
+constant and the spatial structure is determined by means of the trace-variogram. We are
+aware that the simulation study is limited to the simple case in which the spatial depen-
+dence structure does not change w.r.t. t ∈T, as assumed by the trace-covariogram. While
+it might be worth exploring more complex scenarios a full analysis of the air pollution data
+described in Section 5.2, Ignaccolo et al. (2014) showed that in practice the assumption of
+a spatial structure that is constant over time is reasonable, as the drift term in the model
+picks up most of the spatial variability over time. This suggests that in similar situations,
+where the available covariates are able to explain a large part of the time-space variability,
+ordinary residual kriging should be appropriate.
+Nevertheless, it may be the case that a more complex kriging alternative is desiderable
+in order to let the weights vary with t (for both the real data and the bootstrap samples). To
+be consistent with the way the kriging weights have been speciﬁed in the cases of continuous
+time-varying kriging and functional kriging total model, the underlying spatial structure
+(and hence the matrices K in Section 2 and Σ in Section 3) should not be determined by
+means of the trace-variogram. In fact, in Giraldo et al. (2011) and Giraldo et al. (2009)
+functional data are expressed as linear combinations of splines and a Linear Model of
+Coregionalization is used to estimate cross-correlations among the spline coeﬃcients; this
+way a possible interaction between the curve domain and the space domain is taken into
+account. Consequently the matrices K and Σ would need to be adjusted accordingly but
+with the added burden of an increased computational load.
+We believe that the method proposed in this paper is appropriate in the framework of
+functional data and is able to provide uncertainty bands for a predicted curve in an unmon-
+itored site. Further, half the width of the resulting prediction band could be considered
+as an approximate margin of error. We think this will prove useful for monitoring pur-
+poses and policy assessment where the uncertainty should always accompany the related
+prediction.
+21
+
+7
+Acknowledgments
+This work was supported by “Futuro in Ricerca” 2012 Grant (project no. RBFR12URQJ,
+named StEPhI) provided by the Italian Ministry of Education, Universities and Research.
+The authors are grateful to all the participants of the StEPhI workshops for the fruitful
+discussions.
+References
+Caballero, W., R. Giraldo, and J. Mateu (2013). A universal kriging approach for spatial
+functional data. Stochastic Environmental Research and Risk Assessment 27(7), 1553–
+1563.
+Cameletti, M., R. Ignaccolo, and S. Bande (2011). Comparing spatio-temporal models for
+particulate matter in piemonte. Environmetrics 22(8), 985–996.
+Canty, A., A. Davison, D. Hinkley, and V. Ventura (2006). Bootstrap diagnostics and
+remedies. Canadian Journal of Statistics 34(1), 5–27.
+Chiles, J.-P. and P. Delﬁner (2012).
+Geostatistics: Modeling Spatial Uncertainty, 2nd
+Edition. Wiley, Hoboken, NJ.
+Cressie, N. (1993). Statistics for Spatial Data. Revised Edition Wiley, New York.
+Cuevas, A., M. Febrero, and R. Fraiman (2006). On the use of the bootstrap for estimating
+functions with functional data. Computational Statistics and Data Analysis 51, 1063–
+1074.
+Delicado, P., R. Giraldo, C. Comas, and J. Mateu (2010). Statistics for spatial functional
+data: Some recent contributions. Environmentrics 21, 224–239.
+Ferraty, F., I. V. Keilegom, and P. Vieu (2010). On the validity of the bootstrap in non-
+parametric functional regression. Scandinavian Journal of Statistics 37, 286–306.
+22
+
+Finardi, S., R. DeMaria, A. D’Allura, C. Cascone, G. Calori, and F. Lollobrigida (2008). A
+deterministic air quality forecasting system for Torino urban area, Italy. Environmental
+Modelling and Software 23(3), 344–355.
+Freedman, D. and S. Peters (1984). Bootstrapping a regression equation: Some empirical
+results. Journal of the American Statistical Association 79, 97–106.
+Giraldo, R., P. Delicado, and J. Mateu (2009). Geostatistics with inﬁnite dimensional data:
+A generalization of cokriging and multivariable spatial prediction.
+Technical report,
+Reporte Interno de Investigacion No. 14, Universidad Nacional de Colombia.
+Giraldo, R., P. Delicado, and J. Mateu (2010). Continuous time-varying kriging for spatial
+prediction of functional data: An environmental application. Journal of Agricultural,
+Biological, and Environmental Statistics 15(1), 66–82.
+Giraldo, R., P. Delicado, and J. Mateu (2011). Ordinary kriging for function-valued spatial
+data. Environmental and Ecological Statistics 18(3), 411–426.
+Giraldo, R., J. Mateu, and P. Delicado (2012). geofd: An R package for function-valued
+geostatistical prediction. Revista Colombiana de Estad´ıstica 35(3), 383–405.
+Goldsmith, J., S. Greven, and C. Crainiceanu (2013).
+Corrected conﬁdence bands for
+functional data using principal components. Biometrics 69, 41–51.
+Gonz´alez-Rodr´ıguez, G. and A. Colubi (2017). On the consistency of bootstrap methods
+in separable Hilbert spaces. Econometrics and Statistics 1, 118–127.
+Goulard, M. and M. Voltz (1993). Geostatistical interpolation of curves: A case study in
+soil science. In A. Soares (Ed.), Geostatistics Troia ’92, pp. 805–816. Kluwer Academic,
+Dordrecht.
+Horv´ath, L. and P. Kokoszka (2012).
+Inference for functional data with applications.
+Springer, New York.
+Ignaccolo, R., M. Franco-Villoria, and A. Fass`o (2015). Modelling collocation uncertainty of
+3D atmospheric proﬁles. Stochastic Environmental Research and Risk Assessment 29(2),
+417–429.
+23
+
+Ignaccolo, R., J. Mateu, and R. Giraldo (2014). Kriging with external drift for functional
+data for air quality monitoring. Stochastic Environmental Research and Risk Assess-
+ment 28, 1171–1186.
+Iranpanah, N., M. Mohammadzadeh, and C. Taylor (2011). A comparison of block and
+semi-parametric bootstrap methods for variance estimation in spatial statistics. Compu-
+tational Statistics and Data Analysis 55, 578–587.
+Lahiri, S. (2003). Resampling Methods for Dependent Data. Springer-Verlag, New York.
+Lopez-Pintado, S. and J. Romo (2009).
+On the concept of depth for functional data.
+Journal of the American Statistcal Association 104(486), 718–734.
+Menafoglio, A. and G. Petris (2016). Kriging for Hilbert-space valued random ﬁelds: The
+operatorial point of view. Journal of Multivariate Analysis 146, 84–94.
+Menafoglio, A., P. Secchi, and M. D. Rosa (2013). A universal kriging predictor for spatially
+dependent functional data of a Hilbert space. Electronic Journal of Statistics 7, 2209–
+2240.
+Nerini, D., P. Monestiez, and C. Mant´e (2010).
+Cokriging for spatial functional data.
+Journal of Multivariate Analysis 101, 409–418.
+Pigoli, D., A. Menafoglio, and P. Secchi (2016). Kriging predictions for manifold-valued
+random ﬁelds. Journal of Multivariate Analysis 145, 117–131.
+R Core Team (2015). R: A Language and Environment for Statistical Computing. Vienna,
+Austria: R Foundation for Statistical Computing.
+Ramsay, J. and B. Silverman (2006). Functional Data Analysis. Springer, New York.
+Ramsay, J. O., H. Wickham, S. Graves, and G. Hooker (2014).
+fda: Functional Data
+Analysis. R package version 2.4.4.
+Rana, P., G. Aneiros, J. Vilar, and P. Vieu (2016). Bootstrap conﬁdence intervals in func-
+tional nonparametric regression under dependence. Electronic Journal of Statistics 10,
+1973–1999.
+24
+
+Reyes, A., R. Giraldo, and J. Mateu (2015). Residual kriging for functional spatial pre-
+diction of salinity curves. Communications in Statistics - Theory and Methods 44(4),
+798–809.
+Robinson, G. (1991).
+That BLUP is a good thing: The estimation of random eﬀects.
+Statistical Science 6, 15–32.
+Scheipl, F., A.-M. Staicu, and S. Greven (2015). Functional additive mixed models. Journal
+of Computational and Graphical Statistics 24(2), 477–501.
+Schelin, L. and S. S. de Luna (2010). Kriging prediction intervals based on semiparametric
+bootstrap. Mathematical Geosciences 42, 985–1000.
+Solow, A. (1985). Bootstrapping correlated data. Journal of the International Association
+for Mathematical Geology 17, 769–775.
+Speed, T. (1991). [That BLUP is a good thing: The estimation of random eﬀects]: Com-
+ment. Statistical Science 6(1), 42–44.
+Sun, Y. and M. Genton (2011). Functional boxplots. Journal of Computational and Graph-
+ical Statistics 20(2), 316–334.
+Sun, Y., M. Genton, and D. Nychka (2012). Exact fast computation of band depth for
+large functional datasets: How quickly can one million curves be ranked? Stat 1, 68–74.
+Wood, S. (2006). Generalized Additive Models: An Introduction with R. Chapman and
+Hall/CRC.
+Wood, S. (2011). Fast stable restricted maximum likelihood and marginal likelihood es-
+timation of semiparametric generalized linear models. Journal of the Royal Statistical
+Society (B) 73(1), 3–36.
+Wood, S. (2015). mgcv: Mixed GAM Computation Vehicle with GCV/AIC/REML Smooth-
+ness Estimation. R package version 1.8.6.
+25
+
+Appendix: note on the trace-variogram
+Let us recall that the trace-variogram is deﬁned, for a zero-mean weakly-stationary isotropic
+process, as
+υ(h) =
+Z
+T
+1
+2V ar
+ ϵsi(t) −ϵsj(t)
+
+dt
+where h = ||si −sj|| represents the Euclidean distante between locations si and sj.
+By assuming a ﬁnite development for the functions ϵ(t) such that ϵsi(t) = PNb
+l=1 ξl(s)Bl(t)
+where Nb is the number of considered basis functions and Bl(t) is the l-th basis function
+evaluated at t ∈T, we can write
+Cov
+ ϵsi(t), ϵsj(v)
+
+=
+Nb
+X
+l=1
+Cov (ξl(si), ξl(sj)) Bl(t)Bl(v) = C(si, sj)
+Nb
+X
+l=1
+Bl(t)Bl(v) = C(si, sj)τ(t, v)
+where C(si, sj) = Cov (ξl(si), ξl(sj)) is assumed identical for all l and τ(t, v) = PNb
+l=1 Bl(t)Bl(v).
+Thus we get a factorization with respect to the spatial domain D and the curve domain T.
+Moreover, for every i, V ar (ϵsi(t)) = C(si, si)τ(t, t) and we can write
+V ar
+ ϵsi(t) −ϵsj(t)
+
+= V ar (ϵsi(t)) + V ar
+ ϵsj(t)
+
+−2Cov
+ ϵsi(t), ϵsj(t)
+
+= C(si, si)τ(t, t) + C(sj, sj)τ(t, t) −2C(si, sj)τ(t, t).
+With the assumption of stationarity and isotropy for ϵ we obtain
+υ(h) = [C(0) −C(h)]
+Z
+T
+τ(t, t)dt
+so that the trace-variogram is written as a product of a (classical) spatial variogram and a
+constant depending on the Nb basis functions Bl.
+26
+
+1
+2
+3
+456
+7
+8
+9
+φ=0.5
+Median DC
+10
+85
+90
+95
+100
+σ2=0.25
+1
+2
+3
+4567
+8
+910
+1
+23456
+7
+8910
+1
+23456
+7
+8910
+123
+4
+5678910
+123
+4
+56
+7
+8910
+1
+2
+3
+4567
+8
+9
+φ=1
+10
+1
+2
+3
+4567
+8
+910
+1
+23456
+7
+8910
+1
+2345
+6
+7
+8910
+123
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+1
+2
+3
+456789
+φ=1.5
+10
+1
+2
+3
+4567
+8
+910
+12345
+6
+7
+8910
+12345
+6
+7
+8910
+123
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Median DC
+10
+85
+90
+95
+100
+σ2=0.5
+1
+2
+3
+456
+7
+8
+910
+1
+23
+4
+56
+7
+8910
+1
+23456
+7
+8910
+123
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+1
+2
+3
+4
+5
+6
+7
+8
+910
+1
+2
+3
+456
+7
+8
+910
+1
+23
+4
+56
+7
+8910
+1
+23456
+7
+8910
+123
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+1
+2
+3
+4567
+8
+910
+1
+2
+3
+4567
+8
+910
+1
+23456
+7
+8910
+1
+23456
+7
+8910
+123
+4
+56
+7
+89
+10
+123
+4
+56
+7
+89
+10
+1
+2
+3
+4
+5
+6
+7
+8
+9
+Median DC
+10
+85
+90
+95
+100
+n=25
+n=50
+n=90
+Dep
+Dis
+Dep
+Dis
+Dep
+Dis
+σ2=0.75
+1
+2
+3
+4
+5
+6
+7
+8
+910
+1
+23456
+7
+8910
+1
+23456
+7
+8910
+123
+4
+56
+7
+8910
+1
+23
+4
+56
+7
+8910
+1
+2
+3
+4
+5
+67
+8
+910
+n=25
+n=50
+n=90
+Dep
+Dis
+Dep
+Dis
+Dep
+Dis
+1
+2
+3
+4
+5
+67
+8
+910
+1
+23456
+7
+8910
+1
+23456
+7
+8910
+123
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+1
+2
+3
+4567
+8
+910
+n=25
+n=50
+n=90
+Dep
+Dis
+Dep
+Dis
+Dep
+Dis
+1
+2
+3
+4567
+8
+910
+1
+23456
+7
+8910
+1
+23456
+7
+8910
+123
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+Figure 6: Median domain coverage (over S = 100 simulations) at each validation station
+(numbered 1 to 10) for n=25, 50 and 90 and all 9 simulation scenarios.
+27
+
+1
+2
+3
+4567
+8
+9
+φ=0.5
+FC
+10
+0
+20
+40
+60
+80
+100
+σ2=0.25
+1
+2
+3
+4
+5
+6
+7
+8
+910
+1
+23
+4
+5
+6
+7
+8910
+1
+23
+4
+5
+6
+7
+8910
+1
+23
+4
+5
+6
+7
+89
+10
+123
+4
+56
+7
+89
+10
+1
+2
+3
+4567
+8
+9
+φ=1
+10
+1
+2
+3
+4567
+8
+910
+1
+23
+4
+5
+6
+7
+8
+910
+1
+23
+4
+5
+6
+7
+8
+910
+1
+23
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+1
+2
+3
+4567
+8
+9
+φ=1.5
+10
+1
+2
+3
+4567
+8
+910
+1
+23
+4
+5
+6
+7
+8
+910
+1
+23
+4
+5
+6
+7
+8910
+123
+4
+56
+7
+8910
+123
+4
+56
+7
+8910
+1
+2
+3
+456
+7
+8
+9
+FC
+10
+0
+20
+40
+60
+80
+100
+σ2=0.5
+1
+2
+3
+4
+5
+6
+7
+8
+910
+1
+23
+4
+56
+7
+8910
+1
+23
+4
+56
+7
+8910
+1
+23
+4
+5
+6
+7
+8910
+1
+23
+4
+56
+7
+8910
+1
+2
+3
+4567
+8
+910
+1
+2
+3
+4567
+8
+910
+1
+23
+4
+5
+6
+7
+8
+910
+1
+23
+4
+5
+6
+7
+8910
+1
+23
+4
+5
+6
+7
+89
+10
+1
+23
+4
+56
+7
+89
+10
+1
+2
+3
+4567
+8
+910
+1
+2
+3
+4567
+8
+910
+1
+23
+4
+5
+6
+7
+8
+910
+1
+23
+4
+5
+6
+7
+8910
+1
+23
+4
+5
+6
+7
+89
+10
+123
+4
+56
+7
+89
+10
+1
+2
+3
+456
+7
+8
+9
+FC
+10
+0
+20
+40
+60
+80
+100
+n=25
+n=50
+n=90
+Dis
+Dep
+Dis
+Dep
+Dis
+Dep
+σ2=0.75
+1
+2
+3
+4
+5
+6
+7
+8
+910
+1
+23
+4
+56
+7
+8910
+1
+23
+4
+56
+7
+8910
+1
+23
+4
+5
+6
+7
+8910
+1
+23
+4
+56
+7
+8910
+1
+2
+3
+4567
+8
+910
+n=25
+n=50
+n=90
+Dis
+Dep
+Dis
+Dep
+Dis
+Dep
+1
+2
+3
+4567
+8
+910
+1
+23
+4
+56
+7
+8
+910
+1
+23
+4
+56
+7
+8910
+1
+23
+4
+5
+6
+7
+89
+10
+1
+23
+4
+56
+7
+89
+10
+1
+2
+3
+4567
+8
+910
+n=25
+n=50
+n=90
+Dis
+Dep
+Dis
+Dep
+Dis
+Dep
+1
+2
+3
+4567
+8
+910
+1
+23
+4
+5
+6
+7
+8
+910
+1
+23
+4
+5
+6
+7
+8910
+1
+23
+4
+5
+6
+7
+89
+10
+1
+23
+4
+56
+7
+89
+10
+1
+2
+3
+456789
+φ=0.5
+FC
+10
+0
+20
+40
+60
+80
+100
+σ2=0.25
+12
+3
+45678910
+1
+2345678910
+1
+2345678910
+123
+4
+5678910
+123
+4
+5678910
+1
+2
+3
+4567
+8
+9
+φ=1
+10
+1
+2
+3
+45678910
+12345
+6
+78910
+12345678910
+123
+4
+5678910
+123
+4
+5678910
+1
+2
+3
+456789
+φ=1.5
+10
+1
+2
+3
+45678910
+12345
+6
+78910
+12345
+6
+78910
+123
+4
+5678910
+123
+4
+5678910
+12
+3
+456789
+FC
+10
+0
+20
+40
+60
+80
+100
+σ2=0.5
+12
+3
+4567
+8
+910
+1
+2345678910
+1
+2345678910
+123
+4
+5678910
+123
+4
+5678910
+12
+3
+4567
+8
+910
+12
+3
+4567
+8
+910
+1
+2345678910
+1
+2345678910
+1
+23
+4
+5678910
+123
+4
+5678910
+1
+2
+3
+4567
+8
+910
+1
+2
+3
+45678910
+1
+2345
+6
+78910
+1
+2345678910
+123
+4
+5678910
+123
+4
+56789
+10
+12
+3
+4567
+8
+9
+FC
+10
+0
+20
+40
+60
+80
+100
+n=25
+n=50
+n=90
+Dis
+Dep
+Dis
+Dep
+Dis
+Dep
+σ2=0.75
+12
+3
+4567
+8
+910
+1
+2345678910
+1
+2345678910
+1
+23
+4
+56
+7
+8910
+123
+4
+567
+8910
+12
+3
+4567
+8
+910
+n=25
+n=50
+n=90
+Dis
+Dep
+Dis
+Dep
+Dis
+Dep
+12
+3
+4567
+8
+910
+1
+2345678910
+1
+2345678910
+123
+4
+5678910
+123
+4
+5678910
+1
+2
+3
+4567
+8
+910
+n=25
+n=50
+n=90
+Dis
+Dep
+Dis
+Dep
+Dis
+Dep
+1
+2
+3
+4567
+8
+910
+1
+2345678910
+1
+2345678910
+123
+4
+5678910
+12345678910
+Figure 7: Functional coverage FCς(0.05) at each validation station (numbered 1 to 10) for
+n=25, 50 and 90 and all 9 simulation scenarios with tolerance ς = 0.05 (top) and ς = 0.10
+(bottom).
+28
+
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+−68
+−66
+−64
+−62
+−60
+44.5
+45.5
+46.5
+47.5
+Longitude °E
+Latitude °N
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+1
+2
+4
+24
+32
+0
+100
+200
+300
+−10
+0
+10
+20
+Day
+Temperature (°C)
+Figure 8: Locations of the 35 meteorological stations in Canada’s Maritimes Provinces area
+(left, validation stations numbered in red) and temperature curves (right, raw data)
+Temp (°C)
+0
+100
+200
+300
+−10
+0
+10
+20
+Station 1
+Day
+G
+G
+G
+G
+G
+G
+GG
+GG
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GGG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+GGG
+G
+G
+GG
+GG
+GGG
+G
+G
+G
+GGG
+G
+GG
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+GG
+GG
+G
+G
+GG
+GG
+G
+G
+GG
+GG
+G
+G
+GG
+GGG
+G
+GG
+G
+GGG
+G
+G
+GG
+G
+GG
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+GGG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+GGGGGG
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GG
+GG
+G
+G
+GG
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+G
+GGG
+G
+G
+G
+G
+G
+Station 2
+Day
+0
+100
+200
+300
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+GGG
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GGG
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GG
+GGG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GG
+G
+GGG
+G
+G
+GGG
+GG
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+GGGG
+G
+G
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GG
+G
+G
+G
+GGG
+G
+G
+GGG
+G
+G
+G
+GG
+G
+G
+G
+G
+GG
+G
+GGG
+G
+G
+GG
+GGG
+G
+GG
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+GG
+GG
+G
+GG
+G
+G
+G
+GG
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GG
+GG
+GG
+G
+G
+GGG
+G
+G
+G
+G
+GG
+G
+G
+GG
+G
+GG
+G
+GGGGGG
+G
+G
+G
+G
+G
+GG
+GG
+G
+G
+G
+G
+G
+Station 4
+Day
+0
+100
+200
+300
+G
+G
+G
+GG
+G
+G
+G
+G
+GGG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+GG
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GGG
+G
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+GG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GGG
+G
+G
+G
+G
+G
+G
+G
+G
+GGGG
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+GGG
+G
+GG
+G
+GG
+GG
+G
+GGGG
+GG
+GGG
+GGGG
+GG
+GGGGG
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+GG
+GGGGG
+GGG
+GG
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+GGG
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+GG
+G
+G
+GGG
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+Station 24
+Day
+0
+100
+200
+300
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+GG
+GG
+G
+GG
+G
+G
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GG
+G
+GG
+G
+G
+GGGG
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+GGG
+GG
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+G
+GG
+G
+G
+GGGG
+G
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+GG
+GG
+G
+GGG
+G
+G
+G
+GGG
+G
+GGG
+GG
+G
+G
+G
+GG
+GG
+G
+GG
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+GG
+GG
+GG
+G
+G
+G
+G
+G
+GG
+GGG
+G
+GGG
+GG
+GG
+G
+GG
+GG
+GGGGG
+GG
+G
+G
+GGGGG
+G
+G
+GGG
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+GG
+GGGG
+G
+G
+GG
+G
+G
+GG
+GG
+G
+G
+G
+GGG
+G
+G
+G
+GG
+GGG
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GG
+G
+G
+G
+GG
+G
+G
+GG
+G
+G
+GGGG
+G
+GG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+GG
+G
+G
+GG
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+GGG
+G
+GG
+GGG
+G
+G
+GGG
+GG
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+Station 32
+Day
+0
+100
+200
+300
+GGG
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+GGGG
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GGG
+GG
+G
+G
+G
+GG
+G
+G
+GGG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+G
+G
+GGGGGGG
+G
+G
+GG
+GG
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+GG
+G
+GG
+G
+G
+G
+G
+GGG
+GGG
+G
+GG
+GG
+GG
+G
+G
+GG
+G
+G
+G
+GG
+G
+G
+G
+GGG
+G
+G
+G
+GGGGG
+GG
+GG
+G
+GG
+G
+G
+GG
+G
+G
+GG
+G
+G
+GG
+G
+GG
+G
+G
+GGGG
+GGG
+GG
+GG
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+G
+GGG
+G
+GG
+GG
+GG
+G
+G
+G
+G
+G
+G
+G
+GGG
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+GG
+G
+GGG
+G
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+GG
+GG
+GG
+G
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+GG
+G
+GGGG
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GG
+GG
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GG
+GG
+G
+Figure 9: Original temperature data (black dots), FKED predicted curve (red line), 95%
+prediction band based on L2 distance (pink) and on MBD (blue) for validation stations
+29
+
+Figure 10: Locations of the 24 PM10 monitoring sites (red triangles) and 10 validation
+stations (blue dots).
+30
+
+log(PM10)
+0
+2
+4
+6
+GG
+GGGGGG
+G
+GGGGGGGG
+GGGGGGGGGGGGGG
+GGG
+GG
+GGGGGGGGGGG
+GGGGGGGG
+GGGGGGGGGG
+GGGGGGG
+G
+GGGG
+GG
+GGGG
+GGGG
+GGGGG
+G
+G
+GGGGGGGGGGGGGGG
+G
+G
+GGG
+GGGGGGGG
+GGGG
+GGGGG
+G
+GGGGGG
+G
+G
+GGGGGG
+GGGG
+GG
+GG
+G
+G
+GGGGGGGGG
+GGGG
+GGGG
+BI...Largo.Lamarmora
+log(PM10)
+0
+2
+4
+6
+G
+G
+GGG
+GG
+G
+G
+G
+GGGGGGG
+GGGGGGG
+GGGG
+GGG
+GG
+G
+GG
+G
+G
+G
+G
+G
+GGGGG
+GGG
+G
+GG
+GG
+GGG
+GGGG
+GG
+G
+GGGGG
+G
+GGGGG
+G
+G GGGG
+GGGGGGGGG
+G
+GGGG
+GG
+G
+G
+G
+G
+G
+GGGGGG
+G
+GGGGG
+GGG
+GGGGGGGG
+GG
+GG
+G
+GGG
+GGG
+G
+GGG
+GGG
+GGGG
+GG
+G
+GG
+G
+GG
+GGG
+G
+GGGGGGG
+GGGGG
+GG
+G
+GG
+Borgo.San.Dalmazzo
+log(PM10)
+0
+2
+4
+6
+G
+G
+G
+GGGGGG
+GGGGGGG
+GGGGG
+GGGGGGGG
+GGG
+GG
+G
+G
+G
+GGGG
+G
+GGGGGGG GGGGG
+GGGGGG
+GGGGGGGGGGGGGGG
+G
+GGGGGGGGG
+GG
+GGGGGGGGGGGGGGGGGGGGG GGGGGG
+G
+G
+GGGGGGGGGGG
+GGG
+GG G
+GG
+GG
+GGG
+GG
+G
+GGGGGG
+G
+G
+GG
+GG
+GG
+GG
+GGGGGGGGGGGGGGGGG
+Bra
+log(PM10)
+0
+2
+4
+6
+GG G GGGG
+GGGGGGGG
+GGGGGGGGGGGGGG
+G
+GGG
+GGGGGGGG
+GGGGGGG
+GG
+GGGGGGGGG G
+GGGGGGGGGGGGGG
+GG
+G GGGGGGG
+GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+GG
+GG
+GGGGGG
+GGG
+GGG
+GGGGGG
+GG
+G
+G
+G
+G
+GGG
+GGGG
+G
+G
+GG
+G
+GG
+G
+GGGGGGGGGGG
+GGGG
+G
+G
+GG
+Chivasso...Edipower
+log(PM10)
+0
+2
+4
+6
+GG
+GG
+GGGG
+G
+GGGGGGGG
+GGGGGGGGGGGGGG
+GGG
+GG
+GGGGGGG
+G
+GGGGGG
+GG
+GG
+GGG
+G
+GGG
+G
+G
+GG
+GGG
+GGGGGGGG
+GG
+GGGGGGGG
+G
+GG
+GG
+GG
+GGG
+GGGG
+GGG
+GG
+GGGGG
+GGGGG
+GG
+G
+GGGGGGG
+GG
+GGGG
+GG
+G
+GGGGGGG
+G
+GG
+G
+GG
+G
+G
+G
+G
+GGGGGGGGG
+G
+GGG
+G
+G
+G
+G
+Ivrea
+log(PM10)
+0
+2
+4
+6
+G
+G
+GGGGGG
+G
+GGGGG
+GG
+G
+GGGGGGGG
+GGG
+G
+G
+GG
+G
+GG
+GG
+G
+G
+G
+G
+G
+G
+GG
+GGG
+GGGG
+G
+G
+GGGG
+GGGG
+GGGGGG
+GGG
+G
+G
+GGGGGGGGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGG
+GGG
+GGGG
+GG
+GGG
+GGGGG
+GGG
+GGGGGG
+GGGGGGGG
+G
+GGGGGG
+GG
+Saliceto
+log(PM10)
+0
+2
+4
+6
+G
+GG
+GGG
+G
+G
+GG
+GGGGGG
+G
+GG
+GG
+GGG
+GGG
+GGG
+GGG
+G
+G
+GGG
+GG
+GG
+G
+GGGGGGGGGGGGGGGG
+GGGG
+GGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGG
+GGGGGGGGGGGGGGGGGGGG
+GGGGGGGGGGGGGGGGGG
+GGGGGGG
+G
+GGG
+G
+G
+G
+GGG
+GGGGGG
+G
+G
+G
+GGGGGGGGG
+G
+G
+GGGGG
+G
+G
+Serravalle.Scrivia
+log(PM10)
+0
+2
+4
+6
+GGG
+GGGGGG
+GGGGGGG
+G
+GGG
+G
+GG
+G
+GGGGGG
+G
+GGG
+G
+GG
+G
+G
+GG
+GG
+G
+GGG
+GGGGG
+GGG
+GG
+G
+G
+G
+GG
+GG
+G
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+GGG
+G
+G
+G
+GG
+G
+G
+G
+G
+G
+GGG
+G
+GGGG
+GGGG
+G
+G
+G G
+GG
+G
+G
+G
+G
+GG
+G
+G
+GGG
+G
+G
+G
+GGGGG
+G
+G
+GG
+G
+G
+GG
+G
+G
+G
+G
+G
+G
+G
+GG
+G
+G
+GGG GG
+GGG
+G
+G
+G
+G
+G
+Susa
+log(PM10)
+0
+2
+4
+6
+G
+G
+G
+G
+GGGGG
+GGGGGGGG
+GGGGGGGGGGGGGG
+GGGGG
+GG
+GGGGGG
+GGGGGGG
+GGGGGGGGGGGGGGG GGGGGGG
+GGG
+GG
+GGGGGGGGGGGGGGGGG
+GGGGGGGGGGGG
+G
+GG
+G
+GGGGGGGGGG
+G
+GG
+GGGGGG
+GGGGG
+G
+G
+GGGGGGGG
+G
+G
+G
+GG
+G
+G
+G
+GGGGGGGGGG
+GGGG
+G
+G
+GG
+TO...Piazza.Rivoli
+log(PM10)
+0
+2
+4
+6
+G
+G
+GGGGG
+G
+GGG
+GGGGG
+GGGGGGGGGGGGG
+G
+GG
+GGGGGGG
+G
+GGGGGGGGGGGGGGGGGGG
+GGGGG
+G
+G
+GGGG
+G
+G
+GGGGGGGGGGG
+GGGGG
+GGGGGGGGGG GG
+GG
+GGGGGG
+GGGGG
+GGG
+GGGG
+GG
+GGGGG
+G
+G
+GGGGGGG
+G
+GG
+G
+GG
+G
+G
+G
+GGGGGGGGGG
+GGGG
+G
+G
+GG
+TO...Via.Gaidano
+0
+50
+100
+150
+Day
+Figure 11: Original PM10 data (black dots), FKED predicted curve (red line), 95% predic-
+tion band based on L2 distance (pink) and on MBD (blue) for validation stations.
+31

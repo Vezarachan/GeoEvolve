@@ -1,0 +1,1137 @@
+Proceedings of Machine Learning Research 266:1–14, 2025 Conformal and Probabilistic Prediction with Applications
+Conformal Prediction of Classifiers with Many Classes based
+on Noisy Labels
+Coby Penso
+coby.penso24@gmail.com
+Bar-Ilan University, Israel
+Jacob Goldberger
+jacob.goldberger@biu.ac.il
+Bar-Ilan University, Israel
+Ethan Fetaya
+ethan.fetaya@biu.ac.il
+Bar-Ilan University, Israel
+Editor: Khuong An Nguyen, Zhiyuan Luo, Tuwe L¨ofstr¨om, Lars Carlsson and Henrik Bostr¨om
+Abstract
+Conformal Prediction (CP) controls the prediction uncertainty of classification systems
+by producing a small prediction set, ensuring a predetermined probability that the true
+class lies within this set. This is commonly done by defining a score, based on the model
+predictions, and setting a threshold on this score using a validation set. In this study, we
+address the problem of CP calibration when we only have access to a calibration set with
+noisy labels. We show how we can estimate the noise-free conformal threshold based on
+the noisy labeled data. We derive a finite sample coverage guarantee for uniform noise
+that remains effective even in tasks with a large number of classes. We dub our approach
+Noise-Aware Conformal Prediction (NACP). We illustrate the performance of the proposed
+results on several standard image classification datasets with a large number of classes.
+1. Introduction
+In machine learning for safety-critical applications, the model must only make predictions
+it is confident about. One way to achieve this is by returning a (hopefully small) set of
+possible class candidates that contain the true class with a predefined level of certainty.
+This is a natural approach for medical imaging, where safety is of the utmost importance
+and a human makes the final decision. This allows us to aid the practitioner, by reducing
+the number of possible diagnoses he needs to consider, with a controlled risk of mistake.
+The general approach to return a prediction set without any assumptions on the data
+distribution (besides i.i.d.
+samples) is called Conformal Prediction (CP) (Angelopoulos
+et al., 2023; Vovk et al., 2005). It creates a prediction set with the guarantee that the
+probability of the correct class being within this set meets or exceeds a specified confidence
+threshold. The goal is to return the smallest set possible while maintaining the confidence
+level guarantees. Recently, with the growing use of neural network systems in safety-critical
+applications such as medical imaging, CP has become an important calibration tool (Lu
+et al., 2022a,b; Olsson et al., 2022). We note that CP is a general framework rather than a
+specific algorithm. The most common approach builds the prediction set using a conformity
+score, and different algorithms mostly vary in terms of how the conformity score is defined.
+When dealing with conformal predictions, a critical challenge arises in applications such
+as medical imaging due to label noise. In these domains, datasets frequently contain noisy
+© 2025 C. Penso, J. Goldberger & E. Fetaya.
+arXiv:2501.12749v2  [cs.LG]  13 Aug 2025
+
+Penso Goldberger Fetaya
+labels stemming from ambiguous data that can confuse even clinical experts. Furthermore,
+physicians may disagree on the diagnosis for the same medical image, leading to incon-
+sistencies in the ground truth labeling. Noisy labels also occur when applying differential
+privacy techniques to overcome privacy issues (Ghazi et al., 2021; Penso et al., 2025). While
+significant efforts have been devoted to the problem of noise-robust network training (Song
+et al., 2022; Xue et al., 2022), the challenge of calibrating the models has only recently
+begun to receive attention (Penso et al., 2024).
+In this study, we tackle the challenge of applying CP to classification networks using
+a calibration set with noisy labels. Einbinder et al. (2022) suggested ignoring label noise
+and simply applying the standard CP algorithm on the noisy labeled calibration set. This
+strategy results in large prediction sets especially when there are many classes. A recent
+study suggests estimating the noise-free conformal score given its noisy version and then
+applying the standard CP algorithm (Penso and Goldberger, 2024).
+The most related
+studies to ours are (Sesia et al., 2024) and (Clarkson et al., 2024) which present a noisy CP
+algorithm with coverage guarantee bounds that can be too conservative in tasks with many
+classes (a detailed discussion on related works appears in Section 4). Here, we present a
+novel algorithm for CP on noisy data that yields an effective coverage guarantee even in tasks
+with a large number of classes. We applied the algorithm to several standard medical and
+scenery imaging classification datasets and show that our method outperformed previous
+methods.
+2. Background
+2.1. Conformal Prediction
+Consider a setup involving a classification network that categorizes an input x into k pre-
+determined classes. Given a coverage level of 1 −α, we aim to identify the smallest possible
+prediction set (a subset of these classes) ensuring the correct class is within the set with a
+probability of at least 1 −α. A straightforward strategy to achieve this objective involves
+sequentially incorporating classes from the highest to the lowest probabilities until their
+cumulative sum exceeds the threshold of 1 −α. Despite the network’s output adopting a
+mathematical distribution format, it does not inherently reflect the actual class distribu-
+tion. Typically, the network will not be calibrated and it tends to be overly optimistic (Guo
+et al., 2017). Consequently, this straightforward approach doesn’t assure the inclusion of
+the correct class with the desired probability.
+The first step of the CP algorithm involves forming a conformity score S(x, y) that
+measures the network’s uncertainty between x and its true label y (larger scores indicate
+worse agreement). The Homogeneous Prediction Sets (HPS) score (Vovk et al., 2005) is
+SHP S(x, y) = 1 −p(y|x; θ), s.t. θ is the network parameter set. The Adaptive Prediction
+Score (APS) (Romano et al., 2020) is the sum of all class probabilities that are not lower
+than the probability of the true class:
+SAP S(x, y) =
+X
+{i|pi≥py}
+pi,
+(1)
+2
+
+Conformal Prediction of Classifiers with Many Classes based on Noisy Labels
+such that pi = p(y = i|x; θ) and py is the probability of the label y. The RAPS score
+(Angelopoulos et al., 2021) is a variant of APS, which is defined as follows:
+SRAP S(x, y) =
+X
+{i|pi≥py}
+pi + a · max(0, (NC −b))
+(2)
+s.t. NC = |{i|pi ≥py}| and a, b are parameters that need to be tuned. RAPS is espe-
+cially effective in the case of a large number of classes where it explicitly encourages small
+prediction sets.
+We can also define a randomized version of a conformity score. For example in the case
+of APS we define:
+SAP S(x, y, u) =
+X
+{i|pi>py}
+pi + u · py,
+u ∼U[0, 1].
+(3)
+The random version tends to yield the required coverage more precisely and thus it produces
+smaller prediction sets (Angelopoulos et al., 2023). The CP prediction set of a data point
+x is defined as Cq(x) = {y|S(x, y) ≤q} where q is a threshold that is found using a labeled
+calibration set (x1, y1), ..., (xn, yn). The CP theorem (Vovk et al., 2005) states that if we set
+q to be the (1−α) quantile of the conformal scores S(x1, y1), ..., S(xn, yn) we can guarantee
+that 1−α ≤p(y ∈C(x)). where x is a test point and y is its the unknown true label (Vovk
+et al., 2005). In the random case there is still a coverage guarantee, which is defined by
+marginalizing over all test points x and samplings u from the uniform distribution (Romano
+et al., 2020).
+3. CP Calibration based on Noisy Labels
+3.1. Setting the Threshold Given Noisy Labels
+Here we show how, given a simple noise model and a known noise level, we can get the
+correct CP threshold based on noisy data. We will generalize this beyond the simple noise
+model in the following section. Consider a network that classifies an input x into k pre-
+defined classes. Given a conformity score S(x, y) and a specified coverage 1 −α, the goal of
+the conformal prediction algorithm is to find a minimal q such that p(y ∈Cq(x)) ≥1 −α.
+Let (x1, ˜y1), ..., (xn, ˜yn) be a calibration set with noisy labels and let yi be the unknown
+correct label of xi. Let si = S(xi, ˜yi) be the conformity score of (xi, ˜yi). We assume that
+the label noise follows a uniform distribution, where with a probability of ϵ, the correct
+label is replaced by a label that is randomly sampled from the k classes:
+p(˜y = j|y = i) = 1{i=j}(1 −ϵ) + ϵ
+k.
+(4)
+Uniform noise is relevant, for example, when applying differential privacy techniques to
+overcome privacy issues (Ghazi et al., 2021).
+In that setup the noise level ϵ is usually
+known. In other applications such as medical imaging, where the noise parameter ϵ is not
+given, it can be estimated with sufficient accuracy from the noisy-label data during training
+(Zhang et al., 2021; Li et al., 2021; Lin et al., 2023). We can write ˜y as ˜y = (1−z)·y +z ·u,
+where u is a random label uniformly sampled from {1, ..., k} and z is a binary random
+3
+
+Penso Goldberger Fetaya
+variable (p(z = 1) = ϵ) indicating whether the label of the sample (x, y) was replaced by a
+random label or not. For each candidate threshold, q denote:
+F c(q) = p(y ∈Cq(x)),
+F n(q) = p(˜y ∈Cq(x)),
+F r(q) = p(u ∈Cq(x)),
+where F c, F n, and F r represent the clean, noisy and random labels. Note as well that each
+one is the CDF of the appropriate conformal score function, e.g., F c(q) = p(y ∈Cq(x)) =
+p(S(x, y) ≤q).
+It is easily verified that
+F n(q) = p(z = 0)F c(q) + p(z = 1)F r(q) = (1 −ϵ)F c(q) + ϵF r(q).
+(5)
+For each value q, we can estimate F n(q) from the noisy calibration set:
+ˆF n(q) = 1
+n
+X
+i
+1{˜yi∈Cq(xi)} = 1
+n
+X
+i
+1{si≤q}.
+(6)
+Note that q is the ˆF n(q)-quantile of s1, ..., sn. Similarly we can also estimate F r(q):
+ˆF r(q) = 1
+n
+X
+i
+p(ui ∈Cq(xi)) = 1
+n
+X
+i
+|Cq(xi)|
+k
+,
+(7)
+where ui is uniformly sampled from {1, ..., k}. By substituting (6) and (7) in (5) we obtain
+an estimation of F c(q) = p(y ∈Cq(x)) based on the noisy calibration set and the noise level
+ϵ:
+ˆF c(q) =
+ˆF n(q) −ϵ ˆF r(q)
+1 −ϵ
+.
+(8)
+For each candidate q we first compute ˆF n(q) and ˆF r(q) and then by using (8) obtain
+the coverage estimation ˆF c(q). Given a coverage requirement (1 −α), we can thus use the
+noisy calibration set to find a threshold q such that ˆF c(q) = 1 −α. Note that since F c(q) is
+monotonous, it seems reasonable to search for the threshold q using the bisection method.
+However, as ˆF c(q) is an approximation based on the difference between two monotonic
+functions, it might not be exactly monotonous. We therefore find the threshold q using an
+exhaustive grid search. If there are several solutions we select the largest value. (In practice
+selecting one of the solutions has almost no effect on the results.) We note that even with
+an exhaustive search the entire runtime is negligible compared to the training time. We can
+narrow the threshold search domain as follows:
+Lemma 1 For every threshold q we have: ˆF n
+q /k ≤ˆF r(q).
+Proof Denote A = {i|ˆyi ∈Cq(xi)} and B = {i|1 ≤|Cq(xi)|}. Note that ˆF n(q) = |A|/n.
+|B| =
+X
+i∈B
+1 ≤
+X
+i∈B
+|Cq(xi)| ≤
+n
+X
+i=1
+|Cq(xi)| = nk ˆF r(q).
+Finally A ⊂B implies that: ˆF n(q) = |A|/n ≤|B|/n ≤k ˆF r(q).
+4
+
+Conformal Prediction of Classifiers with Many Classes based on Noisy Labels
+Theorem 2 Let q1 be the (1−α)(1 −ϵ)/(1 −ϵ
+k) quantile of s1, ..., sn and let q2 be the
+(1 −α) + αϵ quantile. If q satisfies ˆF c(q) = 1 −α then q1 ≤q ≤q2.
+Proof Assume q satisfies ˆF c(q) = 1 −α. Eq. (8) implies that
+1 −α = ˆF c(q) =
+ˆF n(q) −ϵ ˆF r(q)
+1 −ϵ
+⇒
+ˆF n(q) = (1 −α)(1 −ϵ) + ϵ ˆF r(q).
+(9)
+Since 0 ≤ˆF r(q) ≤1 we get that:
+(1 −α)(1 −ϵ) ≤ˆF n(q) ≤(1 −α) + αϵ = ˆF n(q2).
+(10)
+For every q we have ˆF n(q)/k ≤ˆF r(q) (Lemma 3.1). Hence, (1 −α)(1 −ϵ) ≤ˆF n(q) (10)
+implies that (1 −α)(1 −ϵ)/k ≤ˆF r(q). Combining this inequality with Eq. (9) yields a
+better lower bound: (1 −α)(1 −ϵ)(1 + ϵ/k) ≤ˆF n(q). Iterating this process yields:
+(1 −α)(1 −ϵ)
+
+1 + ϵ
+k +
+ ϵ
+k
+2
++ . . .
+
+= (1 −α) 1 −ϵ
+1 −ϵ
+k
+= ˆF n(q1) ≤ˆF n(q).
+Finaly, ˆF n(q) is a monotonically increasing function of q which implies that q1 ≤q ≤q2.
+As an alternative to the grid search we can sort the noisy conformity scores si = S(xi, ˜yi)
+and look for the minimal i such that ˆF c(si) ≥1 −α. In the noise-free case ˆF c is piece-wise
+constant, with jumps determined exactly by the order statistics si, namely, ˆF c(si) = i/n
+and thus this algorithm coincides with the standard CP algorithm. We dub our algorithm
+Noise-Aware Conformal Prediction (NACP), and summarize it in Algorithm 1. Note that in
+the noise-free case (ϵ = 0) the NACP algorithm coincides with the standard CP algorithm
+and selects q that satisfies ˆF c(q) = ˆF n(q) = 1 −α, i.e., q is the 1 −α quantile of the
+calibration set conformity scores.
+3.2. Prediction Size Comparison
+We next compare our NACP approach analytically to Noisy-CP (Einbinder et al., 2022) in
+terms of the average size of the prediction set.
+Theorem 3 Let q and ˜q be the thresholds computed by the NACP and the Noisy-CP algo-
+rithms respectively. Then q ≤˜q if and only if ˆF r(˜q) ≤(1 −α).
+Proof
+The threshold ˜q computed by the Noisy-CP algorithm (by applying standard CP
+on the noisy validations set) satisfies ˆF n(˜q) = (1 −α).
+The true threshold q satisfies
+ˆF n(q) = (1 −α)(1 −ϵ) + ϵ ˆF r(q) (9). Looking at the difference
+ˆF n(˜q) −ˆF n(q) = 1 −α −(1 −α)(1 −ϵ) −ϵ ˆF r(q) = ϵ(1 −α −ˆF r(q)).
+(11)
+Hence from the monotonicity of ˆF n(q) we have q ≤˜q iff ˆF n(q) ≤ˆF n(˜q) iff ˆF r(q) ≤1 −α.
+The theorem above states that if the size of the prediction set obtained by NACP is less
+than k(1 −α), NACP is more effective than Noisy-CP. For example, assume k = 100 and
+5
+
+Penso Goldberger Fetaya
+Algorithm 1 Noise-Aware Conformal Prediction (NACP) for uniform noise
+1: Input:
+A conformity score S(x, y), a coverage level 1 −α and a calibration set
+(x1, ˜y1), ..., (xn, ˜yn), where the labels are corrupted by a uniform noise with parame-
+ter ϵ.
+2: Set q1 to be the (1−α)(1 −ϵ)/(1 −ϵ
+k) quantile of S(x1, ˜y1), ..., S(xn, ˜yn) and set q2 to
+be ((1 −α) + αϵ) quantile.
+3: For each candidate threshold q compute:
+ˆF n(q) = 1
+n
+X
+i
+1{˜yi∈Cq(xi)},
+ˆF r(q) = 1
+n
+X
+i
+|Cq(xi)|
+k
+,
+ˆF c(q) =
+ˆF n(q) −ϵ ˆF r(q)
+1 −ϵ
+4: Apply a grid search to find q ∈[q1, q2] that satisfies ˆF c(q) = 1−α.
+5: The prediction set of a test sample x is:
+Cq(x) = {y | S(x, y) ≤q}.
+6: Coverage guarantee: p(y ∈Cq(x)) ≥1 −α −∆(n, ϵ, δ) with probability (1 −δ) over the
+noisy calibration set sampling (see Theorem 5).
+1 −α = 0.9. In this case, if the average size of the NACP prediction set is less than 90,
+NACP is more effective than Noisy-CP. We also see from eq. (11) that the smaller ˆF r is the
+larger the gap between the two methods. Since ˆF r is inversely proportional to the number
+of classes, we expect the difference to be substantial when there is a large number of classes
+to consider, which is exactly where CPs’ ability to reliably exclude possible classes is very
+useful.
+3.3. Coverage Guarantees
+We next provide a coverage guarantee for NACP. We show that if we apply the NACP
+to find a threshold q for 1 −α + ∆, then P(y ∈Cq(x)) ≥1 −α were ∆depends on the
+calibration set size. ∆is a finite-sample term that is needed to approximate the CDF to set
+the threshold instead of simply picking a predefined quantile. Because ∆can be computed,
+one can adjust the α used in the NACP algorithm to get the desired coverage guarantee. We
+note that we empirically found this bound to be over-conservative and that the un-adjusted
+method does reach the desired coverage (see Section 5).
+Lemma 4 Given δ > 0, define ∆=
+q
+log(4/δ)
+2nh2
+such that h = 1−ϵ
+1+ϵ and n is the size of the
+noisy calibration set. Then
+p(sup
+q |F c(q) −ˆF c(q)| > ∆) ≤δ,
+(12)
+such that the probability is over the sampling of the noisy calibration set.
+Proof The Dvoretzky–Kiefer–Wolfowitz (DKW) inequality (Massart, 1990) states that if
+we estimate a CDF F from n samples using the empirical CDF Fn then p(supx |Fn(x) −
+6
+
+Conformal Prediction of Classifiers with Many Classes based on Noisy Labels
+F(x)| > ∆) ≤2 exp(−2n∆2). Eq. (8) defines ˆF c(q) using ˆF n(q) and ˆF r(q). Both are
+empirical CDF, so from the DKW theorem and the union bound we get that:
+p(sup
+q |F r(q) −ˆF r(q)| > h∆or sup
+q |F n(q) −ˆF n(q)| > h∆) ≤4 exp(−2nh2∆2) = δ.
+Using eq. (8) we get that with probability at least 1 −δ for every q:
+ˆF c(q) =
+ˆF n(q) −ϵ ˆF r(q)
+1 −ϵ
+≤(F n(q) + h∆) −ϵ(F r(q) −h∆)
+1 −ϵ
+F c(q) + h∆+ ϵh∆
+1 −ϵ
+= F c(q) + h∆1 + ϵ
+1 −ϵ = F c(q) + ∆.
+Similarly, we can show that ˆF c(q) ≥F c(q) −∆which completes the proof.
+The proof of the main theorem now follows the standard CP proof, taking the inaccuracy
+in estimating F c(q) into account.
+Theorem 5 Assume you have a noisy calibration set of size n with noise level ϵ and set
+∆(n, ϵ, δ) =
+q
+log(4/δ)
+2nh2
+where h = 1−ϵ
+1+ϵ and that you pick q such that ˆF c(q) ≥1−α+∆. Then
+with probability at least 1 −δ (over the calibration set), we have that if (x, y) are sampled
+from the clear label distribution we get:
+1 −α ≤p(y ∈Cq(x)).
+Proof Given a clean test pair (x, y), with probability δ over the calibration set, we have:
+p(y ∈Cq(x)) = p(S(x, y) < q) = F c(q) ≥ˆF c(q) −∆≥1 −α.
+As the size of the noisy calibration set, n, tends to infinity, ∆converges to zero and
+thus the noisy threshold converges to the noise-free threshold.
+3.4. A More General Noise Model
+The focus of this paper is on the case of a uniform noise.
+Our approach, however, is
+easily extended to a more general noise model. We will assume that the noisy label ˜y is
+independent of x given y. We also assume that the noise matrix P(i, j) = p(˜y = j|y = i) is
+known and that the matrix P is invertible. For each q define the following matrices for the
+clear and the noisy data: Mc
+q(ℓ, i) = p(ℓ∈Cq(x), y = i) and Mq(ℓ, i) = p(ℓ∈Cq(x), ˜y = i).
+Assuming that, given the true label y, the r.v. x and ˜y are independent, we obtain:
+Mq(ℓ, i) = p(ℓ∈Cq(x), ˜y = i) =
+X
+j
+p(ℓ∈Cq(x), ˜y = i, y = j)
+(13)
+=
+X
+j
+p(ℓ∈Cq(x), y = j)p(˜y = i|y = j) =
+X
+j
+Mc
+q(ℓ, j)P(j, i).
+7
+
+Penso Goldberger Fetaya
+We can write (13) in matrix notation: Mq = Mc
+qP. Eq. (13) implies that:
+F c(q) = p(y ∈Cq(x)) =
+X
+i
+p(i ∈Cq(x), y = i) =
+X
+i
+Mc
+q(i, i) = Tr(MqP −1).
+(14)
+We can estimate the matrix Mq from the noisy samples:
+ˆ
+Mq(ℓ, i) = 1
+n
+X
+j
+1{˜yj=i, ℓ∈Cq(xj)},
+i, ℓ= 1, .., k.
+(15)
+Substituting (15) in (14) yields an estimation of the probability F c(q) = p(y ∈Cq(x)):
+ˆF c(q) = Tr( ˆ
+MqP −1).
+(16)
+The final step is applying a grid search to find a threshold q such that ˆF c(q) = 1 −α.
+In the case that P is a uniform noise matrix (4), the Sherman-Morison formula implies
+that P −1 = ( 1
+1−ϵI −
+ϵ
+(1−ϵ)k11⊤). Therefore,
+ˆF c(q) = Tr( ˆ
+MqP −1) =
+1
+1 −ϵ
+X
+i
+ˆ
+Mq(i, i) −
+ϵ
+(1 −ϵ)k
+X
+ℓ,i
+ˆ
+Mq(ℓ, i) =
+ˆF n(q) −ϵ ˆF r(q)
+1 −ϵ
+.
+Thus in the case of a uniform noise the coverage estimation (16) coincides with (8).
+4. Related Work
+In this section we review two closely related works that address the same problem of calibra-
+tion with noisy labels (Sesia et al., 2024; Clarkson et al., 2024). The derivation of the noisy
+conformal threshold in these two works is similar to ours. These two methods compute the
+same threshold q that satisfies ˆfc(q) = 1−α (16). The only minor difference is that in these
+two studies they use the distribution of correct labels given the noisy labels, while we use
+the more natural distribution of the noisy labels given the correct label. As a result, they
+need to know the marginal class frequencies for both the clean and noisy labels, whereas
+we do not. Each one of the two methods provides a different finite coverage guarantee in
+the form of:
+p(y ∈Cq(x)) ≥1 −α −∆
+where ∆depends on the calibration set size n, the number of classes k, and the noise model,
+but it doesn’t depend on the validation dataset itself.
+We first review the bound ∆derived in (Sesia et al., 2024). Let ρi = p(y = i) and
+˜ρi = p(˜y = i) be the marginal true and noisy label distributions. Let M(y|˜y) be the noise
+conditional distribution and let V = M−1. Let c(n) = E
+
+maxi∈[n]
+  i
+n −u(i)
+
+, such that
+{u(i)}n
+i=1 order statistics of {ui}n
+i=1 i.i.d. uniform random variables on [0, 1]. The size of the
+least common class is n∗= mini∈[k] ni where ni is the number of samples of noisy label i.
+Finally, the finite sample correction is:
+∆= c(n) +
+2 maxi∈[k]
+P
+l̸=i |Vil| + Pk
+i=1 |ρi −˜ρi|
+√n∗
+(17)
+· min
+ 
+k2
+rπ
+2 ,
+1
+√
+n∗+
+r
+log(2k2) + log(n∗)
+2
+!
+.
+8
+
+Conformal Prediction of Classifiers with Many Classes based on Noisy Labels
+It can be easily verified that ∆= O(log k) and therefore the bound becomes less effective
+for large values of k.
+The finite sample term ∆derived in (Clarkson et al., 2024) is:
+∆=
+k
+X
+i=1
+(|w(1)
+i |b(n, i) +
+X
+i̸=j
+|w(2)
+ij |b(n, j))
+(18)
+where k is the number of classes, w(1)
+i
+= P −1
+i,i ρi −˜ρi, w(2)
+ij = ρiP −1
+ji , and b(n, j) = (1−˜ρj)n +
+q π
+n˜ρj . ρi = p(y = i) and ˜ρi = p(˜y = i) are the marginal clean and contaminated label
+probabilities and Pji = p(y = j|˜y = i) is the conditional label noise distribution. It can
+be easily verified that ∆= O(
+√
+k) and therefore the bound becomes less effective for large
+values of k.
+We note that our finite sample term ∆(see Lemma 4) does not depend on the number
+of classes k. Therefore, unlike the algorithms of (Sesia et al., 2024) and (Clarkson et al.,
+2024), it remains effective even in tasks with many classes. A further distinction between
+our approach and previous works is that their finite sample coverage guarantee is established
+based on the average of all the noisy calibration sets. In contrast, our approach provides an
+individual coverage guarantee for nearly all (1−δ) of the sampled noisy calibration sets. In
+Section 5 we show that the average coverage guarantee obtained by (Sesia et al., 2024) and
+(Clarkson et al., 2024) implies that in tasks with a large number of classes, the prediction
+set should include all the classes and therefore it is useless. In contrast, our individual finite
+set coverage guarantee, on to (1 −δ) portion of the noisy calibration sets, remains effective
+for tasks with many classes.
+We note that our observation that the finite sample correction term does not depend on
+the number of classes, applies to the case of a uniform label noise. In the case of a general
+noise matrix, all finite sample correction terms are not effective.
+5. Experiments
+In this section, we evaluate the capabilities of our NACP algorithm on various publicly
+available image classification datasets.
+Compared methods.
+We implemented three popular conformal prediction scores,
+namely APS (Romano et al., 2020), RAPS (Angelopoulos et al., 2021) and HPS (Vovk
+et al., 2005). For each score, we implemented the following CP methods: (1) CP (oracle) -
+using a calibration set with clean labels, (2) Noisy-CP - applying a standard CP on noisy
+labels without any modifications (Einbinder et al., 2022), (3) NR-CP (w/o ∆) - Noise-
+Robust CP approach without the finite sample coverage guarantee ∆, see Eq. (16) and
+(Sesia et al., 2024; Clarkson et al., 2024). We also implemented three methods that add
+finite sample coverage guarantee terms to the NR-CP method. (4) Adaptive Conformal
+Classification with Noisy labels (ACNL) (Sesia et al., 2024), (5) Contamination Robust
+Conformal Prediction (CRCP) (Clarkson et al., 2024), and (6) NACP - our approach. For
+methods (4), (5), we used their official codes 1 2 and we share our code for reproducibility3.
+1. https://github.com/msesia/conformal-label-noise
+2. https://github.com/jase-clarkson/cp_under_data_contamination
+3. https://github.com/cobypenso/Noise-Aware-Conformal-Prediction
+9
+
+Penso Goldberger Fetaya
+Table 1: CP calibration results for 1−α = 0.9 and noise level ϵ = 0.2. We report the mean
+and the std over 1000 different splits. We show the best result with theoretical guarantees
+in bold.
+APS
+RAPS
+HPS
+Dataset
+CP Method
+size ↓
+coverage(%)
+size ↓
+coverage(%)
+size ↓
+coverage(%)
+CP (oracle)
+1.1 ± 0.01
+90.0 ± 0.62
+1.1 ± 0.01
+90.0 ± 0.61
+0.9 ± 0.01
+90.0 ± 0.59
+Noisy-CP
+5.1 ± 0.18
+99.9 ± 0.04
+5.1 ± 0.18
+99.9 ± 0.04
+5.1 ± 0.18
+99.8 ± 0.04
+NR-CP (w/o ∆)
+1.1 ± 0.02
+90.1 ± 0.70
+1.1 ± 0.02
+90.1 ± 0.69
+0.9 ± 0.02
+90.0 ± 0.75
+CIFAR-10
+ACNL
+1.5 ± 0.06
+96.0 ± 0.61
+1.3 ± 0.03
+94.6 ± 0.65
+1.1 ± 0.03
+96.0 ± 0.59
+(10 classes)
+CRCP
+1.2 ± 0.03
+93.7 ± 0.62
+1.2 ± 0.03
+93.7 ± 0.62
+1.1 ± 0.01
+95.7 ± 0.18
+NACP
+1.3 ± 0.04
+94.4 ± 0.62
+1.3 ± 0.04
+94.5 ± 0.62
+1.1 ± 0.01
+95.9 ± 0.18
+CP (oracle)
+6.5 ± 0.20
+90.0 ± 0.43
+4.0 ± 0.08
+90.0 ± 0.43
+2.0 ± 0.03
+90.0 ± 0.43
+Noisy-CP
+50.5 ± 1.29
+99.8 ± 0.04
+50.5 ± 1.33
+99.8 ± 0.03
+50.1 ± 1.34
+99.9 ± 0.02
+NR-CP (w/o ∆)
+6.4 ± 0.28
+89.9 ± 0.54
+4.0 ± 0.11
+89.9 ± 0.55
+2.0 ± 0.06
+89.9 ± 0.56
+CIFAR-100
+ACNL
+100.0 ± 0.00
+100.0 ± 0.00
+100.0 ± 0.00
+100.0 ± 0.00
+100.0 ± 0.00
+100.0 ± 0.00
+(100 classes)
+CRCP
+25.7 ± 3.71
+98.7 ± 0.39
+8.5 ± 0.41
+98.3 ± 0.16
+11.1 ± 3.46
+98.7 ± 0.42
+NACP
+9.0 ± 0.46
+93.0 ± 0.49
+4.8 ± 0.13
+93.0 ± 0.48
+2.5 ± 0.09
+93.0 ± 0.52
+CP (oracle)
+14.9 ± 0.60
+90.0 ± 0.61
+6.9 ± 0.19
+90.0 ± 0.62
+3.8 ± 0.13
+90.02 ± 0.58
+Noisy-CP
+99.7 ± 3.67
+99.7 ± 0.08
+101.4 ± 3.58
+99.5 ± 0.09
+98.3 ± 3.80
+99.8 ± 0.05
+NR-CP (w/o ∆)
+14.0 ± 0.91
+89.4 ± 0.81
+6.7 ± 0.27
+89.3 ± 0.80
+3.5 ± 0.24
+89.3 ± 0.80
+TinyImagenet
+ACNL
+200.0 ± 0.00
+100.0 ± 0.00
+200.0 ± 0.00
+100.0 ± 0.00
+200.0 ± 0.00
+100.0 ± 0.00
+(200 classes)
+CRCP
+200.0 ± 0.00
+100.0 ± 0.00
+200.0 ± 0.00
+100.0 ± 0.00
+200.0 ± 0.00
+100.0 ± 0.00
+NACP
+22.6 ± 1.87
+93.7 ± 0.71
+9.0 ± 0.50
+93.6 ± 0.70
+7.0 ± 0.87
+93.6 ± 0.72
+CP (oracle)
+16.6 ± 0.33
+90.0 ± 0.26
+6.3 ± 0.06
+90.0 ± 0.27
+3.6 ± 0.07
+90.0 ± 0.28
+Noisy-CP
+502.6 ± 8.56
+99.9 ± 0.01
+501.6 ± 8.51
+99.9 ± 0.01
+501.3 ± 10.2
+100.0 ± 0.01
+NR-CP (w/o ∆)
+16.7 ± 0.51
+90.0 ± 0.34
+6.3 ± 0.10
+90.0 ± 0.36
+3.6 ± 0.14
+90.0 ± 0.38
+ImageNet
+ACNL
+1000.0 ± 0.00
+100.0 ± 0.00
+1000.0 ± 0.00
+100.0 ± 0.00
+1000.0 ± 0.00
+100.0 ± 0.00
+(1000 classes)
+CRCP
+1000.0 ± 0.00
+100.0 ± 0.00
+1000.0 ± 0.00
+100.0 ± 0.00
+1000.0 ± 0.00
+100.0 ± 0.00
+NACP
+20.9 ± 0.72
+91.9 ± 0.32
+7.1 ± 0.13
+91.9 ± 0.34
+4.8 ± 0.23
+91.9 ± 0.36
+Evaluation Measures. We evaluated each CP method based on the average size of the
+prediction sets (where a small value means high efficiency) and the fraction of test samples
+for which the prediction sets contained the ground-truth labels. The two evaluation metrics
+are formally defined as:
+size = 1
+n
+X
+i
+|C(xi)|,
+coverage = 1
+n
+X
+i
+1(yi ∈C(xi))
+such that n is the size of the test set. We report the mean and standard deviation over
+1000 random splits.
+Datasets. We show results on four standard scenery image datasets CIFAR-10, CIFAR-
+100 (Krizhevsky et al., 2009), Tiny-ImageNet, and ImageNet (Deng et al., 2009).
+Implementation details.
+Each task was trained by fine-tuning on a pre-trained
+ResNet-18 (He et al., 2016) network. The models were taken from the PyTorch site4. We
+selected this network architecture because of its widespread use in classification problems.
+The last fully connected layer output size was modified to fit the corresponding number of
+classes for each dataset. For the standard dataset evaluated in Table 1 we used publicly
+available checkpoints. For each dataset, we combined the calibration and test sets and then
+constructed 1000 different splits where 50% was used for the calibration phase and 50% was
+used for testing. In all our experiments we used δ = 0.001. In other words, the computed
+coverage guarantee is applied to the sampled noisy calibration set with probability 0.999,
+4. https://pytorch.org/vision/stable/models.html
+10
+
+Conformal Prediction of Classifiers with Many Classes based on Noisy Labels
+Table 2: Finite sample correction terms ∆of NACP, ACNL (Sesia et al., 2024) and CRCP
+(Clarkson et al., 2024), for several datasets and two noise levels, n is the size of the calibra-
+tion set.
+Dataset
+n
+#classes
+NACP
+ACNL
+CRCP
+ϵ = 0.1
+ϵ = 0.2
+ϵ = 0.1
+ϵ = 0.2
+ϵ = 0.1
+ϵ = 0.2
+CIFAR-10
+5000
+10
+0.035
+0.043
+0.031
+0.059
+0.016
+0.036
+CIFAR-100
+10000
+100
+0.025
+0.030
+0.077
+0.163
+0.039
+0.088
+TinyImagenet
+5000
+200
+0.035
+0.043
+0.175
+0.382
+0.078
+0.176
+ImageNet
+25000
+1000
+0.016
+0.019
+0.194
+0.466
+0.079
+0.177
+Conformal prediction results. Table 1 reports the noisy label calibration results
+across 3 different conformal prediction scores, HPS, APS, and RAPS for four standard
+publicly available datasets, CIFAR-10, CIFAR-100, Tiny-ImageNet, and ImageNet. In all
+cases, we used 1−α = 0.9 and a noise level of ϵ = 0.2. The results indicate that in the case
+of a calibration set with noisy labels, the Noisy-CP threshold became larger to facilitate
+the uncertainty induced by the noisy labels. This yielded larger prediction sets and the
+coverage was higher than the target coverage which was set to 90%. We can see that NACP
+outperformed the ACNL, and CRCP methods for all datasets except for CIFAR-10 with
+fewer classes. Following Theorem 3, we expect the gain in performance when using NACP
+versus Noisy-CP to increase with the number of classes, indeed validated empirically in Table
+1. Here for CIFAR-100, Tiny-ImageNet, and ImageNet the ACNL and CRCP methods failed
+due to the large number of classes and the relatively small number of samples per class. A
+direct comparison of the finite sample correction terms ∆obtained by NACP, ACNL and
+CRCP is shown in Table 2. Note that if 1 −α + ∆> 1, the prediction set includes all the
+classes and thus it becomes useless. We can see in Table 2 that this is the case for ACNL
+and CRCP in datasets with a large number of classes when the noise level is sufficiently
+high.
+Correction term analysis. Following the theoretical and empirical results, the ef-
+fectiveness of our method and baselines can be fully explained by the correction terms ∆
+each method guarantees as practitioners require coverage guarantee and therefore will use
+1 −α + ∆. Note that, as explained in Section 4, our finite sample coverage guarantee is
+different from the one provided by the baseline method. Figure 1 presents the correction
+term as a function of calibration set size and the number of classes. Note that the NACP
+curve remains exactly the same across the 3 plots. Our main contribution is grounded in
+the fact that NACP is not dependent on the number of classes k, clearly shown in plots as
+the number of classes grows.
+Different network architectures. Conformal prediction in general and our method
+NACP specifically has is agnostic to the underlying model architecture. We next exper-
+imentally verify it with ImageNet across different model architectures. Table 3 presents
+the results of applying conformal prediction on noisy labels using ResNet18, ResNet50,
+DenseNet121, ViT-B16 (Vision transformer). We can see that the NACP yields signifi-
+cantly improved results regardless of the network architecture while the coverage guarantee
+provided by ACNL and CPRC is useless. We can see that even without adding any cor-
+11
+
+Penso Goldberger Fetaya
+Figure 1: Correction terms ∆of NACP, ACNL and CRCP as a function of the calibration
+set size n given ϵ = 0.2. We show results for 3 numbers of classes, 10, 100 and 1000.
+rection term, we get the required coverage guarantee. This indicates that all the current
+correction terms are very conservative.
+Table 3: CP calibration results on ImageNet and various model architectures for 1−α =
+0.9 and ϵ = 0.2. We report the mean and the std over 1000 different splits. Bold for best
+result with theoretical guarantees.
+ResNet-18
+ResNet-50
+DenseNet121
+ViT-B16
+Dataset
+CP Method
+size ↓
+coverage(%)
+size ↓
+coverage(%)
+size ↓
+coverage(%)
+size ↓
+coverage(%)
+APS
+CP (oracle)
+16.6 ± 0.33
+90.0 ± 0.26
+13.9 ± 0.34
+90.0 ± 0.28
+12.0 ± 0.28
+90.0 ± 0.27
+10.7 ± 0.38
+90.0 ± 0.25
+Noisy-CP
+502.6 ± 8.56
+99.9 ± 0.01
+505.5 ± 8.11
+99.9 ± 0.01
+502.8 ± 8.46
+99.9 ± 0.01
+506.8 ± 8.14
+99.8 ± 0.02
+NR-CP (w/o ∆)
+16.7 ± 0.51
+90.0 ± 0.34
+13.9 ± 0.47
+90.0 ± 0.37
+12.0 ± 0.38
+90.0 ± 0.34
+10.7 ± 0.55
+90.0 ± 0.35
+ACNL
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+CRCP
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+NACP
+20.9 ± 0.72
+91.9 ± 0.32
+17.4 ± 0.62
+91.9 ± 0.36
+15.1 ± 0.55
+91.9 ± 0.34
+15.5 ± 0.81
+91.9 ± 0.31
+RAPS
+CP (oracle)
+6.3 ± 0.06
+90.0 ± 0.27
+4.5 ± 0.05
+89.9 ± 0.29
+4.7 ± 0.06
+90.0 ± 0.26
+2.6 ± 0.04
+90.0 ± 0.25
+Noisy-CP
+501.6 ± 8.51
+99.9 ± 0.01
+501.1 ± 8.85
+99.9 ± 0.01
+501.9 ± 8.80
+99.9 ± 0.01
+505.8 ± 7.90
+99.9 ± 0.01
+NR-CP (w/o ∆)
+6.3 ± 0.10
+90.0 ± 0.36
+4.5 ± 0.06
+90.0 ± 0.35
+4.7 ± 0.08
+90.0 ± 0.36
+2.6 ± 0.05
+90.0 ± 0.36
+ACNL
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+CRCP
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+NACP
+7.1 ± 0.13
+91.9 ± 0.34
+5.0 ± 0.08
+91.9 ± 0.34
+5.3 ± 0.10
+92.0 ± 0.35
+2.9 ± 0.07
+92.0 ± 0.30
+HPS
+CP (oracle)
+3.6 ± 0.07
+90.0 ± 0.28
+2.0 ± 0.03
+90.0 ± 0.28
+2.4 ± 0.03
+90.0 ± 0.25
+1.5 ± 0.02
+90.0 ± 0.26
+Noisy-CP
+501.3 ± 10.2
+100.0 ± 0.01
+502.4 ± 9.50
+99.9 ± 0.01
+502.3 ± 10.3
+99.9 ± 0.20
+504.3 ± 8.19
+99.9 ± 0.01
+NR-CP (w/o ∆)
+3.6 ± 0.14
+90.0 ± 0.38
+2.1 ± 0.06
+90.0 ± 0.38
+2.4 ± 0.07
+90.0 ± 0.34
+1.5 ± 0.03
+90.0 ± 0.35
+ACNL
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+CRCP
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+1000.0 ±0.00
+100.0 ± 0.00
+NACP
+4.8 ± 0.23
+91.9 ± 0.36
+2.6 ± 0.10
+91.9 ± 0.37
+3.1 ± 0.12
+91.9 ± 0.34
+1.7 ± 0.04
+91.9 ± 0.33
+6. Conclusions
+We presented a procedure that applies the Conformal Prediction algorithm on a calibration
+set with noisy labels. We first presented our method in the simpler case of a uniform noise
+model and then extended it to a general noise matrix. We showed that if the noise level
+is given, we can find the noise-free calibration threshold without access to clean data by
+using the noisy-label data. We showed that the finite sample coverage guarantee obtained
+by current methods is not effective in the case of classification tasks with a large number of
+classes. We proposed a different notion of coverage guarantee and derived a suitable finite
+sample coverage guarantee that remains effective in tasks with a large number of classes. We
+12
+
+Conformal Prediction of Classifiers with Many Classes based on Noisy Labels
+showed, however, that even without adding the finite sample term, noise-robust methods
+obtained the required coverage. This indicates that the current coverage guarantee methods
+are very conservative and there is room for future research to improve it and to find much
+tighter bounds. In this study, we focused on noise models that assume the noisy label and
+the input image are independent, given the true label. In a more general noise model, the
+label corruption process also depends on the input features.
+References
+Anastasios N. Angelopoulos, Stephen Bates, Jitendra Malik, and Michael I Jordan. Uncer-
+tainty sets for image classifiers using conformal prediction. International Conference on
+Learning Representations (ICLR), 2021.
+Anastasios N Angelopoulos, Stephen Bates, et al. Conformal prediction: A gentle introduc-
+tion. Foundations and Trends in Machine Learning, 16(4):494–591, 2023.
+Jase Clarkson, Wenkai Xu, Mihai i Cucuringu, and Gesine Reinert. Split conformal pre-
+diction under data contamination. In Proceedings of the Symposium on Conformal and
+Probabilistic Prediction with Applications, 2024.
+Jia Deng, Wei Dong, Richard Socher, Li-Jia Li, Kai Li, and Li Fei-Fei. Imagenet: A large-
+scale hierarchical image database. In Proc. of the IEEE Conference on Computer Vision
+and Pattern Recognition (CVPR), 2009.
+Bat-Sheva Einbinder, Stephen Bates, Anastasios N Angelopoulos, Asaf Gendler, and Yaniv
+Romano. Conformal prediction is robust to label noise. arXiv preprint arXiv:2209.14295,
+2022.
+Badih Ghazi, Noah Golowich, Ravi Kumar, Pasin Manurangsi, and Chiyuan Zhang. Deep
+learning with label differential privacy. In Advances in Neural Information Processing
+Systems (NeurIPs), 2021.
+Chuan Guo, Geoff Pleiss, Yu Sun, and Kilian Q Weinberger. On calibration of modern
+neural networks. In International Conference on Machine Learning (ICML), 2017.
+Kaiming He, Xiangyu Zhang, Shaoqing Ren, and Jian Sun.
+Deep residual learning for
+image recognition. In Proc. of the IEEE Conference on Computer Vision and Pattern
+Recognition (CVPR), 2016.
+Alex Krizhevsky, Geoffrey Hinton, et al. Learning multiple layers of features from tiny
+images. 2009.
+Xuefeng Li, Tongliang Liu, Bo Han, Gang Niu, and Masashi Sugiyama. Provably end-to-
+end label-noise learning without anchor points. In International Conference on Machine
+Learning (ICML), 2021.
+Yong Lin, Renjie Pi, Weizhong Zhang, Xiaobo Xia, Jiahui Gao, Xiao Zhou, Tongliang Liu,
+and Bo Han. A holistic view of label noise transition matrix in deep learning and beyond.
+In International Conference on Learning Representations (ICLR), 2023.
+13
+
+Penso Goldberger Fetaya
+Charles Lu, Anastasios N Angelopoulos, and Stuart Pomerantz. Improving trustworthi-
+ness of AI disease severity rating in medical imaging with ordinal conformal prediction
+sets. In International Conference on Medical Image Computing and Computer-Assisted
+Intervention (MICCAI), 2022a.
+Charles Lu, Andr´eanne Lemay, Ken Chang, Katharina H¨obel, and Jayashree Kalpathy-
+Cramer. Fair conformal predictors for applications in medical imaging. In Proceedings of
+the AAAI Conference on Artificial Intelligence, 2022b.
+Pascal Massart.
+The tight constant in the Dvoretzky-Kiefer-Wolfowitz inequality.
+The
+Annals of Probability, pages 1269–1283, 1990.
+Henrik Olsson, Kimmo Kartasalo, Nita Mulliqi, et al. Estimating diagnostic uncertainty in
+artificial intelligence assisted pathology using conformal prediction. Nature Communica-
+tions, 13(1):7761, 2022.
+Coby Penso and Jacob Goldberger. A conformal prediction score that is robust to label
+noise. In MICCAI Int. Workshop on Machine Learning in Medical Imaging (MLMI),
+2024.
+Coby Penso, Lior Frenkel, and Jacob Goldberger.
+Confidence calibration of a medical
+imaging classification system that is robust to label noise. IEEE Transactions on Medical
+Imaging, 43(6):2050–2060, 2024.
+Coby Penso, Bar Mahpud, Jacob Goldberger, and Or Sheffet. Privacy-preserving conformal
+prediction under local differential privacy. In Proceedings of the Symposium on Conformal
+and Probabilistic Prediction with Applications, 2025.
+Yaniv Romano, Matteo Sesia, and Emmanuel Candes. Classification with valid and adaptive
+coverage. Advances in Neural Information Processing Systems, 2020.
+Matteo Sesia, YX Rachel Wang, and Xin Tong. Adaptive conformal classification with noisy
+labels. Journal of the Royal Statistical Society Series B: Statistical Methodology, 2024.
+Hwanjun Song, Minseok Kim, Dongmin Park, Yooju Shin, and Jae-Gil Lee. Learning from
+noisy labels with deep neural networks: A survey. IEEE Transactions on Neural Networks
+and Learning Systems, pages 1–19, 2022.
+Vladimir Vovk, Alexander Gammerman, and Glenn Shafer. Algorithmic learning in a ran-
+dom world, volume 29. Springer, 2005.
+Cheng Xue, Lequan Yu, Pengfei Chen, Qi Dou, and Pheng-Ann Heng. Robust medical
+image classification from noisy labeled data with global and local representation guided
+co-training. IEEE Transactions on Medical Imaging, 41(6):1371–1382, 2022.
+Yivan Zhang, Gang Niu, and Masashi Sugiyama. Learning noise transition matrix from only
+noisy labels via total variation regularization. In International Conference on Machine
+Learning (ICML), 2021.
+14

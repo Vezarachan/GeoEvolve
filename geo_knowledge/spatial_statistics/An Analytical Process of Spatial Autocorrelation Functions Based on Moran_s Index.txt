@@ -1,0 +1,2948 @@
+ 
+1
+An Analytical Process of Spatial Autocorrelation Functions 
+Based on Moran’s Index 
+Yanguang Chen 
+ (Department of Geography, College of Urban and Environmental Sciences, Peking University, 
+100871, Beijing, China. Email: chenyg@pku.edu.cn ) 
+ 
+Abstract: A number of spatial statistic measurements such as Moran’s I and Geary’s C can be 
+used for spatial autocorrelation analysis. Spatial autocorrelation modeling proceeded from the 1-
+dimension autocorrelation of time series analysis, with time lag replaced by spatial weights so 
+that the autocorrelation functions degenerated to autocorrelation coefficients. This paper develops 
+2-dimensional spatial autocorrelation functions based on the Moran index using the relative 
+staircase function as a weight function to yield a spatial weight matrix with a displacement 
+parameter. The displacement bears analogy with time lag of time series analysis. Based on the 
+spatial displacement parameter, two types of spatial autocorrelation functions are constructed for 
+2-dimensional spatial analysis. Then the partial spatial autocorrelation functions are derived by 
+Yule-Walker recursive equation. The spatial autocorrelation functions are generalized to the 
+autocorrelation functions based on Geary’s coefficient and Getis’ index. As an example, the new 
+analytical framework was applied to the spatial autocorrelation modeling of Chinese cities. A 
+conclusion can be reached that it is an effective method to build an autocorrelation function based 
+on the relative step function. The spatial autocorrelation functions can be employed to reveal deep 
+geographical information and perform spatial dynamic analysis, and lay the foundation for the 
+scaling analysis of spatial correlation. 
+Key words: spatial autocorrelation function (SACF); partial spatial autocorrelation function 
+(PSACF); Moran’s index; Geary’s coefficient; Getis-Ord’s index; spatial weights matrix; spatial 
+analysis; spatial modeling 
+ 
+
+ 
+2
+1 Introduction 
+Measuring spatial autocorrelation is one of important methods of quantitative analyses in 
+geography. This method can be treated as the cornerstone of spatial statistics. However, present 
+spatial autocorrelation analysis has two significant shortcomings, which hinder its application scope 
+and effect. First, in the theoretical aspect, the scaling property of geographical spatial distributions 
+has been ignored. Conventional mathematical modeling and quantitative analysis depend on 
+characteristic scales. If and only if we find the valid characteristic scales such as determinate length, 
+eigenvalue, and mean, will we be able to make effective mathematical models. If a geographical 
+distribution is a scale-free distribution, no characteristic scale can be found, and the conventional 
+mathematical methods will be ineffective. In this case, the mathematical tools based on 
+characteristic scales should be replaced by those based on scaling analysis (Chen, 2013a). Second, 
+in the methodological aspect, the spatial displacement parameter has also been neglected. Thus, 
+spatial autocorrelation function analysis in a strict sense has not been developed yet. The 
+development path of spatial autocorrelation analysis in geography can be summarized as follows. 
+First, generalizing Pearson’s simple cross-correlation coefficient to time series analysis yielded a 1-
+dimensional temporal auto-correlation function (TACF) based on a time lag parameter (Bowerman 
+and O’Connell, 1993; Box et al, 1994; von Neumann, 1941; von Neumann et al, 1941). Second, 
+generalizing temporal auto-correlation function to ordered space series and substituting the time lag 
+with spatial displacement yielded a 1-dimensional spatial auto-correlation function (SACF) (Chen, 
+2013a). Third, generalizing the 1-dimensional spatial auto-correlation function to a 2-dimensional 
+spatial dataset and replacing the displacement parameters with the spatial weight matrix yielded a 
+2-dimensional spatial autocorrelation coefficient, which is termed Moran’s index, or Moran’s I for 
+short, in the literature (de Jong et al, 1984; Haggett et al, 1977; Odland, 1988). In principle, a time 
+lag parameter corresponds to a spatial displacement parameter, which in turn corresponds to the 
+weight matrix. Where 1-dimensional autocorrelation analysis is concerned, a series of time lag 
+parameters correspond to a series of spatial displacement parameters. However, only one spatial 
+weight matrix can be taken into account in conventional autocorrelation modeling.  
+If the variable distance is adopted instead of the fixed distance to construct the spatial weight 
+matrix, the spatial autocorrelation function analysis may be created. Many spatial statisticians have 
+
+ 
+3
+thought of this, and variable distance has been introduced into spatial autocorrelation analysis in 
+many ways (Bjørnstad and Falck, 2001; De Knegt et al, 2010; Getis and Ord, 1992; Legendre and 
+Legendre, 1998; Odland, 1988; Ord and Getis, 1995). However, the introduction of variable distance 
+is only one of the necessary conditions to advance spatial autocorrelation function analysis method. 
+To develop this methodological framework, a series of key problems need to be solved. The keys 
+include how to select the distance attenuation function, how to define the spatial weight matrix, and 
+how to have spatial autocorrelation function effectively correspond with the autocorrelation function 
+of time series analysis. This paper develops 2-dimensional spatial autocorrelation functions based 
+on Moran’s index and the corresponding analytical process, laying the foundation for scaling 
+analysis based on spatial autocorrelation. A set of ordered spatial weight matrixes are introduced 
+into the spatial autocorrelation models to construct the 2-dimensional spatial autocorrelation 
+function. Based on the 2-dimensional autocorrelation function, spatial scaling analysis may be made 
+in addition to a spatial correlation analysis. The parts of the paper are organized as follows. In 
+Section 2, two types of spatial autocorrelation functions based on Moran’s index are established by 
+using the relative staircase function as a weight function. The autocorrelation functions based on 
+Moran’s index are generalized to the autocorrelation functions based on Geary’s coefficient and 
+Getis’s index. In Section 3, empirical analyses are made to show how to utilize the spatial 
+autocorrelation functions to make analytical analyses of geographical phenomena. In Section 4, 
+several related questions are discussed. Finally, the discussion are concluded by outlining the main 
+points of this study.  
+2 Theoretical results 
+2.1 Simplified expression of Moran’s index 
+The first measurement of spatial autocorrelation was the well-known Moran’s index, which is in 
+fact a spatial autocorrelation coefficient. The formula of Moran’s index bears a complicated form, 
+but the expression can be simplified by means of a normalized matrix and a standardized vector. 
+The formulae and expressions are not new in this subsection, but they are helpful for us to 
+understand the new mathematical process shown in next subsection. Suppose there are n elements 
+(e.g., cities) in a system (e.g., a network of cities) which can be measured by a variable (e.g., city 
+size), x. In the literature, the global Moran’s index can be expressed as 
+
+ 
+4
+1
+1
+2
+1
+1
+1
+(
+)(
+)
+(
+)
+n
+n
+ij
+i
+j
+i
+j
+n
+n
+n
+ij
+i
+i
+j
+i
+n
+v
+x
+x
+I
+v
+x
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,                             (1) 
+where I denotes Moran’s I, xi is a size measurement of the ith element in a geographical spatial 
+system (i=1,2,…,n), μ represents the mean of xi, vij refers to the elements in a spatial contiguity 
+matrix (SCM), V. The symbols can be developed as follows 
+
+
+T
+1
+2
+n
+x
+x
+x
+x
+
+,                              (2) 
+1
+1
+n
+i
+i
+x
+n
+
+
+
+,                                     (3) 
+11
+12
+1
+21
+22
+2
+1
+2
+[
+]
+n
+n
+ij n n
+n
+n
+nn
+v
+v
+v
+v
+v
+v
+V
+v
+v
+v
+v
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.                        (4) 
+Using algebra, we can simplify the formula of Moran’s index and re-express it as a quadratic form 
+(Chen, 2013b) 
+T
+I
+z Wz
+
+,                                   (5) 
+in which z denotes the standardized size vector based on population standard deviation, W is the 
+unitized spatial contiguity matrix (USCM), i.e., a spatial weight matrix (SWM), the superscript T 
+indicates matrix or vector transposition. The standardized size vector is as follows 
+x
+z
+
+
+
+
+,                                   (6) 
+where σ refers to population standard deviation, which can be expressed as 
+2 1/2
+T
+1/2
+1
+1
+1
+[
+(
+) ]
+[
+(
+) (
+)]
+n
+i
+i
+x
+x
+x
+n
+n
+
+
+
+
+
+
+
+
+
+
+
+.                   (7) 
+The spatial weight matrix, W, can be expressed as 
+11
+12
+1
+21
+22
+2
+0
+1
+2
+[
+]
+n
+n
+ij n n
+n
+n
+nn
+w
+w
+w
+w
+w
+w
+V
+W
+w
+V
+w
+w
+w
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,                     (8) 
+where 
+0
+1
+1
+n
+n
+ij
+i
+j
+V
+v
+
+
+
+,                                  (9) 
+
+ 
+5
+represents the summation of the numeric value of matrix elements, and 
+0
+1
+1
+ij
+ij
+ij
+n
+n
+ij
+i
+j
+v
+v
+w
+V
+v
+
+
+
+
+
+,                               (10) 
+denotes the unitized value of the ith row and the jth column in the weight matrix. Apparently, the 
+matrix W satisfies the following relation 
+1
+1
+1
+n
+n
+ij
+i
+j
+w
+
+
+
+
+,                                 (11) 
+which is termed normalization condition and W is termed normalization matrix in the literature 
+(Chen, 2013b). Besides the unitization indicated by equation (11), the matrix has another two 
+characteristics. One is symmetry, i.e., wij=wji; the other is zero diagonal elements, namely, |wii|=0, 
+which implies no self-correlation of an element with itself. The spatial contiguity matrix comes from 
+spatial distance matrix, which is a symmetric hollow matrix. The distance axiom determines the 
+properties of spatial weight matrices (Chen, 2016).  
+Scientific description always relies heavily on a characteristic scale of a geographical system. A 
+characteristic scale is a typical scale which can be represented by a 1-dimensional measure. Thus, 
+characteristic scales are usually termed characteristic length in the literature (Feder, 1988; Hao, 
+2004; Liu and Liu, 1993; Takayasu, 1990; Wang and Li, 1996). In mathematics, characteristic scales 
+include determinate radius, side length, eigenvalue, average values, and standard deviation. An 
+eigenvalue, if it does not depend on measurement scale, can be treated as a characteristic length. 
+Therefore, eigenvalues and eigenvectors are important in spatial autocorrelation analyses (de Jong 
+et al, 1984; Dray, 2011; Dray et al, 2006; Griffith, 1996; Griffith, 2003). Mathematical 
+transformation can be employed to identify eigenvalues, and thus identify characteristic length of 
+spatial autocorrelation. For a transformation T, if a function f(x) is an eigen function if it satisfies 
+the following relation 
+( ( ))
+( )
+f x
+f x
+
+
+T
+,                                (12) 
+where λ is the corresponding eigenvalue of the function. If T denotes a scaling transformation, the 
+eigenvalue λ will be associated with fractal dimension, including correlation dimension. This 
+relation can be generalized to matrix equations. It can be proved that Moran’s index is the eigenvalue 
+of generalized spatial correlation matrixes. Based on the inner product of the standardized size 
+
+ 
+6
+vector, a Real Spatial Correlation Matrix (RSCM) can be defined as 
+zW
+z
+nW
+M
+T
+
+
+,                               (13) 
+where n=zTz represents the inner product of z. Thus we have 
+T
+Mz
+nWz
+z zWz
+Iz
+
+
+
+,                            (14) 
+which indicates that I is the characteristic root of the polynomial equation proceeding from the 
+determinant of the matrix nW, and z is just the corresponding characteristic vector. Based on the 
+outer product of z, a Ideal Spatial Correlation Matrix (ISCM) can be defined as 
+W
+zz
+M
+T
+* 
+,                                  (15) 
+where zzT represents the outer product of the standardized size vector. Then we have 
+Iz
+Wz
+zz
+z
+M
+
+
+T
+*
+,                               (16) 
+which implies that I is the largest eigenvalue of the generalized spatial correlation matrix zzTW, and 
+z is just the corresponding eigenvector of zzTW. This suggests that geographers have been taking 
+advantage of the characteristic parameter for spatial analyses based on autocorrelation. Using 
+equations (14) and (16), we can generate canonical Moran’s scatterplots for local spatial analyses. 
+2.2 Standard spatial autocorrelation function based on Moran’s I 
+Conventional mathematical modeling and quantitative analysis are based on characteristic scales. 
+A mathematical model of a system is usually involved with three scales, and thus includes three 
+levels of parameters. The first is the macro-scale parameter indicating environmental level, the 
+second is the micro-scale parameter indicating the element level, and the third is the characteristic 
+scale indicating the key level (Hao, 1986). As indicated above, a characteristic scale is often 
+expressed as a characteristic length since it is always a 1-dimensional measure (Hao, 2004; Takayasu, 
+1990). In geometry, a characteristic length may be the radius of a circle or the side length of a square; 
+in algebra, a characteristic length may be the eigen values of a square matrix or characteristic roots 
+of a polynomial; in probability theory and statistics, a characteristic length may be the mean value 
+and standard deviation of a probability distribution. As demonstrated above, Moran’s index is the 
+eigenvalues of the generalized spatial correlation matrixes. Although the characteristic scales are 
+expressed as radius, length of a side, eigenvalue, mean value, standard deviation, and so on, the 
+reverse is not necessarily true. In other words, the radius, the side length, the eigenvalue, the mean 
+value and the standard deviation do not necessarily represent a characteristic scale. If and only if a 
+
+ 
+7
+quantity can be objectively determined and its value does not depend on the scale of measurement, 
+the quantity can be used to represent a characteristic length. Can Moran’s index be evaluated 
+uniquely and objectively under given spatio-temporal conditions? This is still a pending question in 
+theoretical and quantitative geographies, needing an answer. To find the answer, we should calculate 
+the Moran’s index by means of different spatial scales.  
+Moran’s index is a spatial autocorrelation coefficient (SACC), but it can be generalized to a 
+spatial autocorrelation function (SACF). A spatial autocorrelation function is a set of a series of 
+ordered autocorrelation coefficients. The spatial autocorrelation function can be derived from the 
+proper spatial weight functions. Four types of spatial weight functions can be used to generate spatial 
+contiguity matrixes: inverse power function, negative exponential function, absolute staircase 
+function, and relative staircase function (Chen, 2012; Chen, 2015; Chen, 2016; Cliff and Ord, 1973; 
+Getis, 2009; Odland, 1988). Among these spatial weight functions, only the relative staircase 
+function can be used to construct a spatial autocorrelation function. A relative staircase function can 
+be expressed as 
+1, 0<
+( )
+( )
+0, 
+,
+0
+ij
+ij
+ij
+ij
+d
+r
+v r
+f r
+d
+r d
+
+
+
+
+
+
+
+,                          (17) 
+where dij denotes the distance between location i and j, and r represents the threshold value of spatial 
+distance. In the literature, the threshold value r is always represented by an average value, and is 
+treated as a constant. However, a complex system often has no effective average value. In other 
+word, complex systems are scale-free systems and have no characteristic scales. In this case, the 
+quantitative analysis based on characteristic scale should be replaced by scaling analysis. In fact, 
+spatial statisticians and theoretical geographers have been aware the uncertainty of the threshold, r 
+(Bjørnstad and Falck, 2001; De Knegt et al, 2010; Getis and Ord, 1992; Legendre and Legendre, 
+1998). Suppose that r is a variable rather than a constant. The spatial contiguity matrix, equation (4), 
+should be rewritten as 
+11
+12
+1
+21
+22
+2
+1
+2
+( )
+( )
+( )
+( )
+( )
+( )
+( )
+[
+( )]
+( )
+( )
+( )
+n
+n
+ij
+n n
+n
+n
+nn
+v
+r
+v
+r
+v
+r
+v
+r
+v
+r
+v
+r
+V r
+v r
+v
+r
+v
+r
+v
+r
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.                 (18) 
+Accordingly, the spatial weight matrix, equation (8), can be re-expressed as 
+
+ 
+8
+11
+12
+1
+21
+22
+2
+0
+1
+2
+( )
+( )
+( )
+( )
+( )
+( )
+( )
+( )
+[
+( )]
+( )
+( )
+( )
+( )
+n
+n
+ij
+n n
+n
+n
+nn
+w
+r
+w
+r
+w
+r
+w
+r
+w
+r
+w
+r
+V r
+W r
+w r
+V r
+w
+r
+w
+r
+w
+r
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,            (19) 
+where 
+T
+0
+1
+1
+( )
+( )
+( )
+n
+n
+ij
+i
+j
+V r
+v r
+e V r e
+
+
+
+
+
+,                         (20) 
+1
+1
+( )
+( )
+( )
+ij
+ij
+n
+n
+ij
+i
+j
+v r
+w r
+v r
+
+
+
+
+.                               (21) 
+In equation (20), e=[1 1 … 1]T refers to the “constant” vector with components ei =1 (i = 1, . . . , n) 
+(de Jong et al, 1984), which is also termed the n-by-1 vector of ones (Dray, 2011). The unitization 
+property of spatial weight matrices remain unchanged, i.e., 
+1
+1
+( )
+1
+n
+n
+ij
+i
+j
+w r
+
+
+
+
+.                               (22) 
+The global spatial autocorrelation function (SACF) based on cumulative correlation can be defined 
+as 
+T
+( )
+( )
+cI r
+z W r z
+
+,                               (23) 
+in which refers to cumulative ACF. Equation (23) comes from the global Moran’s index and relative 
+staircase function, equations (5) and (17).  
+The distance threshold is a type of displacement parameter, which correspond to the time lag 
+parameter in the temporal autocorrelation models of time series analysis. In this framework, 
+Moran’s index is no longer a spatial autocorrelation coefficient. It becomes a function of spatial 
+displacement r. By means of the spatial autocorrelation function, we can make quantitative analyses 
+of geographical spatial dynamics. The distance threshold can be discretized as rk=r0+ks, where k=1, 
+2, 3,…,m represents natural numbers, s refers to step length, and r0 is a constant. Empirically, the 
+distance threshold comes between the minimum distance and the maximum distance, namely, 
+min(dij)≤r≤max(dij). The global spatial autocorrelation function (SACF) based on density 
+correlation can be computed by 
+
+ 
+9
+T
+1
+T
+T
+1
+( )
+( ) ,                        
+1
+( )
+( )
+( )
+(
+) , 
+1
+k
+d
+k
+k
+k
+I r
+z W r z
+k
+I
+r
+I r
+z W r z
+z W r
+z k
+
+
+
+
+
+
+
+
+
+
+,                  (24) 
+which indicates that the density correlation function is the differences of cumulative correlation 
+function.  
+2.3 Generalized spatial autocorrelation function based on Moran’s I 
+In the above defined spatial autocorrelation function, each value represents an autocorrelation 
+coefficient. In other word, if a distance threshold value r is given, then we have a standard Moran’s 
+index. Spatial autocorrelation analysis originated from time series analysis. However, this kind of 
+autocorrelation function does not bear the same structure with the temporal autocorrelation function 
+in time series analysis. If we construct a “weight matrix” to compute the autocorrelation function of 
+a time series, the “weight matrix” is a quasi-unitized matrix instead of a strict unitized matrix. 
+Actually, by analogy with the temporal autocorrelation function, we can improve the spatial 
+autocorrelation function by revising the spatial weight matrix. The key lies in equation (20). 
+According to the property of the spatial contiguity matrix based on the relative staircase function, 
+the maximum of V0(r) is 
+0
+max(
+)
+1
+1
+max(
+( ))
+lim
+( )
+(
+1)
+ij
+n
+n
+ij
+r
+d
+i
+j
+V r
+v r
+n n
+
+
+
+
+
+
+
+.                     (25) 
+Thus the spatial weight matrix, equation (19), can be revised as 
+*
+*
+*
+11
+12
+1
+*
+*
+*
+*
+*
+21
+22
+2
+*
+*
+*
+1
+2
+( )
+( )
+( )
+( )
+( )
+( )
+1
+( )
+( )
+[
+( )]
+(
+1)
+( )
+( )
+( )
+n
+n
+ij
+n n
+n
+n
+nn
+w
+r
+w
+r
+w
+r
+w
+r
+w
+r
+w
+r
+W
+r
+V r
+w r
+n n
+w
+r
+w
+r
+w
+r
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.        (26) 
+Based on equation (26), the spatial autocorrelation function can be re-defined as 
+*
+T
+*
+T
+1
+( )
+( )
+( )
+(
+1)
+I
+r
+z W
+r z
+z V r z
+n n
+
+
+
+,                        (27) 
+which bears a strict analogy with the temporal autocorrelation function of time series analysis. The 
+difference between equation (23) and equation (27) is as follows, for I(r), V0(r) is a variable which 
+depends on the distance threshold r, while for I*(r), V0(r) is a constant which is independent of r. In 
+this case, the spatial weight matrix does not always satisfy the unitization condition, and we have 
+an inequality as below 
+
+ 
+10
+*
+1
+1
+( )
+1
+n
+n
+ij
+i
+j
+w r
+
+
+
+
+.                               (28) 
+This implies that the summation of the elements in W*(r) is equal to or less than 1. 
+2.4 Partial spatial autocorrelation function based on Moran’s I 
+Autocorrelation coefficients reflect both direct correlation and indirect correlation between the 
+elements in a sample or spatial dataset. If we want to measure the pure direct autocorrelation and 
+neglect the indirect autocorrelation, we should compute the partial autocorrelation coefficients. A 
+set of ordered partial autocorrelation coefficients compose an autocorrelation function. Generally 
+speaking, the partial spatial autocorrelation function (PSACF) should be calculated by the SACF 
+based on density correlation function. In fact, we transform the spatial autocorrelation functions into 
+the partial autocorrelation functions by means of the Yule-Walker recursive equation: 
+1
+1
+2
+1
+1
+2
+1
+1
+2
+2
+3
+2
+1
+3
+3
+1
+2
+3
+1
+1
+1
+1
+m
+m
+m
+m
+m
+m
+m
+m
+I
+I
+I
+I
+H
+I
+I
+I
+I
+H
+I
+I
+I
+I
+H
+I
+I
+I
+I
+H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.                   (29) 
+where Ik denotes the kth order autocorrelation coefficient, and the parameter Hk is the corresponding 
+auto-regression coefficients. The Yule-Walker equation associates autocorrelation and auto-
+regression equation. The last auto-regression coefficient, Hm, is equal to the mth order partial 
+autocorrelation coefficient (k=1, 2, 3,…, m). If m=1, we have the first-order partial autocorrelation 
+coefficient, which can be given by 
+
+
+
+1
+1
+1
+1
+J
+H
+H
+
+
+
+,                             (30) 
+in which J1=H1 is the first-order partial autocorrelation coefficient. If m=2, we have the second-
+order partial autocorrelation coefficient, which can be given by the following matrix equation 
+1
+1
+1
+2
+1
+2
+1
+1
+I
+I
+H
+I
+I
+H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,                             (31) 
+where J2=H2 is the second-order partial autocorrelation coefficient. If m=3, we have the third-order 
+partial autocorrelation coefficient, which can be given by 
+
+ 
+11 
+1
+1
+2
+1
+2
+1
+1
+2
+3
+2
+1
+3
+1
+1
+1
+I
+I
+I
+H
+I
+I
+I
+H
+I
+I
+I
+H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,                          (32) 
+in which J3=H3 is the third-order partial autocorrelation coefficient. Among these matrix equations, 
+equation (30) is a special case. It suggests that the first-order autocorrelation coefficient equals the 
+first-order partial autocorrelation coefficient, which in turn equals the first-order auto-regression 
+coefficient. For equations (31) and (32), we can calculate the autoregressive coefficient by means 
+of finding the inverse matrix of the autocorrelation coefficient matrix. The last autoregressive 
+coefficient gives the partial autocorrelation coefficient value. The others can be obtained by analogy. 
+Applying equation (29) to equation (23) yields the partial spatial autocorrelation function based on 
+cumulative correlation, and applying equation (29) to equation (24) yields the partial spatial 
+autocorrelation function based on density correlation. For n spatial elements, the correlation number 
+is n*n. Thus, based on significance level of 0.05, the standard deviation of the spatial SACF and 
+PSACF can be estimated by the formula, 1/n.  
+2.5 Spatial autocorrelation functions based on Geary’s C and Getis’ G 
+In order to carry out more comprehensive spatial autocorrelation analysis, the spatial 
+autocorrelation functions may be extended to more spatial statistical measurements. Besides 
+Moran’s index, the common spatial autocorrelation measurements include Geary’s coefficient and 
+Getis-Ord’s index (Geary, 1954; Getis and Ord, 1992). The former is often termed Geary’s C, and 
+the latter is also termed Getis’s G for short in the literature (Anselin, 1995; de Jong et al, 1984; 
+Odland, 1988). It is easy to generalize the 2-dimensional spatial autocorrelation functions to Geary’s 
+coefficient according to the association of Moran’s index with Geary’s coefficient. In theory, 
+Geary’s coefficient is equivalent to Moran’s index, but in practice, the former is based on sample, 
+while the latter is based on population (Chen, 2013b; Chen, 2016). Geary’s coefficient can be 
+expressed in the following form (Geary, 1954): 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+n
+i
+i
+n
+i
+n
+j
+j
+i
+ij
+n
+i
+i
+n
+i
+n
+j
+ij
+n
+i
+n
+j
+j
+i
+ij
+x
+x
+x
+x
+w
+n
+x
+x
+v
+x
+x
+v
+n
+C
+1
+2
+1
+1
+2
+1
+2
+1
+1
+1
+1
+2
+)
+(
+2
+)
+(
+)1
+(
+)
+(
+2
+)
+(
+)1
+(
+.               (33) 
+Based on matrix and vector, equation (33) can be simplified to the following form 
+
+ 
+12
+T
+2
+T
+T
+2
+1
+1
+(
+)
+(
+)
+n
+n
+C
+e Wz
+z Wz
+e Wz
+I
+n
+n
+
+
+
+
+
+
+,                    (34) 
+where e=[1 1 … 1]T, and z2=D(z)z=[z12 z22 … zn2]T. Here D(z) is the diagonal matrix consisting of the 
+elements of z. Equation (34) gives the exact relation between Moran’s index I and Geary’s 
+coefficient C. Introducing the spatial displacement parameter into equation (33) yields two 
+autocorrelation functions as follows 
+T
+2
+T
+2
+T
+1
+1
+( )
+[
+( )
+( )]
+[
+( )
+( ) ]
+n
+n
+C r
+e W r z
+I r
+e W r z
+z W r z
+n
+n
+
+
+
+
+
+
+,            (35) 
+*
+T
+*
+2
+*
+T
+*
+2
+T
+*
+1
+1
+( )
+[
+( )
+( )]
+[
+( )
+( ) ]
+n
+n
+C
+r
+e W
+r z
+I
+r
+e W
+r z
+z W
+r z
+n
+n
+
+
+
+
+
+
+.          (36) 
+Clearly, equation (35) is based on the standard unitized spatial weight matrix, corresponding to 
+equation (23), while equation (36) is based on the quasi-unitized spatial weight matrix, 
+corresponding to equation (27). 
+Further, the analytical process of spatial autocorrelation functions can be generalized to Getis’ 
+index. Based on the unitized size vector, the formula of Getis’ index can be simplified to the form 
+similar to the new expression of Moran’s index, equation (5). Generally speaking, Getis’s index, G, 
+is expressed as below (Getis and Ord, 1992): 
+1
+1
+1
+1
+n
+n
+ij
+i
+j
+i
+j
+n
+n
+i
+j
+i
+j
+w x x
+G
+x x
+
+
+
+
+
+
+
+.                                (37) 
+The notation is the same as those in equation (1). Suppose that for the outer product xixj, i=j can be 
+kept, but for weight, wij, i=j is rejected. Using unitized matrix and unitized vector, we can rewritten 
+equation (37) in the following simple form (Chen, 2020) 
+T
+G
+y Wy
+
+,                                  (38) 
+where y=x/S=[y1, y2, …, yn]T represents the unitized vector of x. The elements of y is defined as 
+below: 
+1
+/
+n
+i
+i
+i
+i
+i
+i
+x
+x
+y
+x
+x
+S
+nx
+
+
+
+
+
+,                            (39) 
+where the sum of x is 
+1
+n
+i
+i
+S
+x
+
+
+.                                  (40) 
+
+ 
+13
+Now, introducing the spatial displacement parameter r into equation (38) produces two 
+autocorrelation functions as below 
+T
+( )
+( )
+G r
+y W r y
+
+,                              (41) 
+*
+T
+*
+( )
+( )
+G r
+y W r y
+
+.                             (42) 
+Similar to equations (35) and (36), equation (41) is based on the standard unitized spatial weight 
+matrix, corresponding to equation (23), while equation (42) is based on the quasi-unitized spatial 
+weight matrix, corresponding to equation (27). 
+3 Materials and Methods 
+3.1 Data and analytical approach 
+The analytical process of spatial autocorrelation functions can be used to research the dynamic 
+spatial structure of China’s system of cities. As a case demonstration of new methodology, only the 
+capital cities of the 31 provinces, autonomous regions, and municipalities directly under the Central 
+Government of China are taken into consideration for simplicity. The urban population is employed 
+as a size measurement, while the distances by train between any two cities act as a spatial contiguity 
+measurement. The census data of the urban population in 2000 and 2010 are available from the 
+Chinese website, and the railroad distance matrix can be found in many Chinese traffic atlases (Chen, 
+2013b; Chen, 2016; Chen, 2020). The cities of Haikou and Lhasa are not taken into account in this 
+study. Located in Hainan Island, Haikou is the capital of Hainan Province and do not be linked to 
+other cities by railway (lack of traffic mileage data of Haikou to other cities in the atlas). Lhasa is 
+the capital of the Tibetan Autonomous Region, located on the Qinghai Tibet Plateau. Because of the 
+plateau climate, Lhasa is loosely connected with other mainland cities of China. In fact, the Qinghai 
+Tibet railway has been being under construction. Therefore, 29 Chinese capital cities are actually 
+included in the datasets. In this case, the spatial sample size of the urban population is n=29. First 
+of all, the staircase function was used to determine a spatial contiguity matrix based on a threshold 
+distance r. Then, the three-step method was employed to calculate Moran’s index and Getis-Ord’s 
+index (Chen, 2013b; Chen, 2020). The process is as follows. Step 1: standardizing the size vector x 
+yields standardized size vector z. Step 2: unitizing the spatial contiguity matrix based on a threshold 
+distance r yields a spatial weight matrix W(r). Step 3: computing Moran’s index using equation (23). 
+
+ 
+14
+The values of Moran’s index can be converted into the corresponding values of Geary’s coefficient 
+with equation (34). As for Getis’s index, the standardized size variable z should be replaced by the 
+utilized size variable y, and the formula is equation (38). Changing the distance threshold r value 
+yields different values of Moran’s index, Geary’s coefficient, and Getis’s index. Thus we have 
+spatial autocorrelation functions based on cumulative distributions (correlation cumulation). The 
+differences of cumulative distributions give the spatial autocorrelation functions base on density 
+distribution (correlation density). Main calculation process of spatial autocorrelation functions can 
+be illustrated as follows (Figure 1). It is easy to realize the whole calculation process by 
+programming the computer. 
+ 
+ 
+Figure 1 A flow chart of data processing, parameter estimation, and spatial autocorrelation function 
+analyses 
+(Note: The analytical process is based on the improved analytical processes based on Moran’s I, Geary’s C and 
+Geary’s Coefficient: 
+ C(r)=[eTW(r)z2- 
+I(r)](n-1)/n 
+Spatial contiguity 
+matrix, V 
+Size measurement, 
+x 
+Spatial weights 
+matrix, W 
+Transformed 
+variables, y and z 
+Preparation of spatial 
+and size datasets 
+Introduction of 
+relative staircase 
+function (0 or 1) 
+Moran’s index: 
+I(r)=zTW(r)z 
+Getis-Ord’s index: 
+ I(r)=yTW(r)y 
+Spatial analysis of 
+autocorrelation 
+function 
+
+ 
+15
+Getis-Ord’s G. Based on x, y represents the unitized size variable, and z represents the standardized variable.) 
+ 
+Spatial analytical process and results rely heavily on the definition and structure of the spatial 
+contiguity matrix. Two aspects of factors in its structure significantly impact the analytical process. 
+One is the diagonal elements, and the other is the sum of spatial contiguity values. (1) Diagonal 
+elements of spatial contiguity matrix. For conventional spatial autocorrelation analysis, the diagonal 
+elements should be removed; while for spatial correlation dimension analysis, the diagonal elements 
+must be taken into account. As a matter of fact, theoretical geographers and spatial statisticians have 
+taken into account the diagonal elements for the spatial weight matrix (Getis and Ord, 1992; Ord 
+and Getis, 1995). Where generalized spatial autocorrelation functions are concerned, the diagonal 
+elements of the spatial contiguity matrix should not be zero. As for special fractal analysis, the 
+diagonal element can be overlooked. (2) The sum of spatial contiguity matrix. For the theoretical 
+spatial autocorrelation function, the sum varies with the yardstick length. However, for a practical 
+spatial autocorrelation function, the sum of spatial contiguity matrix should be fixed to the original 
+sum value. Different diagonal elements plus different definitions of the sum of the spatial contiguity 
+matrix lead to four approaches to autocorrelation function analyses (Table 1). 
+ 
+Table 1 Four possible types of calculation approaches to spatial autocorrelation functions based 
+on different diagonal elements and means of spatial contiguity matrix 
+ 
+Variable sum of distance 
+matrix [V] 
+Fixed sum of distance matrix [F] 
+All elements (including 
+diagonal elements) [D] 
+[D+V] Generalized Moran’s 
+function, I*(r); the sum of 
+spatial contiguity matrix 
+elements is N(r) 
+[D+F] 
+Generalized 
+Moran’s 
+function, If*(r), the sum of spatial 
+contiguity matrix elements is N2 
+Partial elements (excluding 
+diagonal elements) [N] 
+[N+V] Conventional Moran’s 
+function, I(r); the sum of 
+spatial contiguity matrix 
+elements is N(r)-N 
+[N+F] Conventional Moran’s 
+function, If(r); the sum of spatial 
+contiguity matrix elements is N(N-
+1) 
+Application direction 
+Theoretical study and fractal 
+analysis 
+Practical study and spatial 
+autocorrelation analysis 
+ 
+3.2 Empirical analysis of spatial autocorrelation 
+The spatial contiguity matrix in spatial autocorrelation analysis bears analogy with the time lag 
+parameter in time series analysis. Normalizing a spatial contiguity matrix yields a spatial weight 
+
+ 
+16
+matrix, and the former is equivalent to the latter. Therefore, the spatial weight matrix is always 
+confused with the spatial contiguity matrix in the literature. A spatial contiguity matrix is based on 
+the generalized distance matrix and must satisfy the axiom of distance. This suggests that a spatial 
+weight matrix must be a nonnegative definite symmetric matrix. It is easy to generate a spatial 
+contiguity matrix by using a weight function (Chen, 2012; Getis, 2009). For n elements in a 
+geographical system, a spatial contiguity matrix, V(r), can be produced by means of equation (17). 
+Normalizing the matrix V yields the spatial weight matrix W(r). Changing the distance threshold, 
+i.e., the yardstick length r, results in a different weight matrix W(r), and thus results in different 
+Moran’s index I(r). A set of Moran’s index values compose Moran’s function. The spatial 
+autocorrelation functions based on cumulative correlation can be converted into those based on 
+density correlation by using difference method. Moran’s autocorrelation function can be turned into 
+Moran’s partial autocorrelation function through the Yule-Walker recursive equation. The results 
+are tabulated as below (Table 2). 
+ 
+Table 2 Datasets for spatial autocorrelation function (ACF) and partial spatial autocorrelation 
+function (PACF) based on Moran’s index (Partial results)  
+Scale 
+2000 (Fifth census data) 
+2010 (Sixth census data) 
+r 
+(km) 
+D+F 
+N+F 
+D+F 
+N+F 
+ACF 
+ I*(r) 
+PACF 
+J*(r) 
+ACF 
+∆I (r) 
+PACF 
+∆J (r) 
+ACF 
+I*(r) 
+PACF 
+J*(r) 
+ACF 
+∆I (r) 
+PACF 
+∆J (r) 
+150 
+0.0384 
+0.0384 
+0.0040 
+0.0040 
+0.0412 
+0.0412 
+0.0069 
+0.0069 
+250 
+0.0372 
+0.0357 
+-0.0013 
+-0.0013 
+0.0424 
+0.0408 
+0.0012 
+0.0012 
+350 
+0.0344 
+0.0318 
+-0.0028 
+-0.0028 
+0.0404 
+0.0372 
+-0.0021 
+-0.0021 
+450 
+0.0309 
+0.0273 
+-0.0036 
+-0.0036 
+0.0375 
+0.0329 
+-0.0030 
+-0.0029 
+550 
+0.0291 
+0.0248 
+-0.0019 
+-0.0019 
+0.0334 
+0.0278 
+-0.0043 
+-0.0042 
+650 
+0.0264 
+0.0216 
+-0.0027 
+-0.0027 
+0.0327 
+0.0264 
+-0.0007 
+-0.0007 
+750 
+0.0254 
+0.0202 
+-0.0011 
+-0.0011 
+0.0294 
+0.0225 
+-0.0034 
+-0.0034 
+850 
+0.0176 
+0.0120 
+-0.0081 
+-0.0081 
+0.0201 
+0.0127 
+-0.0097 
+-0.0096 
+950 
+0.0199 
+0.0145 
+0.0024 
+0.0024 
+0.0230 
+0.0159 
+0.0031 
+0.0032 
+1050 
+0.0109 
+0.0054 
+-0.0094 
+-0.0094 
+0.0121 
+0.0049 
+-0.0114 
+-0.0114 
+1150 
+0.0119 
+0.0069 
+0.0011 
+0.0011 
+0.0117 
+0.0052 
+-0.0004 
+-0.0003 
+1250 
+0.0203 
+0.0157 
+0.0087 
+0.0086 
+0.0143 
+0.0085 
+0.0027 
+0.0026 
+1350 
+0.0125 
+0.0076 
+-0.0080 
+-0.0082 
+0.0110 
+0.0055 
+-0.0034 
+-0.0035 
+1450 
+0.0122 
+0.0075 
+-0.0003 
+-0.0003 
+0.0078 
+0.0027 
+-0.0033 
+-0.0034 
+1550 
+0.0301 
+0.0257 
+0.0185 
+0.0185 
+0.0270 
+0.0227 
+0.0199 
+0.0198 
+1650 
+0.0222 
+0.0167 
+-0.0082 
+-0.0084 
+0.0214 
+0.0161 
+-0.0058 
+-0.0062 
+
+ 
+17
+1750 
+0.0176 
+0.0115 
+-0.0048 
+-0.0047 
+0.0170 
+0.0112 
+-0.0045 
+-0.0045 
+1850 
+0.0255 
+0.0193 
+0.0082 
+0.0082 
+0.0224 
+0.0163 
+0.0056 
+0.0055 
+1950 
+0.0195 
+0.0126 
+-0.0062 
+-0.0062 
+0.0185 
+0.0119 
+-0.0040 
+-0.0039 
+2050 
+0.0243 
+0.0173 
+0.0050 
+0.0050 
+0.0224 
+0.0155 
+0.0040 
+0.0041 
+2150 
+0.0116 
+0.0040 
+-0.0131 
+-0.0132 
+0.0098 
+0.0022 
+-0.0131 
+-0.0132 
+2250 
+0.0029 
+-0.0043 
+-0.0090 
+-0.0087 
+0.0003 
+-0.0071 
+-0.0098 
+-0.0095 
+2350 
+0.0157 
+0.0097 
+0.0133 
+0.0134 
+0.0128 
+0.0068 
+0.0129 
+0.0134 
+2450 
+0.0034 
+-0.0030 
+-0.0128 
+-0.0133 
+0.0032 
+-0.0028 
+-0.0100 
+-0.0106 
+2550 
+0.0139 
+0.0087 
+0.0109 
+0.0114 
+0.0135 
+0.0086 
+0.0107 
+0.0112 
+2650 
+0.0078 
+0.0026 
+-0.0064 
+-0.0066 
+0.0076 
+0.0028 
+-0.0061 
+-0.0064 
+2750 
+0.0039 
+-0.0013 
+-0.0040 
+-0.0046 
+0.0025 
+-0.0021 
+-0.0053 
+-0.0056 
+2850 
+0.0019 
+-0.0025 
+-0.0021 
+-0.0014 
+0.0006 
+-0.0032 
+-0.0020 
+-0.0015 
+2950 
+0.0022 
+-0.0016 
+0.0004 
+0.0000 
+0.0016 
+-0.0015 
+0.0011 
+0.0008 
+3050 
+-0.0046 
+-0.0085 
+-0.0071 
+-0.0077 
+-0.0046 
+-0.0076 
+-0.0064 
+-0.0069 
+Note: (1) Only partial results are tabulated. (2) D implies that diagonal elements are taken into account, N denotes 
+that diagonal elements are deleted, and F means fixed mean values of spatial contiguity matrix elements. (3) ACF 
+represents spatial autocorrelation function, and PACF refers to partial spatial autocorrelation function. (4) For [D+F] 
+type, ACF and PACF are based on cumulative correlation, while for [N+F] type, ACF and PACF are based on density 
+correlation. (5) The unit of distance is kilometer (km). 
+ 
+Figure 2 Spatial autocorrelation function and partial autocorrelation function of Chinese cities 
+based on generalized Moran’s index and correlation cumulation (2000) 
+
+ 
+18
+ 
+Figure 3 Spatial autocorrelation function and partial autocorrelation function of Chinese cities 
+based on generalized Moran’s index and correlation cumulation (2010) 
+ 
+First of all, let us investigate the generalized spatial autocorrelation function based on cumulative 
+correlation and the corresponding partial spatial autocorrelation function. These functions reflect 
+the distance decay effect. The generalized autocorrelation function is based on the spatial contiguity 
+matrix with non-zero diagonal elements, and the sum of the matrix elements is fixed to a constant 
+n2=29*29=841. That is to say, for every yardstick r, the number 841 is employed to divide the sum 
+of spatial contiguity matrix elements, and the normalized results represent the spatial weight matrix. 
+This autocorrelation coefficient includes two parts: one is i correlates i and j correlates j (based on 
+diagonal elements), and the other, i correlates j and j correlates i (based on the elements outside the 
+diagonal of the matrix). The dynamic properties of the generalized spatial autocorrelation are as 
+below. (1) With the increase of threshold distance, both the autocorrelation function and partial 
+autocorrelation function show wave attenuation. (2) The shape of the autocorrelation function curve 
+is similar to that of partial autocorrelation function curve. (3) From 2000 to 2010, the shape of 
+autocorrelation function curve showed no significant change (Figure 2, Figure 3). Therefore, it can 
+be concluded that the spatial relationship between Chinese cities is relatively stable, and the direct 
+
+ 
+19
+relationship between different cities is relatively weak. From about 2750 km to 2950 km, the 
+positive correlation becomes weak and even turns to negative correlation. This indicates that the 
+distance 150 to 2950 km is a significant correlation range in the spatial distribution of Chinese cities. 
+ 
+Figure 4 Spatial autocorrelation function and partial autocorrelation function of Chinese cities 
+based on conventional Moran’s index and correlation density (2000) 
+ 
+Secondly, let us examine the standard spatial autocorrelation function based on density correlation 
+and partial autocorrelation function. These functions reflect the spatial transition and oscillation 
+between positive autocorrelation and negative autocorrelation. The standard autocorrelation 
+function is based on the spatial contiguity matrix with zero diagonal elements, and the sum of the 
+matrix elements is fixed to a constant (n-1)n=28*29=812 for different yardstick r. That is, the sum 
+of spatial contiguity matrix elements is divided by the number 812, and the normalized results serve 
+as spatial weight matrix. This autocorrelation coefficient includes only one part, namely, i correlates 
+j and j correlates i (based on the elements outside the diagonal of the matrix). Another part, i.e., i 
+correlates i and j correlates j (based on diagonal elements), is ignored. To reflect the sensitivity of 
+spatial correlation, the cumulative autocorrelation functions are transformed into density 
+autocorrelation functions. The dynamic properties of the standard spatial autocorrelation are as 
+
+ 
+20
+follows. (1) If the distance is too short and too remote, the autocorrelation is very weak. Only when 
+the distance is proper is the autocorrelation significant. (2) The pattern of indirect correlation 
+reflected by the autocorrelation function looks very like the pattern of direct correlation reflected by 
+the partial autocorrelation function. (3) From 2000 to 2010, the autocorrelation and partial 
+autocorrelation patterns have no significant change (Figure 4, Figure 5).  
+ 
+ 
+Figure 5 Spatial autocorrelation function and partial autocorrelation function of Chinese cities 
+based on conventional Moran’s index and correlation density (2010) 
+ 
+However, if we calculate the ratio of spatial autocorrelation function and partial spatial 
+autocorrelation function, we will find the inherent regularities. When the curves of autocorrelation 
+function and partial autocorrelation function fluctuate sharply, the ratio of them is very stable. On 
+the contrary, when the autocorrelation function and partial autocorrelation function seem to be stable, 
+the ratio of them changes sharply (Figure 6). Combining the results of two autocorrelation functions, 
+the characteristic correlation ranges can be obtained. This can be treated as the scaling ranges of 
+spatial correlation of Chinese cities. For 2000, the scaling range comes between about 250 km and 
+
+ 
+21
+2850 km. For 2010, the scaling range comes between about 250 km and 3350 km. In fact, based on 
+the scales ranging 250 to 2750, a scaling exponent, spatial correlation dimension, can be revealed 
+from the relationships between yardstick lengths and correlation numbers of cities, and the result is 
+about D=1.7 (this will be discussed in a companion paper). 
+ 
+ 
+  a. 2000                                 b. 2010 
+Figure 6 The ratios of SACF to PSACF based on correlation density for the main cities of China 
+(Note: Inside the scaling ranges of spatial correlation dimension, the ratio of spatial autocorrelation function to the 
+partial spatial autocorrelation function are stable; In contrast, outside the scaling range, the ratio curves fluctuate 
+significantly. From 2000 to 2010, the scaling range extended from about 2850 to 3350 km.) 
+ 
+If a geographical system has a typical scale, we can utilize the parameter indicating characteristic 
+length to perform spatial analysis. In this case, we can find characteristic scale of spatial 
+autocorrelation (Odland, 1988). In contrast, if the autocorrelation coefficient values depend 
+measurement scale and no determinate typical value of Moran’s index can be found, we meet a 
+scale-free system, and the characteristic length should be replaced by a scaling process. Scaling 
+range is important for geographical spatial analysis from the perspective of spatial complexity. An 
+interesting finding in this work is that, within the scaling range, all the autocorrelation measurements 
+based on density correlation change sharply over distance, but the ratio of the autocorrelation 
+function to the corresponding partial autocorrelation function is very stable. Besides Moran’s index, 
+the changing feature of spatial autocorrelation can be reflected by Moran’s scatterplots. Based on 
+spatial autocorrelation functions, a series of canonical Moran’s scatterplots can be drawn by means 
+-5
+0
+5
+10
+15
+20
+25
+0
+1050
+2100
+3150
+4200
+5250
+SACF/PSACF
+Distance (km)
+-15
+-10
+-5
+0
+5
+10
+15
+0
+1050
+2100
+3150
+4200
+5250
+SACF/PSACF
+Distance (km)
+
+ 
+22
+of equation (14) and (16). These graphs can reflect the positive and negative alternation process and 
+local characteristics of spatial autocorrelation (Figure 7). 
+By using spatial ACF and PACF, we can real the spatial autocorrelation characteristics of Chinese 
+cities as follows. First, the spatial autocorrelation of population among the principal cities in 
+China is weak. Most values of autocorrelation coefficients are less than twice the standard deviation, 
+1.96/29, i.e., 0.0676. The reason lies in two aspects: one is the large territory of China, and the other 
+is the strict registered residence management system. Therefore, on the national dimension, 
+population migration between large cities is not easy. Second, population flow among Chinese 
+cities takes on self-correlation, namely, a city influences itself. As indicated above, the self-
+correlation is shown by the diagonal elements. If the diagonal elements are taken into account, there 
+is no significant difference between the spatial ACF and to the spatial PACF. This suggests that the 
+diagonal elements indicative of self-correlation play a significant part in the calculation of spatial 
+ACF and PACF. Third, the spatial autocorrelation fluctuates sharply within certain scale range. 
+This can be seen by the standard spatial ACF and PACF. When the distance is less than 2750 km, 
+the spatial autocorrelation changes significantly with distance, but when the distance is more than 
+3350 km, the spatial autocorrelation does not change significantly with distance. The maximum 
+effective distance of urban spatial correlation in China seems to be about 3000 km (2750-3350 km). 
+This seems to be a characteristic length of spatial autocorrelation of Chinese cities. 
+ 
+ 
+   (a) 450-550 km                            (b) 1050-1150 km 
+nWz = -0.0043z
+R² = 0.0247
+zzTWz = -0.0043z
+R² = 1
+-0.06
+-0.04
+-0.02
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+-2
+-1
+0
+1
+2
+3
+4
+nWz, zzTWz
+z
+nWz = -0.0004z
+R² = 0.0003
+zzTWz = -0.0004z
+R² = 1
+-0.04
+-0.02
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+-2
+-1
+0
+1
+2
+3
+4
+nWz, zzTWz
+z
+
+ 
+23
+ 
+  (c) 1450-1550 km                          (d) 2550-2650 km 
+Figure 7 The canonical Moran’s scatterplots of spatial autocorrelation based on correlation 
+density function for the main cities of China (examples for 2010) 
+(Note: The scatter points are based on the inner product correlation, zTzWz=Iz, and the relation is equation (14). 
+The trend line is based on the outer product correlation, zzTWz=Iz, and the relation is equation (16). The Moran’s 
+index difference values are as follows. (a) For 450<r≤550, ∆I=-0.0043; (b) For 1050<r≤1150, ∆I=-0.0004; (c) For 
+1450<r≤1550, ∆I=0.0199; (d) For 2550<r≤2650, ∆I=0.0061.) 
+ 
+3.3 Scaling analysis of spatial autocorrelation 
+The autocorrelation functions based on Moran’s index involves negative values, and cannot be 
+directly associated with scaling relation. The solution to a scaling equation is always a power law. 
+So power law is the basic mark of scaling in positive studies. In equation (12), if T represents a 
+contraction-dilation transformation, and a function satisfies equation (12), we will say it follows the 
+scaling law. The values of Geary’s coefficient and Getis-Ord’s index are greater than 0 in empirical 
+studies and may follow a power law. For the autocorrelation function based on Geary’s coefficient, 
+the power law relation is as below 
+T
+2
+0
+1
+( )
+[
+( )
+( )]
+a
+n
+C r
+e W r z
+I r
+C r
+n
+
+
+
+
+,                      (43) 
+where C0 refers to the proportionality coefficient, and a to a scaling exponent. For the Getis-Ord’s 
+index, the power law relation is as follows 
+T
+0
+( )
+( )
+b
+G r
+y W r y
+G r
+
+
+,                            (44) 
+in which G0 refers to the proportionality coefficient, and b to a scaling exponent. The empirical 
+analyses show that both the spatial cumulative autocorrelation function based on Geary’s coefficient 
+nWz = 0.0199z
+R² = 0.2677
+zzTWz = 0.0199z
+R² = 1
+-0.06
+-0.04
+-0.02
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+-2
+-1
+0
+1
+2
+3
+4
+nWz, zzTWz
+z
+nWz = -0.0061z
+R² = 0.0511
+zzTWz = -0.0061z
+R² = 1
+-0.04
+-0.02
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+-2
+-1
+0
+1
+2
+3
+4
+nWz, zzTWz
+z
+
+ 
+24
+and that based on Getis-Ord’s index follow power law if scaling range is taken into account (Figure 
+8, Figure 9). For Geary’s coefficient, the scaling ranges from 250 to 2750 km. The scaling exponent 
+changed from 1.5479 in 2000 to 1.5863 in 2010 (Figure 8). For Getis-Ord’s index, the scaling range 
+come between 150 and 2750 km. The scaling exponent turned from 1.5811 in 2000 to 1.4986 in 
+2010 (Figure 9). 
+ 
+ 
+      a. 2000                                 b. 2010 
+Figure 8 The scaling relations for the spatial autocorrelation function based on cumulative 
+correlation and Geary’s coefficient 
+Note: The solid dots represent all points of spatial autocorrelation functions, and the hollow blocks represent the 
+points within the scaling range. The scaling range comes between 250 and 2750 km. 
+ 
+ 
+      a. 2000                                 b. 2010 
+Figure 9 The scaling relations for the spatial autocorrelation function based on cumulative 
+C(r) = 5E-06r1.5479
+R² = 0.9944
+0.001
+0.01
+0.1
+1
+10
+100
+1000
+10000
+Geary's C (C(r)
+Yardstick (r)
+C(r) = 4E-06r1.5863
+R² = 0.9916
+0.001
+0.01
+0.1
+1
+10
+100
+1000
+10000
+Geary's C (C(r)
+Yardstick (r)
+G(r) = 4E-09r1.5811
+R² = 0.9944
+1.E-05
+1.E-04
+1.E-03
+1.E-02
+100
+1000
+10000
+Getis-ord's G (G(r)
+Yardstick (r)
+G(r) = 8E-09r1.4986
+R² = 0.9939
+1.E-05
+1.E-04
+1.E-03
+1.E-02
+100
+1000
+10000
+Getis-ord's G (G(r)
+Yardstick (r)
+
+ 
+25
+correlation and Getis-Ord’s index 
+Note: The solid dots represent all points of spatial autocorrelation functions, and the hollow blocks represent the 
+points within the scaling range. The scaling range comes between 150 and 2750 km. 
+ 
+Using difference function, we can transform the cumulative autocorrelation functions based on 
+Geary’s coefficient and Getis-Ord’s index into density autocorrelation functions. For Geary’s 
+coefficient, the formula for the autocorrelation function based on density correlation is as follows 
+1
+( ),                              
+1
+( )
+( )
+( )
+(
+), 
+1
+k
+d
+k
+k
+k
+C r
+k
+C r
+C r
+C r
+C r
+k
+
+
+
+
+
+
+
+
+,                     (45) 
+For Getis-Ord’s coefficient, the formula for the autocorrelation function based on density correlation 
+is as below 
+T
+1
+( )
+( ) ,            
+1
+( )
+( )
+( )
+(
+), 
+1
+k
+k
+d
+k
+k
+k
+G r
+y W r y
+k
+G
+r
+G r
+G r
+G r
+k
+
+
+
+
+
+
+
+
+
+
+,                    (46) 
+In equations (45) and (46), the distance r is discretized as rk=r0+ks, in which k=1, 2, 3,…,m 
+represents natural numbers, s refers to step length, and r0 is a constant.  
+ 
+  a. 2000                                 b. 2010 
+Figure 10 The curves of Geary’s C based on correlation density for the main cities of China 
+(Note: Inside the scaling ranges of spatial correlation dimension, the curves of Geary’s C fluctuate sharply. From 
+2000 to 2010, the curve shapes have no significant change.) 
+ 
+The autocorrelation function based on density correlation can reflect the scaling range of spatial 
+dependence from another view of angle. The density correlation function curves are a random 
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0
+1050
+2100
+3150
+4200
+5250
+Geary's C
+Distance (km)
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0
+1050
+2100
+3150
+4200
+5250
+Geary's C
+Distance (km)
+
+ 
+26
+fluctuation curves, and the autocorrelation function curve based on Geary’s coefficient looks like 
+that based on Getis-Ord’s index (Figure 10, Figure 11). Within the scaling range, spatial correlation 
+changes greatly with distance, while outside the scaling range, spatial correlation changes slightly 
+over distance. This feature is similar to the change trend of the density autocorrelation function 
+based on Moran’s index. The scaling range suggested by Geary’s coefficient and Getis-Ord’s index 
+corresponds to that suggested by Moran’s index (150 or 250 km -2750 or 3350 km). It is hard to 
+clarify the whole questions about spatial scaling in the autocorrelation processes by means of several 
+paragraph of words, and the related problems will be discussed in a companion paper. 
+ 
+ 
+  a. 2000                                 b. 2010 
+Figure 11 The curves of Getis-Ord’s G based on correlation density for the main cities of China 
+(Note: Inside the scaling ranges of spatial correlation dimension, the curves of Getis-Ord’s G fluctuate 
+significantly. From 2000 to 2010, the curve shapes have slight change.) 
+4 Discussion 
+This work concerns two aspects of innovation in spatial modeling and analysis. First, in theory, 
+the idea of spatial scaling is introduced into spatial autocorrelation modeling. Conventional spatial 
+autocorrelation analysis is based on a fixed distance threshold and characteristic scales. Moran’s I 
+is actually an eigenvalue of the generalized spatial correlation matrix. If and only if an eigenvalue 
+bear no scale dependence, it can serve a characteristic length in spatial analysis. Unfortunately, in 
+many cases, Moran’s I depends on spatial measurement scale. In this paper, spatial autocorrelation 
+modeling is based on variable distance threshold and scaling. Moran’s I can be associated with the 
+0.E+00
+2.E-05
+4.E-05
+6.E-05
+8.E-05
+1.E-04
+1.E-04
+0
+1050
+2100
+3150
+4200
+5250
+Getis-Ord's G
+Distance (km)
+0.E+00
+2.E-05
+4.E-05
+6.E-05
+8.E-05
+1.E-04
+1.E-04
+0
+1050
+2100
+3150
+4200
+5250
+Getis-Ord's G
+Distance (km)
+
+ 
+27
+spatial correlation dimension. Second, in methodology, the spatial correlation coefficients were 
+generalized to spatial autocorrelation functions and partial autocorrelation functions. Using these 
+functions, we can perform analyses of the spatial dynamics of complex geographical systems. As 
+we know, the modeling methods of ACF and PACF as well as the related spectrums have been 
+developed for time series analysis. A time series is in fact a 1-dimensional variable based on ordered 
+point sets. The methods for time series analysis can be applied to 1-dimensional spatial series based 
+on isotropic ordered spatial point sets. However, the methods cannot be directly generalized to the 
+2-dimensional spatial data based on anisotropic random spatial point sets (Table 3). Correlogram is 
+a basic way for illustrating ACF and PACF in time series analysis. It is natural for this tool to be 
+introduced into spatial autocorrelation analysis based on variable distance. However, the 
+development of spatial autocorrelation function analysis is a system engineering. The methodology 
+cannot be completely represented by correlograms and autocorrelation coefficients based on 
+variable distance. Developing spatial autocorrelation functions relies heavily on three necessary 
+conditions. First, introduction of spatial displacement parameter into spatial contiguity matrix. This 
+step is easy to do, and, as mentioned above, many scholars have already done so (Bjørnstad and 
+Falck, 2001; Getis and Ord, 1992; Legendre and Legendre, 1998; Ord and Getis, 1995). The key is 
+to select a proper distance decay function. Second, definition of spatial contiguity matrix. This 
+seems to be an easy problem to solve, but it is not. This involves the treatment of diagonal elements 
+of the spatial weight matrix. Third, conversion of the spatial contiguity matrix to a weight matrix. 
+If and only if the spatial contiguity matrix is normalized to yield a weight matrix, the key step can 
+be revealed clearly, that is, the sum used to normalize the spatial contiguity matrix does not change 
+over the spatial displacement parameter. Otherwise, the spatial autocorrelation functions cannot 
+correspond to the temporal autocorrelation functions of time series analysis. 
+ 
+Table 3 A comparison of the analytical processes of autocorrelation functions and related methods 
+Domain 
+Dimension 
+Object 
+ACF 
+PACF 
+Spectral 
+analysis 
+Time 
+domain 
+1-dimension 
+time 
+Time series 
+Temporal 
+ACF 
+analysis and auto-
+regressive process 
+Temporal 
+PACF 
+analysis and auto-
+regressive process 
+Power 
+spectrum 
+Spatial 
+domain 
+1-dimension 
+space 
+Isotropic 
+ordered spatial 
+Spatial 
+ACF 
+analysis and auto-
+Spatial 
+PACF 
+analysis and auto-
+Wave 
+spectrum 
+
+ 
+28
+series 
+regressive process 
+regressive process 
+2-dimension 
+space 
+Anisotropic 
+random spatial 
+series 
+To be developed 
+To be developed 
+To 
+be 
+developed 
+ 
+Spatial autocorrelation analysis has gone through two stages. The first stage is reflected in 
+biometrics. At this stage, spatial autocorrelation measurements are mainly used as an auxiliary 
+means of traditional statistical analysis. The prerequisite or basic guarantee of statistical analysis is 
+that the sample elements are independent of each other (Odland, 1988). To measure the 
+independence of spatial sampling results, Moran’s index was presented by analogy with Pearson’s 
+product-moment correlation coefficient and the autocorrelation coefficient in time series analysis 
+(Moran, 1948; Moran, 1950). Moran’s I is based on spatial populations (universes) rather than 
+spatial samples (Chen, 2013b). As an addition, Geary’s coefficient was proposed by analogy with 
+the Durbin-Watson statistic (Geary, 1954), and this index is for spatial sample analysis (Chen, 
+2013b). The second stage is reflected in human geography. At this stage, spatial autocorrelation 
+becomes one of the leading tools of geospatial modeling and statistical analysis. In the period of the 
+geographical quantitative revolution (1953-1976), autocorrelation measurements were introduced 
+into geography (Haining, 2009; Haggett et al, 1977). Geographers have found that few types of 
+geospatial phenomena do not have spatial correlations, so traditional statistical analysis often fails 
+in geographical research (Haining, 2008; Odland, 1988). Geographers changed their thinking and 
+decided to develop a set of analytical processes based on spatial autocorrelation (Cliff and Ord, 1973; 
+Cliff and Ord, 1969; Cliff and Ord, 1981; Griffith, 2003; Odland, 1988; Wang, 2006). A number of 
+new measurements and methods emerged, including Getis-Ord’s index (Getis’s G) (Getis, 2009; 
+Getis and Ord, 1992), local Moran’s indexes and Moran’s scatterplot (Anselin, 1995; Anselin, 1996), 
+spatial filtering (Griffith, 2003), and spatial auto-regression models (Anselin, 1988; Ward and 
+Gleditsch, 2008). At the same time, spatial autocorrelation analysis continued to develop in 
+biometrics and ecology (Bjørnstad and Falck, 2001; De Knegt et al, 2010; Dray et al, 2006; 
+Legendre and Legendre, 1998; Sokal and Oden, 1978; Sokal and Thomson, 1987; Wang et al, 2016). 
+At present, autocorrelation analysis seems to enter the third stage. Based on spatial autocorrelation 
+measures and analytical processes, spatial statistics have developed rapidly and applied to many 
+areas (e.g., Beck and Sieber, 2010; Benedetti-Cecchi et al, 2010; Bivand et al, 2009; Braun et al, 
+
+ 
+29
+2012; Deblauwe et al, 2012; Dray, 2011; Li et al, 2007; Tiefelsdorf, 2002; Weeks et al, 2004). 
+However, if the spatial statistics are confined to autocorrelation coefficients and related measures, 
+it will be difficult to further extend the applications and functions of spatial modeling and analysis. 
+Spatial autocorrelation methods open new ways of geographical statistical analysis under the 
+conditions of existing inherent correlation among spatial sampling points. In particular, it laid the 
+foundation for spatial autoregressive modeling. However, more and more evidences showed that the 
+measurement values of spatial autocorrelation indexes depend on size, shape, and spatial scales of 
+geographical systems (Bjørnstad and Falck, 2001; Getis and Ord, 1992; Legendre and Legendre, 
+1998; Odland, 1988). At least two approaches can be used to solve this problem. One is to make 
+spatial scaling analysis based on spatial autocorrelation indexes, and the other is develop spatial 
+autocorrelation function analysis. One basic method of developing spatial autocorrelation functions 
+is to make use of variable distance. Based on the variable distance defined in spatial contiguity 
+matrices, spatial correlation function, structure function, spatial correlogram, spline correlogram, 
+and so on, have been introduced into spatial autocorrelation processes (Bjørnstad and Falck, 2001; 
+Legendre and Legendre, 1998; Odland, 1988). Spatial correlogram is just a result from analogy with 
+the correlation function histogram in time series analysis. Among various methods of spatial 
+analyses based on variable distance, the structure function advanced by Legendre and Legendre 
+(1998) looks like the spatial autocorrelation function developed in this work. However, there is 
+essential difference between structure function and autocorrelation function. A comparison can be 
+drawn by tabulating the similarities and differences between structure function and spatial 
+autocorrelation function (Table 4). In short, the structure function is based on the idea of 
+characteristic scales, while the spatial autocorrelation function is associated with scaling analysis 
+for geographical systems. In fact, the variable distance can be employed to find the characteristic 
+scale of spatial autocorrelation processes (Odland, 1988). 
+ 
+Table 4 The differences and similarities between structure function and spatial autocorrelation 
+function 
+Item 
+Legendres’ work 
+Work in this paper 
+Objective 
+Finding 
+typical 
+autocorrelation 
+index 
+Find spatial scaling and relations to 
+fractal dimension 
+Basic postulate 
+Characteristic scale 
+Scaling invariance 
+
+ 
+30
+Statistic hypothesis 
+Gaussian distribution 
+Pareto distribution 
+Spatial 
+contiguity 
+definition  
+Kronecker's delta 
+Heaviside function (step function) 
+Distance conversion 
+Metric variable → Rank variable 
+→ Categorical variable 
+Metric variable → Categorical 
+variable 
+Spatial weight matrix 
+(1) Based on variable mean; (2) 
+Diagonals are zeros 
+(1) Based on fixed mean; (2) 
+Diagonals are zeros or ones 
+Spatial correlation 
+Correlation density 
+Correlation cumulation 
+Measurement method 
+Variable distance 
+Variance distance 
+Measurement result 
+Autocorrelation coefficients 
+Autocorrelation 
+and 
+partial 
+autocorrelation coefficients 
+Modeling result 
+Structure function 
+Autocorrelation function partial 
+autocorrelation function 
+Representation way 
+Correlogram 
+Correlogram 
+Function 
+Spatial structure analysis based on 
+characteristic scale 
+Spatial dynamics analysis based on 
+scaling idea 
+ 
+The empirical analysis results demonstrate that the 2-dimensional spatial autocorrelation 
+coefficients and the related statistics can be generalized to 2-dimensional spatial autocorrelation 
+functions and the related functions. A preliminary framework of spatial analysis based on 
+autocorrelation functions was put forward. The main contributions of this study to academy can be 
+outlined as three aspects. First, construction of 2-dimensional spatial autocorrelation functions. 
+Based on Moran’s index and the relative staircase function with a spatial displacement parameter, 
+two sets of spatial autocorrelation functions are constructed. Second, definition of partial spatial 
+autocorrelation functions. By means of the Yule-Walker recursive equation, the calculation 
+approach of partial autocorrelation functions is proposed. Third, generalization of the spatial 
+autocorrelation functions. The 2-dimensional spatial autocorrelation function are generalized to 
+Geary’s coefficient and Getis’ index and the extended autocorrelation functions are established. 
+Moreover, the spatial autocorrelation analysis based on characteristic scales is generalized to that 
+based on scaling. The concept of scaling was associated with spatial autocorrelation (De Knegt et 
+al, 2010). However, the substantial research on spatial autocorrelation based on scaling has not been 
+reported. The main mathematical expressions can be tabulated for comparison (Table 5). The 
+significance of developing this mathematical framework for spatial autocorrelation lies in three 
+respects. First, spatial information mining of geographical systems. The spatial autocorrelation 
+functions can be used to reveal more geographical spatial information and express more complex 
+
+ 
+31
+dynamic processes than the spatial autocorrelation coefficients. Second, foundation of scale and 
+scaling analysis. If a geographical system bears characteristic scales, the spatial autocorrelation 
+functions can be used to bring to light the characteristic length; if a geographical system has no 
+characteristic scale, the spatial autocorrelation functions can be employed to make scaling analysis. 
+Third, future development of spectral analysis. Autocorrelation functions and power/wave 
+spectral density represents two different sides of the same coin. Based on the spatial autocorrelation 
+functions, the method of 2-dimensional spectral analysis can be developed for geographical research. 
+ 
+Table 5 Collections of two types of spatial autocorrelation functions and the extended results 
+Type 
+Base 
+Standard SACF (i≠j) 
+Generalized SACF (i=j) 
+Basic 
+functions 
+Moran’
+s 
+I: 
+SACF 
+T
+( )
+( )
+I r
+z W r z
+
+ 
+*
+T
+*
+( )
+( )
+I
+r
+z W
+r z
+
+ 
+PSACF 
+( )
+( ( ))
+J r
+f I r
+
+ 
+*
+*
+( )
+(
+( ))
+J
+r
+f I
+r
+
+ 
+Extended 
+functions 
+Geary’s 
+C 
+T
+2
+1
+( )
+[
+( )
+( )]
+n
+C r
+e W r z
+I r
+n
+
+
+
+ 
+*
+T
+*
+2
+*
+1
+( )
+[
+( )
+( )]
+n
+C r
+e W
+r z
+I
+r
+n
+
+
+
+ 
+Getis’s 
+G 
+T
+( )
+( )
+G r
+y W r y
+
+ 
+*
+T
+*
+( )
+( )
+G r
+y W r y
+
+ 
+Difference 
+SWM 
+0
+( )
+( )/
+( )
+W r
+V r
+V r
+
+ 
+*( )
+( )/ ( ( -1))
+W r
+V r
+n n
+
+ 
+ 
+The new development of a theory or a method always gives rise to a series of new problems. New 
+problems will lead to further exploration about the theory or the method. The main shortcomings of 
+this work are as follows. First, the local spatial autocorrelation functions have not been taken 
+into consideration. Moran’s index, Geary’s coefficient, and Getis’ index can be used to measure 
+local spatial autocorrelation. However, local spatial coefficients have not been generalized to local 
+spatial autocorrelation functions. Second, the auto-regression models have not been built. 
+Autocorrelation and auto-regression represent two different sides of the same coin. How can the 
+auto-regression models, which can give the partial autocorrelation coefficients, be conducted? This 
+is a pending question. Third, the case study is based on 29 provincial capital cities rather than 
+a system of cities based on certain size threshold. The system of provincial capital cities are in 
+the administrative sense instead of pure geographical sense. This type of spatial sample can be used 
+to generate example to illustrate a research method. If we perform a spatial analysis of Chinese cities, 
+
+ 
+32
+we should make a spatial sampling according to certain scale threshold. Due to limitation of space, 
+the problems remain to be further solved in future studies. 
+5 Conclusions 
+A new analytical framework based on a series of spatial autocorrelation functions have been 
+demonstrated with mathematical derivation. A case study is presented to show how to make use of 
+this analytical process. Next, we further improve the related spatial analytical methods based on 
+spatial autocorrelation functions, including spatial cross-correlation functions, spatial auto-
+regression modeling, and spatial wave-spectral analysis. The main points can be summarized as 
+follows. First, a new spatial analytical process can be developed by spatial autocorrelation 
+functions based on the relation staircase function. Introducing spatial displacement parameter 
+into spatial weight functions, we can transform the spatial autocorrelation coefficients such as 
+Moran’s index into spatial autocorrelation functions on the analogy of the corresponding methods 
+in time series analysis. An autocorrelation function is a parameter set comprising a series of 
+autocorrelation coefficients. A spatial autocorrelation coefficient can be used to characterize the 
+simple spatial correlation and structure, while a spatial autocorrelation function can be employed to 
+describe the complex spatial correlation and dynamics. Second, partial spatial autocorrelation 
+functions can be used to assist spatial autocorrelation function analysis. Using the Yule-Walker 
+recursive equation, we can convert the spatial autocorrelation function based on Moran’s index into 
+partial spatial autocorrelation functions. Spatial autocorrelation functions reflect both direct and 
+indirect spatial autocorrelation processes in a system, while partial spatial autocorrelation functions 
+can be employed to display the pure direct autocorrelation process. Third, the spatial 
+autocorrelation function can be extended by means of more spatial autocorrelation 
+measurements. The spatial autocorrelation functions can be generalized to the autocorrelation 
+functions based on Geary’s coefficient and Getis’ index based on scaling. Different autocorrelation 
+functions have different uses in spatial analysis. Using the spatial autocorrelation functions, we can 
+mine more geographical spatial information, seek the characteristic scales for spatial modeling and 
+quantitative analysis, or reveal the hidden scaling in complex geographical patterns and processes. 
+ 
+
+ 
+33
+Acknowledgement: 
+This research was sponsored by the National Natural Science Foundation of China (Grant No. 
+41671167. See: http://isisn.nsfc.gov.cn/egrantweb/). The support is gratefully acknowledged.  
+References 
+Anselin L (1988). Spatial Econometrics: Methods and Models. Dordrecht, The Netherlands: Kluwer 
+Anselin L (1995). Local indicators of spatial association—LISA. Geographical Analysis, 27(2): 93-115 
+Anselin L (1996). The Moran scatterplot as an ESDA tool to assess local instability in spatial association. 
+In: M. Fischer, H.J. Scholten, D. Unwin (Eds). Spatial Analytical Perspectives on GIS. London: 
+Taylor & Francis, pp111-125 
+Beck J, Sieber A (2010). Is the spatial distribution of mankind’s most basic economic traits determined 
+by climate and soil alone? PLoS ONE, 5(5): e10416 
+Benedetti-Cecchi L, Iken K, Konar B, Cruz-Motta J, Knowlton A, Pohle G, Castelli A, Tamburello L, 
+Mead A, Trott T, Miloslavich P, Wong M, Shirayama Y,  Lardicci C, Palomo G, Maggi E (2010). 
+Spatial relationships between polychaete assemblages and environmental variables over broad 
+geographical scales. PLoS ONE, 5(9): e12946 
+Bivand RS, Müller W, Reder M (2009). Power calculations for global and local Moran’s I. 
+Computational Statistics and Data Analysis, 53: 2859-2872 
+Bjørnstad ON, Falck W (2001). Nonparametric spatial covariance functions: Estimation and testing. 
+Environmental and Ecological Statistics, 8: 53-70 
+Bowerman BL, O’Connell RT (1993). Forecasting and Time Series: An Applied Approach (Third 
+Edition). Pacific Grove, CA: Thomson Brooks 
+Box GEP, Jenkins GM, Reinsel GC (1994). Time Series Analysis Forecasting and Control (Third Edition). 
+Upper Saddle River, NJ: Prentice Hall 
+Braun A, Auerswald K, Geist J (2012). Drivers and spatio-temporal extent of hyporheic patch variation: 
+Implications for sampling. PLoS ONE, 7(7): e42046 
+Chen YG (2012). On the four types of weight functions for spatial contiguity matrix. Letters in Spatial 
+and Resource Sciences, 5(2): 65-72 
+Chen YG (2013a). Fractal analytical approach of urban form based on spatial correlation function. Chaos, 
+Solitons & Fractals, 49(1): 47-60 
+
+ 
+34
+Chen YG (2013b). New approaches for calculating Moran’s index of spatial autocorrelation. PLoS ONE, 
+8(7): e68336 
+Chen YG (2015). A new methodology of spatial cross-correlation analysis. PLoS ONE, 10(5): e0126158 
+Chen YG (2016). Spatial autocorrelation approaches to testing residuals from least squares regression. 
+PLoS ONE, 11(1): e0146865 
+Chen YG (2020). New framework of Getis-Ord’s indexes associating spatial autocorrelation with 
+interaction. PLoS ONE, 15(7): e0236765 
+Cliff AD, Ord JK (1969). The problem of spatial autocorrelation. In: A.J. Scott (Ed.). London Papers in 
+Regional Science 1, Studies in Regional Science. London: Poin, pp25-55 
+Cliff AD, Ord JK (1973). Spatial Autocorrelation. London: Pion 
+Cliff AD, Ord JK (1981). Spatial Processes: Models and Applications. London: Pion 
+de Jong P, Sprenger C, van Veen F (1984). On extreme values of Moran's I and Geary's C. Geographical 
+Analysis, 16(1): 17-24 
+De Knegt HJ, van Langevelde F, Coughenour MB, Skidmore AK, De Boer WF, Heitkönig IMA, Knox 
+NM, Slotow R, van Der Waal C, Prins HHT (2010). Spatial autocorrelation and the scaling of 
+species–environment relationships. Ecology, 91 (8): 2455–2465 
+Deblauwe V, Kennel P, Couteron P (2012). Testing pairwise association between spatially autocorrelated 
+variables: A new approach using surrogate lattice data. PLoS ONE, 7(11): e48766 
+Dray S (2011). A new perspective about Moran's coefficient: spatial auto-correlation as a linear 
+regression problem. Geographical Analysis, 43(2): 127-141 
+Dray S, Legendre P, Peres-Neto PR (2006). Spatial modeling: a comprehensive framework for principal 
+coordinate analysis of neighbor matrices (PCNM). Ecological Modelling, 196(3-4): 483-493 
+Feder J (1988). Fractals. New York: Plenu 
+Geary RC (1954). The contiguity ratio and statistical mapping. The Incorporated Statistician, 5(3): 115–
+145 
+Getis A (2008). A history of the concept of spatial autocorrelation: A geographer's perspective. 
+Geographical Analysis, 40(3): 297-309. 
+Getis A (2009). Spatial weights matrices. Geographical Analysis, 41 (4): 404–410 
+Getis A, Ord JK (1992). The analysis of spatial association by use of distance statistic. Geographical 
+Analysis, 24(3):189-206 
+
+ 
+35
+Griffith DA (1996). Spatial autocorrelation and eigenfunctions of the geographic weights matrix 
+accompanying geo-referenced data. Canadian Geographer, 40(4): 351-367 
+Griffith DA (2003). Spatial Autocorrelation and Spatial Filtering: Gaining Understanding Through 
+Theory and Scientific Visualization. New York: Springer 
+Haggett P, Cliff AD, Frey A (1977). Locational Analysis in Human Geography. London: Edward Arnold 
+Haining RP (2009). Spatial autocorrelation and the quantitative revolution. Geographical Analysis, 41 
+(4): 364-374 
+Hao BL (1986). Fractals and fractal dimensions. Science, 38 (1): 9-17 (in Chinese) 
+Hao BL (2004). Chaos and Fractals: a Collection of Popular Science Works by Hao Bolin. Shanghai: 
+Shanghai Science and Technology Press (In Chinese) 
+Legendre P, Legendre L (1998). Numerical Ecology (2nd edition). Amsterdam: Elsevier Science 
+Li H, Calder CA, Cressie N (2007). Beyond Moran’s I: Testing for spatial dependence based on the 
+spatial autoregressive model. Geographical Analysis, 39(4): 357-375 
+Liu SD, Liu SK (1993). An Introduction to Fractals and Fractal Dimension. Beijing: China 
+Meteorological Press (In Chinese) 
+Moran PAP (1948). The interpretation of statistical maps. Journal of the Royal Statistical Society, Series 
+B, 37(2): 243-251 
+Moran PAP (1950). Notes on continuous stochastic phenomena. Biometrika, 37(1-2): 17-33 
+Odland J (1988). Spatial Autocorrelation. London: SAGE Publications 
+Ord JK, Getis A (1995). Local spatial autocorrelation statistics: distributional issues and an application. 
+Geographical Analysis, 27(4): 286-306 
+Sokal RR, Oden NL (1978). Spatial autocorrelation in biology. 1. Methodology. Biological Journal of 
+the Linnean Society, 10(2): 199-228 
+Sokal RR, Thomson JD (1987). Applications of spatial autocorrelation in ecology. In: P. Legendre, L. 
+Legendre (Eds). Developments in Numerical Ecology, NATO ASI Series, Vol. G14. Berlin: Springer-
+Verlag, pp431-466 
+Takayasu H (1990). Fractals in the Physical Sciences. Manchester: Manchester University Press 
+Tiefelsdorf M (2002). The saddle point approximation of Moran’s I and local Moran’s Ii reference 
+distributions and their numerical evaluation. Geographical Analysis, 34(3): 187-206 
+von Neumann J (1941). Distribution of the ratio of the mean square successive difference to the variance. 
+
+ 
+36
+The Annals of Mathematical Statistics, 12: 367-395 
+von Neumann J, Kent RH, Bellinson HR, Hart BI (1941). The mean square successive difference. The 
+Annals of Mathematical Statistics, 12: 153-162 
+Wang FQ, Li HQ (1996). Fractals--The Artistic Structure of Nature. Jinan: Shandong Education Press 
+(In Chinese) 
+Wang JF (2006). Spatial Analysis. Beijing: Scientific Press [In Chinese] 
+Wang JF, Zhang TL, Fu BJ (2016). A measure of spatial stratified heterogeneity. Ecological Indicators, 
+67: 250–256 
+Ward MD, Gleditsch KS (2008). Spatial Regressive Models. London: SAGE Publications 
+Weeks JR, Getis A, Hill AG, Gadalla MS, Rashed T (2004). The fertility transition in Eqypt: Intraurban 
+patterns in Cairo. Annals of the Association of American Geographers, 94(1): 74-93 

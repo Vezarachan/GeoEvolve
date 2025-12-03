@@ -1,0 +1,3232 @@
+Wasserstein Spatial Depth
+Fran¸cois Bachoc1, Alberto Gonz´alez-Sanz2, Jean-Michel Loubes3,
+Yisha Yao4
+1IMT, Universit´e de Toulouse, Institut universitaire de France (IUF), France, e-mail:
+francois.bachoc@math.univ-toulouse.fr
+2Department of Statistics, Columbia University, New York, USA, e-mail:
+ag4855@columbia.edu
+3INRIA, Universit´e de Toulouse, France, e-mail: loubes@math.univ-toulouse.fr
+4Department of Statistics, Columbia University, New York, USA, e-mail:
+yy3381@columbia.edu
+Abstract: Modeling observations as random distributions embedded within
+Wasserstein spaces is becoming increasingly popular across scientific fields,
+as it captures the variability and geometric structure of the data more effec-
+tively. However, the distinct geometry and unique properties of Wasserstein
+space pose challenges to the application of conventional statistical tools,
+which are primarily designed for Euclidean spaces. Consequently, adapting
+and developing new methodologies for analysis within Wasserstein spaces
+has become essential. The space of distributions on Rd with d > 1 is not lin-
+ear, and “mimic” the geometry of a Riemannian manifold. In this paper, we
+extend the concept of statistical depth to distribution-valued data, intro-
+ducing the notion of Wasserstein spatial depth. This new measure provides
+a way to rank and order distributions, enabling the development of order-
+based clustering techniques and inferential tools. We show that Wasserstein
+spatial depth (WSD) preserves critical properties of conventional statistical
+depths, notably, ranging within [0, 1], transformation invariance, vanishing
+at infinity, reaching a maximum at the geometric median, and continuity.
+Additionally, the population WSD has a straightforward plug-in estima-
+tor based on sampled empirical distributions. We establish the estimator’s
+consistency and asymptotic normality. Extensive simulation and real-data
+application showcase the practical efficacy of WSD.
+MSC2020 subject classifications: Primary 62R10, 62G30; secondary
+62G35.
+Keywords and phrases: Distributional data analysis, High dimensional
+data, Order statistic, Outlier detection, Statistical depths, Wasserstein dis-
+tance.
+1. Introduction
+Contemporary data collected in various disciplines is complex and multifaceted.
+Traditional statistical tools, which model data objects as samples from a Eu-
+clidean space or vector space, are inadequate to capture the variation and ge-
+ometry of the data objects. Random objects lying in general metric spaces, in-
+cluding spaces of functions [60], Wasserstein spaces [44], and hyperbolic spaces
+[61], are gaining increasing favor in the scientific community. For instances, lon-
+gitudinal images are treated as functions [60]; texts and media are modeled as
+1
+arXiv:2411.10646v2  [math.ST]  6 Mar 2025
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+2
+distributions in modern AI training models [13, 29]; certain trees and graphs
+are embedded into hyperbolic spaces [12]. It is widely recognized that statistical
+efficiency can be gained by utilizing special properties of the above metric spaces
+[6].
+In this paper, we focus on modeling distribution-valued data objects within
+Wasserstein spaces. There are several advantages to model certain data objects
+as distributions or probability measures. Firstly, it captures the hierarchical
+variations in the data by simulating a two-stage data-generating process: initially
+sampling multiple distributions from a Wasserstein space, followed by drawing
+data points from each sampled distribution. Secondly, it captures variations of
+the data along geodesics of the distribution space that are not straight lines
+as in the Euclidean setting and thus are closer to the observations. Thirdly,
+it often provides a low-dimensional embedding that effectively represents high-
+dimensional data, enabling better statistical inference without the curse of the
+dimension. Since the Wasserstein space has different structure and property from
+the Euclidean space, conventional analytic tools cannot apply to distribution-
+valued data objects. Therefore, new methods specifically designed for analyzing
+such data are essential.
+There have been some efforts in this line of research, including but not lim-
+ited to histogram regression [9], Wasserstein regression [2, 15], geodesic PCA [7],
+template estimation [8], and Wasserstein clustering [24, 62]. Despite the above
+developments, there is limited effort in agnostic exploratory analysis for data
+objects in Wasserstein spaces [22, 25, 28, 59]. Still, exploratory analysis and de-
+scriptional statistics are critical to overview the properties of the data distribu-
+tion before modeling. In particular, a notion of “ordering” for distribution-valued
+objects in Wasserstein spaces will be of fundamental utility. Besides exploratory
+analysis, it will also facilitate nonparametric methods for distribution-valued
+data.
+Quantiles, ranks, and signs are pivotal tools of semiparametric and nonpara-
+metric statistics. Due to the lack of canonical ordering in multi-dimensional Eu-
+clidean space, quantile or rank based tools have been limited to one-dimensional
+data before the creation of statistical depths. The notion of statistical depths
+fills this gap, extending the notion of order to higher dimension. Given a distri-
+bution P on Rd, the depth of any data point x ∈Rd is a non-negative value that
+measures the “centrality” of x with respect to P. A larger value of depth indi-
+cates the data point is more central within the distribution, while data points
+with small depths are considered outliers or less typical within the distribution,
+worthy of investigation. Several different types of depths have been proposed,
+including Tukey depth [47, 54], simplicial depth [34], spatial depth [14, 56],
+Monge-Kantorovich depth [16, 31] and lens depth [35]. Via endowing multi-
+variate data points with “center-outward” orderings, depths allow extension of
+order statistics, robust inference [36, 63] and classification to multivariate data
+[43, 64].
+Statistical depth theory is one of the main research areas of functional data
+analysis (FDA). Most of the Euclidean depth functions extend naturally to
+Hilbert-space-valued data, see [20, 38, 45, 46]. For instance, this is the case for
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+3
+the h-depth [19], the Tukey depth [26] and its random version [18], the spatial
+depth [11], the integrated depth [20] and the Monge-Kantorovich depth [30]. For
+Banach spaces, some examples are the integrated depth [20], the band depth
+and its modified version [38], the half-region depth and its modified version [39],
+the L∞depth [37] and the infimal depth [42].
+While it may be tempting to embed the Wasserstein space into a function
+space, for instance a reproducing kernel Hilbert space (RKHS) [52], and ap-
+ply existing functional depth measures, this approach neglects the intricate
+geodesic structure of the Wasserstein space. There is no linear representation of
+the Wasserstein distance between distributions on Rd with d > 1 [5]. Existing
+depths do not generalize well to nonlinear spaces. Besides the nonlinearity, the
+Wasserstein distance is computationally expensive even for empirical measures
+[49], which essentially rules out practical implementation of Tukey depth [54]
+and Monge-Kantorovich depth [16, 31]. The computational complexity of these
+two depths grows exponentially with the sample size.
+In conclusion, conventional depth measures cannot be directly extended to
+Wasserstein spaces due to the unique properties and structure discussed above.
+This requires the development of a new notion of depth tailored specifically for
+Wasserstein spaces.
+1.1. Contributions
+In this paper we develop a new notion of depth to order or rank distributions. It
+is inspired by spatial depth, one of the simplest and most widely used notions of
+statistical depths. Recall that the spatial depth of a point x ∈Rd with respect
+to a probability measure P over Rd is defined as
+SD(x; P) = 1 −
+E
+ X −x
+∥X −x∥
+ ,
+X ∼P.
+(1.1)
+The spatial depth has been generalized to Hilbert spaces by following exactly
+the same definition [51, 56, 59]. However, the lack of linear structure of the
+Wasserstein space prevents a straightforward adaptation of the spatial depth.
+Nevertheless, the Wasserstein metric endows the space of probability measures
+with a structure of geodesic metric space (see [1]). For absolutely continuous
+probability measures Q and P, the constant speed geodesic joining Q and P is
+given by the curve of probability measures
+[0, 1] ∋λ 7→((1 −λ)I + λ TQ,P )#Q,
+where # denotes the push-forward operator (see Section 3.3 for its definition).
+The definition of spatial depth for manifold-valued data motivates us to de-
+fine the depth of a probability measure Q ∈Pa.c
+2 (Rd) (where Pa.c
+2 (Rd) is the
+set of absolutely continuous measures on Rd with finite second moments, see
+Section 3.3) with respect to a probability measure over the Wasserstein space
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+4
+P ∈P(P2(Rd)) (where P(P2(Rd)) is formally defined in Section 3.3) as
+SD(Q; P) := 1 −
+ Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+.
+Above, TQ,P is the optimal transport map from Q to P and W2(P, Q) is the
+Wasserstein distance between P and Q, both being formally defined in Sec-
+tion 3.3. We will show that SD(Q; P) satisfies the same properties as its Eu-
+clidean counterpart, namely transformation invariance, taking values in [0, 1],
+decreasing at infinity and attaining maximum at the median. Moreover, we show
+that Q 7→SD(Q; P) is continuous and P 7→SD(Q; P) is continuous. Next, we
+will propose a finite-sample estimator under the so-called two-stage and one-
+stage sampling models. In the two-stage sampling model, such an estimator can
+be computed in polynomial time. Moreover, we will show that in both models,
+the estimator is consistent, meaning that it approximates the true population
+depth function as the sample size increases. We also prove asymptotic normality.
+Finally, we will provide numerical simulations for real and synthetic datasets. In
+particular, we highlight that our suggested depth is more informative than depth
+methods designed for linear spaces and applied to mappings of distributions to
+these linear spaces.
+In conclusion, Wasserstein spatial depth (WSD) serves as a valid measure for
+ordering objects within Wasserstein spaces, adhering to the axiomatic properties
+of depth [64] and being computationally feasible. This concept facilitates the
+extension of depth-based analytic tools to Wasserstein spaces, paving the way
+for future research.
+1.2. Organization
+General notations are provided in Section 2. The definition of WSD is given in
+Section 3 with illustrating examples in Section 4. In Section 5, we show that
+WSD shares the desirable properties of conventional statistical depths [64]. In
+Section 6, we tackle consistent estimation with asymptotic normality. In Sec-
+tion 7, we compare WSD to several depths in general metric spaces [22, 28, 59]
+adapted to Wasserstein spaces. We advocate WSD over the other depths in
+terms of computational feasibility and assumption flexibility, while possessing
+all desirable properties of a depth. In section 8, extensive numerical simulations
+are shown to demonstrate the empirical validity and merits of WSD. Finally, in
+Section 9, we apply it to explore real-world data and make informative discov-
+eries. All the proofs are provided in the Appendix.
+2. Notation
+The space of Borel probability measures on a Polish space (K, d) is denoted as
+P(K). For P ∈P(K), its support is written supp(P). The space of Borel finite
+(signed) measures is denoted as M(K) and the space of finite (signed) measures
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+5
+with 0 mass as M0(K), meaning that h ∈M0(K) if h ∈M(K) and h(K) = 0.
+The integral of a measurable function f : K →R with respect to P ∈P(K) is
+denoted as
+Z
+f(x)dP(x) =
+Z
+fdP = P(f).
+Set P ∈P(K) and f : K →R be measurable. Then
+∥f∥L2(P ) :=
+Z
+f 2dP
+1/2
+denotes the L2(P)-norm of f. The Hilbert space of measurable functions with
+finite L2(P)-norm is denoted as L2(P) with inner product ⟨·, ·⟩L2(P ). We also
+extend the definition of the Hilbert space L2(P) and the associated notation to
+vector-valued functions, with for f, g : K →Rk,
+⟨f, g⟩L2(P ) :=
+Z
+⟨f, g⟩dP.
+We say that a sequence {µn}n∈N ⊂P(K) converges weakly to µ ∈P(K) if
+Z
+f dµn −→
+Z
+f dµ
+for every bounded and continuous function f : K →R. In such a case we
+write µn
+P(K)
+−−−→µ and also say that µn →µ in the weak sense of P(K). For
+Zn ∼µn and Z ∼µ we write similarly Zn
+P(K)
+−−−→Z and we may also write
+simply Zn
+w
+−→Z. Such a convergence is metrizable by means of the so-called
+bounded Lipschitz metric [55, p. 73]
+dBL(µ, ν) = sup
+ Z
+f(x)d(µ −ν)(x) :
+|f(x)| ≤1 and |f(x) −f(y)| ≤d(x, y), ∀x, y ∈K
+
+.
+3. From Euclidean to Wasserstein spatial depth
+In this section we define our notion of Wasserstein spatial depth. In Section 3.1
+we recall the definition of Euclidean spatial depth and its main properties. In
+Section 3.2 we provide our interpretation of spatial depth in terms of geodesics,
+which allows for its generalization to the Wasserstein space of measures (see
+Section 3.3). For readers interested in a more comprehensive understanding of
+the mathematical concepts discussed in Sections 3.2 and 3.3, we recommend
+consulting the monograph [1] for an in-depth exposition.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+6
+3.1. Euclidean spatial depth
+In Rd, for d > 1, the spatial depth of a point x with respect to a random variable
+X ∼P is defined as
+SD(x; P) = 1 −
+E
+ X −x
+∥X −x∥
+ .
+Throughout the paper, we use the convention 0/0 = 0. The spatial depth
+shares the following properties with the univariate canonical depth function
+2 min(F(x), 1 −F(x)). First, the statistical depth SD(x; P) belongs to the in-
+terval [0, 1]. Second, the geometric median, defined as
+mX ∈arg min
+m
+E[∥X −m∥],
+satisfies SD(mX; P) = 1. Third, as ∥x∥→∞, we have that SD(x; P) →0.
+Finally, for an isometric transformation T : Rd →Rd, it holds that
+SD(T(x); T#P) = SD(x; P),
+where again the push-forward operator # is defined in Section 3.3.
+3.2. Geodesic interpretations of the spatial depth
+Let (M, d) be a metric space. A curve {γx→y
+t
+}t∈[0,1] valued in M is a (constant
+speed) geodesic joining x ∈M to y ∈M if
+d(γx→y
+t
+, γx→y
+s
+) = (t −s)d(x, y),
+for all 0 ≤s ≤t ≤1.
+The space (M, d) is said to be geodesic if any two points are joined by at least
+one geodesic. The length of a curve {γt}t∈[0,1] with values in M (not necessarily
+a geodesic) is defined as L(γ) =
+R 1
+0 |γ′
+t|dt, where |γ′
+t| = lims→t
+d(γt,γs)
+|t−s| . Assume
+now that M ⊂Rd is a Riemannian manifold with metric tensor {gx}x∈M. Then
+it holds that
+L(γ) =
+Z 1
+0
+q
+gγt(∂tγt, ∂tγt)dt,
+where {∂tγt}t∈[0,1] denotes the velocity (standard time derivative) of the curve
+{γt}t∈[0,1].
+In Rd, a geodesic joining x and y is just the segment γx→y
+t
+= (1 −t)x + ty,
+t ∈[0, 1]. Therefore, the spatial depth of x can be seen as the spatial depth of
+the velocities at time 0
+SD(x; P) = 1 −
+E
+ ∂t|t=0γx→X
+t
+∥∂t|t=0γx→X
+t
+∥
+ .
+This allows for the following Riemannian generalization of the spatial depth
+SD(x; P) = 1 −
+s
+gx
+
+E
+ ∂t|t=0γx→X
+t
+∥∂t|t=0γx→X
+t
+∥
+
+, E
+ ∂t|t=0γx→X
+t
+∥∂t|t=0γx→X
+t
+∥
+
+.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+7
+3.3. Geodesic spatial depth over the space of measures
+Let Pp(Rd) be the space of Borel probability measures over Rd with finite pth
+order moment. The optimal transport cost between two probability measures
+P, Q ∈Pp(Rd) is defined as
+OTp(P, Q) =
+inf
+π∈Π(P,Q)
+1
+2
+Z
+∥x −y∥pdπ(x, y),
+(3.1)
+where Π(P, Q) ⊂Pp(Rd × Rd) stands for the set of probability measures with
+marginals P and Q, i.e., (X, Y) ∼π ∈Π(P, Q) if X ∼P and Y ∼Q. For p ≥1,
+the mapping (P, Q) 7→Wp(P, Q) = (OTp(P, Q))
+1
+p defines a distance over the
+space Pp(Rd) such that
+Wp(Pn, P) →0
+⇐⇒
+Pn
+P(Rd)
+−−−−→P
+and
+Z
+∥x∥pdPn(x) →
+Z
+∥x∥pdP(x).
+We focus now on the case p = 2. We define Pa.c
+2 (Rd) as the subset of P2(Rd)
+composed of absolutely continuous measures. If P belongs to Pa.c
+2 (Rd), there
+exists a unique minimizer πP,Q of (3.1), for p = 2. Moreover, there exists a
+unique gradient of a convex function TP,Q = ∇ϕP,Q such that πP,Q = (I ×
+∇ϕP,Q)#P. The map TP,Q is called an optimal transport map. Here, for a
+probability measure µ and a Borel mapping T, T#µ denotes the push forward
+measure, which is the distribution of T(X), for X ∼µ.
+In [48], the author demonstrated that W2 serves as the natural metric for
+P2(Rd), aimed at describing the long-term behavior of solutions to the porous
+medium equation. This metric also imparts a geodesic metric space structure to
+P2(Rd).
+It is natural in the following sense. If {Xt}t∈[0,1] is a curve of random vec-
+tors with ∂tXt = vt(X0), then its associated curve of distributions {Pt}t∈[0,1]
+satisfies the so-called transport/continuity equation
+∂tPt + div(vtPt) = 0
+(3.2)
+in an appropriate weak sense. The continuity equation is commonly used in
+fluid mechanics, where vt represents the flow velocity vector field. However,
+given the curve {Xt}t∈[0,1] there could exist several curves of velocity fields
+{vt}t∈[0,1] solving (3.2), i.e., generating the same flow. Among all of them, there
+exists only one belonging to
+arg min
+Z 1
+0
+∥vt∥2
+L2(Pt)dt :
+∂tPt + div(vtPt) = 0
+
+.
+(3.3)
+The tangent bundle of (P2(Rd), W2) is
+TP (P2(Rd)) = {∇ϕ :
+ϕ ∈C∞
+c (Rd)}
+L2(P ),
+P ∈P2(Rd)
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+8
+where C∞
+c (Rd) denotes the set of infinitely differentiable functions with com-
+pact support. Above, A
+L2(P ) denotes the closure of a subset A in the Hilbert
+space L2(P). Given two probability measures P and Q, a geodesic is any curve
+{γP →Q
+t
+}t∈[0,1] with endpoints γP →Q
+0
+= P and γP →Q
+1
+= Q with minimal velocity,
+i.e., any element of
+arg min
+Z 1
+0
+∥vt∥2
+L2(γt)dt :
+∂tγt + div(vtγt) = 0, γ0 = P and γ1 = Q
+
+.
+(3.4)
+If P belongs to Pa.c
+2 (Rd), there exists a unique geodesic given by the relation
+γP →Q
+t
+= ((1 −t)I + tTP,Q)#P.
+Its velocity field at t = 0 is vP →Q
+0
+= TP,Q −I and the Riemannian inner product
+in TP (P2(Rd)) is ⟨·, ·⟩L2(P ). Therefore, the WSD of a probability measure Q ∈
+Pa.c.
+2
+(Rd) with respect to a a probability measure P over P2(Rd) is defined as
+SD(Q; P) := 1 −
+EP ∼P
+"
+vQ→P
+0
+∥vQ→P
+0
+∥L2(Q)
+#
+L2(Q)
+.
+Since vQ→P
+0
+= TQ,P −I we get the following definition of spatial depth.
+Definition 3.1. The Wasserstein spatial depth of a distribution Q ∈Pa.c
+2 (Rd)
+with respect to a distribution of distributions P ∈P(P2(Rd)) is defined as
+SD(Q; P) := 1 −
+ Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+.
+When PP ∼P(W2(P, Q) = 0) ̸= 0, we set x−TQ,P (x)
+W2(P,Q)
+= 0 for all x when W2(P, Q) =
+0.
+Note that the definition of SD(Q; P) is focused on absolutely continuous
+distributions Q, while the distributions that P samples can be arbitrary (for
+instance, absolutely continuous, discrete, or a mixture of both). We also refer
+to the discussion in Section 10 on this point.
+4. Examples
+In this section we give several examples where the WSD can be computed ex-
+plicitly.
+4.1. Univariate case
+In the case of univariate distributions, WSD reduces to quantile spatial depth.
+The univariate Wasserstein distance has a flat structure since there is an iso-
+metric homeomorphism between distributions and the corresponding generalized
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+9
+quantile functions. Consequently, the Wasserstein distance between univariate
+distributions P and Q has a simple form
+W2
+2(P, Q) =
+Z 1
+0
+(F −1
+P (u) −F −1
+Q (u))2du,
+where F −1
+P (u) = inf{x ∈R : u ≤P((−∞, x])}. Moreover, the univariate case
+is the unique case where the composition of optimal transport maps (here non-
+decreasing functions) is still an optimal transport map. Therefore, the spatial
+depth is just
+SD(Q; P) := 1 −
+
+
+
+Z 1
+0
+
+
+EP ∼P
+
+
+F −1
+P (u) −F −1
+Q (u)
+R 1
+0 (F −1
+P (u) −F −1
+Q (u))2du
+ 1
+2
+
+
+
+
+
+2
+du
+
+
+
+1
+2
+,
+which in short notation stands
+SD(Q; P) := 1 −
+
+EP ∼P
+
+
+F −1
+P
+−F −1
+Q
+F −1
+P (u) −F −1
+Q
+
+L2([0,1])
+
+
+
+L2([0,1])
+,
+which is the spatial depth of the quantile functions in the Hilbert space L2([0, 1])
+(see [51, 56, 59]).
+4.2. Location families
+Consider that P is supported on a location family, a set of shifted distribu-
+tions indexed by the location parameter θ. In this case, P coincides with the
+distribution of the location parameter. And the WSD reduces to
+SD(Q; P) = 1 −
+EP ∼P
+ 
+θP −θQ
+∥θP −θQ∥
+! = 1 −
+Eθ
+ 
+θ −θQ
+∥θ −θQ∥
+! ,
+(4.1)
+which is the Euclidean spatial depth of θQ with respect to the distribution of
+θ. This also includes the Gaussian location family (see below).
+4.3. Gaussian families
+It is well known that the optimal transport problem between Gaussian prob-
+ability measures admits a closed form (see [17]). In particular if Q and P are
+non degenerated Gaussian with means µQ and µP and (invertible) covariance
+matrices ΣQ and ΣP , respectively, the optimal transport map TQ,P is
+µP + AQ,P (x −µQ)
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+10
+with
+AQ,P = Σ
+−1
+2
+Q
+
+Σ
+1
+2
+QΣP Σ
+1
+2
+Q
+ 1
+2 Σ
+−1
+2
+Q .
+Therefore, if supp(P) is a set of Gaussian probability measures and Q is a non-
+degenerated Gaussian, then the WSD can be equivalently formulated as
+SD(Q; P) =
+1−
+
+
+
+
+
+
+Z
+
+EP ∼P
+
+
+x −µP −AQ,P (x −µQ)
+
+∥µP −µQ∥2 + Tr
+
+ΣP + ΣQ −2
+
+Σ
+1
+2
+P ΣQΣ
+1
+2
+P
+ 1
+2  1
+2
+
+
+
+2
+dQ(x)
+
+
+
+
+
+
+1
+2
+.
+In the special case of a common Σ for all P ∈supp(P), and when ΣQ = Σ, the
+above formula reduces to
+SD(Q; P) = 1 −
+EP ∼P
+ 
+µP −µQ
+∥µP −µQ∥
+! ,
+which is the Euclidean spatial depth function of µQ. When P = 1
+n
+Pn
+i=1 δPi, we
+obtain
+SD(Q; P) :=
+1−
+
+
+
+
+
+
+Z
+
+1
+n
+n
+X
+i=1
+
+
+x −µPi −AQ,Pi(x −µQ)
+
+∥µPi −µQ∥2 + Tr
+
+ΣPi + ΣQ −2
+
+Σ
+1
+2
+PiΣQΣ
+1
+2
+Pi
+ 1
+2  1
+2
+
+
+
+2
+dQ(x)
+
+
+
+
+
+
+1
+2
+.
+Furthermore, if ΣPi = ΣQ for all i = 1, . . . , n, the WSD is
+1 −
+
+
+Z 
+1
+n
+n
+X
+i=1
+µPi −µQ
+∥µPi −µQ∥
+
+2
+dQ(x)
+
+
+1
+2
+= 1 −
+
+1
+n
+n
+X
+i=1
+µPi −µQ
+∥µPi −µQ∥
+ .
+5. Properties of Wasserstein spatial depth
+Zuo and Serfling postulated in [64] the main four properties that a data depth
+should satisfy in Euclidean spaces. Those properties are affine invariance, mean-
+ing that the data depth function is invariant to affine transformations; center-
+outward monotonicity, meaning that the depth function decreases along rays
+arising from the deepest point; vanishing at infinity, meaning that the depth
+function tends to 0 as the distance to the deepest point tends to infinity; maxi-
+mality at the center, meaning that for elliptic distributions, its geometric center
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+11
+is the unique deepest point. The Euclidean spatial depth satisfies some of these
+properties. In particular, it is invariant to isometric transformations, it van-
+ishes at infinity and, if the spatial median is unique it is the unique maximizer
+of the spatial depth. As Rd is trivially embedded on P2(Rd) by means of the
+mapping x 7→δx, we cannot expect better properties for the Wasserstein space
+adaptation.
+5.1. General properties
+In this section we prove that the WSD shares the main properties of the Eu-
+clidean spatial depth, i.e., it belongs to the interval [0, 1], it decreases at infinity
+and it is transformation invariant.
+Theorem 5.1. Set P ∈P(P2(Rd)). Then the following properties hold:
+1. (Values in [0, 1].) SD(Q; P) ∈[0, 1] for all Q ∈Pa.c
+2 (Rd).
+2. (Transformation invariance.) Assume that d ≥2. Then for any isometry
+F : P2(Rd) →P2(Rd), it holds that
+SD(F(Q); F#P) = SD(Q; P),
+for all Q ∈Pa.c
+2 (Rd).
+3. (Vanishing at infinity.) Let {Qn}n∈N ⊂Pa.c
+2 (Rd) be a sequence such that
+W2(Qn, Q) →+∞, for one Q ∈P2(Rd), then SD(Qn; P) →0.
+Recall from [5] that there are tree types of isometries in (P2(Rd), W2). Let
+F : P2(Rd) →P2(Rd) be an isometry, i.e.,
+W2(F(P), F(Q)) = W2(P, Q)
+for all P, Q ∈P2(Rd).
+Then F is called trivial if there exists an isometry f : Rd →Rd such that
+F(P) = f#P for all P ∈P2(Rd); F is said to preserve shapes if for all P ∈
+P2(Rd) there exists an isometry f = fP : Rd →Rd such that F(P) = f#P; and
+if F does not preserve shapes, it is said to be exotic. An example of nontrivial
+isometry on (P2(Rd), W2) that preserves shapes is given by the mapping Φ(φ) :
+P 7→Φ(φ)(P) where φ : Rd →Rd is a linear isometry and Φ(φ)(P) is the law
+of the random variable
+φ(X −E[X]) + E[X],
+for X ∼P.
+Theorems 1.1 and 1.2 in [5] prove that (P2(Rd), W2) admits exotic isometries
+if and only if d = 1, which is the reason for which the invariance of the WSD
+holds for d ≥2.
+5.2. Maximality at the center
+The set of spatial medians of P is defined as
+arg min
+Q∈P2(Rd)
+EP ∼P[W2(P, Q)].
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+12
+The following result shows that, under some assumptions, the set of spatial
+medians which are absolutely continuous with respect to Lebesgue measure has
+maximum depth.
+Theorem 5.2. Set P ∈P(P2(K)) for a compact set K ⊂Rd. Assume that P
+is supported on a finite set P1, . . . , Pn. Then any
+Q ∈Pa.c
+2 (K) ∩arg min
+Q′∈P(K)
+EP ∼P[W2(P, Q′)]
+such that Q ̸= Pi for all i = 1, . . . , n satisfies SD(Q; P) = 1.
+Remark 5.3. We do not know if the set of spatial medians which are absolutely
+continuous with respect to Lebesgue measure is nonempty. It is known that,
+under the setting of Theorem 5.2, if we assume that Pi ∈Pa.c
+2 (K), the set of
+geometric means (or barycenters) is a singleton and its unique element belongs
+to Pa.c
+2 (K) (see [65]). However, the proof of [65], based on a fixed point argument
+which exploits the strict convexity of the squared Wasserstein distance, does not
+apply to our setting.
+5.3. Continuity
+In this section we investigate some topological properties of the WSD. We ana-
+lyze separately the function Q 7→SD(Q; P) and P 7→SD(Q; P). The following
+result shows that the function Pa.c.
+2
+(Rd) ∋Q 7→SD(Q; P) is continuous.
+Theorem 5.4. Let P ∈P(P2(Rd)) be atomless and {Qn}n∈N ⊂Pa.c.
+2
+(Rd) be a
+sequence such that W2(Qn, Q) →0 for some Q ∈Pa.c.
+2
+(Rd). Then
+lim
+n→∞SD(Qn; P) = SD(Q; P).
+Next we show the continuity of P 7→SD(Q; P) for fixed Q. As an intermediate
+step we need to show that for each Q ∈Pa.c.
+2
+(Rd) the function
+T Q : P2(Rd) ∋P 7→TQ,P ∈L2(Q)
+is continuous. Recall that TQ,P is the optimal transport map from Q to P.
+Lemma 5.5 (Continuity of T Q). Set Q ∈Pa.c
+2 (Rd). Let {Pn}n ⊂P2(Rd) be a
+sequence of probability measures such that W2(Pn, P) →0 for some P ∈P2(Rd).
+Then
+∥TQ,Pn −TQ,P ∥L2(Q) →0.
+In words, T Q : P2(Rd) →L2(Q) is continuous.
+Fix Q ∈Pa.c
+2 (Rd). Lemma 5.5 implies that the function
+P2(Rd) ∋P 7→I −TQ,P
+W2(P, Q) ∈L2(Q)
+is continuous around all P ̸= Q. This observation enables to derive the conti-
+nuity of the function P(P2(Rd)) ∋P 7→SD(Q; P) around atomless probability
+measures.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+13
+Theorem 5.6. Let P ∈P(P2(Rd)) be atomless and let Q ∈Pa.c
+2 (Rd). Then
+lim
+n→∞SD(Q; Pn) = SD(Q; P)
+for every sequence {Pn}n∈N ⊂P(P2(Rd)) such that Pn →P weakly in P(P2(Rd)).
+6. Consistent estimation
+In practice, we only observe sample datasets instead of knowing the true P
+or even the true P1, P2, . . . , Pn ∼P. Two common scenarios in the literature
+of distributional data learning [3, 41, 53] will be considered, namely, one-stage
+sampling model and two-stage sampling model. One-stage sampling model as-
+sumes the observation of an i.i.d. sample P1, . . . , Pn of P. Two-stage sampling
+model assumes the observation of a data array
+
+
+
+X1,1
+. . .
+X1,m
+...
+...
+...
+Xn,1
+. . .
+Xn,m
+
+
+,
+(6.1)
+where Xi,1, . . . , Xi,m ∈Rd is an i.i.d. sample from the distribution Pi for each
+i = 1, . . . , n, and P1, . . . , Pn are i.i.d. drawn from P. The difference between the
+two models is that the sampled distributions P1, . . . , Pn are known in one-stage
+sampling model, but unknown and to be estimated by the empirical distributions
+in two-stage sampling model.
+In each scenario, we give the empirical counterpart to the population WSD
+in Definition 3.1. We also establish a point-wise central limit theorem for the
+empirical WSD under the one-stage sampling model and a consistency result for
+the two-stage sampling model.
+6.1. One-stage sampling
+We describe the asymptotic behavior of the empirical WSD
+SD(Q; Pn) := 1 −
+
+
+Z 
+1
+n
+n
+X
+i=1
+x −TQ,Pi(x)
+W2(Q, Pi)
+
+2
+dQ(x)
+
+
+1
+2
+,
+Pn = 1
+n
+n
+X
+i=1
+δPi,
+(6.2)
+where Pn is the empirical counterpart to P. The WSD is associated with the
+spatial distribution process
+SP : Pa.c
+2 (Rd) ∋Q 7→SP,Q = EP ∼P
+ I −TQ,P
+W2(P, Q)
+
+∈L2(Q).
+The representation
+SP,Q = EP ∼P
+
+I −TQ,P
+∥I −TQ,P ∥L2(Q)
+
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+14
+allows to use standard techniques to obtain the point-wise strong law of large
+numbers and a central limit theorem for the empirical spatial distribution pro-
+cess (SPn,Q −SP,Q) ∈L2(Q), after showing that the random function TQ,P in
+L2(Q) is tight if P ∼P for a tight P. In other words, we need that for each
+Q ∈Pa.c.
+2
+(Rd) the function
+T Q : P2(Rd) ∋P 7→TQ,P ∈L2(Q)
+pushes forward tight probability measures over P2(Rd) to tight probabilities in
+L2(Q). Recall that a probability measure µ ∈P(X) over a separable topological
+space (X, d) is said to be tight if for every ϵ > 0 there exists a compact (in the
+metric topology) set K such that µ(K) ≥1 −ϵ. A random variable is tight if
+its distribution is tight. Therefore, Lemma 5.5 implies that if P ∼P is tight
+in P2(Rd), then TQ,P is tight in L2(Q). As a consequence, if P ∈P(P2(Rd)),
+then
+n
+I−TQ,Pi
+∥I−TQ,Pi∥L2(Q)
+on
+i=1 is an i.i.d. sequence of tight random elements in the
+separable Hilbert space L2(Q), with finite second order moments. The strong
+law of large numbers and the central limit theorem in separable Hilbert spaces
+(cf. [33, Corollary 10.9]) yield the following result. Note that a random element
+Z of a Hilbert space H is defined to be Gaussian when h(Z) follows a (univariate)
+Gaussian distribution for all linear continuous mappings h : H →R.
+Theorem 6.1. Set P ∈P(P2(Rd)), Q ∈Pa.c
+2 (Rd). Then
+∥SPn,Q −SP,Q∥L2(Q)
+a.s
+−−→0
+and
+√n(SPn,Q −SP,Q)
+P(L2(Q))
+−−−−−−→GP,Q,
+for some centered Gaussian element GP,Q ∈L2(Q). As a consequence, it holds
+that
+SD(Q; Pn)
+a.s
+−−→SD(Q; P)
+and, if SD(Q; P) < 1, also
+√n(SD(Q; Pn) −SD(Q; P))
+P(R)
+−−−→⟨GP,Q, SP,Q⟩L2(Q)
+SD(Q; P) −1
+.
+The last two statements of Theorem 6.1 are a mere application of the delta
+method.
+6.2. Two-stage sampling
+Now we deal with the scenario where only the data array (6.1) is available. Recall
+that, in this case, the i.i.d. samples P1, . . . , Pn of P are no longer observed but a
+sample {Xi,j}n,m
+i,j=1 is, where Xi,j ∼Pi for j ∈{1, . . . , m} and each i ∈{1, . . . , n}
+. We denote
+Pn,m := 1
+n
+n
+X
+i=1
+δPi,m,
+with
+Pi,m := 1
+m
+m
+X
+j=1
+δXi,j
+for each
+i ∈{1, . . . , n}.
+(6.3)
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+15
+Correspondingly, the empirical WSD is formulated as
+SD(Qm; Pn,m) = 1 −
+v
+u
+u
+t 1
+m
+m
+X
+j=1
+
+1
+n
+n
+X
+i=1
+Xq,j −TQm,Pi,m(Xq,j)
+W2(Qm, Pi,m)
+
+2
+,
+where Qm =
+1
+m
+Pm
+j=1 δXq,j with Xq,1, . . . , Xq,m
+i.i.d.
+∼
+Q, and the convention
+0
+0 = 0 remains. Now we show that, as n, m →∞, Pn,m converges in probability
+in P(Pp(Rd)) for all p ≥1. We endow P(Pp(Rd)) with the metric
+dBL(p)(P, Q)
+= sup
+ Z
+f(P)d(P−Q)(P) : |f(P)| ≤1 and |f(P)−f(Q)| ≤Wp(P, Q), ∀P, Q ∈Pp(Rd)
+
+.
+Lemma 6.2. Let {Pn,m}n∈N be as in (6.3) where m = m(n) is such that
+m →∞as n →∞. Assume that P ∈P(Pp(Rd)) for p ≥1. Then
+E[dBL(p)(Pn,m, P)] −→0
+as n →∞.
+A combination of Lemma 6.2, Theorem 5.6 and the continuous mapping theo-
+rem yields the following consistency result for the two-stage sampling estimator.
+Theorem 6.3. Set P ∈P(P2(Rd)) be atomless. Let {Pn,m}n∈N be as in (6.3)
+where m = m(n) is such that m →∞as n →∞. Then, for every Q ∈Pa.c
+2 (Rd),
+SD(Q; Pn,m)
+P
+−→SD(Q; P)
+as n →∞.
+Theorems 6.1 and 6.3 state that the empirical WSD converges to the pop-
+ulation version asymptotically. Given enough sample size, the empirical WSD
+is informative of the truth and has practical values. The simulation results in
+Section 8.1 also verify the above theorems.
+7. Comparison with other possible depth notions
+In the field of nonparametric statistics, the concept of depth presents significant
+challenges when attempting generalization to non-Euclidean spaces, a topic that
+has garnered considerable attention in advanced statistical research. Within
+the confines of linear functional spaces, such as Banach or Hilbert spaces, the
+application of Euclidean methodologies remains largely successful, attributed
+primarily to their inherent vectorial structures. Contrastingly, the landscape
+becomes markedly more complex when venturing into the domain of infinite-
+dimensional spaces devoid of a vectorial framework.
+The statistical literature identifies a mere trio of propositions capable of ad-
+dressing this complexity: lens depth, Tukey depth, and a novel approach of
+metric spatial depth, different from our proposal. Here we delve into a metic-
+ulous exploration of these methodologies, with a particular emphasis on their
+adaptability to Wasserstein space framework.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+16
+We shall demonstrate that these methodologies do not possess all the favor-
+able theoretical and computational properties that we have established for the
+WSD. The WSD is thus most beneficial in broad, complex statistical contexts,
+thereby yielding a significant advancement in the field of machine learning and
+statistical analysis.
+7.1. Tukey depth
+The next definition is a natural adaptation of the metric Tukey (or halfspace)
+depth proposed by Dai and Lopez-Pintado [22] to the Wasserstein space.
+Definition 7.1 (Adapted from [22]). The Wasserstein halfspace depth of a
+distribution Q ∈P2(Rd) with respect to a probability measure P ∈P(P2(Rd)) is
+the value
+HSD(Q; P) =
+inf
+P1,P2∈P2(Rd)
+W2(Q,P1)≤W2(Q,P2)
+PP ∼P(W2(P, P1) ≤W2(P, P2)).
+According to [22], the Wasserstein halphspace depth is transformation in-
+variant and vanishes at infinity. Moreover, center-outward monotonicity (the
+function t 7→HSD(γ(t); P) is monotone decreasing for any geodesic γ(t) with
+HSD(γ(0); P) = 1/2) holds if for any constant speed geodesic γ of (P2(Rd), W2),
+the following geometric condition holds:
+there exists t ∈[0, 1] such that W2
+2(γ(t), P) ≤W2
+2(γ(t), Q)
+=⇒
+ W2
+2(γ(0), P) ≤W2
+2(γ(0), Q)
+
+or
+ W2
+2(γ(1), P) ≤W2
+2(γ(1), Q)
+
+.
+(7.1)
+Recall (Section 3.2) that a constant speed geodesic in a metric space (M, d) is
+a curve γ : [0, 1] →M such that d(γ(t), γ(s)) = |t −s|d(γ(0), γ(1)) for all s, t ∈
+[0, 1]. In (P2(Rd), W2), a constant speed geodesic corresponds to interpolations
+obtained from optimal transport plans [1, p. 158]. More precisely, any constant
+speed geodesic connecting two absolutely continuous distributions P1 and P2 is
+of the form γ(t) = ((1 −t)I + tTP1,P2)#P1, where TP1,P2 is the unique optimal
+map pushing P1 to P2 (see also Section 3.3).
+Center-outward monotonicity is widely regarded as a favorable attribute
+within the scope of statistical depth measures. However, it is an attribute not
+typically anticipated in the context of spatial depths, particularly within Eu-
+clidean spaces. Notably, neither the transport-based depth nor the lens depth
+exhibit this property. Moreover, for the Wasserstein halphspace depth it is not
+clear if the geometric condition (7.1), and a fortiori the center-outward mono-
+tonicity, holds in general.
+Despite the ostensibly advantageous traits of Tukey depths, they are en-
+cumbered by significant computational demands, particularly evident as the
+dimensionality of the data increases. This computational intensity escalates to
+the point of impracticality for exact calculations in dimensions exceeding five,
+already in the Euclidean case. Within the confines of Wasserstein spaces, which
+are characterized by infinite dimensions, approximating Tukey depths poses a
+substantial challenge, much more so than for the WSD.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+17
+7.2. Lens depth
+Let us now turn our attention to the adaptation of the metric lens depth, pre-
+sented by Geenens, Nieto-Reyes and Francisci in [28], to the Wasserstein space.
+Definition 7.2 (Adapted from [28]). The Wasserstein lens depth of a distribu-
+tion Q ∈P2(Rd) with respect to P ∈P(P2(Rd)) is defined as
+LD(Q; P) = P(P ′,P )∼P⊗P[W2(P, P ′) ≥max(W2(P, Q), W2(P ′, Q))].
+The Wasserstein lens depth is transformation invariant and vanishes at in-
+finity. The two-stage plug-in estimator of LD(Q; P) can be computed exactly
+for a discrete distribution Q within polynomial time. Nevertheless, as indicated
+in [28], the lens depth fails to exhibit center-outward monotonicity in the linear
+case. Similarly, this property would possibly be absent in Wasserstein spaces.
+7.3. Metric spatial Wasserstein depth
+Virta [59] gave a definition of spatial depth for general metric spaces that does
+not agree with our definition in the particular case of Wasserstein space. To
+avoid confusion in terminology, the proposal from [59] will be referred to as
+metric spatial Wasserstein depth.
+Definition 7.3 (Adapted from [59]). The metric spatial Wasserstein depth of
+Q ∈P2(Rd) with respect to P ∈P(P2(Rd)) is defined as
+MSD(Q; P) = 1 −1
+2E(P ′,P )∼P⊗P
+W2
+2(P, Q) + W2
+2(P ′, Q) −W2
+2(P, P ′)
+W2(Q, P)W2(Q, P ′)
+
+.
+The function Q 7→MSD(Q; P) takes values in the interval [0, 2]. It is trans-
+formation invariant and vanishing at infinity. The metric spatial depth presents
+a remarkably viable and effective solution that is widely applicable to general
+metric spaces. Nevertheless, when specialized to the Wasserstein space, it falls
+short of fulfilling all the desirable properties that we have established for the
+WSD. In particular, also pointed out in [59], the question of the inclusion of spa-
+tial medians within the set of deepest points in terms of the metric spatial depth
+remains overall open. Note that taking a directional derivative of MSD(Q; P)
+with respect to Q, in the aim of studying deepest points, does not seem par-
+ticularly fruitful. This leads us to conjecture that, in general, spatial medians
+have no relation to the maximizers of MSD(Q; P). In contrast, our Theorem 5.2
+establishes that spatial medians maximize the WSD, in more general situations.
+Another natural question remaining overall open in [59] is whether the max-
+imal possible value 2 for the metric spatial depth can be reached. In particular
+Theorem 3 there states that this value 2 is attained by any non-atomic Q such
+that, given two independent realizations P1 and P2 from P, Q always falls be-
+tween these two points on a geodesic going through all three. As noted in [59],
+this condition is very strict and only satisfied in arguably pathological cases.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+18
+8. Numerical simulations
+In this section, we carry out extensive numerical simulations to validate our
+notion of Wasserstein spatial depth and support its theoretical properties and
+practical utility. Specifically, we confirm the consistency of the empirical WSD,
+examine its relationship with conventional spatial depth in certain cases, eval-
+uate its effectiveness in outlier detection and show its benefit compared to ap-
+plying functional depths to distributions. Throughout this section, we use the R
+package transport to compute all the Wasserstein distances and optimal trans-
+port maps from data clouds. Based on the two stage sampling model in (6.1), the
+empirical WSDs are calculated via the formula below. For Qm = 1
+m
+Pm
+j=1 δXq,j
+with Xq,1, . . . , Xq,m
+i.i.d.
+∼
+Q,
+SD(Qm; Pn,m) = 1 −
+v
+u
+u
+t 1
+m
+m
+X
+j=1
+
+1
+nq
+X
+i̸=q
+Xq,j −TQm,Pi,m(Xq,j)
+W2(Qm, Pi,m)
+
+2
+,
+(8.1)
+where Qm could be outside (with the convention q = n + 1 and nq = n) or
+within (with the convention q ∈{1, . . . , n} and nq = n −1) the sampled dis-
+tributions {P1,m, . . . , Pn,m}, and where we recall the convention 0/0 = 0. The
+code for all simulations is publicly available at https://github.com/YishaYao/
+Wasserstein-Spatial-Depth/tree/main.
+Since computing the optimal transport map between any pair of empirical dis-
+tributions costs O(m2) [49], and once the optimal transport map between a pair
+of empirical distributions is available, the corresponding Wasserstein distance
+immediately follows with almost zero extra cost, the computational complexity
+of SD(Qm, P n,m) is of order O(nm2).
+8.1. Consistency of the empirical Wasserstein spatial depth
+The simulation results below support the theoretical results in Section 6. That
+is, the empirical WSD, formulated in (8.1), is close to the theoretical value
+SD(Q; P) in Definition 3.1. Hence, the WSD can be inferred accurately from
+sample data and has practical value. Four cases are considered and described
+below.
+• Case 1: P is supported on a family of exponential distributions indexed by
+the rate parameter λ which follows a Beta(2, 2) distribution. The theoret-
+ical WSD of the exponential distribution with rate parameter λQ ∈(0, 1],
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+19
+denoted as exp(λQ), with respect to P is
+SD(Q; P) = 1 −
+sZ ∞
+0
+
+Eλ∼Beta(2,2)
+x −(λQ/λ)x
+W2(FλQ, Fλ)
+2
+λQe−λQxdx
+= 1 −
+sZ ∞
+0
+λ2
+Qx2
+2
+
+Eλ∼Beta(2,2)
+1/λQ −1/λ
+|1/λQ −1/λ|
+2
+λQe−λQxdx
+= 1 −
+sZ ∞
+0
+λ2
+Q
+2
+
+4λ3
+Q −6λ2
+Q + 1
+2
+x2λQe−λQxdx
+= 1 −
+1 + 4λ3
+Q −6λ2
+Q
+,
+where Fλ is the CDF of the exponential distribution with rate parameter
+λ, the optimal map from exp(λQ) to exp(λ) is
+TλQ,λ(x) = F −1
+λ
+◦FλQ(x) = λQx
+λ ,
+and W2(FλQ, Fλ) is derived by
+W2(FλQ, Fλ) =
+sZ ∞
+0
+
+x −(λQ/λ)x
+2
+λQe−λQxdx =
+√
+2
+ 1
+λQ
+−1
+λ
+.
+Note that the WSD is equal to 1 (maximal) for λQ = 1/2 which is the
+mean of the Beta(2, 2) distribution.
+• Case 2: P is supported on a family of Weibull distributions with fixed
+scale parameter 1 and varying shape parameter k. This family of Weibull
+distributions is indexed by the shape parameter k which takes value either
+1 or 2 with equal probabilities, i.e., k ∼Unif({1, 2}). Let Q be the Weibull
+distribution with shape parameter kQ (kQ equating either 1 or 2). Its
+theoretical WSD with respect to P is
+SD(Q; P) = 1 −
+sZ ∞
+0
+
+Ek∼Unif({1,2})
+x −xkQ/k
+W2(kQ, k)
+2
+kQxkQ−1e−xkQ dx
+= 1 −
+sZ ∞
+0
+ x −xkQ/kQ
+2W2(kQ, kQ)
+2
+kQxkQ−1e−xkQ dx
+= 1 −
+1
+2W2(kQ, kQ)
+sZ ∞
+0
+ x −xkQ/kQ2kQxkQ−1e−xkQ dx
+= 1/2,
+where the optimal map from Weibull(kQ) to Weibull(k) is
+TkQ,k(x) = F −1
+k
+◦FkQ(x) = xkQ/k,
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+20
+using kQ = 3 −kQ, the convention 0/0 = 0, and where W2(kQ, kQ) is
+derived by
+W2(kQ, kQ) =
+sZ ∞
+0
+ x −xkQ/kQ2kQxkQ−1e−xkQ dx.
+• Case 3: P is supported on a family of isotropic bivariate Gaussian dis-
+tributions with varying centers. The distribution of the Gaussian cen-
+ters is supported on four points {µ1 = (1, 0)⊤, µ2 = (−1, 0)⊤, µ3 =
+(0, 1)⊤, µ4 = (0, −1)⊤} with equal probabilities 1/4. Let Q be N(µq, I)
+for q ∈{1, . . . , 4}. The theoretical WSD is computed as, see Section 4.3,
+SD(Q; P) = 1 −
+
+1
+4
+X
+k̸=q
+µq −µk
+∥µq −µk∥
+ = 3 −
+√
+2
+4
+.
+• Case 4: P is supported on a family of bivariate uniform distributions
+Unif
+ [0, c]2
+with c ∼Unif([1, 2]). Let Q be Unif
+ [0, cq]2
+. Its theoreti-
+cal WSD with respect to P is
+SD(Q; P) = 1 −
+sZ
+[0,cq]2
+Ec∼Unif([1,2])
+x −(c/cq)x
+W2(cq, c)
+
+2 1
+c2q
+dx
+= 1 −
+sZ
+[0,cq]2
+
+p
+3/2xEc∼Unif([1,2])
+1 −(c/cq)
+|cq −c|
+
+2 1
+c2q
+dx
+= 1 −
+s
+3(2 −3/cq)2/2
+Z
+[0,cq]2 ∥x∥2 1
+c2q
+dx
+= 1 −|2cq −3|,
+where the optimal map from Unif
+ [0, cq]2
+to Unif
+ [0, c]2
+is the dilation
+Tcq,c(x) = c
+cq
+x,
+and W2(cq, c) is computed as
+W2(cq, c) =
+sZ
+[0,cq]2 ∥x −(c/cq)x∥2(1/c2q)dx =
+p
+2/3|cq −c|.
+For each of the above cases, we repeat independently the following experiment
+for 100 times: generate the data array X via the two-stage sampling procedure
+in Section 6.2; then compute the empirical WSDs of the sampled distributions;
+finally, compare the theoretical WSD and the ensemble of 100 empirical WSDs.
+We choose m = 1000, n = 2000. As shown in Figure 1, the empirical estimates
+are gathering tightly around the corresponding theoretical values.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+21
+Fig 1: The green solid lines depict the change of theoretical WSD along the
+parameter indexing P. The black circles represent the distribution of empirical
+WSDs, with error bars indicating one standard deviation above and below the
+mean.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+22
+8.2. Wasserstein spatial depth vs. conventional spatial depth
+As discussed in Section 4, when P is supported on a location family, the WSD
+coincides with the spatial depth of the location parameter. We verify the equiv-
+alence between WSD and spatial depth in the four cases described below.
+• Case 1: P is supported on a set of d = 10-dimensional Gaussian distribu-
+tions with identity covariance matrix. The Gaussian centers are i.i.d. from
+Unif([−2, 2]d).
+• Case 2: P is supported on a set of d = 10-dimensional Gaussian distribu-
+tions with a common covariance matrix. The common covariance matrix
+is chosen as Σi,j = 0.2|i−j|. The Gaussian centers are drawn in the same
+way as in Case 1.
+• Case 3: The support of P is a set of uniform distributions on d = 10-
+dimensional unit cubes with varying centers. The centers of the cubes are
+identically independently drawn from N(0, I).
+• Case 4: P is supported on a set of univariate double exponential distribu-
+tions with fixed rate equaling 1 and varying locations. The locations are
+identically independently drawn from N(0, 1).
+The simulation procedure is as follows. First, n = 500 distributions are drawn
+as described above in each case. Second, m = 500 data points are randomly
+drawn for each sampled distribution. Third, the empirical WSD of each empirical
+distribution is computed according to (8.1), and the empirical spatial depths of
+the locations are computed as in (4.1). Finally, we check whether the empirical
+WSDs and spatial depths are approximately equal. As shown in Figure 2, there
+are nice equality relationships between the two depths.
+8.3. Outlier detection
+Like conventional statistical depth, WSD can be used to detect outlier distri-
+butions. We demonstrate its utility for outlier detection in two cases. In each
+case, we draw n = 500 distributions from a population P and six outlier dis-
+tributions which are relatively far away from the population. For each sampled
+distribution, we draw m = 500 data points. All the distributions are on Rd with
+d = 10.
+• Case 1: the population is a collection of Gaussian distributions with com-
+mon identity covariance matrix and random centers, where the centers
+follow i.i.d. N(0, I); the six outlier distributions are
+N((5, . . . , 5)⊤, I),
+N((5, . . . , 5)⊤, Σ) with Σi,j = 0.5|i−j|,
+
+Gamma(3, 2)
+d,
+
+Unif([−6, 6])
+d,
+
+Beta(0.1, 0.1)
+d,
+Multinomial
+ 2d, (0.25, 0.25, 0.15, 0.15, 0.15, 0.01, 0.01, 0.01, 0.01, 0.01)
+
+.
+Here for a distribution µ, [µ]d is the distribution such that for Z =
+(Z1, . . . , Zd) ∼[µ]d we have Z1, . . . , Zd ∼i.i.d. µ.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+23
+Fig 2: The relationships between the WSD and conventional spatial depth in
+the four cases of Section 8.2.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+24
+• Case 2: the population is a collection of uniform distributions
+
+Unif([0, u])
+d
+with u ∼Unif([1, 2]); the outlier distributions are
+N
+ (3, . . . , 3)⊤, I
+
+,
+N
+ (−1, . . . , −1)⊤, Σ
+
+with Σi,j = 0.5|i−j|,
+
+Poisson(3)
+d,
+
+Binomial(d, 0.2)
+d,
+
+χ2
+10
+d,
+Multinomial
+ 2d, (0.25, 0.15, 0.1, 0.1, 0.15, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+.
+For each case, we repeat similar experiments for 20 times. The experimental
+procedure is as follows: draw the data array X according to Case 1 or Case
+2; compute their empirical WSD according to (8.1); detect the outlier distribu-
+tions whose empirical WSDs are smaller than the 1% quantile of all the empirical
+WSDs. In each of these 20 repetitions, all the outlier distributions can be de-
+tected for both Case 1 and Case 2. Figure 3 shows the result of one experiment,
+where the black and orange dots represent distributions from P and the outlier
+distributions, respectively.
+Fig 3: Left panel: the distributions are drawn according to Case 1. Right panel:
+the distributions are drawn according to Case 2. The green dots represent regular
+distributions from the population P, and the orange dots represent the outlier
+distributions.
+8.4. Wasserstein spatial depth vs. functional depth
+Hilbertian embedding of probability measures (into a RKHS) is a powerful tech-
+nique in machine learning and statistics that allows for a functional representa-
+tion of probability measures [52]. This approach maps a probability distribution
+µ ∈P(Rd) to an element fµ in the RKHS HK via kernel mean embedding,
+fµ(t) =
+Z
+Rd K(x, t)dµ(x).
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+25
+Here K : Rd × Rd →R is a kernel on Rd, yielding the Hilbert space HK (the
+RKHS) of functions from Rd to R [4]. Given this embedding machinery and an
+available notion of depth for functional data [27, 38], one could first transform
+a distribution into a functional data point and then compute its functional
+depth. However, such an approach neglects the rich geodesic structure of the
+Wasserstein space. The relative distance and “ordering” of pairs of distributions
+are probably distorted after Hilbertian embedding. The simulation results in this
+subsection support the above point of view.
+We consider two cases here. In each case, n = 100 similar distributions (de-
+noted as regular distributions) and four exotic distributions are drawn. By “sim-
+ilar” we mean that these n distributions are of the same parametric family and
+are close to each other in terms of Wasserstein distance. All the distributions
+are on R3 so that visualization is possible. We draw m = 300 data points for
+each distribution.
+• Case 1: the regular distributions are from a collection of spherical Gaussian
+distributions N(µ, σ2I) with varying centers µ
+i.i.d.
+∼N(0, I) and varying
+variances σ
+i.i.d.
+∼Unif([0.8, 1]); the four exotic distributions are
+
+Gamma(3, 2)
+d,
+
+Weibull(2, 1) · 3Bernoulli(−1, 1, 1/2)
+d,
+
+Unif({−3.5, −2.5, 2.5, 3.5})
+d,
+N((−3, 3, −3)⊤, Σ) with Σi,j = 0.5|i−j|.
+• Case 2: the regular distributions are from a collection of uniform distri-
+butions
+
+Unif([0, u])
+d with u ∼Beta(2, 2) + 1; the exotic distributions
+are
+
+Poisson(1)
+d,
+
+Exponential(2) · Bernoulli(−1, 1, 1/2)
+d,
+
+Unif({1, 2, 3})
+d,
+Multinomial
+ 2d, (0.1, 0.2, 0.7)
+
+.
+Here Bernoulli(−1, 1, 1/2) means an independent Bernoulli random variable tak-
+ing value −1 or +1 with probability 1/2. In each case, the regular distributions
+are close to each other in the Wasserstein space because
+W2
+
+N(µ1, σ2
+1I), N(µ2, σ2
+2I)
+
+=
+p
+∥µ1 −µ2∥2 + d(σ1 −σ2)2 ≲1.5
+√
+d,
+W2
+
+Unif[0, u1]
+d,
+
+Unif[0, u2]
+d
+=
+sZ
+[0,u1]d
+∥x −(u2/u1)x∥2
+ud
+1
+dx
+=
+p
+d/3 |u2 −u1| ≤
+p
+d/3.
+Also shown in Figure 4 (a) and Figure 5 (a), the regular distributions (rep-
+resented by green triangles) tend to form a data cloud and are not visually
+distinguishable, while the exotic distributions are visually distant to the regular
+distributions.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+26
+We compare the WSD and two types of functional depth, Modified Band
+Depth (MBD) [38] and Functional Spatial Depth (FSD) [11] in terms of detecting
+those exotic distributions. To compute the functional depth of a distribution,
+we first embed the distribution into a RKHS via a Gaussian kernel, and then
+compute the functional depth of the embedded function. The MBD and FSD are
+computed, respectively, by the R packages depthTools and fda.usc. As shown
+in Figures 4 and 5, the WSD is able to detect the exotic distributions in both
+cases, while the functional depths are not informative on the “ordering” of the
+distributions. This numerical experiment shows the superiority of the proposed
+WSD when applied to distribution-valued data objects, which is expected since
+the WSD is specially designed for distribution-valued data objects and adapts
+to the geometry of the Wasserstein space.
+9. Application
+Nowadays, climate change is a major concern across the society. Considerable
+amount of information can be extracted from longitudinal series of daily tem-
+peratures. We apply the notion of WSD to explore a dataset recording European
+daily temperatures during the past two centuries.
+The data is collected from the public database “European Climate Assess-
+ment and Dataset”1. It contains the daily average temperatures collected at
+40 meteorological stations located across Europe, including Austria, Croatia,
+Czech Republic, Denmark, Finland, Germany, Sweden, and United Kingdom,
+from year 1874 to 2023. These 40 meteorological stations cover a broad range
+of Europe and are representative of the region. The goal is to explore the tem-
+perature change over the years.
+We consider monthly temperatures obtained by averaging daily temperatures
+per month. For each weather station, we obtain a 12 monthly-average tempera-
+ture curve, represented by a vector in R12. Hence, the monthly temperatures of
+each year correspond to one distribution on R12. For a particular year, the 12
+monthly temperatures (forming a vector in R12) collected at each station act as
+a sample point drawn from this distribution. Finally, we gather 150 distributions
+(from year 1874 to year 2023) with each distribution associated to 40 sample
+points (for the 40 meteorological stations), and where each sample point is a
+12-dimensional real vector. In the following we assume that the distributions
+are drawn each year independently.
+Contrary to other work, we do not consider the annual evolution of the tem-
+peratures for a particular place but rather analyze the different temperature
+curves at all locations at the same time. We aim at understanding weather
+change at a global scale by considering the 40 different locations as representa-
+tives of the European climate.
+Within this framework, we compute the empirical WSDs of these 150 distri-
+butions as in (8.1). Several outlier years are identified based on their excessively
+1https://www.ecad.eu/dailydata/index.php.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+27
+Fig 4: (a): The data points are drawn from the distributions of Case 1. The
+green triangles represent data points from the regular distributions, while orange
+triangles represent data points from the exotic distributions. (b): The green dots
+represent the WSD values of the regular distributions, while the orange dots
+represent the WSD values of the exotic distributions. (c): Each dot represents
+the MBD of a distribution. The coloring pattern is the same as before. (d):
+Each dot represents the FSD of a distribution. The coloring pattern remains
+the same.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+28
+Fig 5: (a): The data points are drawn from the distributions of Case 2. The
+green triangles represent data points from the regular distributions, while orange
+triangles represent data points from the exotic distributions. (b): The green dots
+represent the WSD values of the regular distributions, while the orange dots
+represent the WSD values of the exotic distributions. (c): Each dot represents
+the MBD of a distribution. The coloring pattern is the same as before. (d):
+Each dot represents the FSD of a distribution. The coloring pattern remains
+the same.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+29
+small WSDs. As we discuss next, these identified “abnormal years” are consis-
+tent with historical records, which further validate the practical utility of the
+WSD.
+For the reproducibility of our research, the code for data analysis is publicly
+available at https://github.com/YishaYao/Wasserstein-Spatial-Depth/tree/
+main.
+Fig 6: The green dots represent regular/representative/central distributions,
+while the red dots correspond to the distributions near the outskirt and “far”
+from the center.
+The values of the 150 empirical WSDs are shown in Figure 6. The lowest 5%
+values, which we consider as outliers, are colored red, and the corresponding
+years are also marked. Based on empirical WSDs, the temperatures at years
+1879, 1929, 1940, 1942, 1947, 1956, 1963, and 2018 are more “exotic” or near
+outskirt. After searching among historical documentations, we indeed fond evi-
+dences to support this discovery. Year 1879 was an extremely cold year, featured
+with a unusually snowy winter (November and December). The first two months
+of 1929 were recorded as one of the coldest winters in Europe during the past
+century with temperature reaching down to -30°C in central Europe. Both year
+1940 and year 1942 were marked by severe winters with dramatic ice storms,
+and year 1942 had a cool summer. The weather in year 1947 was unusually cold
+in winter and record-breaking hot in summer. Europe experienced severe cold
+waves in both winters of 1956 and 1963. The well-known 2018 European drought
+and heat wave led to record-breaking temperatures and wildfires in many parts
+of Europe.
+To get a better view on how these years’ temperatures differ from other
+regular years’, we compare the four most “exotic” years with the most regular
+years. We pick the two years with the largest WSDs as our “regular years”,
+year 1935 and year 1960. In each plot of Figure 7, the bundle of green curves
+represents the temperature trends of the 40 locations in the regular years (1935
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+30
+and 1960), while the bundle of red curves corresponds to one particular outlier
+year. The green bundle and red bundle do exhibit clear visual differences in
+temperature trends over the months.
+(a) outlier year 1929
+(b) outlier year 1940
+(c) outlier year 1956
+(d) outlier year 2018
+Fig 7: Comparisons between the most regular years 1935 and 1960 (the two
+years with the largest WSDs) and four outlier years. In each plot, the bundle
+of green curves represents the temperature trends in years 1935 and 1960 at 40
+locations in Europe (totally 80 green curves); the bundle of red curves represents
+the temperature trends in an outlier year at the same 40 locations (totally 40
+red curves).
+10. Further directions and future work
+In this work, we propose a new notion of depth on the Wasserstein space.
+We demonstrate that it preserves critical properties of conventional statistical
+depths. Additionally, it has a straightforward empirical counterpart that can be
+easily computed from sample data and is asymptotically consistent. Numerical
+simulations and real data analysis further support its practical utility. Impor-
+tantly, in Section 8.4, we demonstrate that simply embedding distributions into
+linear Hilbert spaces, and relying on existing FDA methods, is not satisfying.
+In contrast, the WSD proves to be very informative in this section.
+Note that we have defined the new notion of WSD SD(Q; P) for absolutely
+continuous distributions Q and where P can be arbitrary. This is because our
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+31
+approach exploits the definition of the geodesics in the Wasserstein space (see
+Section 3.3).
+When Q is not absolutely continuous, the geodesic between Q and another
+distribution P might be not unique. In this case, the set of geodesics is given
+by the laws of the random vectors (1 −t)X + tY where the law of the random
+vector (X, Y), namely πP,Q, is an optimal transport plan, as in (3.1) with p = 2.
+Hence, uniqueness of the geodesics is equivalent to uniqueness of the transport
+plans.
+Thus, if with P-probability one P ∼P is absolutely continuous, even if Q is
+not absolutely continuous, the geodesics are unique and, following the route of
+Section 3.3, we can still define a notion of depth as follows:
+SDdiscr(Q; P) := 1−
+
+E
+(P,P ′)∼P⊗P
+Z 
+x −y
+W2(P, Q),
+x −y′
+W2(P ′, Q)
+
+dπQ,P,P ′(x, y, y′)
+1/2
+,
+(10.1)
+where πQ,P,P ′(x, y, y′) is the distribution of a vector (X, Y, Y′) with (X, Y) ∼
+πQ,P , (X, Y′) ∼πQ,P ′ and Y and Y′ are independent given X. Here πQ,P
+(resp. πQ,P ′) is the unique optimal transport plan from Q to P (resp. P ′).
+This provides a definition of WSD for any distribution Q when P samples a.s.
+absolutely continuous distributions. It can be seen, similarly as the proof of
+Theorem 5.1, that SDdiscr(Q; P) would be [0, 1]-valued (and the quantity in the
+square root being non-negative).
+We leave for future exploration the practical utility of this complementary
+WSD, along with the task of establishing analogous favorable mathematical
+properties as those demonstrated in this paper. Note that the depth in (10.1)
+coincides with SD(Q; P) in the special case where both Q and (a.s.) the samples
+from P are absolutely continuous. This can be seen from the arguments leading
+to (A.2) in the Appendix.
+Finally, for computational reasons, the statistics and machine learning com-
+munity has also focused on regularized optimal transport [21, 49]. It is an in-
+teresting prospect as well to extend the WSD to regularized optimal transport.
+Appendix A: Proof of Theorem 5.1
+A.1. Values in [0, 1]
+Here we prove that SD(Q; P) ∈[0, 1] for all Q ∈Pa.c
+2 (Rd), which is probably
+the easiest statement to prove. To prove the upper bound we realize that
+ Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+≥0,
+so that
+SD(Q; P) = 1 −
+ Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+≤1.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+32
+To prove the lower bound we observe that
+ Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+=
+sup
+∥G∥L2(Q)≤1
+Z 
+EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+, G(x)
+
+dQ(x)
+
+=
+sup
+∥G∥L2(Q)≤1
+Z
+EP ∼P
+⟨x −TQ,P (x), G(x)⟩
+W2(P, Q)
+
+dQ(x)
+
+≤EP ∼P
+"sup∥G∥L2(Q)≤1
+R
+⟨x −TQ,P (x), G(x)⟩dQ(x)
+W2(P, Q)
+#
+= EP ∼P
+∥I −TQ,P ∥L2(Q)
+W2(P, Q)
+
+= EP ∼P
+W2(P, Q)
+W2(P, Q)
+
+= 1,
+so that
+SD(Q; P) = 1 −
+ Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+≥0.
+A.2. Transformation invariance
+Theorem 1.2 in [32] describes the group of isometries of (P2(Rd), W2) for d ≥2.
+Any isometry F can be written as the composition of Φ(φ) and a trivial isometry.
+Recall that Φ(φ) : P 7→Φ(φ)(P) where φ : Rd →Rd is a linear isometry and
+Φ(φ)(P) is the law of the random variable
+φ(X −E[X]) + E[X],
+for X ∼P.
+Therefore, it is enough to show that the WSD is invariant with respect to
+trivial isometries and isometries of type Φ(φ) for some linear isometry φ : Rd →
+Rd.
+Invariance under trivial isometries. Let A be a d × d orthogonal matrix and
+b ∈Rd. We write
+fA,b(x) = Ax + b.
+The mapping
+SP = fA,b ◦TQ,P ◦(fA,b)−1 : x 7→A TQ,P (AT (x −b)) + b
+is the a.s. defined gradient of a convex function and (by construction) pushes
+(fA,b)#Q forward to (fA,b)#P. Therefore, SP is the optimal transport map
+from (fA,b)#Q forward to (fA,b)#P (cf. [40]). Hence, the following holds for
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+33
+the induced isometry F : P 7→F(P) = (fA,b)#P:
+SD(F(Q); F#P) = 1 −
+ Z EP
+x −SP (x)
+W2(P, Q)
+
+2
+d((fA,b)#Q)(x)
+! 1
+2
+= 1 −
+ Z EP
+fA,b(x) −fA,b ◦TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+= 1 −
+ Z EP
+A(x −TQ,P (x))
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+= 1 −
+ Z A EP
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+= 1 −
+ Z EP
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x)
+! 1
+2
+= SD(Q; P).
+This proves the invariance under trivial isometries.
+Invariance under isometries of type Φ(φ). Let φ be a linear isometry. Then the
+mapping SP solving
+SP (φ(x −EX∼Q[X]) + EX∼Q[X]) = φ(TQ,P (x) −EY∼P [Y]) + EY∼P [Y]
+is, as in the previous case, the optimal transport map from Φ(φ)(Q) to Φ(φ)(P).
+Then it holds that
+SD(Φ(φ)(Q); (Φ(φ))#P) = 1 −
+ Z EP ∼P
+x −SP (x)
+W2(P, Q)
+
+2
+dΦ(φ)(Q))(x)
+! 1
+2
+= 1 −
+ Z EP ∼P
+φ(x −EX∼Q[X]) + EX∼Q[X]
+W2(P, Q)
+−φ(TQ,P (x) −EY∼P [Y]) + EY∼P [Y]
+W2(P, Q)
+
+2
+dQ(x)
+ 1
+2
+.
+As φ is linear, we get the equality
+SD(Φ(φ)(Q); (Φ(φ))#P) =1 −
+ Z EP ∼P
+φ(x −TQ,P (x) −EX∼Q[X] + EY∼P [Y])
+W2(P, Q)
++ EX∼Q[X] −EY∼P [Y]
+W2(P, Q)
+
+2
+dQ(x)
+ 1
+2
+=1 −
+ Z φ
+
+EP ∼P
+x −TQ,P (x) −EX∼Q[X] + EY∼P [Y])
+W2(P, Q)
+
++ EP ∼P
+EX∼Q[X] −EY∼P [Y]
+W2(P, Q)
+
+2
+dQ(x)
+ 1
+2
+.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+34
+Develop the squares and use the fact that φ is an isometry to obtain
+SD(Φ(φ)(Q); (Φ(φ))#P)
+=1 −
+ Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
++ 2
+EP ∼P
+EX∼Q[X] −EY∼P [Y]
+W2(P, Q)
+
+2
++ 2
+
+EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+, EP ∼P
+EY∼P [Y] −EX∼Q[X]
+W2(P, Q)
+
+−2
+
+φ
+
+EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+, EP ∼P
+EY∼P [Y] −EX∼Q[X]
+W2(P, Q)
+
+−2
+
+φ
+
+EP ∼P
+EY∼P [Y] −EX∼Q[X]
+W2(P, Q)
+
+, EP ∼P
+EY∼P [Y] −EX∼Q[X]
+W2(P, Q)
+
+dQ(x)
+ 1
+2
+.
+The second term of the sum cancels with the third and the fourth with the last
+one as a consequence of Fubini’s theorem, the linearity of φ and the fact that
+(TQ,P )#Q = P. Therefore, the result follows.
+A.3. Vanishing at infinity
+The goal of this section is to prove that SD(Qn; P) →0 as W2(Qn, P) →∞for
+one P ∈P2(Rd).
+Remark A.1. Note that W2(Qn, P) →∞implies that for any other P ′ ∈
+P2(Rd),
+W2(Qn, P ′) ≥W2(Qn, P) −W2(P ′, P) →+∞.
+Moreover, for any compact set K,
+inf
+P ∈K W2(Qn, P) →+∞.
+Let {Qn}n∈N ⊂Pa.c
+2 (Rd) be such that W2(Qn, P) →∞for all P ∈P2(Rd).
+Recall that
+SD(Qn; P) := 1 −
+ Z EP ∼P
+x −TQn,P (x)
+W2(P, Qn)
+
+2
+dQn(x)
+! 1
+2
+with the convention x−TQn,P (x)
+W2(P,Qn)
+= 0 if W2(P, Qn) = 0. First we want to get rid
+of this last pathological case. Let
+An :=
+Z EP ∼P
+x −TQn,P (x)
+W2(P, Qn)
+
+2
+dQn(x).
+(A.1)
+Let En = {Qn}. Note that when P ∈En, a 0 appears in the expression of An
+(recall the convention 0/0 = 0). For each n, we modify P = P1 + P2, where P1
+is a measure on P2(Rd)\En and P2 is a measure on En, by P′ = P1 + eP2, where
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+35
+eP2 is an arbitrary measure on P2(Rd)\En such that eP2(P2(Rd)) = P(En). Note
+that P′ is also a probability measure.
+Since the measure P is tight and Qn diverges, it is clear that P(En) →0 as
+n →∞. Moreover,
+
+ Z EP ∼P′
+x −TQn,P (x)
+W2(P, Qn)
+
+2
+dQn(x)
+!1/2
+−(An)1/2
+
+≤P(En)
+ Z EP ∼
+e
+P2
+P(En)
+x −TQn,P (x)
+W2(P, Qn)
+
+2
+dQn(x)
+!1/2
+.
+Since the spatial depth lies in [0, 1], we can upper bound this quantity by P(En)
+and obtain that the limit of SD(Qn; P) is that of SD(Qn; P′). Therefore, we can
+feel free to assume that W2(P, Qn) = 0 does not happen for n big enough and
+for P ∼P.
+We prove that An →1, where An is defined in (A.1). To do so, let P ′ be an
+independent copy of P, so that
+An =
+Z 
+EP ∼P
+x −TQn,P (x)
+W2(P, Qn)
+
+, EP ′∼P
+x −TQn,P ′(x)
+W2(P ′, Qn)
+
+dQn(x)
+=
+Z
+EP,P ′∼P
+⟨x −TQn,P (x), x −TQn,P ′(x)⟩
+W2(P, Qn)W2(P ′, Qn)
+
+dQn(x).
+(A.2)
+In order to reduce the size of the formulas we call BP,n(x) = x −TQn,P (x) and
+BP ′,n(x) = x −TQn,P ′(x). Then
+An =
+Z
+EP,P ′∼P
+
+⟨BP,n(x), BP ′,n(x)⟩
+∥BP,n∥L2(Qn)∥BP ′,n∥L2(Qn)
+
+dQn(x),
+and, via Fubini’s theorem,
+An = EP,P ′∼P
+"
+⟨BP,n, BP ′,n⟩L2(Qn)
+∥BP,n∥L2(Qn)∥BP ′,n∥L2(Qn)
+#
+.
+Since
+|Cn(P, P ′)| :=
+
+⟨BP,n, BP ′,n⟩L2(Qn)
+∥BP,n∥L2(Qn)∥BP ′,n∥L2(Qn)
+ ≤∥BP,n∥L2(Qn)∥BP ′,n∥L2(Qn)
+∥BP,n∥L2(Qn)∥BP ′,n∥L2(Qn)
+= 1,
+the dominated convergence theorem can be applied and we only need to show
+that
+Cn(P, P ′) −→1,
+for P ⊗P −a.e. (P, P ′).
+(A.3)
+We decompose Cn(P, P ′) in two terms: Cn(P, P ′) = Cn,1(P, P ′) + Cn,2(P, P ′)
+with
+Cn,1(P, P ′) =
+∥BP,n∥2
+L2(Qn)
+∥BP,n∥2
+L2(Qn)
+= 1,
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+36
+and
+Cn,2(P, P ′) =
+
+BP,n
+∥BP,n∥L2(Qn)
+,
+BP ′,n
+∥BP ′,n∥L2(Qn)
+−
+BP,n
+∥BP,n∥L2(Qn)
+
+L2(Qn)
+.
+The goal, of course, is to show that Cn,2(P, P ′) →0, for P ⊗P-a.e. (P, P ′).
+Since
+Cn,2(P, P ′)
+=
+
+BP,n
+∥BP,n∥L2(Qn)
+, BP ′,n −BP,n
+∥BP ′,n∥L2(Qn)
++ BP,n
+
+1
+∥BP ′,n∥L2(Qn)
+−
+1
+∥BP,n∥L2(Qn)
+
+L2(Qn)
+=
+
+BP,n
+∥BP,n∥L2(Qn)
+, TQn,P −TQn,P ′
+∥BP ′,n∥L2(Qn)
++ BP,n
+
+1
+∥BP ′,n∥L2(Qn)
+−
+1
+∥BP,n∥L2(Qn)
+
+L2(Qn)
+,
+we can upper bound |Cn,2(P, P ′)| by
+∥BP,n∥L2(Qn)
+∥BP,n∥L2(Qn)
+∥TQn,P ∥L2(Qn) + ∥TQn,P ′∥L2(Qn)
+∥BP ′,n∥L2(Qn)
++
+
+
+BP,n
+∥BP,n∥L2(Qn)
+, BP,n
+
+1
+∥BP,n∥L2(Qn)
+−
+1
+∥BP ′,n∥L2(Qn)
+
+L2(Qn)
+ .
+(A.4)
+The first term of (A.4) tends to 0 for P ⊗P-a.e. (P, P ′). Indeed, using the
+equality ∥TQn,P ∥2
+L2(Qn) =
+R
+∥x∥2dP(x), the first term of (A.4) is equal to
+qR
+∥x∥2dP(x) +
+qR
+∥x∥2dP ′(x)
+∥BP ′,n∥L2(Qn)
+.
+(A.5)
+The latter clearly tends to 0 since ∥BP ′,n∥L2(Qn) = W2(Qn, P ′).
+To show that the second term of (A.4) also tends to 0 we use the bound
+
+
+BP,n
+∥BP,n∥L2(Qn)
+, BP,n
+
+1
+∥BP,n∥L2(Qn)
+−
+1
+∥BP ′,n∥L2(Qn)
+
+L2(Qn)
+
+≤
+∥BP,n∥
+∥BP,n∥L2(Qn) −∥BP ′,n∥L2(Qn)
+∥BP,n∥L2(Qn)∥BP ′,n∥L2(Qn)
+
+followed by the triangle inequality
+∥BP,n∥
+∥BP,n∥L2(Qn) −∥BP ′,n∥L2(Qn)
+∥BP,n∥L2(Qn)∥BP ′,n∥L2(Qn)
+ =
+
+∥BP,n∥L2(Qn) −∥BP ′,n∥L2(Qn)
+∥BP ′,n∥L2(Qn)
+
+≤
+∥BP,n −BP ′,n∥L2(Qn)
+∥BP ′,n∥L2(Qn)
+
+=
+∥TQn,P −TQn,P ′∥L2(Qn)
+∥BP ′,n∥L2(Qn)
+
+.
+The latter can be upper bounded by (A.5), so that the second term of (A.4)
+also tends to 0 for P ⊗P-a.e. (P, P ′). This implies Cn,2(P, P ′) tends to 0 for
+P ⊗P-a.e. (P, P ′). Hence, (A.3) holds.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+37
+Appendix B: Proof of Theorem 5.2
+Consider P ∈{P1, . . . , Pn} and Q ∈Pa.c.
+2
+(Rd) such that Q ̸∈{P1, . . . , Pn}. We
+recall from [57] that
+W2
+2(P, Q) =
+inf
+π∈Π(P,Q)
+1
+2
+Z
+∥x −y∥2dπ(x, y)
+(B.1)
+admits a dual formulation
+W2
+2(P, Q) =
+sup
+(f,g)∈Φ
+Z
+f(x) dQ(x) +
+Z
+g(y) dP(y)
+
+,
+(B.2)
+where Φ = {(f, g) ∈C(Rd) × C(Rd) : f(x) + g(y) ≤1
+2∥x −y∥2}. Here C(Rd) is
+the set of continuous functions on Rd. We denote as (fQ,P , fP,Q) the solutions
+of (B.2). It is well-known that ∇fQ,P (x) = x −TQ,P (x). Now we argue by
+contradiction. We assume first that there exists
+Q ∈Pa.c
+2 (Rd) ∩arg min
+Q′
+EP ∼P[W2(P, Q′)]
+with Q ̸∈{P1, . . . , Pn} and we assume that the set K′ of all x such that
+s(x) := EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+̸= 0
+has positive measure Q(K′) > 0. As TQ,P is the gradient of a lower semi
+continuous convex function, it is continuous Q-a.e., so that s is also contin-
+uous Q-a.e. Therefore, there exists a compact convex set with non-empty in-
+terior U such that U ⊂K′. Consider the signed measure h such that
+dh
+dQ =
+−1U
+
+fQ,P −
+1
+Q(U)
+R
+U fQ,P (z)dQ(z)
+
+, where 1U is the indicator function of the
+set U.
+Note that h(Rd) = 0 and Q + th is a probability measure with finite second
+order moment for all t in a neighborhood of zero. Since (·)1/2 is concave,
+W2(P, Q + th) ≤W2(P, Q) + W2
+2(P, Q + th) −W2
+2(P, Q)
+2W2(P, Q)
+.
+Using the dual formulation (B.2) we obtain for t in a neighborhood of zero,
+W2(P, Q + th) −W2(P, Q)
+t
+≤
+R
+fQ+th,P (x) dh(x)
+2W2(P, Q)
+.
+Since h(Rd) = 0, we have for t in a neighborhood of zero
+W2(P, Q + th) −W2(P, Q)
+t
+≤−
+R
+U
+
+fQ,P (x) −
+1
+Q(U)
+R
+U fQ,P (z)dQ(z)
+ 
+fQ+th,P (x) −
+1
+Q(U)
+R
+U fQ+th,P (z)dQ(z)
+
+dQ(x)
+2W2(P, Q)
+.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+38
+Set
+M(P) := 1
+2
+R
+U
+
+fQ,P (x) −
+1
+Q(U)
+R
+U fQ,P (z)dQ(z)
+2
+dQ(x)
+W2(P, Q)
+and the norm
+∥ϕ∥U :=
+ Z
+U
+
+ϕ(x) −
+1
+Q(U)
+Z
+U
+ϕ(z)dQ(z)
+2
+dQ(x)
+! 1
+2
+.
+Then
+W2(P, Q + th) −W2(P, Q)
+t
+≤−M(P) + ∥fQ,P ∥U∥fQ,P −fQ+th,P ∥U
+2W2(P, Q)
+.
+Since s(x) ̸= 0 for x ∈U, the function U ∋x 7→EP ∼P[fQ,P (x)] is non constant,
+which implies that
+EP ∼P[M(P)] := 1
+2EP ∼P
+
+
+R
+U
+
+fQ,P (x) −
+1
+Q(U)
+R
+U fQ,P (z)dQ(z)
+2
+dQ(x)
+W2(P, Q)
+
+> 0.
+The theorem follows upon showing that
+EP ∼P
+∥fQ,P ∥U∥fQ,P −fQ+th,P ∥U
+W2(P, Q)
+
+→0
+as t →0,
+(B.3)
+which is a trivial consequence of the main result of [50] and the assumption
+Q ̸∈{P1, . . . , Pn}.
+Appendix C: Proofs of Section 5.3
+Proof of Theorem 5.4. As P ∈P(P2(Rd)) is atomless there exists an open
+Wasserstein ball
+BW2(Q, β) = {P ∈P2(Rd) : W2(P, Q) < β}
+with P(BW2(Q, β)) ≤ϵ/2. Since P ∈P(P2(Rd)) is tight, there exists a compact
+set K ⊂P2(Rd) such that P(P2(Rd) \ K) ≤ϵ/2. Set Vβ = K ∩(P2(Rd) \
+BW2(Q, β)) and Vc
+β = P2(Rd) \ Vβ. In summary, it holds that
+P(Vc
+β) ≤ϵ.
+(C.1)
+Moreover, as W2(Qn, Q) →0, we can assume that n is large enough such that
+W2(Qn, Q) ≤β/2, which implies that
+W2(Qn, P) ≥W2(P, Q) −W2(Qn, Q) ≥β/2,
+(C.2)
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+39
+for all P ∈Vβ. Next, call
+A2
+n =
+Z EP ∼P
+x −TQn,P (x)
+W2(P, Qn)
+
+2
+dQn(x)
+and
+A2 =
+Z EP ∼P
+x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x).
+The result follows by showing that A2
+n →A2. Triangle inequality implies that
+
+An −
+
+
+
+
+
+Z EP ∼P
+
+1Vβ(P)x −TQn,P (x)
+W2(P, Qn)
+
+2
+dQn(x)
+|
+{z
+}
+=:B2n
+
+
+
+
+
+1
+2 
+≤
+ Z EP ∼P
+
+1Vc
+β(P)x −TQn,P (x)
+W2(P, Qn)
+
+2
+dQn(x)
+! 1
+2
+,
+so that, arguing as in Subsection A.1 and using (C.1), we derive the bound
+|An −Bn| ≤ϵ for all n ∈N. By the same means |A −B| ≤ϵ where
+B2 =
+Z EP ∼P
+
+1Vβ(P)x −TQ,P (x)
+W2(P, Q)
+
+2
+dQ(x).
+Therefore, since ϵ is arbitrary, the result follows after showing that Bn →B.
+To do so, we set Xn ∼Qn for n ∈N, X ∼Q and P, P ′ ∈P2(Rd). Arguing as in
+the proof of Theorem 2.1 in [23] we get for every P, P ′ ∈P2(Rd),
+(Xn, TQn,P (Xn), TQn,P ′(Xn))
+w
+−→(X, TQ,P (X), TQ,P ′(X)).
+(C.3)
+Indeed a straightforward adaptation of the arguments there shows first that
+there is a limit in distribution which is the distribution of the random vector
+(Z1, Z2, Z3),
+where of course we have Z1 ∼Q. Then the arguments there show that (Xn, TQn,P (Xn))
+w
+−→
+(X, TQ,P (X)) and thus a.s.
+Z2 = TQ,P (Z1).
+Similarly,
+Z3 = TQ,P ′(Z1)
+and thus (C.3) holds. The continuous mapping theorem with the function (x, y, z) 7→
+(y −x, z −x) implies that
+TQn,P (Xn) −Xn
+TQn,P ′(Xn) −Xn
+
+w
+−→
+TQ,P (X) −X
+TQ,P ′(X) −X
+
+.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+40
+Since for all P ∈P2(Rd), it holds that W2(Qn, P) →W2(Q, P), Slutsky’s
+theorem yields
+ TQn,P (Xn)−Xn
+W2(Qn,P )
+TQn,P ′(Xn)−Xn
+W2(Qn,P ′)
+!
+w
+−→
+ TQ,P (X)−X
+W2(Q,P )
+TQ,P ′(X)−X
+W2(Q,P ′)
+!
+(C.4)
+for all P, P ′ such that W2(Q, P) > 0 and W2(Q, P ′) > 0. As a consequence,
+(C.4) holds for P-a.e. P, P ′.
+Let Pβ be the probability measure A 7→Pβ(A) = P(Vβ∩A)
+P(Vβ) . Therefore, for
+(P, P ′) ∼Pβ ⊗Pβ with (P, P ′) independent of {Xn}n∈N, we obtain
+Yn := ⟨Xn −TQn,P (Xn), Xn −TQn,P ′(Xn)⟩
+W2(P, Qn)W2(P ′, Qn)
+w
+−→Y := ⟨X −TQ,P (X), X −TQ,P ′(X)⟩
+W2(P, Q)W2(P ′, Q)
+.
+Indeed, for a bounded continous function F : R →R,
+E [F(Yn)] = E [E [F(Yn)| P, P ′]]
+=
+Z Z
+E
+h
+F(Yn)| P = ˜P, P ′ = ˜P ′i
+dPβ( ˜P)dPβ( ˜P ′)
+=
+Z Z
+E
+
+F
+
+
+D
+Xn −TQn, ˜
+P (Xn), Xn −TQn, ˜
+P ′(Xn)
+E
+W2( ˜P, Qn)W2( ˜P ′, Qn)
+
+
+
+dPβ( ˜P)dPβ( ˜P ′)
+−→
+n→∞
+Z Z
+E
+
+F
+
+
+D
+X −TQ, ˜
+P (X), X −TQ, ˜
+P ′(X)
+E
+W2( ˜P, Q)W2( ˜P ′, Q)
+
+
+
+dPβ( ˜P)dPβ( ˜P ′)
+= E[F(Y)],
+where the above limit holds due to dominated convergence.
+Skorokhod’s representation theorem yields the existence of a sequence of ran-
+dom variables { ˜Yn} defined on a common probability space (Ω′, A′, P′) taking
+values in R with ˜Yn
+d= Yn converging P′-a.e. to a random variable ˜Y : Ω′ →Rd
+with ˜Y
+d= Y. Since
+B2
+n = P(Vβ)2E
+⟨Xn −TQn,P (Xn), Xn −TQn,P ′(Xn)⟩
+W2(P, Qn)W2(P ′, Qn)
+
+= P(Vβ)2E[ ˜Yn]
+and
+B2 = P(Vβ)2E
+⟨X −TQ,P (X), X −TQ,P ′(X)⟩
+W2(P, Q)W2(P ′, Q)
+
+= P(Vβ)2E[ ˜Y],
+we only need to prove that Yn is uniformly integrable. The bound (C.2) implies
+that it is enough to show that each of the terms of the right hand side of
+| ⟨Xn −TQn,P (Xn), Xn −TQn,P ′(Xn)⟩|
+≤∥Xn∥2+∥TQn,P (Xn)∥∥Xn∥+∥TQn,P ′(Xn)∥∥Xn∥+∥TQn,P (Xn)∥∥TQn,P ′(Xn)∥
+(C.5)
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+41
+are uniformly integrable. Recall that a set S of random variables is uniformly
+integrable if
+lim
+R→+∞sup
+U∈S
+E[|U|1|U|>R] = 0.
+Since Vβ and {Qn}n∈N are relatively compact subsets in the 2-Wasserstein topol-
+ogy, Theorem 7.12 in [57] implies that
+lim
+R→+∞sup
+P ∈Vβ
+Z
+∥x∥2>R
+∥x∥2dP(x) = 0
+(C.6)
+and
+lim
+R→+∞sup
+n∈N
+Z
+∥x∥2>R
+∥x∥2dQn(x) = 0.
+(C.7)
+The last limit (C.7) implies that the sequence {∥Xn∥2}n∈N is uniformly in-
+tegrable, so that the first term of the right-hand-side of (C.5) is uniformly
+integrable. For the second, we observe that
+E[∥TQn,P (Xn)∥∥Xn∥1∥TQn,P (Xn)∥∥Xn∥>R]
+≤E
+h
+∥TQn,P (Xn)∥∥Xn∥1∥Xn∥>R
+1
+2
+i
++ E
+h
+∥TQn,P (Xn)∥∥Xn∥1∥TQn,P (Xn)∥>R
+1
+2
+i
+≤
+
+E
+
+∥TQn,P (Xn)∥2
+E
+h
+∥Xn∥21∥Xn∥>R
+1
+2
+i 1
+2
++
+
+E
+h
+∥TQn,P (Xn)∥21∥TQn,P (Xn)∥>R
+1
+2
+i
+E
+
+∥Xn∥2 1
+2
+≤
+ 
+sup
+P ∈Vβ
+Z
+∥x∥2dP(x)
+Z
+∥x∥2>R
+∥x∥2dQn(x)
+! 1
+2
++
+ 
+sup
+P ∈Vβ
+Z
+∥x∥2>R
+∥x∥2dP(x)
+Z
+∥x∥2dQn(x)
+! 1
+2
+,
+where we used the fact that TQn,P (Xn) ∼P for all n ∈N. Since, supn∈N
+R
+∥x∥2dQn(x)
+and supP ∈Vβ
+R
+∥x∥2dP(x) are bounded, the previous display, (C.6) and (C.7)
+imply that the second term of (C.5) is uniformly integrable. Since P and P ′ are
+exchangeable, the same holds for the third term. The uniform integrability of
+the last one follows directly from (C.6).
+Proof of Lemma 5.5. From [58, Corollary 5.23], for every ϵ > 0, it holds that
+Q(∥TQ,Pn −TQ,P ∥≥ϵ) →0. As ∥TQ,Pn −TQ,P ∥L2(Q) is uniformly bounded,
+the sequence {TQ,Pn −TQ,P }n∈N is compact w.r.t. the weak topology of L2(Q)
+by the Banach-Alaoglu–Bourbaki theorem (cf. [10, Theorem 3.16]). Therefore,
+for each subsequence {TQ,Pnk −TQ,P }k∈N there exists a further subsequence
+{TQ,Pnkℓ−TQ,P }ℓ∈N such that
+⟨TQ,Pnkℓ−TQ,P , h⟩L2(Q) →⟨L, h⟩L2(Q)
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+42
+for some L ∈L2(Q) and all h ∈L2(Q). We prove now that L = 0, irrespective of
+the subsequences. To improve readability, we write {TQ,Pn −TQ,P }n∈N instead
+of {TQ,Pnkℓ−TQ,P }ℓ∈N. Since Q(∥TQ,Pn −TQ,P ∥≥ϵ) →0 and
+∥TQ,Pn∥2
+L2(Q) =
+Z
+∥x∥2dPn(x) →
+Z
+∥x∥2dP(x) = ∥TQ,P ∥2
+L2(Q) < +∞,
+Vitali convergence theorem implies that {TQ,Pn −TQ,P }n∈N converges to zero
+in the reflexive space L
+3
+2 (Q). Therefore, 0 is also the weak limit of TQ,Pn −TQ,P
+in L
+3
+2 (Q), i.e.,
+Z
+⟨TQ,Pn −TQ,P , h⟩dQ →0
+for all h ∈L3(Q). As a consequence, L = 0, Q-a.e. Moreover,
+∥TQ,Pn −TQ,P ∥2
+L2(Q) = ∥TQ,Pn∥2
+L2(Q) + ∥TQ,P ∥2
+L2(Q) −2⟨TQ,Pn, TQ,P ⟩L2(Q)
+→2∥TQ,P ∥2 −2⟨TQ,P , TQ,P ⟩L2(Q)
+= 0.
+This concludes the proof.
+Proof of Theorem 5.6. Fix ϵ > 0. As P ∈P(P2(Rd)) is atomless there exists an
+open Wasserstein ball
+BW2(Q, β) = {P ∈P2(Rd) : W2(P, Q) < β}
+with P(BW2(Q, β)) ≤ϵ/8. Since Pn
+w
+−→P in P(P2(Rd)) and the closure of
+BW2(Q, β/2) under the W2-metric, is contained in BW2(Q, β), there exists n0 ∈
+N such that
+Pn(BW2(Q, β/2)) ≤ϵ/4
+for all n ≥n0.
+As {Pn}n∈N ⊂P(P2(Rd)) is tight, there exists a compact set K ⊂P2(Rd) such
+that
+Pn(P2(Rd) \ K) ≤ϵ/4
+for all n ≥n0.
+Call V = K ∩(P2(Rd) \ BW2(Q, β/2)) and V c = P2(Rd) \ V . Then
+P(V c) + Pn(V c) ≤ϵ
+for all n ≥n0.
+We call
+A :=
+
+
+Z
+I −TQ,P
+W2(P, Q)dPn(P)
+
+L2(Q)
+−
+
+Z
+I −TQ,P
+W2(P, Q)dP(P)
+
+L2(Q)
+ .
+The triangle inequality yields
+A ≤
+
+Z
+I −TQ,P
+W2(P, Q)d(Pn −P)(P)
+
+L2(Q)
+≤
+
+Z
+V
+I −TQ,P
+W2(P, Q)d(Pn −P)(P)
+
+L2(Q)
++
+
+Z
+V c
+I −TQ,P
+W2(P, Q)dP(P)
+
+L2(Q)
++
+
+Z
+V c
+I −TQ,P
+W2(P, Q)dPn(P)
+
+L2(Q)
+.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+43
+Arguing as in Section A.1 we get that, for n ≥n0,
+
+Z
+V c
+I −TQ,P
+W2(P, Q)dP(P)
+
+L2(Q)
++
+
+Z
+V c
+I −TQ,P
+W2(P, Q)dPn(P)
+
+L2(Q)
+≤P(V c)+Pn(V c) ≤ϵ.
+Moreover, as the function
+V ∋P 7→I −TQ,P
+W2(P, Q) ∈L2(Q)
+is continuous and bounded (Lemma 5.5), for every h ∈L2(Q) it holds that
+Z
+V
+ I −TQ,P
+W2(P, Q), h
+
+L2(Q)
+d(Pn −P)(P) →0,
+meaning that
+R
+V
+I−TQ,P
+W2(P,Q)d(Pn −P)(P) converges to zero in the weak topology
+of L2(Q). However, as the set
+ I −TQ,P
+W2(P, Q) : P ∈V
+
+∪{0}
+is compact (note that V is compact in P2(Rd) and P2(Rd)\{Q} ∋P 7→
+I−TQ,P
+W2(P,Q)
+is continuous, see Lemma 5.5), its closed convex hull, namely C, is compact
+as well. Since
+R
+V
+I−TQ,P
+W2(P,Q)dPn lies in C for all n ∈N, the convergence of
+R
+V
+I−TQ,P
+W2(P,Q)d(Pn −P)(P) towards zero holds in the strong topology of L2(Q).
+We have proven that A ≤2ϵ for n big enough. Since ϵ was arbitrarily chosen,
+the result follows.
+Appendix D: Proof of Lemma 6.2
+Let S ⊂Pp(Rd) be a closed set and define
+BL1(S) = {f : S →R : |f(P)| ≤1 and |f(P) −f(Q)| ≤Wp(P, Q), ∀P, Q ∈S} .
+Fix f ∈BL1(Pp(Rd)). Then
+
+Z
+f(P)d(Pn,m −P)(P)
+ ≤
+
+Z
+f(P)d(Pn,m −Pn)(P)
+
+|
+{z
+}
+An,m(f)
++
+
+Z
+f(P)d(Pn −P)(P)
+
+|
+{z
+}
+Bn(f)
+,
+where Pn = 1
+n
+Pn
+i=1 δPi. It can be proved by standard means that
+E
+"
+sup
+f∈BL1(Pp(Rd))
+Bn(f)
+#
+→0
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+44
+as n →∞. Since f ∈BL1(Pp(Rd)), it holds that
+An,m(f) =
+
+1
+n
+n
+X
+i=1
+f(Pi,m) −f(Pi)
+ ≤1
+n
+n
+X
+i=1
+min(2, Wp(Pi,m, Pi))
+which, by taking expectations, implies
+E
+"
+sup
+f∈BL1(Pp(Rd))
+An,m(f)
+#
+≤1
+n
+n
+X
+i=1
+E[min(2, Wp(Pi,m, Pi))].
+Since the sequence {Wp(Pi,m, Pi)}n
+i=1 is exchangeable, it holds that
+E
+"
+sup
+f∈BL1(Pp(Rd))
+An,m(f)
+#
+≤E[min(2, Wp(P1,m, P1))].
+The latter tends to zero by Glivenko–Cantelli theorem and the fact that, con-
+ditionally to P1,
+1
+m
+m
+X
+j=1
+Xp
+1,j
+a.s.
+−−→
+Z
+∥x∥pdP1(x)
+as m →∞.
+Funding
+Fran¸cois Bachoc was supported by the Project GAP (ANR-21-CE40-0007) of
+the French National Research Agency (ANR) and by the Chair UQPhysAI of
+the Toulouse ANITI AI Cluster.
+References
+[1] Ambrosio, L., Gigli, N. and Savare, G. (2005). Gradient Flows in Met-
+ric Spaces and in the Space of Probability Measures. Birkh¨auser Basel.
+[2] Bachoc, F., B´ethune, L., Gonzalez-Sanz, A. and Loubes, J.-M.
+(2023a). Gaussian processes on distributions based on regularized optimal
+transport. In International Conference on Artificial Intelligence and Statis-
+tics 26 4986–5010.
+[3] Bachoc, F., B´ethune, L., Gonz´alez-Sanz, A. and Loubes, J.-M.
+(2023b). Improved learning theory for kernel distribution regression with
+two-stage sampling. arXiv:2308.14335.
+[4] Berlinet, A. and Thomas-Agnan, C. (2011). Reproducing Kernel
+Hilbert Spaces in Probability and Statistics. Springer Science & Business
+Media.
+[5] Bertrand, J. and Kloeckner, B. (2012). A geometric study of Wasser-
+stein spaces: Hadamard spaces. Journal of Topology and Analysis 4 515–
+542.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+45
+[6] Bigot, J. (2020). Statistical data analysis in the Wasserstein space.
+ESAIM: Proceedings and Surveys 68 1–19.
+[7] Bigot, J., Gouet, R., Klein, T. and L´opez, A. (2017). Geodesic PCA
+in the Wasserstein space by convex PCA. Annales de l’Institut Henri
+Poincar´e, Probabilit´es et Statistiques 53 1 – 26.
+[8] Boissard, E., Le Gouic, T. and Loubes, J.-M. (2015). Distribution’s
+template estimate with Wasserstein metrics. Bernoulli 21 740–759.
+[9] Bonneel, N., Peyr´e, G. and Cuturi, M. (2016). Wasserstein barycen-
+tric coordinates: histogram regression using optimal transport. ACM Trans-
+actions on Graphics 35 71–1.
+[10] Brezis, H. (2010). Functional Analysis, Sobolev Spaces and Partial Dif-
+ferential Equations. New York: Springer.
+[11] Chakraborty, A. and Chaudhuri, P. (2014). The spatial distribution
+in infinite dimensional spaces and related quantiles and depths. The Annals
+of Statistics 42 1203 – 1231.
+[12] Chami, I., Gu, A., Chatziafratis, V. and R´e, C. (2020). From trees to
+continuous embeddings and back: Hyperbolic hierarchical clustering. Ad-
+vances in Neural Information Processing Systems 33 15065–15076.
+[13] Chan,
+S., Santoro,
+A., Lampinen,
+A., Wang,
+J., Singh,
+A.,
+Richemond, P., McClelland, J. and Hill, F. (2022). Data distribu-
+tional properties drive emergent in-context learning in transformers. Ad-
+vances in Neural Information Processing Systems 35 18878–18891.
+[14] Chaudhuri, P. (1996). On a geometric notion of quantiles for multivariate
+data. Journal of the American Statistical Association 91 862–872.
+[15] Chen, Y., Lin, Z. and M¨uller, H.-G. (2023). Wasserstein regression.
+Journal of the American Statistical Association 118 869–882.
+[16] Chernozhukov, V., Galichon, A., Hallin, M. and Henry, M. (2017).
+Monge-Kantorovich depth, quantiles, ranks and signs. The Annals of Statis-
+tics 45 223–256.
+[17] Cuesta-Albertos, J. A., Matr´an-Bea, C. and Tuero-Di´az, A.
+(1996). On lower bounds for the L2-Wasserstein metric in a Hilbert space.
+Journal of Theoretical Probability 9 263-283.
+[18] Cuesta-Albertos, J. A. and Nieto-Reyes, A. (2008). The random
+Tukey depth. Computational Statistics and Data Analysis 52 4979–4988.
+[19] Cuevas, A., Febrero, M. and Fraiman, R. (2007). Robust estimation
+and classification for functional data via projection-based depth notions.
+Computational Statistics 22 481–496.
+[20] Cuevas, A. and Fraiman, R. (2009). On depth measures and dual statis-
+tics. A methodology for dealing with general data. Journal of Multivariate
+Analysis 100 753-766.
+[21] Cuturi, M. (2013). Sinkhorn distances: Lightspeed computation of op-
+timal transport. Advances in Neural Information Processing Systems 27
+2292-2300.
+[22] Dai, X. and Lopez-Pintado, S. (2023). Tukey’s depth for object data.
+Journal of the American Statistical Association 118 1760-1772.
+[23] Deb, N. and Sen, B. (2023). Multivariate rank-based distribution-free
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+46
+nonparametric testing using measure transportation. Journal of the Amer-
+ican Statistical Association 118 192–207.
+[24] Del Barrio, E., Inouzhe, H., Loubes, J.-M., Matr´an, C. and Mayo-
+´Iscar, A. (2020). optimalFlow: optimal transport approach to flow cytom-
+etry gating and population matching. BMC Bioinformatics 21 1–25.
+[25] Dubey, P., Chen, Y. and M¨uller, H.-G. (2024). Metric statistics: Ex-
+ploration and inference for random objects with distance profiles. The An-
+nals of Statistics 52 757–792.
+[26] Dutta, S., Ghosh, A. K. and Chaudhuri, P. (2011). Some intriguing
+properties of Tukey’s half-space depth. Bernoulli 17.
+[27] Fraiman, R. and Muniz, G. (2001). Trimmed means for functional data.
+Test 10 419–440.
+[28] Geenens, G., Nieto-Reyes, A. and Francisci, G. (2023). Statistical
+depth in abstract metric spaces. Statistics and Computing 33.
+[29] Ghorbani, A., Kim, M. and Zou, J. (2020). A distributional framework
+for data valuation. In International Conference on Machine Learning 37
+3535–3544.
+[30] Gonz´alez-Sanz, A., Hallin, M. and Sen, B. (2023). Monotone
+measure-preserving maps in Hilbert spaces: existence, uniqueness, and sta-
+bility. arXiv:2305.11751.
+[31] Hallin, M., del Barrio, E., Cuesta-Albertos, J. and Matr´an, C.
+(2021). Distribution and quantile functions, ranks and signs in dimension
+d: A measure transportation approach. The Annals of Statistics 49 1139 –
+1165.
+[32] Kloeckner, B. (2010). A geometric study of Wasserstein spaces: Eu-
+clidean spaces. Annali della Scuola Normale Superiore di Pisa - Classe di
+Scienze 9 297–323.
+[33] Ledoux, M. and Talagrand, M. (1991). Probability in Banach Spaces.
+Springer Berlin Heidelberg.
+[34] Liu, R. Y. (1990). On a notion of data depth based on random simplices.
+The Annals of Statistics 405–414.
+[35] Liu, Z. and Modarres, R. (2011). Lens data depth and median. Journal
+of Nonparametric Statistics 23 1063–1074.
+[36] Liu, R. Y. and Singh, K. (1993). A quality index based on data depth and
+multivariate rank tests. Journal of the American Statistical Association 88
+252–260.
+[37] Long, J. P. and Huang, J. Z. (2015). A study of functional depths.
+arXiv:1506.01332.
+[38] L´opez-Pintado, S. and Romo, J. (2009). On the concept of depth for
+functional data. Journal of the American Statistical Association 104 718–
+734.
+[39] L´opez-Pintado, S. and Romo, J. (2011). A half-region depth for func-
+tional data. Computational Statistics & Data Analysis 55 1679-1695.
+[40] McCann, R. J. (1995). Existence and uniqueness of monotone measure-
+preserving maps. Duke Mathematical Journal 80 309 – 323.
+[41] Meunier, D., Pontil, M. and Ciliberto, C. (2022). Distribution re-
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+47
+gression with sliced Wasserstein kernels. In International Conference on
+Machine Learning 39 15501–15523.
+[42] Mosler, K. (2013). Depth statistics. Robustness and Complex Data Struc-
+tures: Festschrift in Honour of Ursula Gather 17–34. Springer Berlin Hei-
+delberg.
+[43] Mosler, K. and Mozharovskyi, P. (2022). Choosing among notions of
+multivariate depth statistics. Statistical Science 37 348–368.
+[44] Muzellec, B. and Cuturi, M. (2018). Generalizing point embeddings
+using the Wasserstein space of elliptical distributions. Advances in Neural
+Information Processing Systems 31 10258 - 10269.
+[45] Nagy, S. (2017). Monotonicity properties of spatial depth. Statistics and
+Probability Letters 129 373-378.
+[46] Nieto-Reyes, A. and Battey, H. (2016). A topologically valid definition
+of depth for functional data. Statistical Science 31 61 – 79.
+[47] Oja, H. (1983). Descriptive statistics for multivariate distributions. Statis-
+tics & Probability Letters 1 327–332.
+[48] Otto, F. (2001). The geometry of dissipative evolution equations: The
+porous medium equation. Communications in Partial Differential Equa-
+tions 26 101–174.
+[49] Peyr´e, G. and Cuturi, M. (2019). Computational optimal transport:
+With applications to data science. Foundations and Trends® in Machine
+Learning 11 355–607.
+[50] Segers, J. (2022). Graphical and uniform consistency of estimated optimal
+transport plans. arXiv:2208.02508.
+[51] Serfling, R. (2002). A depth function and a scale curve based on spatial
+quantiles. In Statistical Data Analysis Based on the L1-Norm and Related
+Methods 25–38. Springer.
+[52] Sriperumbudur, B. K., Gretton, A., Fukumizu, K., Sch¨olkopf, B.
+and Lanckriet, G. R. (2010). Hilbert space embeddings and metrics on
+probability measures. The Journal of Machine Learning Research 11 1517–
+1561.
+[53] Szab´o, Z., Sriperumbudur, B. K., P´oczos, B. and Gretton, A.
+(2016). Learning theory for distribution regression. Journal of Machine
+Learning Research 17 1–40.
+[54] Tukey, J. W. (1975). Mathematics and the picturing of data. In Proceed-
+ings of the International Congress of Mathematicians 2 523–531. Vancou-
+ver.
+[55] van der Vaart, A. W. and Wellner, J. A. (1996). Weak Convergence
+and Empirical Processes. Springer New York.
+[56] Vardi, Y. and Zhang, C.-H. (2000). The multivariate L1-median and
+associated data depth. Proceedings of the National Academy of Sciences 97
+1423–1426.
+[57] Villani, C. (2003). Topics in Optimal Transportation. Graduate Studies
+in Mathematics 58. American Mathematical Society, Providence, RI.
+[58] Villani, C. (2009). Optimal Transport: Old and New. Springer-Verlag,
+Berlin.
+
+Bachoc, Gonz´alez-Sanz, Loubes, and Yao/Wasserstein Spatial Depth
+48
+[59] Virta,
+J.
+(2023).
+Spatial
+depth
+for
+data
+in
+metric
+spaces.
+arXiv:2306.09740.
+[60] Wang, J.-L., Chiou, J.-M. and M¨uller, H.-G. (2016). Functional data
+analysis. Annual Review of Statistics and its Application 3 257–295.
+[61] Zhou, Y. and Sharpee, T. O. (2021). Hyperbolic geometry of gene ex-
+pression. Iscience 24.
+[62] Zhuang, Y., Chen, X. and Yang, Y. (2022). Wasserstein K-means for
+clustering probability distributions. Advances in Neural Information Pro-
+cessing Systems 35 11382–11395.
+[63] Zuo, Y. and He, X. (2006). On the limiting distributions of multivariate
+depth-based rank sum statistics and related tests. The Annals of Statistics
+34 2879 – 2896.
+[64] Zuo, Y. and Serfling, R. (2000). General notions of statistical depth
+function. Annals of Statistics 461–482.
+[65] ´Alvarez Esteban, P. C., del Barrio, E., Cuesta-Albertos, J. A.
+and Matr´an, C. (2016). A fixed-point approach to barycenters in Wasser-
+stein space. Journal of Mathematical Analysis and Applications 441
+744–762.

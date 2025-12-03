@@ -102,9 +102,9 @@ class GeoConformalRegressor(GeoConformalBase):
 # EVOLVE-BLOCK-END
 
 def run_geocp():
-    train = pd.read_csv(f'C:\\Users\\Xiayin\\PycharmProjects\\GeoEvolve\\examples\\geocp\\data\\train.csv')
-    calib = pd.read_csv(f'C:\\Users\\Xiayin\\PycharmProjects\\GeoEvolve\\examples\\geocp\\data\\calib.csv')
-    test = pd.read_csv(f'C:\\Users\\Xiayin\\PycharmProjects\\GeoEvolve\\examples\\geocp\\data\\test.csv')
+    train = pd.read_csv(f'/Users/louxiayin/PycharmProjects/GeoEvolve/examples/geocp/data/train.csv')
+    calib = pd.read_csv(f'/Users/louxiayin/PycharmProjects/GeoEvolve/examples/geocp/data/calib.csv')
+    test = pd.read_csv(f'/Users/louxiayin/PycharmProjects/GeoEvolve/examples/geocp/data/test.csv')
     variables = ['bathrooms', 'sqft_living', 'sqft_lot', 'grade', 'condition', 'waterfront', 'view', 'age', 'UTM_X',
                  'UTM_Y']
     X_train, y_train = train[variables], train['price']

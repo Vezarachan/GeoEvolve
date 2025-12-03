@@ -1,0 +1,1290 @@
+arXiv:1910.14494v1  [physics.ins-det]  31 Oct 2019
+The Cramer-Rao inequality to go beyond the
+√
+N-limit of the
+standard least-squares method in track ﬁtting.
+Gregorio Landia∗, Giovanni E. Landib
+a Dipartimento di Fisica e Astronomia, Universita’ di Firenze and INFN
+Largo E. Fermi 2 (Arcetri) 50125, Firenze, Italy
+b ArchonVR S.a.g.l.,
+Via Cisieri 3, 6900 Lugano, Switzerland.
+October 30, 2019
+Abstract
+The Cramer-Rao-Frechet inequality is reviewed specializing it to track ﬁtting. A diffused opinion
+attributes to this inequality the limitation of the resolution of the track ﬁts with the number N of ob-
+servations. It turns out that this opinion is incorrect, weighted least squares method is not subjected
+to that N-limitation. In a previous publication, simulations with a simple Gaussian model produced
+interesting results: a linear growth of the peaks of the distributions with the number N of observa-
+tions, much faster than the
+√
+N of the standard least squares. These results could be considered a
+violation of a well known 1/N-rule for the variance of an unbiased estimator, frequently reported
+as the Cramer-Rao-Frechet bound. To clarify this point beyond any doubt, it would be essential a
+direct proof of the consistency of those results with this inequality. Unfortunately, such proof is lack-
+ing or very difﬁcult to ﬁnd. Hence, the Cramer-Rao-Frechet developments are applied to prove the
+efﬁciency (optimality) of the simple Gaussian model and the consistency of its results. The inequal-
+ity remains valid even for irregular models supporting the results of realistic models with similar
+growths.
+Keywords: Cramer-Rao Bound, Least Squares Method, Track ﬁtting, Silicon Microstrip Detectors.
+Contents
+1
+Introduction
+1
+2
+The standard CRF-inequality
+2
+2.1
+The CRF inequality . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4
+2.2
+Efﬁcient estimators . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4
+2.3
+The standard mean with an i.i.d. Gaussian model
+. . . . . . . . . . . . . . . . . . . . .
+4
+3
+CRF inequality for heteroscedastic models
+5
+3.1
+The weighted mean in heteroscedastic Gaussian models . . . . . . . . . . . . . . . . . .
+6
+3.2
+The weighted mean in a homoscedastic model . . . . . . . . . . . . . . . . . . . . . . .
+6
+∗Corresponding author. Gregorio.Landi@ﬁ.infn.it
+1
+
+4
+CRF-bound for heteroscedastic least squares of straight tracks
+7
+4.1
+The standard least-squares equations with heteroscedastic likelihood . . . . . . . . . . .
+8
+4.2
+Deviations from optimality . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+10
+5
+Inequality for Momentum estimators
+11
+5.1
+The momentum estimators in homoscedastic Gaussian model . . . . . . . . . . . . . . .
+11
+5.2
+The momentum estimators in heteroscedastic Gaussian model
+. . . . . . . . . . . . . .
+12
+6
+Conclusions
+13
+7
+Appendix
+13
+1
+Introduction
+Very recently criticisms and doubts were raised against our paper (ref. [1]) on track ﬁtting. The
+contested results were principally those of the following ﬁg. 1. This ﬁgure illustrated (Monte Carlo)
+simulations of a very simple tracker with N detecting layers of identical technology (silicon microstrips)
+crossed by a set of parallel straight tracks of minimum ionizing particles (MIPs). The reported estimator
+was the track direction.
+0
+0.5
+1
+1.5
+2
+x 10
+−3
+0
+1
+2
+3
+4
+5
+6
+x 10
+4
+Figure 1: The simple Gaussian model of ref.[1]. Distributions of the ﬁts to the track directions for tracker
+models with N=2 to N=13 detecting layers. The ﬁrst distributions are centered on zero, the others are
+shifted of N-2 steps of ﬁxed amplitude. The blue distributions are the results of the standard least-squares.
+The red distributions are obtained with the weighted least-squares.
+The hit uncertainties were approximated with Gaussian distributions with two type of hit quality (het-
+eroscedastic model). One of very good quality when the MIP crosses the detector near to the borders
+1
+
+(20% of strip width), and the other of bad quality (80% of the strip width) around the strip center. A
+slight random mechanical misalignment was supposed with mean value around a half strip (30 µm).
+Random misalignments much larger than this are always present in real trackers. This misalignment
+(rotations and translations) is simulated as a randomization of the hit position on the strips producing
+a binomial distribution of the hit quality. The collection of N hits (a track) is ﬁtted with two different
+least squares method, one with the standard least squares and the other with the weighted least-squares
+with the weights given by the hit quality. The track direction is the illustrated estimator. With standard
+least-squares, we deﬁne the usual least-squares where all the used observations have identical variances
+(homoscedastic models). The standard least-squares, built for homoscedastic models, when applied to
+heteroscedastic models gives results almost insensitive to the presence of the good hits, and the maxi-
+mums of the empirical probability density functions (PDFs) show a growth very near to
+√
+N. The blue
+lines of ﬁg.1. Instead, weighted least-squares, consistent for the heteroscedastic models, reports a sur-
+prising fast increase, almost linear, of the maximums of the simulated PDFs. Translating these results
+on mean variances, the standard ﬁt shows a 1/N trend and the weighted ﬁt shows a trend of the mean
+variances as 1/N2. This trend 1/N2 was considered a violation of the Cramer-Rao-Frechet (CRF) bound
+as reported in many books and documentations. Our arguments about the different hypotheses used to
+prove the 1/N rule and those of our approach had no effect. To settle any type of contrast, a complete
+demonstration is required to prove our consistency with the CRF-inequality. It is evident that this long
+demonstration could not be inserted in ref. [1]. The main part of ref. [1] deals with physical models with
+Cauchy-like tails and (in theory) with inﬁnite variance. Hence, any ﬁnite bound on the variance given
+by the CRF-inequality is automatically satisﬁed by them. However, the strong similarity of the physical
+models with the Gaussian model could extend them the suspects of possible inconsistencies. Thus, to
+give a strong support to our results we review the CRF inequality to show the inappropriate extension of
+the rule 1/N to our approach. For this, we will apply the CRF developments to heteroscedastic models
+and to the least squares method for track ﬁtting (for straight tracks and curved tracks) with a special
+attention to our Gaussian model. The last two points are very difﬁcult to ﬁnd in literature. Surely other
+authors did similar developments and we apologize to not citing them. In any case, the enormous sta-
+tistical samples of tracks (of the order of 1012 tracks per year) renders very important careful studies of
+any detail of their ﬁtting methods. During our analysis of the track ﬁtting we had to read carefully many
+papers (in any case a small portion of those published) on this subject and we found inaccurate ﬁtting
+strategies. Probably the reason of this inaccuracy is connected to the weak growth as
+√
+N of the standard
+least-squares (the Kalmann ﬁlter is essentially identical) that is negligibly modiﬁed by any improvement.
+Another element of inaccuracy is a frequent claim of a "measure" the hit resolutions. In reality, those
+parameters are not a "measure", but an application of an equation valid only for homoscedastic models,
+inappropriate for the physics of the trackers (surely always heteroscedastic). Instead, our ﬁtting methods
+of ref. [1, 2, 3] open very different possibilities. The heteroscedastic models allow drastic improvements
+of the quality of the track ﬁtting. In spite of the possible doubts, they are perfectly consistent with the
+CRF inequality. Instead, the CRF inequality demonstrates the inefﬁciency of the standard least squares
+for heteroscedastic models. The lucky model of ref. [1] is a ﬁrst order tool to insert heteroscedasticity in
+track ﬁtting and able to produce consistent improvements.
+2
+The standard CRF-inequality
+The developments of this section follow as far as possible ref. [4] and ref. [6]. As usual it is considered
+a N-times repetition of random observations {x1,x2 ...xN} described by an identical probability density
+function (PDF) f(x,θ), where θ is a (scalar) parameter. These random variables x = {x1,x2 ...xN}
+are indicated as independent and identically distributed or i.i.d. random variables. We will use this
+notation in the following, without commenting the absolute physical inconsistency of this assumption.
+2
+
+The probability of the set x of i.i.d. random variables (likelihood function) is:
+L(x,θ) = f(x1,θ) f(x2,θ)...... f(xN,θ).
+(1)
+As usual f(x,θ) is positive, normalized and supposed differentiable with respect to the θ-parameter. Let
+us deﬁne the random variable U(x,θ):
+U(x,θ) = ∂ln L(x,θ)
+∂θ
+=
+N
+∑
+i=1
+∂ln f(xi,θ)
+∂θ
+.
+(2)
+The following developments require to differentiate the integrals of f(x,θ) and invert the order of inte-
+gration and differentiation. The functions that allow these operations are called regular models and they
+imply strict analytical conditions. A necessary condition of regular models is the independence of the
+range of f(x,θ) from the θ-parameter. The normalization of the f(x,θ) is:
+Z
+L(x,θ)dx =
+Z
+f(x1,θ) f(x2,θ)...... f(xN,θ)dx1dx2 ...dxN = 1.
+(3)
+Differentiating eq. 3 with respect to θ and inverting the integral with the differentiation gives:
+0 =
+Z ∂L(x,θ)
+∂θ
+dx =
+N
+∑
+i=1
+Z ∂f(xi,θ)
+∂θ
+dxi =
+Z ∂lnL(x,θ)
+∂θ
+L(x,θ)dx =
+N
+∑
+i=1
+Z ∂ln f(xi,θ)
+∂θ
+f(xi,θ)dxi .
+(4)
+The second line of eq. 4 is given by a property of the logarithmic derivative and it implies that the mean
+value of U(x,θ) is zero. Instead, its mean square is different from zero:
+Z
+U(x,θ)2dx =
+N
+∑
+i=1
+Z  ∂ln f(xi,θ)
+∂θ
+2 f(xi,θ)dxi = N
+Z  ∂ln f(x,θ)
+∂θ
+2 f(x,θ)dx.
+(5)
+The ﬁrst term of eq. 5 is called Fisher information of the sample, the last integral is the Fisher information
+contained in a single observation.
+For the i.i.d. random variables the Fisher information is N-times the Fisher information of a
+single observation.
+This originates the 1/N factor in the CRF-bound. It will evident that for non i.i.d (heteroscedastic)
+random variables this factorization disappears. We underline the i.i.d. assumption in eq. 5 because often
+this condition is a standard assumption (as in ref. [4]), and it can only be recovered with an accurate
+re-reading of the intere demonstration and doing another demonstration without the i.i.d assumption.
+If f(x,θ) is twice differentiable with respect to θ, the last term of eq. 4 gives the following identity:
+0 =
+Z  ∂ln f(x,θ)
+∂θ
+2 f(x,θ)dx+
+Z ∂2 ln f(x,θ)
+∂θ2
+f(x,θ)dx.
+(6)
+The Fisher information i(θ) for a single observation becomes:
+i(θ) =
+Z  ∂ln f(x,θ)
+∂θ
+2 f(x,θ)dx = −
+Z ∂2 ln f(x,θ)
+∂θ2
+f(x,θ)dx.
+(7)
+The last form of i(θ) is particularly effective for Gaussian PDF.
+3
+
+2.1
+The CRF inequality
+At this point is is easy to obtain the CRF-inequality for these i.i.d. random variables. Deﬁning an
+estimator T(X) = T(x1,x2 ...xn) and its mean value:
+Z
+T(x)L(x,θ)dx = τ(θ),
+(8)
+differentiating eq. 8 in θ we obtain:
+τ(θ)′ =
+Z
+T(x)∂lnL(x,θ)
+∂θ
+L(x,θ)dx =
+Z 
+T(x)−τ(θ)
+∂lnL(x,θ)
+∂θ
+L(x,θ)dx =
+Z
+bT(x)
+p
+L(x,θ)∂lnL(x,θ)
+∂θ
+p
+L(x,θ)dx
+bT(x) = T(x)−τ(θ).
+(9)
+The form of the last integral is allowed by the positivity of L(x,θ). The subtraction of τ(θ) from T(x)
+does not modify the integral for eq. 4. The Cauchy-Schwarz inequality gives:
+[τ(θ)′]2 ≤
+Z
+d
+T(x)
+2L(x,θ)dx
+Z ∂lnL(x,θ)
+∂θ
+2L(x,θ)dx
+[τ(θ)′]2 ≤N i(θ)
+Z
+d
+T(x)
+2L(x,θ)dx
+(10)
+or in its ﬁnal form:
+Z
+d
+T(x)
+2L(x,θ)dx ≥[τ(θ)′]2
+N i(θ) .
+(11)
+The variance of T(x) can not be lower than the right side of eq. 11. This is the well-known CRF inequality
+that creates many doubts to our readers. When the CRF inequality becomes an identity, the estimator is
+deﬁned efﬁcient.
+2.2
+Efﬁcient estimators
+The Cauchy-Schwarz inequality becomes an equality if and only if bT(x) and U(x,θ) are linearly depen-
+dent:
+T(x,θ)−τ(θ) = a(θ)U(x,θ)
+(12)
+Hence, if an efﬁcient estimator exists, it is a function of the model. The logarithmic functions contained
+in U(x,θ) allow to ﬁnd efﬁcient estimators only in exponential models.
+2.3
+The standard mean with an i.i.d. Gaussian model
+The PDF f(x,θ), the mean value τ(θ) and the Fisher information i(θ) are:
+f(x,θ) = exp[−(x−θ)2/2σ 2]
+√
+2πσ
+τ(θ) =
+Z
+T(x)L(x,θ)dx = θ
+i(θ) = −
+Z ∂2 ln f(x,θ)
+∂θ2
+f(x,θ)dx = 1
+σ 2
+U(x,θ) = 1
+σ 2
+N
+∑
+j=1
+xj −N
+σ 2 θ
+1
+NiU(x,θ) = T e(x)−θ
+T e(x) = ∑N
+j=1 xj
+N
+(13)
+The last of eq. 13 gives the efﬁcient estimator of θ for this model as deﬁned by eq. 12. Its unbiased form
+[
+T e(x) = T e(x)−θ, inserted in eq. 11 gives the identity σ 2/N = σ 2/N.
+4
+
+3
+CRF inequality for heteroscedastic models
+It is well-known by long time that different observations have always non identical PDF. The universe
+would be very simple if the observations were i.i.d., in this case the precision of a measure could be
+improved at any level by the the simple repetition and averaging the results. Gauss knew very well this
+problem and in his paper of 1823 extended his least squares method to handle observations of different
+PDF. For our misfortune the standard books of mathematical statistics do not cover this argument. But to
+complete our confutation of critics moved to ref. [1], we have to venture in this ﬁeld. As in the previous
+section, we suppose a set of observations obtained by an array of different detectors as in a tracker. Even
+if all the detectors are built with identical technology, differences are always present. Each detector is
+anisotropic for its construction, optimized to the measure of positions. The signal spreads in a different
+recognizable way for each hit point. Moreover, each observation has a quantum mechanical interaction
+that renders unrepeatable the observations. However, a PDF for each observation can be deﬁned (ref. [3])
+even if very different from the form required for the CRF-inequality. However, the likelihood of a set of
+heteroscedastic observations becomes:
+L1,2,...,N(x,θ) = f1(x1,θ) f2(x2,θ)...... fN(xN,θ)
+(14)
+The evident difference is an index attached to each PDF. Instead of the awful PDFs of ref. [3, 2], we will
+use an easy model. The simple model of ref. [1] is a heteroscedastic Gaussian model (independent non
+identically distributed Gaussian random variables), hence, it has all the analytical properties required for
+the CRF-inequality. Again U1,2,...,N(x,θ) is deﬁned as:
+U1,2,...,N(x,θ) = ∂ln L1,2,...,N(x,θ)
+∂θ
+=
+N
+∑
+i=1
+∂ln fi(xi,θ)
+∂θ
+(15)
+Even the Fisher information acquires a set of indices,
+Z
+U1,2,...,N(x,θ)2L1,2,...,N(x,θ)dx =
+N
+∑
+j=1
+Z  ∂ln f j(xj,θ)
+∂θ
+2 f j(xj,θ)dxj =
+N
+∑
+j=1
+ij(θ)
+(16)
+but now all the PDF of the observations are different as the Fisher information of each observation. The
+factorization of eq. 5 disappears with its N factor and its supposed generality. All the other equations are
+formally identical up to the ﬁrst line of eq.10 ( a part an additional index to the PDFs ). With the new
+Fisher information the CRF-inequality for an unbiased estimator bT1,2,...,N(x) becomes:
+Z
+bT1,2,...,N(x)2L1,2,...,N(x,θ)dx ≥[τ1,2,...,N(θ)′]2
+∑N
+j=1 ij(θ)
+(17)
+Supposing a large set of possible PDFs ( as those of ref. [3] ) the estimator T1,2,...,N(x,θ) must keep
+the track of the types and the order of the PDFs contained. It must be substituted with Tj1,j2,... jN(x,θ),
+similarly for the likelihood function L j1,j2,... jN(x,θ) and the Fisher information. In this extended form
+the CRF- inequality becomes:
+Z
+bTj1,j2,... jN(x)2L j1,j2,... jN(x,θ)dx ≥[τ j1,j2,... jN(θ)′]2
+ij1,j2,... jN(θ)
+(18)
+The efﬁcient estimators have the variance identical to the CRF-bound. Again the logarithmic functions
+of eq. 15 limit the deﬁnition of efﬁcient estimators to exponential PDFs.
+5
+
+3.1
+The weighted mean in heteroscedastic Gaussian models
+Let us consider the standard mean T a
+1,2,...N(x) = ∑N
+i=1 xi/N as an estimator in heteroscedastic Gaussian
+models. The PDFs f j(x,θ), the mean value τ1,2,...N(θ) and the Fisher information due to the j-PDF ij(θ)
+are:
+f j(x,θ) =
+exp[−(x−θ)2/2σ 2
+j ]
+√
+2πσ j
+τ1,2,...N(θ) =
+Z
+T a
+1,2,...N(x)L1,2,...N(x,θ)dx = θ
+ij(θ) = −
+Z ∂2 ln f j(x,θ)
+∂θ2
+f j(x,θ)dx = 1
+σ 2
+j
+Z  N
+∑
+i=1
+xi
+N −θ
+2 L1,2,...N(x,θ)dx = ∑N
+J=1 σ 2
+j
+N2
+(19)
+With the variance of T a the CRF-inequality is:
+∑N
+J=1 σ 2
+j
+N2
+>
+1
+∑N
+j=1
+1
+σ2
+j
+(20)
+The equality is impossible for the assumption of the heteroscedasticity (the identity of the σ j is excluded).
+Let us extract from eq. 15 an efﬁcient estimator deﬁned (if it exists) as usual:
+T1,2,...N(x)−τ1,2,...N(θ) = a(θ)U1,2,...,N(x,θ)
+(21)
+With a(θ) = 1/[∑N
+j=1 1/σ 2
+j ] and τ1,2,...N = θ it is:
+a(θ)
+N
+∑
+i=1
+∂ln fi(xi,θ)
+∂θ
+=
+1
+∑N
+j=1 1/σ 2
+j
+N
+∑
+i=1
+xi
+σ 2
+i
+−θ
+⇒T e
+1,2,...N(x) =
+N
+∑
+i=1
+xi
+σ 2
+i
+1
+∑N
+j=1
+1
+σ2
+j
+(22)
+This estimator is proportional to ∂lnL1,2,...,N(x,θ)/∂θ and transforms the Cauchy-Schwarz inequality
+in an identity. It is easy to verify, without the CRF inequality, that the variance of the standard mean is
+always greater than the variance of the weighted mean.
+∑N
+J=1 σ 2
+j
+N2
+>
+1
+∑N
+j=1
+1
+σ2
+j
+N
+∑
+J=1
+σ 2
+j
+N
+∑
+j=1
+1
+σ 2
+j
+> N2
+(23)
+The second equation is the Cauchy-Schwarz inequality for the two vectors {σ j} and {1/σ j} . The equal-
+ity is impossible because σ 2 and 1/σ 2 can never be proportional excluding the trivial case of identical
+σ j. Heteroscedasticity excludes this case. Thus, in heteroscedastic models, the weighted average has
+always minor variance compared to the standard mean for regular and irregular models.
+Hence, each combination of observations from our Gaussian model satisﬁes the CRF inequality. No
+1/N factor is present in the equation for a different Fisher information of each single observation. The
+case of identity of all the observations is excluded a priori. Moreover, the mean of the standard variances
+of a set of random sequences {j1, j2 ..., jN}, not all identical, is higher than the mean of the correspond-
+ing weighted averages. The absence of 1/N factors in the variance of the weighted average allows fast
+decreases with N that is impossible to the variance of the standard mean.
+3.2
+The weighted mean in a homoscedastic model
+To prove another aspect of the CRF-inequality, we use the weighted mean outside its deﬁnition model
+(heteroscedasticity) and we use it in a homoscedastic model. In this case the standard mean is the efﬁcient
+estimator. The CRF-inequality states that the variance of the weighted mean is greater than the variance
+of the standard mean. It is easy to illustrate this fact (the reverse of the last equations).
+Z  T e
+1,2...,N(x)−θ
+2 L(x,θ)dx = σ 2 ∑j 1/σ 4
+j
+(∑l 1/σ 2
+l )2 > σ 2
+N
+⇒
+N∑
+j
+1
+σ 4
+j
+>
+
+∑
+l
+1
+σ 2
+l
+2
+(24)
+6
+
+The last inequality is the Cauchy-Schwarz inequality. The equality is excluded. Thus an efﬁcient esti-
+mator in a model, outside its model has always a greater variance compared to the efﬁcient estimator of
+the new model.
+4
+CRF-bound for heteroscedastic least squares of straight tracks
+The application of the CRF-inequality to heteroscedastic least-squares ﬁt for straight tracks adds other
+complications. Two parameters must be handled. The ﬁrst parameter is the constant β: the impact point
+of the track in the reference plane. The second is γ yi: the angular shift of the track in the plane distant yi
+from the reference plane. Also here, the heteroscedasticity eliminates any easy rule with the increase of
+the number (N) of the observation planes for two different reasons. One is again the differences of the σi;
+the new one is due to the constraint of the ﬁxed length of the tracker. Each insertion of a new detecting
+plane requires a repositioning of all the others. We will study our Gaussian model with the condition
+∑N
+j=1 yj = 0, this introduces some simpliﬁcation on standard least squares equations. The likelihood
+function is similar to that of eq. 14, but now, the order of the PDFs must be conserved. The parameter yj
+orders the measuring planes:
+L1,2,...,N(x,β,γ) = f1(x1,β,y1γ) f2(x2,β,y2γ)...... fN(xN,β,yNγ)
+(25)
+f j(x,β,yjγ) =
+exp[−(x−β −yjγ)2/2σ 2
+j ]
+√
+2πσ j
+τγ
+1,2,...N(β,γ) =
+Z
+T γ
+1,2,...N(x)L1,2,...N(x,β,γ)dx = γ
+τβ
+1,2,...N(β,γ) =
+Z
+T β
+1,2,...N(x)L1,2,...N(x,β,γ)dx = β
+(26)
+The function U1,2,...,N(x,θ) is the 2x1 matrix U1,2,...,N(x,β,γ):
+U1,2,...,N(x,β,γ) =
+
+
+
+
+∂lnL1,2,...,N(x,β,γ)
+∂β
+∂lnL1,2,...,N(x,β,γ)
+∂γ
+
+
+
+
+(27)
+The Fisher information I1,2,...,N becomes the 2x2 matrix:
+I1,2,...,N =
+Z
+dxL1,2,...,N(x,β,γ)
+
+
+
+
+−∂2 lnL1,2,...,N(x,β,γ)
+∂β 2
+−∂2 lnL1,2,...,N(x,β,γ)
+∂β∂γ
+−∂2 lnL1,2,...,N(x,β,γ)
+∂γ∂β
+−∂2 lnL1,2,...,N(x,β,γ)
+∂γ2
+
+
+
+
+(28)
+I1,2,...,N =
+
+
+
+
+∑N
+j=1
+1
+σ2
+j
+∑N
+j=1
+yj
+σ2
+j
+∑N
+j=1
+yj
+σ2
+j
+∑N
+j=1
+y2
+j
+σ2
+j
+
+
+
+
+(29)
+Its inverse is:
+I−11,2,...,N =
+1
+Det{I1,2,...,N}
+
+
+
+
+∑N
+j=1
+y2
+j
+σ2
+j
+−∑N
+j=1
+yj
+σ2
+j
+−∑N
+j=1
+yj
+σ2
+j
+∑N
+j=1
+1
+σ2
+j
+
+
+
+
+(30)
+The CRF inequality assumes the form of a matrix inequality, we limit to relations among variances:
+Diag.
+
+
+Var(β,β)
+Cor(β,γ)
+Cor(γ,β)
+Var(γ,γ)
+
+≥Diag.I−11,2,...,N
+(31)
+7
+
+where Var(β,β) and Var(γ,γ) are the variances of β and γ:
+Var(β,β) =
+R 
+T β
+1,2,...N(x)−β
+2L1,2,...N(x,β,γ)dx ≥
+∑N
+j=1 y2
+j/σ2
+j
+∑N
+j=1 y2
+j/σ2
+j ∑N
+k=1 1/σ2
+k −(∑N
+j=1 yj/σ2
+j )2
+(32)
+and:
+Var(γ,γ) =
+R 
+T γ
+1,2,...N(x)−γ
+2L1,2,...N(x,β,γ)dx ≥
+∑N
+j=1 1/σ2
+j
+∑N
+j=1 y2
+j/σ2
+j ∑N
+k=1 1/σ2
+k −(∑N
+j=1 yj/σ2
+j )2
+(33)
+The Gaussian model is efﬁcient because its variances are equal to the diagonal of I−1 (here and in
+the following the indications 1,2,...,N of the used PDFs will be subtended). The unbiased efﬁcient
+estimators of β and γ for the model of eq. 25 are given by I−1U(x,β,γ) (similar to those for a single
+parameter):
+U(x,β,γ) =
+ T1(x)
+T2(x)
+
+−I
+ β
+γ
+
+I−1U(x,β,γ) = I−1
+ T1(x)
+T2(x)
+
+−
+ β
+γ
+
+(34)
+The last equation allows the extraction of the formal expressions of the unbiased efﬁcient estimators for
+this model (and are identical to those reported everywhere for example in ref. [5]). The mean values
+of products of logarithmic derivatives are obtained by the mean values of double derivative of a single
+logarithmic function (as in eq. 6), and due to eq. 28 gives:
+Z
+U(x,β,γ)·U′(x,β,γ)L(x,β,γ)dx = I
+Z
+I−1U(x,β,γ)·U′(x,β,γ)I−1′ L(x,β,γ)dx = I−1 .
+(35)
+The second equation uses the ﬁrst equation giving the Fisher information and the symmetry I−1 = I−1′.
+The diagonal terms are the variances of the efﬁcient estimators for β and γ. It is evident the privileged
+position of the Gaussian PDFs in the CRF-inequality.
+4.1
+The standard least-squares equations with heteroscedastic likelihood
+We deﬁned standard least squares equations the estimators (for β and γ) obtained with a homoscedastic
+model. It is easy to prove that the standard least squares estimators are efﬁcient estimators for a Gaussian
+model with identical σs. The extension of eqs. 13 to the case for two parameters shows immediately this
+property. The condition ∑N
+i=1 yi = 0 simpliﬁes the forms of the estimators. In the case of identical σs the
+CRF-inequality states that any other estimator has a greater variance compared to the efﬁcient estimators.
+It is evident that the efﬁciency of an estimator is strictly bound to the likelihood model of its deﬁnition
+(in a given model the efﬁcient estimator of a parameter is unique) . Outside this model the estimators
+are no more efﬁcient. We could derive the forms of the standard least squares estimators as the efﬁcient
+estimators for the Gaussian model with identical σ j, but the usual derivation is faster. The estimators of
+β and γ of the standard least squares are:
+N
+∑
+i=1
+(xi −β −γyi) = 0
+c
+T β
+s (x,β,γ) = ∑N
+i=1 xi
+N
+−β
+N
+∑
+i=1
+(xi −β −γyi)yi = 0
+c
+T γ
+s (x,β,γ) = ∑N
+i=1 xiyi
+∑N
+i=1 y2
+i
+−γ
+(36)
+For an easy check of the forms of the estimators, we report the least squares equations that give their
+expressions (after inserting ∑iyi = 0). The heteroscedastic likelihood L(x,β,γ) destroys their efﬁciency
+8
+
+(optimality) and the new variances are different from those in the homoscedastic model (σ 2/N and
+σ 2/∑j y2
+j):
+Z c
+T β
+s (x,β,γ)2L(x,β,γ)dx = ∑N
+i=1 σ 2
+i
+N2
+Z
+c
+T γ
+s (x,β,γ)2L(x,β,γ)dx = ∑N
+i=1 σ 2
+i y2
+i
+(∑N
+i=1 y2
+i )2 ,
+(37)
+and, due to the differences from the variances of the efﬁcient estimators, the CRF inequalities of eq. 32
+and eq. 33 impose to them to be grater. We will extensively prove this property as a prototype of demon-
+stration [7] that will be used even for the momentum variances.
+First of all, it is required the joint variance-covariance matrix of bTs
+β,γ with the efﬁcient estimators
+I−1U(x,β,γ). This matrix is positive semi-deﬁnite (symmetrical with the variances in the diagonal). Let
+us deﬁne with C this matrix, with T the column vector T = {bTs
+β,T γ
+s } and with < > the average on the
+likelihood of eq. 25. The matrix I−1 is the variance-covariance matrix of the efﬁcient estimators (eq. 35)
+C =
+
+< T T ′ >
+< T U′I−1′ >
+< I−1U T ′ >
+I−1
+
+≥0
+(38)
+It is easy to show this general property of the covariance of the unbiased estimator bT β
+s with the efﬁcient
+estimators. By deﬁnition, the mean value of an unbiased estimator is always zero as any of its derivative:
+∂
+∂β
+Z
+(T β
+s (x)−β)L(x,β,γ)dx = 0 = −1+
+Z
+(T β
+s (x)−β) ∂
+∂β L(x,β,γ)dx.
+(39)
+The derivative of the likelihood is the ﬁrst component of U(x,β,γ) of eq. 27, and this correlation becomes
+equal to one. The derivative in γ of the mean value of bT β
+s has no one and the sought correlation is zero.
+Similarly for the other estimator bT γ
+s . Hence the matrix < T U′ > is:
+< T U′ >= I2 =
+ 1
+0
+0
+1
+
+=< U T ′ > ⇒C =
+ < T T ′ >
+I−1
+I−1
+I−1
+
+≥0
+(40)
+The I−1 is a symmetric matrix. The positivity of C is conserved even with transformation A′ CA with
+A any real matrix of four lines and two columns (few details about the positive deﬁnite matrices are
+reported in the appendix):
+(I2 −I2)C
+
+I2
+−I2
+
+=< T T ′ > −I−1 ≥0
+⇒
+
+T T ′⟩> I−1
+(41)
+The last of the eq. 41 is eq. 31 as a matrix relation the equality is eliminated being evidently impossible.
+For the deﬁnition of positive deﬁnite matrices it is straightforward to extract the relations among the
+variances. The eqs. 31 to 41 will be extended the estimators of the momentum reconstructions.
+Even if it was demonstrated with a heteroscedastic Gaussian model, eqs. 41 remain always greater
+also for heteroscedastic irregular models with equivalent set of {σ j}. The efﬁcient estimators of het-
+eroscedastic models continue to be efﬁcient even for homoscedastic models, converging to them when
+all the σ j become identical.
+All this set of demonstrations for heteroscedastic Gaussian model is addressed to each given chain
+of PDFs with a deﬁned order of σ j. Their variances of eq. 32 and eq. 33 are strongly modiﬁed by the
+differences among the {σ j} without any evident N limitation. Instead, the variances of the standard least
+squares are weakly modiﬁed and they save explicit N limitations. For example the variances of the β
+parameter has averages ≈σ 2
+m/N. Figure 1 illustrates this limits for the γ estimator (the blue distributions).
+Due to the heavy modiﬁcations of the variances of the chains of PDFs, other PDFs become essential. For
+9
+
+0
+0.5
+1
+1.5
+2
+x 10
+−3
+0
+1
+2
+3
+4
+5
+6
+7
+x 10
+4
+Figure 2: The Gaussian model. A faster increase in the maximums compared to that of ﬁg.1. The blue
+straight lines connect the maximums of the ﬁrst distributions to the last red distribution. The color cade
+is that of ﬁg.1.
+example those that select the chains among the possible set of chains. These PDFs are introduced by the
+properties of the measuring devices. As we said above, a binomial PDF sufﬁces in the disordered tracker
+detector for the models of refs.[1, 2], just a mean disorder of half strip (≈30µm) is enough for this. The
+use of standard least squares method in heteroscedastic models has enormous simpliﬁcations, because it
+does not need the knowledge of the σ j for each observation. Unfortunately, it amounts to a large loss
+of resolution. Our models of ref. [1] illustrate in evident way the amplitude of this loss. In any case the
+lucky model of ref. [1] can be an economic way to introduce effective σ j.
+For our pleasure, in ﬁg. 2, we invented a faster growth than that of the Gaussian model of ref. [1].
+The quality of the detectors increases with the number N of detecting layers, each inserted layer is better
+than the previous one. The bleu straight line shows an evident deviation from a linear growth with an
+almost parabolic growth. The blue distributions are practically insensible to these changes. With cleaver
+selection of the hit quality many types of growth can be implemented.
+4.2
+Deviations from optimality
+Equations 41 proved the non-optimality of the standard least-squares in the case of it use with a different
+(heteroscedastic) likelihood. The standard least squares gives the efﬁcient estimators for a homoscedastic
+Gaussian model, the transportation outside its condition of efﬁciency (optimality) destroys its optimality
+and produces an increase of variances with a degradation of the resolution as illustrated by the simula-
+tions of ref. [1, 2, 3]. Even our heteroscedastic model suffers of a similar non-optimality loss outside
+its range of validity. We underlined that the orders and the values of the sets of {σ j} deﬁne the model,
+each deviation from the order and values implies an increase of the variances compared to the optimality
+condition. We used this property to prove the essential connection of the appropriate σ j with the hit j. If
+the ordered set of {σ j} is randomized, destroying the correlation with the set of the hits, the distributions
+10
+
+of the estimators change drastically becoming worse than the standard least squares. Instead, the differ-
+ences of the heteroscedastic efﬁcient estimator minus a suboptimal estimator with few eliminated PDFs
+rapidly converge as the eliminated PDFs are reduced. This rapid convergence is not observed in the case
+of the standard least-squares.
+5
+Inequality for Momentum estimators
+As stated above the CRF-inequality can be extended to case of the momentum reconstruction. It will
+be studied the case of a high-momentum charged-particle moving in a tracker with a homogeneous
+magnetic ﬁeld and the path of the particle is orthogonal to the ﬁeld direction. Here, the circular path can
+be approximated with a parabola. As for the straight tracks we will compare the estimators of standard
+least squares with those of a heteroscedastic model. The estimators of the standard least squares are
+efﬁcient (optimum) in the homoscedastic Gaussian model.
+5.1
+The momentum estimators in homoscedastic Gaussian model
+We use this approach to deﬁne our expressions for the estimators. These forms will be used in het-
+eroscedastic models. Our equation will be expressed in compact way with matrices. The function
+L(x,β,γ,η) is the likelihood for this case, β and γ are just deﬁned, η is the curvature of the track,
+proportional to 1/p with p the track momentum:
+L(x,β,γ,η) = f1(x1,β,γ,η) f2(x2,β,γ,η)... fN(xN,β,γ,η)
+f j(x,β,γ,η) =
+exp[−(x−β −γyj −ηy2
+j)2/2σ 2]
+√
+2πσ
+(42)
+The index j orders the PDFs f j as the tracker layers. The equivalent of eq. 27 is:
+V(x,β,γ,η) =
+
+
+
+
+
+
+
+∂lnL(x,β,γ,η)
+∂β
+∂lnL(x,β,γ,η)
+∂γ
+∂lnL(x,β,γ,η)
+∂η
+
+
+
+
+
+
+
+(43)
+The unbiased estimators for β,γ,η are:
+V(x,β,γ,η) =
+
+
+Ta(x)
+Tb(x)
+Tc(x)
+
+−R
+
+
+β
+γ
+η
+
+
+R−1V(x,β,γ,η) = R−1
+
+
+Ta(x)
+Tb(x)
+Tc(x)
+
+−
+
+
+β
+γ
+η
+
+
+(44)
+The vector R−1V(x,β,γ,η) contains the efﬁcient estimators of this model, the matrix R is its the Fisher
+information (with the condition ∑j yj = 0 and j ={1,2,...,N}):
+R =
+
+
+N
+0
+∑j y2
+j
+0
+∑j y2
+j
+∑j y3
+j
+∑j y2
+j
+∑j y3
+j
+∑j y4
+j
+
+1
+σ 2
+(45)
+For eq. 35 extended to this case, it is:
+Z
+V(x,β,γ,η)·V ′(x,β,γ,η)L(x,β,γ,η)dx = R
+Z
+R−1V(x,β,γ,η)·V ′(x,β,γ,η)R−1′ L(x,β,γ,η)dx = R−1 .
+(46)
+11
+
+The matrices R and R−1 are symmetric and positive semi-deﬁned, and the second line of the last equation
+is the variance-covariance matrix of the efﬁcient estimators. The variance-covariance matrix of a generic
+vector T of unbiased estimators of β,γ,η with the efﬁcient estimators is:
+K =
+
+< T T ′ >
+< T V ′R−1′ >
+< R−1V T ′ >
+R−1
+
+≥0
+(47)
+As deﬁned, the symbol <> means an integral with the likelihood L, the cross correlations < V T ′ >
+follow the rules of eq. 39 giving now the 3x3 identity matrix I3 reducing the off-diagonal elements of K
+to R−1. With a transformation of the type A′ KA with a 6x3 real matrix A the fundamental inequality is
+obtained:
+(I3 −I3)
+
+< T T ′ >
+R−1′
+R−1
+R−1
+
+I3
+−I3
+
+= ⟨T T ′⟩−R−1 ≥0
+(48)
+The equality is obtained only for the efﬁcient estimators of this model. Therefore, any other set of
+estimators have a greater variance in this model. Any heteroscedastic model has greater variance than
+the efﬁcient model. The reason is connected to the modiﬁcation that the likelihood L introduces in the
+variances. These modiﬁcations always increase the variances. In this model, the parameter σ disappears
+in the expressions for the estimators. The form R of the Fisher information depends from N, this limits
+the growth with the numbers of detecting layers as illustrated in ref. [2].
+5.2
+The momentum estimators in heteroscedastic Gaussian model
+In its essence this model can be obtained from the corresponding homoscedastic model with a set of
+formal differences.
+L(x,β,γ,η) = f1(x1,β,γ,η) f2(x2,β,γ,η)... fN(xN,β,γ,η)
+f j(x,β,γ,η) =
+exp[−(x−β −γyj −ηy2
+j)2/2σ 2
+j ]
+√
+2πσ j
+(49)
+The index j orders the PDFs as the detecting layers and selects a different σ j for this observation. The
+other differences are in the deﬁnitions of the vector T1,T2,T3 that are different from the previous Ta,Tb,Tc
+and the Fisher information I.
+U(x,β,γ,η) =
+
+
+T1(x)
+T2(x)
+T3(x)
+
+−I
+
+
+β
+γ
+η
+
+
+
+
+T1(x)
+T2(x)
+T3(x)
+
+=
+
+
+
+
+
+∑j
+xj
+σ2
+j
+∑j
+xj yj
+σ2
+j
+∑j
+xj y2
+j
+σ2
+j
+
+
+
+
+
+(50)
+The Fisher information becomes:
+I =
+
+
+∑j 1/σ 2
+j
+∑j yj/σ 2
+j
+∑j y2
+j/σ 2
+j
+∑j yj/σ 2
+j
+∑j y2
+j/σ 2
+j
+∑j y3
+j/σ 2
+j
+∑j y2
+j/σ 2
+j
+∑j y3
+j/σ 2
+j
+∑j y4
+j/σ 2
+j
+
+
+(51)
+The efﬁcient unbiased estimators for the likelihood L(x,β,γ,η) are contained in the vector I−1U(x,β,γ,η).
+Even in this case the Fisher information has no obvious N-dependence. The variance-covariance matrix
+for any vector T of unbiased estimators can be transformed as previously described giving the inequality:
+(I3 −I3)
+
+< T T ′ >
+I−1′
+I−1
+I−1
+
+I3
+−I3
+
+= ⟨T T ′⟩−I−1 ≥0
+(52)
+Here, the symbol <> indicates an integral with the likelihood of this model L(x,β,γ,η). The equality
+to zero is obtained only when the vector T is I−1U(x,β,γ,η). For any other unbiased estimator, that
+difference is greater than zero (in the sense of the positive deﬁnite matrices).
+12
+
+6
+Conclusions
+The Cramer-Rao-Frechet inequality is applied to a set of heteroscedastic Gaussian model to prove the
+absence of any limitation introduced by this fundamental inequality. Instead, the inequality shows that, in
+heteroscedastic models, the estimators of the standard least-squares have always greater variances com-
+pared to that given by the weighted least-squares. The variances of the standard least-squares conserve
+approximate 1/N form that imply limitations in the growth of the distributions with the number N of
+detecting layers. No similar limitations are present in the weighted least squares that are dominated by
+the differences of the weights 1/σ 2
+j . For identical σ j the estimators converge to those of the standard
+least-squares. The inequality is calculated also for the momentum estimators. Again the appropriate
+heteroscedastic estimators have a lower variances than those of the standard least squares. Given the
+loss of resolution implied by greater variances it must be avoid the use of standard least squares with
+heteroscedastic data. The lucky model may be helpful in silicon detectors.
+7
+Appendix
+Let us add few details about variance-covariance matrix or about the cross-covariance matrix. For their
+deﬁnitions these matrices are positive semi-deﬁned (they are symmetric with the positive variances in
+the principal diagonal). If the matrix C is a positive semi-deﬁnite matrix it must be a symmetric mxm
+matric C′ = C, and for any real vector z it must be z′Cz ≥0. From these deﬁnitions it follows that if A
+is a real matrix of mxn with n < m the matrix K given by A′ CA is again a nxn positive semi-deﬁnite
+matrix. It is easy to show that the diagonal elements of K are given by z′Cz where each z is a column of
+A and the off-diagonal terms are symmetric. A positive semi-deﬁnite matrix implies an inﬁnite number
+of inequalities (∞m), our interest is to ﬁnd the minimal one with useful dimensions. The eqs. 41 48 52
+are addressed to this. It is easy to show that the identity matrices I2 and I3 select the useful blocks of the
+matrices. AS an example we can elaborate the C matrix (4x4). In general one can use a 4x2 matrix of
+the form (I2,aI2) with a any real constant and search the minimum in a:
+(I2 aI2)C
+
+I2
+aI2
+
+=< T T ′ > +(2a+a2)I−1 ≥0
+∂
+∂a
+
+< T T ′ > +(2a+a2)I−1
+⇒(2+2a) = 0
+⇒
+B =< T T ′ > −I−1 ≥0
+(53)
+The solution a = −1 gives the last inequality. The inequality for each couple of variances is obtained
+with z′Bz where z is (1,0) for the ﬁrst two and (0,1) for the second two.
+References
+[1] Landi G.; Landi G. E. Beyond the
+√
+N-limit of the least squares resolution and the lucky-model
+arXiv:1808.06708[physics.ins-det] https://arxiv.org/abs/1808.06708.
+[2] Landi, G.; Landi G. E. Optimizing momentum resolution with a new ﬁtting method for silicon-
+strip detectors INSTRUMENTS 2018, 2, 22 arXiv:1806.07874[physics.ins-det]
+https://arxiv.org/abs/1806.07874
+[3] Landi G.;
+Landi G. E.
+Improvement of track reconstruction with well tuned prob-
+ability distributions JINST 9 2014 P10006. arXiv:1404.1968[physics.ins-det]
+https://arxiv.org/abs/1404.1968
+[4] Ivchenko G. and Medvedev Yu. MATHEMATICAL STATISTICS-Moscow-URSS-1990
+13
+
+[5] Olive, K.A.; Agashe, K.; Amsler, C.; Antonelli, M.; Arguin, J.-F.; Asner, D.M.; Baer, H.; Band,
+H.R.; Barnett, R.M.; Basaglia, T.; et al. Particle Data Group. Chin. Phys. C 2014, 38, 090001.
+[6] Gowan G. STATISTICAL DATA ANALISIS Oxford University Press, Oxford, 1998
+[7] Takeshi, Amemiya ADVANCED ECONOMETRICS Harvard University Press, Cambridge Mas-
+sachusetts 1985
+14

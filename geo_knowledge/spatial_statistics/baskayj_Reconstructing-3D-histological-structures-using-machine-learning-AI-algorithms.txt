@@ -1,0 +1,1328 @@
+import os
+import numpy as np
+import cv2 as cv
+import pickle
+
+from tqdm import tqdm
+from image_similarity_measures.quality_metrics import ssim
+
+DATA_PATH = os.getcwd() + '/Data/'
+
+def mutual_information(hgram):
+    """ Mutual information for joint histogram"""
+    # Convert bins counts to probability values
+    pxy = hgram / float(np.sum(hgram))
+    px = np.sum(pxy, axis=1) # marginal for x over y
+    py = np.sum(pxy, axis=0) # marginal for y over x
+    px_py = px[:, None] * py[None, :] # Broadcast to multiply marginals
+    # Now we can do the calculation using the pxy, px_py 2D arrays
+    nzs = pxy > 0 # Only non-zero pxy values contribute to the sum
+    return np.sum(pxy[nzs] * np.log(pxy[nzs] / px_py[nzs]))
+
+        
+print("Working on the benchmark images")
+ids = next(os.walk(f"{DATA_PATH}predicted_padded/raw/"))[2]
+print("No. of images = ", len(ids))
+
+img_list = ids[:180]
+
+minf_sym = np.zeros((len(img_list),(len(img_list))))
+for i in tqdm(range(len(img_list))):
+    src = cv.imread(f'{DATA_PATH}predicted_padded/raw/{img_list[i]}',0)
+    for j in range(i,len(img_list)):
+        dst = cv.imread(f'{DATA_PATH}predicted_padded/raw/{img_list[j]}',0)
+        hist_2d, _, _ = np.histogram2d(src.flatten(),dst.flatten(),bins=20)
+        minf_sym[i,j] = mutual_information(hist_2d)
+        outfile = open(f"{DATA_PATH}minf_sym_raw.pickle","wb")
+        pickle.dump(minf_sym, outfile)
+        outfile.close()
+
+
+import os
+from tqdm import tqdm
+
+import numpy as np
+
+import cv2 as cv
+import openslide
+
+from math import ceil,floor
+
+# This is where the scans live, change it if something happens
+DATA_PATH = "../../../../../media/san2_ssd/data/csont_biopszia_copy/"
+# These are the folders inside, instead of listing them it might be easier to always just use those, that are needed!
+FOLDER_NAMES = ["E_fixed/", "F/"]
+
+# Path to save the images
+WORKDIR_PATH = "Data/source_files/"
+
+for foldername in FOLDER_NAMES:
+    # Find the scans
+    filenames = []
+    for filename in sorted(os.listdir(f"{DATA_PATH}{foldername}")):
+        if filename.endswith(".mrxs"):
+            filenames.append(filename)
+
+    for filename in tqdm(filenames):
+        #print(f"{DATA_PATH}{foldername}{filename}")
+        slide = openslide.OpenSlide(f"{DATA_PATH}{foldername}{filename}")
+
+        img = slide.read_region((0, 0), (slide.level_count - 1),
+                                slide.level_dimensions[(slide.level_count - 1)])  # get the slide
+        img = np.array(img)  # to numpy array
+        img = cv.cvtColor(img, cv.COLOR_RGBA2BGRA)  # fix the color channels
+        # Fix the alpha channel
+        alpha_channel = img[:, :, 3]
+        _, mask = cv.threshold(alpha_channel, 254, 255, cv.THRESH_BINARY)  # binarize mask
+        color = img[:, :, :3]
+        img = cv.bitwise_not(cv.bitwise_not(color, mask=mask))
+        # Make a grayscale image
+        gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+        edged = cv.Canny(img, 100, 255)
+        # Apply adaptive threshold
+        thresh = cv.adaptiveThreshold(edged, 255, 1, 1, 11, 2)
+        thresh_color = cv.cvtColor(thresh, cv.COLOR_GRAY2BGR)
+        # apply some dilation and erosion to join the gaps - change iteration to detect more or less area's
+        thresh = cv.dilate(thresh, None, iterations=15)
+        thresh = cv.erode(thresh, None, iterations=15)
+        # Find the contours
+        contours, hierarchy = cv.findContours(thresh, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
+        X = 0
+        Y = 0
+        W = 0
+        H = 0
+        armax = 0
+        for cnt in contours:
+            x, y, w, h = cv.boundingRect(cnt)
+            if w*h > armax:
+                cnt_max = cnt
+                armax = w*h
+                X = x
+                Y = y
+                W = w
+                H = h
+                rect = cv.minAreaRect(cnt)
+                box = cv.boxPoints(rect)
+                box = np.int0(box)
+        if not armax == 0:
+            # starting the export
+            outfile = filename.replace(".mrxs", "")
+            #print(outfile)
+
+            level = 3
+            scale_1 = int(slide.level_downsamples[(slide.level_count - 1)])
+            scale_2 = int(scale_1 / slide.level_downsamples[level])
+
+            real_box = (box - [X, Y]) * scale_2  # the real size params of the rotated rect
+            real_cnt = (cnt_max - [X,Y]) * scale_2 # the real size params of the rotated ROI
+
+            high_res = slide.read_region((X * scale_1, Y * scale_1), level, (W * scale_2, H * scale_2))
+            high_res = np.array(high_res)  # to numpy array
+            high_res = cv.cvtColor(high_res, cv.COLOR_RGBA2BGRA)  # fix the color channels
+            alpha_channel = high_res[:, :, 3]
+            _, mask = cv.threshold(alpha_channel, 254, 255, cv.THRESH_BINARY)  # binarize mask
+            color = high_res[:, :, :3]
+            high_res = cv.bitwise_not(cv.bitwise_not(color, mask=mask))
+
+            #high_res = cv.drawContours(high_res,[real_box],0,(0,0,255),50)
+
+            # How big the padding should be:
+            if min(real_box[:, 1]) < 0:
+                top = (-1) * min(real_box[:, 1])
+            else:
+                top = 0
+            if max(real_box[:, 1]) > np.shape(high_res)[0]:
+                bottom = max(real_box[:, 1]) - np.shape(high_res)[0]
+            else:
+                bottom = 0
+            if min(real_box[:, 0]) < 0:
+                left = (-1) * min(real_box[:, 0])
+            else:
+                left = 0
+            if max(real_box[:, 0]) > np.shape(high_res)[1]:
+                right =max(real_box[:, 0]) - np.shape(high_res)[1]
+            else:
+                right = 0
+            high_res = cv.copyMakeBorder(high_res, top,
+                                         bottom, left,
+                                         right, cv.BORDER_CONSTANT,
+                                         value=[255, 255, 255])  # add padding to fit in the whole rotated rectangle
+
+            new_box = real_box + [left, top]
+            new_cnt = real_cnt + [left, top]
+            high_res_roi = high_res.copy()
+            high_res_roi = cv.fillPoly(np.zeros(np.shape(high_res_roi)), pts =[new_cnt], color=(255,255,255))
+            #high_res = cv.drawContours(high_res, [new_box], 0, (0, 0, 255), 50)
+
+            new_rect = cv.minAreaRect(new_box)
+            center = (new_rect[0][0], new_rect[0][1])
+
+            # Getting the right angle of rotation
+            if new_rect[2] > 5:
+                theta = new_rect[2]-90
+                width = new_rect[1][1]  # the 90 degrees switches height and width
+                height = new_rect[1][0]  # the 90 degrees switches height and width
+            else:
+                theta = new_rect[2]
+                width = new_rect[1][0]
+                height = new_rect[1][1]
+
+            #print(f"center:{center}")
+            #print(f"width:{width}")
+            #print(f"height:{height}")
+
+            # Rotating the biopsy
+            shape = (high_res.shape[1], high_res.shape[0])
+            matrix = cv.getRotationMatrix2D(center=center, angle=theta, scale=1)
+            high_res = cv.warpAffine(src=high_res, M=matrix, dsize=shape, borderMode=cv.BORDER_CONSTANT,
+                                   borderValue=[255, 255, 255])
+            high_res_roi = cv.warpAffine(src=high_res_roi, M=matrix, dsize=shape, borderMode=cv.BORDER_CONSTANT,
+                                   borderValue=[0, 0, 0])
+            fx = 0.85
+            fy = 0.96
+            top = ceil(np.shape(high_res_roi)[0]*(1-fy)*0.5)
+            bottom = floor(np.shape(high_res_roi)[0]*(1-fy)*0.5)
+            left = ceil(np.shape(high_res_roi)[1]*(1-fx)*0.5)
+            right = floor(np.shape(high_res_roi)[1]*(1-fx)*0.5)
+            high_res_roi = cv.resize(high_res_roi,(ceil(np.shape(high_res_roi)[1]*fx),ceil(np.shape(high_res_roi)[0]*fy)))
+            high_res_roi = cv.copyMakeBorder(high_res_roi, top, bottom, left, right, cv.BORDER_CONSTANT, value=[0, 0, 0])
+            # Slice only what's needed
+            x_min = int(center[0] - width / 2)
+            if x_min < 0:
+                x_min = 0
+            x_max = int(x_min + width)
+            if x_max > np.shape(high_res)[1]:
+                x_max = np.shape(high_res)[1]
+            y_min = int(center[1] - height / 2)
+            if y_min < 0:
+                y_min = 0
+            y_max = int(y_min + height)
+            if y_max > np.shape(high_res)[0]:
+                y_max = np.shape(high_res)[0]
+
+            #print(np.shape(high_res))
+            #print(f"x_min:{x_min}")
+            #print(f"x_max:{x_max}")
+            #print(f"y_min:{y_min}")
+            #print(f"y_max:{y_max}")
+
+            high_res = high_res[y_min:y_max, x_min:x_max]
+            high_res_roi = high_res_roi[y_min:y_max, x_min:x_max]
+            _,high_res_roi= cv.threshold(high_res_roi, 128, 255, cv.THRESH_BINARY)
+            cv.imwrite(f"{WORKDIR_PATH}{outfile}.png",high_res)
+            cv.imwrite(f"{WORKDIR_PATH}../roi/{outfile}.png",high_res_roi)
+            #print("----------------------")
+
+
+import os
+import subprocess
+import cv2 as cv
+import pandas as pd
+import numpy as np
+
+def ASIFT_matcher(src_path,dst_path):
+    os.chdir(f'{os.getcwd()}/demo_ASIFT_src')
+    proc = subprocess.Popen(['./demo_ASIFT', src_path, dst_path,'../imgOutVert.png','../imgOutHori.png','../matchings.txt','../keys1.txt','../keys2.txt'])
+    proc.wait()
+    os.chdir(f'{os.getcwd()}/..')
+
+
+def Homography_Transform(src,dst,scale = 2,return_matrix = False):
+    #src is the source image we want to tarnsform
+    #dst is the target, we want the source to look like
+    h = np.shape(dst)[1]
+    w = np.shape(dst)[0]
+
+    src_scaled = cv.resize(src,None,fx=1/scale,fy=1/scale,interpolation = cv.INTER_CUBIC)
+    dst_scaled = cv.resize(dst,None,fx=1/scale,fy=1/scale,interpolation = cv.INTER_CUBIC)
+
+    cv.imwrite(f'{os.getcwd()}/src.png',src_scaled)
+    cv.imwrite(f'{os.getcwd()}/dst.png',dst_scaled)
+
+    ASIFT_matcher(f'{os.getcwd()}/src.png',f'{os.getcwd()}/dst.png')
+    df = pd.read_csv("matchings.txt",skiprows = 1, header = None, sep = '  ', engine='python')
+    p1 = np.zeros((len(df),2),dtype = np.float32)
+    p2 = np.zeros((len(df),2),dtype = np.float32)
+    for i in range(len(df)):
+        p1[i,0] = df.iloc[i,0]
+        p1[i,1] = df.iloc[i,1]
+        p2[i,0] = df.iloc[i,2]
+        p2[i,1] = df.iloc[i,3]
+
+    #Calculate the Homography matrix
+    H, status = cv.findHomography(p1,p2,cv.RANSAC,5.0)
+        
+    #Scale the Homography matrix
+    H[0,2] = scale*H[0,2]
+    H[1,2] = scale*H[1,2]
+    H[2,0] = (1/scale)*H[2,0]
+    H[2,1] = (1/scale)*H[2,1]
+
+    #Transformation
+    src_warped = cv.warpPerspective(src, H, (dst.shape[1],dst.shape[0]),borderMode=cv.BORDER_CONSTANT,borderValue=(255,255,255))
+    
+    #Binarize Image
+    _,thresh = cv.threshold(src_warped, 128, 255, cv.THRESH_BINARY)
+    _,thresh2 = cv.threshold(255-src_warped, 254, 255, cv.THRESH_BINARY)
+    _,thresh3 = cv.threshold(255-thresh2-thresh, 128, 128, cv.THRESH_BINARY)
+    src_binary = thresh3 + thresh
+    
+    #Cleanup
+    os.remove('imgOutVert.png')
+    os.remove('imgOutHori.png')
+    os.remove('matchings.txt')
+    os.remove('keys1.txt')
+    os.remove('keys2.txt')
+    os.remove(f'{os.getcwd()}/src.png')
+    os.remove(f'{os.getcwd()}/dst.png')
+    
+    if return_matrix:
+        return np.array(src_binary),H
+    else:
+        return np.array(src_binary)
+    
+    
+def Homography_Transform_From_Matrix(src,dst,H,border_value=(255,255,255)):
+    src_warped = cv.warpPerspective(src, H, (dst.shape[1],dst.shape[0]),borderMode=cv.BORDER_CONSTANT,borderValue=border_value)
+    return np.array(src_warped)
+
+import os
+import pandas as pd
+import numpy as np
+import cv2 as cv
+from tqdm import tqdm
+from math import floor,ceil
+
+def prepare_images(img_list,source_path,target_path,color_mode = False,padding = 500,border_value=(255,255,255)):
+    print("Finding optimal canvas size.")
+    max_h = 0
+    max_w = 0
+    for i in tqdm(img_list):
+        img = cv.imread(f'{source_path}{i}',0)
+        h = np.shape(img)[1]
+        w = np.shape(img)[0]
+        if h > max_h:
+            max_h = h
+        if w > max_w:
+            max_w = w
+    print("Padding images.")
+    for i in tqdm(img_list):
+        if color_mode:
+            img = cv.imread(f'{source_path}{i}')
+        else:
+            img = cv.imread(f'{source_path}{i}',0)
+        h = np.shape(img)[1]
+        w = np.shape(img)[0]
+        left = ceil((max_h + padding*2 - h)/2)
+        right = floor((max_h + padding*2 - h)/2)
+        top = ceil((max_w + padding*2 - w)/2)
+        bottom = floor((max_w + padding*2 - w)/2)
+        dst = cv.copyMakeBorder(img,top,bottom,left,right,cv.BORDER_CONSTANT,value = border_value)
+        cv.imwrite(f'{target_path}{i}',dst)
+    print('Done.')
+
+import os
+from tqdm import tqdm
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+
+import cv2 as cv
+
+# Images we want to tile
+DATA_PATH = "Data/predicted_tiles/"
+# Place where the tiles go
+WORKDIR_PATH = "Data/"
+# Size of tiles
+size = 512
+# Overlap between the tiles
+overlap = 64
+
+picklenames = []
+for picklename in sorted(os.listdir(f"{WORKDIR_PATH}image_tiles")):
+    if picklename.endswith(".pickle"):
+        picklenames.append(picklename)
+
+for picklename in tqdm(picklenames):
+    df = pd.read_pickle(WORKDIR_PATH + "image_tiles/" + picklename)
+
+    name_str = picklename.replace("_tiles.pickle", "")
+
+    xs = []
+    ys = []
+    for x, y in df.bottom_right:
+        xs.append(x)
+        ys.append(y)
+
+    canvas = np.zeros((max(ys), max(xs), 2))
+    background = np.ones((max(ys), max(xs), 1))*255
+    canvas = np.concatenate((background,canvas), axis = -1)
+
+    for i in range(len(df)):
+        img = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[i].n}.png")
+        img = np.asarray(img).astype(int)
+        top_left = df.loc[i].top_left
+        top_right = df.loc[i].top_right
+        bottom_left = df.loc[i].bottom_left
+        bottom_right = df.loc[i].bottom_right
+
+        # TOP LEFT CORNER
+        top_left_corner = img[0:overlap, 0:overlap].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].bottom_right[0] == top_left[0] + overlap and df.loc[j].bottom_right[1] == top_left[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_left_corner += img_2[size - overlap:size, size - overlap:size]
+                counter += 1
+            elif df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_left_corner += img_2[size - overlap:size, 0:overlap]
+                counter += 1
+            elif df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_left_corner += img_2[0:overlap, size - overlap:size]
+                counter += 1
+        img[0:overlap, 0:overlap] = top_left_corner / counter
+
+        # TOP RIGHT CORNER
+        top_right_corner = img[0:overlap, size - overlap:size].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].bottom_left[0] == top_right[0] - overlap and df.loc[j].bottom_left[1] == top_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_right_corner += img_2[size - overlap:size, 0:overlap]
+                counter += 1
+            elif df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_right_corner += img_2[size - overlap:size, size - overlap:size]
+                counter += 1
+            elif df.loc[j].top_left[0] == top_right[0] - overlap and df.loc[j].top_left[1] == top_right[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_right_corner += img_2[0:overlap, 0:overlap]
+                counter += 1
+        img[0:overlap, size - overlap:size] = top_right_corner / counter
+
+        # BOTTOM LEFT CORNER
+        bottom_left_corner = img[size - overlap:size, 0:overlap].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].top_right[0] == bottom_left[0] + overlap and df.loc[j].top_right[1] == bottom_left[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_left_corner += img_2[0:overlap, size - overlap:size]
+                counter += 1
+            elif df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_left_corner += img_2[0:overlap, 0:overlap]
+                counter += 1
+            elif df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_left_corner += img_2[size - overlap:size, size - overlap:size]
+                counter += 1
+        img[size - overlap:size, 0:overlap] = bottom_left_corner / counter
+
+        # BOTTOM RIGHT CORNER
+        bottom_right_corner = img[size - overlap:size, size - overlap:size].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].top_left[0] == bottom_right[0] - overlap and df.loc[j].top_left[1] == bottom_right[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_right_corner += img_2[0:overlap, 0:overlap]
+                counter += 1
+            elif df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_right_corner += img_2[0:overlap, size - overlap:size]
+                counter += 1
+            elif df.loc[j].bottom_left[0] == bottom_right[0] - overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_right_corner += img_2[size - overlap:size, 0:overlap]
+                counter += 1
+        img[size - overlap:size, size - overlap:size] = bottom_right_corner / counter
+
+        # TOP MIDDLE
+        top_middle = img[0:overlap, overlap:size - overlap].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap and df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_middle += img_2[size - overlap:size, overlap:size - overlap]
+                counter += 1
+        img[0:overlap, overlap:size - overlap] = top_middle / counter
+
+        # BOTTOM MIDDLE
+        bottom_middle = img[size - overlap:size, overlap:size - overlap].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] + overlap and df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_middle += img_2[0:overlap, overlap:size - overlap]
+                counter += 1
+        img[size - overlap:size, overlap:size - overlap] = bottom_middle / counter
+
+        # LEFT MIDDLE
+        left_middle = img[overlap:size - overlap, 0:overlap].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1] and df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                left_middle += img_2[overlap:size - overlap, size - overlap:size]
+                counter += 1
+        img[overlap:size - overlap, 0:overlap] = left_middle / counter
+
+        # RIGHT MIDDLE
+        right_middle = img[overlap:size - overlap, size - overlap:size].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].top_left[0] == top_right[0] + overlap and df.loc[j].top_left[1] == top_right[1] and df.loc[j].bottom_left[0] == bottom_right[0] + overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                right_middle += img_2[overlap:size - overlap, 0:overlap]
+                counter += 1
+        img[overlap:size - overlap, size - overlap:size] = right_middle / counter
+
+        # Adding the corrected image to the canvas
+        xmin = top_left[0]
+        xmax = top_right[0]
+        ymin = top_left[1]
+        ymax = bottom_left[1]
+        canvas[ymin:ymax, xmin:xmax] = img
+
+        cv.imwrite(f"{WORKDIR_PATH}predicted_reconstructed/{name_str}.png", canvas)
+
+import os
+from tqdm import tqdm
+
+import numpy as np
+import pandas as pd
+#import matplotlib.pyplot as plt
+
+import cv2 as cv
+
+# Images we want to tile
+DATA_PATH = "Data/training_set/predicted_tiles/"
+# Place where the tiles go
+WORKDIR_PATH = "Data/training_set/"
+# Size of tiles
+size = 512
+# Overlap between the tiles
+overlap = 64
+
+picklenames = []
+for picklename in sorted(os.listdir(f"{WORKDIR_PATH}")):
+    if picklename.endswith(".pickle"):
+        picklenames.append(picklename)
+
+for picklename in tqdm(picklenames):
+    df = pd.read_pickle(WORKDIR_PATH + picklename)
+
+    name_str = picklename.replace("_tiles.pickle", "")
+
+    xs = []
+    ys = []
+    for x, y in df.bottom_right:
+        xs.append(x)
+        ys.append(y)
+
+    canvas = np.zeros((max(ys), max(xs), 2))
+    background = np.ones((max(ys), max(xs), 1))*255
+    canvas = np.concatenate((background,canvas), axis = -1)
+
+    for i in range(len(df)):
+        img = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[i].n}.png")
+        img = np.asarray(img).astype(int)
+        top_left = df.loc[i].top_left
+        top_right = df.loc[i].top_right
+        bottom_left = df.loc[i].bottom_left
+        bottom_right = df.loc[i].bottom_right
+
+        # TOP LEFT CORNER
+        top_left_corner = img[0:overlap, 0:overlap].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].bottom_right[0] == top_left[0] + overlap and df.loc[j].bottom_right[1] == top_left[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_left_corner += img_2[size - overlap:size, size - overlap:size]
+                counter += 1
+            elif df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_left_corner += img_2[size - overlap:size, 0:overlap]
+                counter += 1
+            elif df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_left_corner += img_2[0:overlap, size - overlap:size]
+                counter += 1
+        img[0:overlap, 0:overlap] = top_left_corner / counter
+
+        # TOP RIGHT CORNER
+        top_right_corner = img[0:overlap, size - overlap:size].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].bottom_left[0] == top_right[0] - overlap and df.loc[j].bottom_left[1] == top_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_right_corner += img_2[size - overlap:size, 0:overlap]
+                counter += 1
+            elif df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_right_corner += img_2[size - overlap:size, size - overlap:size]
+                counter += 1
+            elif df.loc[j].top_left[0] == top_right[0] - overlap and df.loc[j].top_left[1] == top_right[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_right_corner += img_2[0:overlap, 0:overlap]
+                counter += 1
+        img[0:overlap, size - overlap:size] = top_right_corner / counter
+
+        # BOTTOM LEFT CORNER
+        bottom_left_corner = img[size - overlap:size, 0:overlap].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].top_right[0] == bottom_left[0] + overlap and df.loc[j].top_right[1] == bottom_left[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_left_corner += img_2[0:overlap, size - overlap:size]
+                counter += 1
+            elif df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_left_corner += img_2[0:overlap, 0:overlap]
+                counter += 1
+            elif df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_left_corner += img_2[size - overlap:size, size - overlap:size]
+                counter += 1
+        img[size - overlap:size, 0:overlap] = bottom_left_corner / counter
+
+        # BOTTOM RIGHT CORNER
+        bottom_right_corner = img[size - overlap:size, size - overlap:size].copy()
+        counter = 1
+        # Find any other images, that contain this corner
+        for j in range(len(df)):
+            if df.loc[j].top_left[0] == bottom_right[0] - overlap and df.loc[j].top_left[1] == bottom_right[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_right_corner += img_2[0:overlap, 0:overlap]
+                counter += 1
+            elif df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] - overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_right_corner += img_2[0:overlap, size - overlap:size]
+                counter += 1
+            elif df.loc[j].bottom_left[0] == bottom_right[0] - overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_right_corner += img_2[size - overlap:size, 0:overlap]
+                counter += 1
+        img[size - overlap:size, size - overlap:size] = bottom_right_corner / counter
+
+        # TOP MIDDLE
+        top_middle = img[0:overlap, overlap:size - overlap].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap and df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                top_middle += img_2[size - overlap:size, overlap:size - overlap]
+                counter += 1
+        img[0:overlap, overlap:size - overlap] = top_middle / counter
+
+        # BOTTOM MIDDLE
+        bottom_middle = img[size - overlap:size, overlap:size - overlap].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] + overlap and df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] + overlap:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                bottom_middle += img_2[0:overlap, overlap:size - overlap]
+                counter += 1
+        img[size - overlap:size, overlap:size - overlap] = bottom_middle / counter
+
+        # LEFT MIDDLE
+        left_middle = img[overlap:size - overlap, 0:overlap].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1] and df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                left_middle += img_2[overlap:size - overlap, size - overlap:size]
+                counter += 1
+        img[overlap:size - overlap, 0:overlap] = left_middle / counter
+
+        # RIGHT MIDDLE
+        right_middle = img[overlap:size - overlap, size - overlap:size].copy()
+        counter = 1
+        for j in range(len(df)):
+            if df.loc[j].top_left[0] == top_right[0] + overlap and df.loc[j].top_left[1] == top_right[1] and df.loc[j].bottom_left[0] == bottom_right[0] + overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                img_2 = cv.imread(f"{DATA_PATH}{name_str}_{df.loc[j].n}.png")
+                img_2 = np.asarray(img_2).astype(int)
+                right_middle += img_2[overlap:size - overlap, 0:overlap]
+                counter += 1
+        img[overlap:size - overlap, size - overlap:size] = right_middle / counter
+
+        # Adding the corrected image to the canvas
+        xmin = top_left[0]
+        xmax = top_right[0]
+        ymin = top_left[1]
+        ymax = bottom_left[1]
+        canvas[ymin:ymax, xmin:xmax] = img
+
+        cv.imwrite(f"{WORKDIR_PATH}predicted_reconstructed/{name_str}.png", canvas)
+
+
+import os
+
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2 as cv
+
+from tqdm import tqdm
+
+DATA_PATH = "Data/training_set/qupath_annotations/"
+WORKDIR_PATH = "Data/training_set/source_files/"
+
+ids = next(os.walk(f"{WORKDIR_PATH}images"))[2]
+
+for i in tqdm(ids):
+    source_img = cv.imread(f"{WORKDIR_PATH}images/{i}", 0)
+    source_img = np.asarray(source_img)
+
+    name_str = i.replace(".png", "")
+    #print(name_str)
+
+    canvas = np.zeros((np.shape(source_img)[0], np.shape(source_img)[1]))
+
+    # Collecting all patches corresponding to a given image
+    patches = next(os.walk(f"{DATA_PATH}"))[2]
+    tmp = []
+    list(map(lambda x: tmp.append(x) if x.startswith(name_str) else "do nothing", patches))
+    patches = tmp
+    del tmp
+
+    for patch in patches:
+        patch_cut = patch.replace(name_str, "").replace(")-mask.png", "")
+        if "_Tumor_(" in patch_cut:
+            patch_cut = patch_cut.replace("_Tumor_(", "")
+            mask_type = 1
+        elif "_Stroma_(" in patch_cut:
+            patch_cut = patch_cut.replace("_Stroma_(", "")
+            mask_type = 2
+        elif "_Necrosis_(" in patch_cut:
+            patch_cut = patch_cut.replace("_Necrosis_(","")
+            mask_type = 3
+
+        scale_factor = int(float(patch_cut.split(",")[0]))
+        x_upper_left = int(patch_cut.split(",")[1])
+        y_upper_left = int(patch_cut.split(",")[2])
+        x_size = int(patch_cut.split(",")[3])
+        y_size = int(patch_cut.split(",")[4])
+
+        img = cv.imread(f"{DATA_PATH}{patch}", 0)
+        img = cv.resize(img, (x_size, y_size), scale_factor, scale_factor)
+        img = (img > 0.5).astype(np.uint8)
+        img = np.asarray(img)
+
+        for j in range(y_size):
+            for k in range(x_size):
+                if canvas[y_upper_left + j, x_upper_left + k] == 0 or canvas[y_upper_left + j, x_upper_left + k] == 255:
+                    if img[j, k] == 1:
+                        canvas[y_upper_left + j, x_upper_left + k] = img[j, k] * mask_type * 0.25 * 255
+                    else:
+                        canvas[y_upper_left + j, x_upper_left + k] = 255
+
+    for j in range(np.shape(canvas)[0]):
+        for k in range(np.shape(canvas)[1]):
+            if canvas[j,k] == 0:
+                canvas[j,k] = 255
+
+    #plt.imshow(source_img, "gray")
+    #plt.imshow(canvas/255, alpha=0.6)
+    #plt.show()
+
+    cv.imwrite(f"{WORKDIR_PATH}masks/{name_str}.png", canvas)
+
+
+
+
+import os
+
+import numpy as np
+import matplotlib.pyplot as plt
+import cv2 as cv
+import tqdm
+
+DATA_PATH = "Data/"
+scale = 2
+
+ids = next(os.walk(f"{DATA_PATH}predicted_reconstructed"))[2]
+print("No. of images = ", len(ids))
+
+for i in tqdm.tqdm(ids):
+    img = cv.imread(f"{DATA_PATH}predicted_reconstructed/{i}")
+    w = np.shape(img)[0]
+    h = np.shape(img)[1]
+    img = cv.resize(cv.bilateralFilter(cv.resize(img,None,fx = 1/scale,fy = 1/scale, interpolation = cv.INTER_CUBIC),-1,50,50),(h,w),fx = scale,fy = scale, interpolation = cv.INTER_CUBIC)      # Bilateral Smoothing on predicted masks
+    img_t = 1-(np.argmax(img, axis = 2))/2
+    cv.imwrite(f"{DATA_PATH}predicted_thresholded/{i}", img_t*255)
+    # plt.imshow(img_t, "gray")
+    # plt.show()
+
+import os
+from tqdm import tqdm
+from math import ceil
+
+import numpy as np
+import pandas as pd
+
+import cv2 as cv
+
+# Images we want to tile
+DATA_PATH = "Data/source_files/"
+# Place where the tiles go
+WORKDIR_PATH = "Data/"
+# Size of tiles
+size = 512
+# Overlap between the tiles
+overlap = 64
+
+# Reconstruct the tiles for debugging
+RECONSTRUCT = True
+
+filenames = []
+for filename in sorted(os.listdir(f"{DATA_PATH}")):
+    if filename.endswith(".png"):
+        filenames.append(filename)
+
+print("Creating Image Tiles\n")
+for filename in tqdm(filenames):
+    img = cv.imread(f"{DATA_PATH}{filename}")
+    img = np.asarray(img)
+
+    filename = filename.replace(".png", "")
+
+    n = 0 # The number of the tile
+    outfile = [] # File containing metadata for easy reconstruction
+    x_size = ceil((np.shape(img)[1]/size)*(1+overlap/size))
+    y_size = ceil((np.shape(img)[0]/size)*(1+overlap/size))
+    for i in range(x_size):
+        # i goes through x
+        for j in range(y_size):
+            # j goes through y
+            tile = img[j*(size-overlap):j*(size-overlap)+size,i*(size-overlap):i*(size-overlap)+size]
+            if not (np.shape(tile)[0] == size and np.shape(tile)[1] == size):
+                tile = cv.copyMakeBorder(tile,0,size-np.shape(tile)[0],0,size-np.shape(tile)[1],cv.BORDER_CONSTANT,value=[255,255,255])
+            hist, bins = np.histogram(tile.flatten(),bins = list(range(0,256)))
+            log_hist = []
+            for h in hist:
+                if h == 0:
+                    log_hist.append(0)
+                else:
+                    log_hist.append(np.log10(h))
+            area = sum(np.diff(bins)*log_hist)
+            if area > 100:
+                top_left = [i*(size-overlap),j*(size-overlap)]
+                top_right = [i*(size-overlap)+size,j*(size-overlap)]
+                bottom_left = [i*(size-overlap),j*(size-overlap)+size]
+                bottom_right = [i*(size-overlap)+size,j*(size-overlap)+size]
+                file_name = filename + f"_{n}.png"
+                cv.imwrite(f"{WORKDIR_PATH}image_tiles/{file_name}",tile)
+                outfile.append([n,top_left,top_right,bottom_left,bottom_right,file_name])
+            n += 1
+
+    # Saving the metadata
+    outfile = pd.DataFrame(data=outfile,columns=["n","top_left","top_right","bottom_left","bottom_right","file_name"])
+    outfile.to_pickle(f"{WORKDIR_PATH}image_tiles/{filename}_tiles.pickle")
+
+# Then we tile the ROIs in the same way
+print("Creating ROI Tiles\n")
+for filename in tqdm(filenames):
+    img = cv.imread(f"{DATA_PATH}../roi/{filename}")
+    img = np.asarray(img)
+
+    filename = filename.replace(".png", "")
+
+    picklename = filename + "_tiles.pickle"
+    df = pd.read_pickle(WORKDIR_PATH + "image_tiles/" + picklename)
+
+    n = 0  # The number of the tile
+    x_size = ceil((np.shape(img)[1]/size)*(1+overlap/size))
+    y_size = ceil((np.shape(img)[0]/size)*(1+overlap/size))
+    for i in range(x_size):
+        # i goes through x
+        for j in range(y_size):
+            # j goes through y
+            tile = img[j * (size - overlap):j * (size - overlap) + size, i * (size - overlap):i * (size - overlap) + size]
+            if not (np.shape(tile)[0] == size and np.shape(tile)[1] == size):
+                tile = cv.copyMakeBorder(tile,0,size-np.shape(tile)[0],0,size-np.shape(tile)[1],cv.BORDER_CONSTANT,value=[0,0,0])
+            if n in list(df.n):
+                file_name = filename + f"_{n}.png"
+                cv.imwrite(f"{WORKDIR_PATH}roi_tiles/{file_name}", tile)
+            n += 1
+
+print("Reconstructing\n")
+if RECONSTRUCT:
+    picklenames = []
+    for picklename in sorted(os.listdir(f"{WORKDIR_PATH}image_tiles/")):
+        if picklename.endswith(".pickle"):
+            picklenames.append(picklename)
+
+    for picklename in tqdm(picklenames):
+        df = pd.read_pickle(WORKDIR_PATH + "image_tiles/" + picklename)
+
+        name_str = picklename.replace("_tiles.pickle", "")
+
+        xs = []
+        ys = []
+        for x, y in df.bottom_right:
+            xs.append(x)
+            ys.append(y)
+            
+        subfolders = ["image_tiles/", "roi_tiles/"]
+        for subfolder in subfolders:
+            if subfolder == "image_tiles/":
+                canvas = np.ones((max(ys), max(xs), 3)) * 255
+            else:
+                canvas = np.zeros((max(ys), max(xs), 3))
+
+            for i in range(len(df)):
+                img = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[i].n}.png")
+                img = np.asarray(img).astype(int)
+                top_left = df.loc[i].top_left
+                top_right = df.loc[i].top_right
+                bottom_left = df.loc[i].bottom_left
+                bottom_right = df.loc[i].bottom_right
+
+                # TOP LEFT CORNER
+                top_left_corner = img[0:overlap, 0:overlap].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].bottom_right[0] == top_left[0] + overlap and df.loc[j].bottom_right[1] == top_left[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_left_corner += img_2[size - overlap:size, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_left_corner += img_2[size - overlap:size, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_left_corner += img_2[0:overlap, size - overlap:size]
+                        counter += 1
+                img[0:overlap, 0:overlap] = top_left_corner / counter
+
+                # TOP RIGHT CORNER
+                top_right_corner = img[0:overlap, size - overlap:size].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].bottom_left[0] == top_right[0] - overlap and df.loc[j].bottom_left[1] == top_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_right_corner += img_2[size - overlap:size, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_right_corner += img_2[size - overlap:size, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].top_left[0] == top_right[0] - overlap and df.loc[j].top_left[1] == top_right[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_right_corner += img_2[0:overlap, 0:overlap]
+                        counter += 1
+                img[0:overlap, size - overlap:size] = top_right_corner / counter
+
+                # BOTTOM LEFT CORNER
+                bottom_left_corner = img[size - overlap:size, 0:overlap].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].top_right[0] == bottom_left[0] + overlap and df.loc[j].top_right[1] == bottom_left[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_left_corner += img_2[0:overlap, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_left_corner += img_2[0:overlap, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_left_corner += img_2[size - overlap:size, size - overlap:size]
+                        counter += 1
+                img[size - overlap:size, 0:overlap] = bottom_left_corner / counter
+
+                # BOTTOM RIGHT CORNER
+                bottom_right_corner = img[size - overlap:size, size - overlap:size].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].top_left[0] == bottom_right[0] - overlap and df.loc[j].top_left[1] == bottom_right[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_right_corner += img_2[0:overlap, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_right_corner += img_2[0:overlap, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].bottom_left[0] == bottom_right[0] - overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_right_corner += img_2[size - overlap:size, 0:overlap]
+                        counter += 1
+                img[size - overlap:size, size - overlap:size] = bottom_right_corner / counter
+
+                # TOP MIDDLE
+                top_middle = img[0:overlap, overlap:size - overlap].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap and df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_middle += img_2[size - overlap:size, overlap:size - overlap]
+                        counter += 1
+                img[0:overlap, overlap:size - overlap] = top_middle / counter
+
+                # BOTTOM MIDDLE
+                bottom_middle = img[size - overlap:size, overlap:size - overlap].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] + overlap and df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_middle += img_2[0:overlap, overlap:size - overlap]
+                        counter += 1
+                img[size - overlap:size, overlap:size - overlap] = bottom_middle / counter
+
+                # LEFT MIDDLE
+                left_middle = img[overlap:size - overlap, 0:overlap].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1] and df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        left_middle += img_2[overlap:size - overlap, size - overlap:size]
+                        counter += 1
+                img[overlap:size - overlap, 0:overlap] = left_middle / counter
+
+                # RIGHT MIDDLE
+                right_middle = img[overlap:size - overlap, size - overlap:size].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].top_left[0] == top_right[0] + overlap and df.loc[j].top_left[1] == top_right[1] and df.loc[j].bottom_left[0] == bottom_right[0] + overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{subfolder}{name_str}_{df.loc[j].n}.png")
+                        img_2 = np.asarray(img_2).astype(int)
+                        right_middle += img_2[overlap:size - overlap, 0:overlap]
+                        counter += 1
+                img[overlap:size - overlap, size - overlap:size] = right_middle / counter
+
+                # Adding the corrected image to the canvas
+                xmin = top_left[0]
+                xmax = top_right[0]
+                ymin = top_left[1]
+                ymax = bottom_left[1]
+                if subfolder == "image_tiles/":
+                    canvas[ymin:ymax, xmin:xmax,:] = img
+                else:
+                    canvas[ymin:ymax, xmin:xmax] = img
+            if subfolder == "image_tiles/":
+                cv.imwrite(f"{WORKDIR_PATH}{subfolder}reconstructed/{name_str}.png", canvas)
+            else:
+                cv.imwrite(f"{WORKDIR_PATH}{subfolder}reconstructed/{name_str}.png", canvas)
+
+import os
+from tqdm import tqdm
+from math import ceil
+
+import numpy as np
+import pandas as pd
+
+import cv2 as cv
+
+# Images we want to tile
+DATA_PATH = "Data/training_set/source_files/"
+# Place where the tiles go
+WORKDIR_PATH = "Data/training_set/"
+# Size of tiles
+size = 512
+# Overlap between the tiles
+overlap = 64
+
+# Reconstruct the tiles for debugging
+RECONSTRUCT = True
+
+
+
+# First we tile the masks
+filenames = []
+for filename in sorted(os.listdir(f"{DATA_PATH}masks/")):
+    if filename.endswith(".png"):
+        filenames.append(filename)
+
+print("Creating Mask Tiles\n")
+for filename in tqdm(filenames):
+    img = cv.imread(f"{DATA_PATH}masks/{filename}", 0)
+    img = np.asarray(img)
+
+    filename = filename.replace(".png", "")
+
+    n = 0 # The number of the tile
+    outfile = [] # File containing metadata for easy reconstruction
+    x_size = ceil((np.shape(img)[1]/size)*(1+overlap/size))
+    y_size = ceil((np.shape(img)[0]/size)*(1+overlap/size))
+    for i in range(x_size):
+        # i goes through x
+        for j in range(y_size):
+            # j goes through y
+            tile = img[j*(size-overlap):j*(size-overlap)+size,i*(size-overlap):i*(size-overlap)+size]
+            if not (np.shape(tile)[0] == size and np.shape(tile)[1] == size):
+                tile = cv.copyMakeBorder(tile,0,size-np.shape(tile)[0],0,size-np.shape(tile)[1],cv.BORDER_CONSTANT,value=[255,255,255])
+            unique_pixels = np.unique(tile.flatten())
+            if not len(unique_pixels) == 1 and not unique_pixels[0] == 255:
+                top_left = [i*(size-overlap),j*(size-overlap)]
+                top_right = [i*(size-overlap)+size,j*(size-overlap)]
+                bottom_left = [i*(size-overlap),j*(size-overlap)+size]
+                bottom_right = [i*(size-overlap)+size,j*(size-overlap)+size]
+                file_name = filename + f"_{n}.png"
+                cv.imwrite(f"{WORKDIR_PATH}mask_tiles/{file_name}", tile)
+                outfile.append([n,top_left,top_right,bottom_left,bottom_right,file_name])
+            n += 1
+
+    # Saving the metadata
+    outfile = pd.DataFrame(data=outfile,columns=["n","top_left","top_right","bottom_left","bottom_right","file_name"])
+    outfile.to_pickle(f"{WORKDIR_PATH}{filename}_tiles.pickle")
+
+
+
+# Then we tile the images in the same way
+print("Creating Image Tiles\n")
+for filename in tqdm(filenames):
+    img = cv.imread(f"{DATA_PATH}images/{filename}")
+    img = np.asarray(img)
+
+    filename = filename.replace(".png", "")
+
+    picklename = filename + "_tiles.pickle"
+    df = pd.read_pickle(WORKDIR_PATH + picklename)
+
+    n = 0  # The number of the tile
+    x_size = ceil((np.shape(img)[1]/size)*(1+overlap/size))
+    y_size = ceil((np.shape(img)[0]/size)*(1+overlap/size))
+    for i in range(x_size):
+        # i goes through x
+        for j in range(y_size):
+            # j goes through y
+            tile = img[j * (size - overlap):j * (size - overlap) + size, i * (size - overlap):i * (size - overlap) + size]
+            if not (np.shape(tile)[0] == size and np.shape(tile)[1] == size):
+                tile = cv.copyMakeBorder(tile,0,size-np.shape(tile)[0],0,size-np.shape(tile)[1],cv.BORDER_CONSTANT,value=[255,255,255])
+            if n in list(df.n):
+                file_name = filename + f"_{n}.png"
+                cv.imwrite(f"{WORKDIR_PATH}image_tiles/{file_name}", tile)
+            n += 1
+
+print("Reconstructing Masks and Images\n")
+if RECONSTRUCT:
+    picklenames = []
+    for picklename in sorted(os.listdir(f"{WORKDIR_PATH}")):
+        if picklename.endswith(".pickle"):
+            picklenames.append(picklename)
+
+    for picklename in tqdm(picklenames):
+        df = pd.read_pickle(WORKDIR_PATH + picklename)
+
+        name_str = picklename.replace("_tiles.pickle", "")
+
+        xs = []
+        ys = []
+        for x, y in df.bottom_right:
+            xs.append(x)
+            ys.append(y)
+
+        subfolders = ["mask_tiles/", "image_tiles/"]
+        for subfolder in subfolders:
+            canvas = np.ones((max(ys), max(xs))) * 255
+
+            name_str = subfolder + name_str
+            for i in range(len(df)):
+                img = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[i].n}.png", 0)
+                img = np.asarray(img).astype(int)
+                top_left = df.loc[i].top_left
+                top_right = df.loc[i].top_right
+                bottom_left = df.loc[i].bottom_left
+                bottom_right = df.loc[i].bottom_right
+
+                # TOP LEFT CORNER
+                top_left_corner = img[0:overlap, 0:overlap].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].bottom_right[0] == top_left[0] + overlap and df.loc[j].bottom_right[1] == top_left[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_left_corner += img_2[size - overlap:size, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_left_corner += img_2[size - overlap:size, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_left_corner += img_2[0:overlap, size - overlap:size]
+                        counter += 1
+                img[0:overlap, 0:overlap] = top_left_corner / counter
+
+                # TOP RIGHT CORNER
+                top_right_corner = img[0:overlap, size - overlap:size].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].bottom_left[0] == top_right[0] - overlap and df.loc[j].bottom_left[1] == top_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_right_corner += img_2[size - overlap:size, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_right_corner += img_2[size - overlap:size, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].top_left[0] == top_right[0] - overlap and df.loc[j].top_left[1] == top_right[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_right_corner += img_2[0:overlap, 0:overlap]
+                        counter += 1
+                img[0:overlap, size - overlap:size] = top_right_corner / counter
+
+                # BOTTOM LEFT CORNER
+                bottom_left_corner = img[size - overlap:size, 0:overlap].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].top_right[0] == bottom_left[0] + overlap and df.loc[j].top_right[1] == bottom_left[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_left_corner += img_2[0:overlap, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_left_corner += img_2[0:overlap, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_left_corner += img_2[size - overlap:size, size - overlap:size]
+                        counter += 1
+                img[size - overlap:size, 0:overlap] = bottom_left_corner / counter
+
+                # BOTTOM RIGHT CORNER
+                bottom_right_corner = img[size - overlap:size, size - overlap:size].copy()
+                counter = 1
+                # Find any other images, that contain this corner
+                for j in range(len(df)):
+                    if df.loc[j].top_left[0] == bottom_right[0] - overlap and df.loc[j].top_left[1] == bottom_right[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_right_corner += img_2[0:overlap, 0:overlap]
+                        counter += 1
+                    elif df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] - overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_right_corner += img_2[0:overlap, size - overlap:size]
+                        counter += 1
+                    elif df.loc[j].bottom_left[0] == bottom_right[0] - overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_right_corner += img_2[size - overlap:size, 0:overlap]
+                        counter += 1
+                img[size - overlap:size, size - overlap:size] = bottom_right_corner / counter
+
+                # TOP MIDDLE
+                top_middle = img[0:overlap, overlap:size - overlap].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].bottom_left[0] == top_left[0] and df.loc[j].bottom_left[1] == top_left[1] + overlap and df.loc[j].bottom_right[0] == top_right[0] and df.loc[j].bottom_right[1] == top_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        top_middle += img_2[size - overlap:size, overlap:size - overlap]
+                        counter += 1
+                img[0:overlap, overlap:size - overlap] = top_middle / counter
+
+                # BOTTOM MIDDLE
+                bottom_middle = img[size - overlap:size, overlap:size - overlap].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].top_left[0] == bottom_left[0] and df.loc[j].top_left[1] == bottom_left[1] + overlap and df.loc[j].top_right[0] == bottom_right[0] and df.loc[j].top_right[1] == bottom_right[1] + overlap:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        bottom_middle += img_2[0:overlap, overlap:size - overlap]
+                        counter += 1
+                img[size - overlap:size, overlap:size - overlap] = bottom_middle / counter
+
+                # LEFT MIDDLE
+                left_middle = img[overlap:size - overlap, 0:overlap].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].top_right[0] == top_left[0] + overlap and df.loc[j].top_right[1] == top_left[1] and df.loc[j].bottom_right[0] == bottom_left[0] + overlap and df.loc[j].bottom_right[1] == bottom_left[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        left_middle += img_2[overlap:size - overlap, size - overlap:size]
+                        counter += 1
+                img[overlap:size - overlap, 0:overlap] = left_middle / counter
+
+                # RIGHT MIDDLE
+                right_middle = img[overlap:size - overlap, size - overlap:size].copy()
+                counter = 1
+                for j in range(len(df)):
+                    if df.loc[j].top_left[0] == top_right[0] + overlap and df.loc[j].top_left[1] == top_right[1] and df.loc[j].bottom_left[0] == bottom_right[0] + overlap and df.loc[j].bottom_left[1] == bottom_right[1]:
+                        img_2 = cv.imread(f"{WORKDIR_PATH}{name_str}_{df.loc[j].n}.png", 0)
+                        img_2 = np.asarray(img_2).astype(int)
+                        right_middle += img_2[overlap:size - overlap, 0:overlap]
+                        counter += 1
+                img[overlap:size - overlap, size - overlap:size] = right_middle / counter
+
+                # Adding the corrected image to the canvas
+                xmin = top_left[0]
+                xmax = top_right[0]
+                ymin = top_left[1]
+                ymax = bottom_left[1]
+                canvas[ymin:ymax, xmin:xmax] = img
+
+            name_str = name_str.replace(subfolder, "")
+            cv.imwrite(f"{WORKDIR_PATH}{subfolder}reconstructed/{name_str}.png", canvas)

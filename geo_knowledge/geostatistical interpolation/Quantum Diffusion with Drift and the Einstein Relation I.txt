@@ -1,0 +1,2422 @@
+arXiv:1306.4366v1  [math-ph]  18 Jun 2013
+Quantum Diﬀusion with Drift and the Einstein Relation I
+W. De Roeck
+Institute for Theoretical Physics
+Universit¨at Heidelberg
+69120 Heidelberg, Germany
+J. Fr¨ohlich
+Institute for Theoretical Physics
+ETH Z¨urich
+8093 Z¨urich, Switzerland
+K. Schnelli
+Department of Mathematics
+Harvard University
+Cambridge MA 02138, United States
+Abstract: We study the dynamics of a quantum particle hopping on a simple cubic lattice and driven by a constant external force.
+It is coupled to an array of identical, independent thermal reservoirs consisting of free, massless Bose ﬁelds, one at each site of the
+lattice. When the particle visits a site x of the lattice it can emit or absorb ﬁeld quanta of the reservoir at x. Under the assumption
+that the coupling between the particle and the reservoirs and the driving force are suﬃciently small, we establish the following results:
+The ergodic average over time of the state of the particle approaches a non-equilibrium steady state (NESS) describing a non-zero
+mean drift of the particle. Its motion around the mean drift is diﬀusive, and the diﬀusion constant and the drift velocity are related
+to one another by the Einstein relation.
+KEY WORDS: diﬀusion, kinetic limit, quantum brownian motion
+1. Introduction
+In this paper and its companion [6], we study the quantum dynamics of a tracer particle driven by a constant
+external force ﬁeld, F, (e.g., a uniform gravitational ﬁeld) and interacting with thermal reservoirs by emitting or
+absorbing gapless reservoir modes. The purpose of our analysis is to establish properties of the long-time eﬀective
+dynamics of the particle and to justify some ﬂuctuation-dissipation relations, notably the Einstein relations.
+Among properties of the eﬀective dynamics of the tracer particle coupled to thermal reservoirs at positive
+temperature, we expect the following ones to hold: A velocity-dependent friction force caused by scattering
+processes between the particle and the reservoir modes (emission of Cherenkov radiation) can be expected to
+counteract the external force driving the particle, in such a way that its mean velocity approaches a ﬁnite, non-
+zero limit, v(F), in the direction of the external force F, as time t tends to inﬁnity. Because of thermal ﬂuctuations
+in the reservoir(s), the true motion of the particle is expected to be diﬀusive around its mean motion. One might
+guess that the mobility,
+∂
+∂F
+
+F =0v(F), of the particle satisﬁes the ‘Einstein relation’
+∂
+∂F
+
+F =0v(F) = βD(F = 0) ,
+(1.1)
+where β is the inverse temperature of the gas and D(F) ≡D(β, F) its diﬀusion constant. This would be the
+case if we modeled the dynamics of the particle by a Langevin equation. However, for a particle moving in
+physical space R3 and interacting with a single thermal reservoir ﬁlled with a massless, free Bose ﬁeld (e.g., a
+1
+
+weakly interacting Bose gas), this guess is almost certainly false! The reason is that, usually, the friction force
+caused by interactions of the particle with reservoir modes decreases, as the velocity of the particle grows. One
+therefore expects that a suﬃciently large force F will eventually overcome the friction force and cause a ‘run-
+away’ acceleration. At positive temperature, thermal ﬂuctuations will, in the long run, always manage to kick
+the particle velocity into a region where ‘run-away’ occurs. In fact, some part of the intuition described here has
+recently been made precise in a (classical) Hamiltonian model describing the system in a limiting regime where
+the particle is very massive and the Bose gas in the reservoir is very dense (mean-ﬁeld limit); see [12, 9]. In these
+papers, which only concern systems at zero-temperature, it is shown that the friction force, Ffric(v), tends to 0,
+as |v| →∞, and (assuming rotational invariance) |Ffric(v)| = |Ffric(|v|)| has a unique maximum, Fmax, at some
+ﬁnite value of |v|. These properties imply that, for |F| < Fmax, there are two stationary solutions of the equations
+of motion corresponding to two diﬀerent values,
+v−, v+ ,
+with
+v+ > v−,
+of the speed of the particle. Particle motion with speed v+ is likely to be unstable: One expects to ﬁnd ‘run-away’
+solutions accelerating to ever higher speed, for initial conditions close to the stationary solution corresponding
+to v+.
+Thus, at positive temperatures, and for a particle moving in R3 interacting with a single thermal reservoir,
+we do not expect to ever observe an approach of the particle’s motion towards a uniform mean motion at a
+ﬁnite constant velocity determined by the external force F, as time t tends to inﬁnity, (with diﬀusive ﬂuctuations
+around the mean motion). This type of motion – if observed – is a transient phenomenon that may be encountered
+at intermediate times, but will disappear at very large times. If the reasoning sketched here is correct the status
+of the Einstein relation (1.1) becomes rather questionable.
+It actually seems to us that the eﬀective dynamics of a tracer particle in the continuum driven by a constant
+external force and interacting with an inﬁnitely extended thermal reservoir (corresponding, e.g., to an ideal or
+weakly interacting Bose gas at positive temperature), as described above, is too complicated to be treated with
+mathematical precision, at present. We therefore propose to study an idealized model for which the expected phe-
+nomenology is much simpler: We imagine that the tracer particle moves through a static crystalline background
+of ions modeled by a periodic potential. We assume that the lowest energy band in the given periodic potential
+is well separated from the higher lying bands. Assuming that the initial state of the particle is a superposition of
+states with energies belonging to the lowest band and following the particle’s motion only over a long, but ﬁnite
+interval of time, we may neglect transitions of the particle to states in higher-lying energy bands altogether and
+use a tight-binding approximation to describe the dynamics of the particle. This amounts to replacing physical
+space R3 by a lattice, e.g., the simple cubic lattice Z3, and to considering a quantum particle hopping on Z3. The
+particle is subject to a linear external potential, −F · x, x ∈Z3, and interacts with a dispersive thermal reservoir
+at positive temperature. The crucial diﬀerence, compared to the continuum model described above, is that the
+speed of a quantum particle hopping on a lattice is uniformly bounded, and there are no ‘run-away solutions’ to
+the equations of motion.
+Yet, the problem of analyzing the long-time motion of the particle in such a model is still rather challenging,
+and although a lot of attention was devoted to problems of this type, see e.g. [3, 23, 22], we do not have any
+precise mathematical results, yet. The origin of the diﬃculties lies in memory eﬀects within the reservoir: The
+probability for the tracer particle to re-absorb a reservoir mode it has emitted at another position in space, some
+time ∆t ago, does not decay to 0 suﬃciently rapidly, as ∆t tends to inﬁnity, to control the eﬀective dynamics. The
+reason is that reservoir auto-correlation functions do not decay in time very fast, uniformly in space. (Assuming
+they decay in time integrably fast, uniformly in space, one may hope to face a problem that can be solved
+rigorously. However, a solution would still require a major eﬀort; see [5, 21] for corresponding results when the
+external force F vanishes.) We therefore propose to simplify the problem yet a little further: We assume that,
+at each site, x, of the lattice Z3, there is another thermal reservoir, Rx, and that reservoirs at diﬀerent sites of
+the lattice are independent. Moreover, all these reservoirs are isomorphic to one another and are described by
+free quantum ﬁelds at some positive temperature β−1. When the particle visits the site x it only interacts with
+the reservoir Rx. Thus, for memory eﬀects to occur, the particle has to return to a site it has visited previously.
+Such memory eﬀects tend to decay exponentially fast in ∆t. Models of this sort, but for a vanishing external
+force ﬁeld F, have been introduced and studied in [20]. They are suﬃciently simple to be analyzed rigorously. A
+somewhat similar model was treated in [2].
+Assuming that, at this point, the reader has an idea of what the models are that will be analyzed in this
+paper (see Section 2 for precise deﬁnitions), we proceed to summarizing our main results; (for detailed, precise
+2
+
+statements see Section 3, Theorems 3.2 through 3.4). We assume that the strength of interaction between the
+particle and the reservoirs is proportional to a coupling constant λ that will be chosen appropriately and that
+the external force ﬁeld is given by F = λ2χ, where χ ∈R3 is a ﬁxed vector. The initial state of the system
+is given by a product state, ρS ⊗ρR,β, where ρS is a density matrix on the Hilbert space, HS = l2(Z3), of the
+tracer particle localized around some site of the lattice, while ρR,β is the equilibrium state of the reservoirs at
+inverse temperature β. The time evolution of the initial state in the Schr¨odinger picture is (formally) given by
+e−itHρS⊗ρR,β eitH, where H is the Hamiltonian of the system; see Subsections 2.2, 2.3, 2.4. The precise deﬁnition
+of the Hamiltonian H involves the dispersion law, ǫ, of the particle and a form factor, φ, that appears in the
+interaction Hamiltonian coupling the particle to the reservoirs. In Subsection 3.1, two assumptions, on ǫ and φ,
+are formulated that are suﬃcient for the results summarized below to hold and that shall not be described here.
+We deﬁne the eﬀective dynamics, Z[0,t], of the particle by
+ρS,t ≡Z[0,t]ρS := TrR
+
+e−itH(ρS ⊗ρR,β) eitH
+,
+(1.2)
+where TrR[ · ] denotes the partial trace over the reservoir degrees of freedom. In the thermodynamic limit, the
+state ρR,β can no longer be represented by a density matrix and the above formula needs to be re-interpreted,
+but the left-hand side remains meaningful.
+All the results summarized below are only known to hold, provided the coupling constant λ is suﬃciently
+small.
+Momentum space of the tracer particle is given by the torus T3. Let f be an arbitrary continuous function
+on momentum space. Our ﬁrst result says that
+lim
+T →∞
+1
+T
+Z T
+0
+dt TrS
+
+f( · )ρS,t
+
+= ⟨f, ζχ,λ⟩L2(T3) ,
+where ζχ,λ is a probability density on T3 describing a stationary state of the tracer particle corresponding to
+uniform motion at constant velocity v ̸= 0.
+Here, TrS[ · ] denotes the trace over the tracer particle Hilbert
+space HS. The interpretation of this result is that the ergodic average over time of the states of the particle
+approaches a so-called ‘non-equilibrium steady state’ (NESS). If χ = 0 then ζχ,λ is actually an equilibrium
+measure on T3 approximately equal to Maxwell’s velocity distribution, ∝e−βǫ, corresponding to the dispersion
+law ǫ.
+Our second result says that, asymptotically, the average motion of the tracer particle is uniform, with asymp-
+totic velocity
+v(χ) = lim
+t→∞
+1
+t TrS
+
+XρS,t
+
+,
+(1.3)
+given by v(χ) = ⟨∇ǫ, ζχ,λ⟩. Assuming time-reversal invariance, one sees that v(χ = 0) = 0, and one expects that
+limχ→∞v(χ) = 0. To understand the latter, recall that the Hamiltonian of a particle hopping on Z3 and driven
+by a constant ﬁeld F, has discrete spectrum, corresponding to Bloch oscillations. The eigenvectors form the
+so-called Wannier-Stark ladder, they are localized and their localization length decreases as |F| →∞. Viewed
+from this angle, it is quite remarkable that one gets transport upon coupling to the reservoirs.
+The third result concerns the fact that the ‘true’ motion of the particle is diﬀusive.
+Because of thermal
+ﬂuctuations in the reservoirs, the particle performs quantum Brownian motion around its uniform mean motion,
+with a diﬀusion tensor given by
+Dij(χ) = lim
+T →∞
+1
+T 2
+Z ∞
+0
+dt e−t
+T TrS
+
+(Xi −vi(χ)t)(Xj −vj(χ)t)ρS,t
+
+.
+(1.4)
+In the companion paper [6], we will establish the ‘Einstein relation’
+∂
+∂χi
+
+χ=0
+vj(χ) = λ2βDij(χ = 0) .
+Next, we sketch some of the main steps that go into the proofs of these results. The key idea is to show
+that the eﬀective dynamics, Z[0,t], of the tracer particle deﬁned in (1.2) is well approximated by its kinetic limit.
+Rescaling space and time as (x, t) = λ−2(ξ, τ), the kinetic limit is approached when λ →0, with (ξ, τ) (arbitrary,
+3
+
+but) ﬁxed. Let us consider the Wigner distribution, ν(ξ, k), with (ξ, k) ∈R3 × T3, corresponding to the state ρS
+of the particle at time t = 0. Then, in the kinetic limit, time evolution is given by a linear Boltzmann equation
+∂
+∂τ ντ(ξ, k) = (∇ε)(k) · ∇ξντ(ξ, k) −χ · ∇kντ(ξ, k) +
+Z
+Td dk′
+r(k′, k)ντ(ξ, k′) −r(k, k′)ντ(ξ, k)
+
+,
+(1.5)
+where r(k, k′)dk′ is the rate for a jump of the particle from momentum k to momentum k′. The kernel r(k, k′)
+can be expressed in terms of the reservoir auto-correlation function (see Subsections 3.1 and 4.2) and satisﬁes
+‘detailed balance’. The second, but last term on the right-hand side of Equation (1.5) is a ‘gain term’, the last
+term is a ‘loss term’.
+It is convenient to consider the Fourier transform in the variable ξ of Equation (1.5). We set
+ˆνκ
+τ (k) :=
+1
+(2π)d/2
+Z
+Rd dξ e−i(κ, ξ) ντ(ξ, k) ,
+where the ‘pseudo-momentum’ κ ∈Rd is the variable dual to ξ ∈Rd. Then ˆνκ
+τ satisﬁes the equation
+∂
+∂τ ˆνκ
+τ = M κ,χˆνκ
+τ ,
+where the operator M κ,χ is given by
+(M κ,χg)(k) := iκ · (∇ε)(k)g(k) −χ · ∇kg(k) +
+Z
+Td dk′r(k′, k)g(k′) −
+Z
+Td dk′r(k, k′)g(k) ,
+(1.6)
+for g ∈L2(T3). To understand our approach it is important to know that, for any force ﬁeld χ and arbitrary
+τ ≥0,
+(Z[0,λ−2τ])λ2κ
+−→
+λ→0
+eτMκ,χ ,
+(1.7)
+strongly on L2(Td); see Theorem 4.2, Equation (4.9).
+The properties of the dynamics generated by the op-
+erator M κ,χ are studied in detail in Section 5. It satisﬁes all the results summarized above; (approach to a
+NESS describing uniform motion at a ﬁnite velocity, diﬀusion around the average motion, Einstein relation, and
+vanishing of v(χ), as χ →∞).
+Our goal is then to show that the true dynamics of the tracer particle, as described by the eﬀective time
+evolution Z[0,λ−2τ], on the ﬁber corresponding to pseudo-momentum λ2κ and with small, but non-zero λ, is well
+approximated by the dynamics in the kinetic limit, as given by the propagator eτMκ,χ. Indeed, we will analyze the
+properties of Z[0,t] on the ﬁber corresponding to pseudo-momentum λ2κ, for arbitrarily large times t, by viewing
+it as a perturbation of the propagator eλ2tMκ,χ. It will turn out to be convenient to develop the perturbation
+theory for the Laplace transforms of Z[0,t] and eλ2tMκ,χ. The Laplace transform of the latter is the resolvent
+of the operator λ2M κ,χ, while the Laplace transform of Z[0,t] on the ﬁber with pseudo-momentum λ2κ is a
+‘pseudo-resolvent’ that, in a suitable domain of the spectral parameter, can be viewed as a small perturbation of
+the resolvent of λ2M κ,χ. This analysis is carried out in Section 7. The formalism in Section 7 relies on material
+gathered in [6] (standard Dyson expansion for Z[0,t] and for time-dependent correlation functions). The relevant
+results of [6] are summarized in Section 6 of the present paper. In Section 8.1, the system without external force,
+i.e., for χ = 0, is analyzed in some detail, and, in Section 8.2, the proofs of the main results are completed.
+Finally, let us also point out an interesting eﬀect that we observe in our model and that forces us to state
+our results in the sense of ergodic averages (note indeed that a more natural expression in
+(1.4) would be
+Dij(χ) = limt→∞1
+t TrS
+
+(Xi −vi(χ)t)(Xj −vj(χ)t)ρS,t
+
+.) Consider matrix elements ρS,t(x, x′) of the reduced
+density matrix. If |x −x′| is large compared to |F|−1, then the free Liouville equation (neglecting the reservoir)
+is dominated by the driving ﬁeld and one can neglect the kinetic term, i.e., ρS,t(x, x′) ≈e−iF ·(x−x′)tρS,0(x, x′). In
+that case, the dissipative eﬀect of the reservoir vanishes. Indeed, recall that in many-body theory dissipation is
+related to the imaginary part of the self-energy, which emerges from virtual transitions. However, if we keep only
+the ﬁeld term in HS (as we just argued), then there are no such transitions because the coupling to the reservoirs
+is diagonal in the position basis. The conclusion is that these matrix elements ρS,t(x, x′) do not decay with
+time, as one would naturally expect. In other words, decoherence is switched oﬀby the ﬁeld! The mathematical
+expression of this phenomenon is visible in Lemma 6.2, where we bound the operator f
+M λ,κ,χ, which describes
+the lowest order (second order) eﬀect of the particle-reservoir coupling. The point to note is that this operator is
+4
+
+not close to the operator M κ,χ, which describes the dynamics in lowest order in λ. The diﬀerence between these
+two operators comes from the fact that λ also appears in the force ﬁeld, since we set F = λ2χ and keep χ constant.
+Acknowledgements. We thank A. Kupiainen and A. Pizzo for many useful discussions on related problems.
+We also thank D. Egli, Z. Gang and A. Knowles for helpful comments. W.D.R. is grateful to the DFG for ﬁnancial
+support.
+2. Definition of the model
+In this section, we deﬁne our model in a ﬁnite volume approximation.
+2.1. Notations and conventions.
+2.1.1. Banach spaces. Given a Hilbert space E , we use the standard notation
+Bp(E ) :=
+n
+A ∈B(E ) : Tr
+h
+(A∗A)p/2i
+< ∞
+o
+,
+1 ≤p ≤∞,
+with B∞(E ) ≡B(E ) the bounded operators on E , and
+∥A∥p :=
+
+Tr
+h
+(A∗A)p/2i1/p
+,
+∥A∥:= ∥A∥∞.
+For operators acting on Bp(E ), e.g., elements of B(Bp(E )), we often use the calligraphic font: V, W etc.. An
+operator A ∈B(E ) determines bounded operators Ad(A) , ad(A) , Al , Ar on Bp(E ) by
+Ad(A)B := ABA∗,
+ad(A)B := [A, B] = AB −BA
+and
+AlB := AB ,
+ArB := BA∗,
+B ∈Bp(E ) .
+(2.1)
+Note that (A1)l(A2)r = (A2)r(A1)l, as operators on Bp(E ), A1, A2 ∈B(E ), i.e., the left- and right multiplications
+commute. The norm of operators in B(Bp(E )) is deﬁned by
+∥W∥:=
+sup
+A∈Bp(E )
+∥W(A)∥p
+∥A∥p
+.
+In the following, we usually set p = 1 or 2.
+2.1.2. Scalar products. For vectors κ ∈Cd, we let Re κ denote the vector (Re κ1, . . . , Re κd), where Re denotes
+the real part. Similar notation is used for the imaginary part, Im. The scalar product on Cd is written as (κ1, κ2)
+or κ1 · κ2 and the norm as |κ| :=
+p
+(κ, κ). The scalar product on an inﬁnite-dimensional Hilbert space E is
+written as ⟨· , ·⟩, or, occasionally, as ⟨· , ·⟩E . All scalar products are deﬁned to be linear in the second argument
+and anti-linear in the ﬁrst one.
+2.1.3. Kernels. For E = ℓ2(Zd), we can represent A ∈B2(E ) by its kernel A(x, y), i.e., (Af)(x) = P
+y A(x, y)f(y),
+f ∈E . Similarly, an operator, A, acting on B2(E ) can be represented by its kernel A(x, y, x′, y′) satisfying
+(Aρ)(x, y) = P
+x′,y′ A(x, y, x′, y′)ρ(x′, y′), ρ ∈B2(E ). Occasionally, we use the notation |x⟩for δx ∈E , deﬁned
+by δx(x′) = δx,x′, and ⟨x| for ⟨δx , · ⟩. In this notation |x⟩⟨y| stands for the rank-one operator δx ⟨δy , · ⟩. Similarly,
+for the choice E = L2(Td), we often use the notation |f⟩for f ∈L2(Td) and ⟨g| for ⟨g, · ⟩, g ∈L2(Td). In this
+‘Dirac notation’, |f⟩⟨g| stands for the rank-one operator f⟨g, · ⟩on L2(Td).
+2.2. The particle.Consider the hypercube Λ = ΛL = Zd ∩[−L/2, L/2]d, for some L ∈2N. The particle Hilbert
+space is chosen as HS = ℓ2(Λ) where the subscript S refers to ‘system’.
+5
+
+To describe the hopping term (kinetic energy), we choose a real function ε : Td →R and we consider the
+self-adjoint operator T ≡T Λ on ℓ2(Λ) with symmetric kernel1
+T (x, x′) = ˆε(x −x′) ,
+with ˆε the Fourier transform of ε. Since we will assume ε to be analytic, the hopping is short range.
+A natural choice for the dispersion law is ε(k) = P
+j 2(1 −cos kj), corresponding to T = −∆, with ∆the
+lattice Laplacian on ℓ2(Λ) with Dirichlet boundary conditions. This choice satisﬁes all our assumptions, to be
+stated in Section 3.1.
+We deﬁne the particle Hamiltonian as
+HS := T −F · X ,
+where F ∈Rd is an external force ﬁeld, e.g., an electric ﬁeld, and X ≡XΛ denotes the position operator on HS,
+deﬁned by Xf(x) = xf(x). In what follows we will write F = λ2χ, with χ a rescaled ﬁeld, (a notation to be
+motivated later).
+2.3. The reservoir.
+2.3.1. Dynamics. For each x ∈Zd, we deﬁne a reservoir Hilbert space at site x by
+HRx := Γs(L2(¯Λ)) ,
+where ¯Λ = ¯ΛL = Rd ∩[−L/2, L/2]d and Γs(E) is the symmetric (bosonic) Fock space over the Hilbert space E.
+We assume that the reader is familiar with basic concepts of second quantization, such as Fock space and
+creation/annihilation operators; (we refer to, e.g., [7] for deﬁnitions and background). The total reservoir Hilbert
+space is deﬁned by
+HR :=
+O
+x∈Λ
+HRx .
+Note that for all x, the spaces HRx are isomorphic to each other. We remark that there is no compelling reason
+to restrict the one-site reservoirs to the same region, [−L/2, L/2]d, as the particle system, but this simpliﬁes our
+notation. The reservoir Hamiltonian is deﬁned as
+HR :=
+X
+x∈Λ
+X
+q∈¯Λ∗
+ω(q)a∗
+x,qax,q ,
+(2.3)
+where ¯Λ∗= 2π
+L Zd is the set of quasi-momenta for the reservoir at site x, and the operators a#
+x,q are the canonical
+creation/annihilation operators satisfying the commutation relations
+[ax,q, a∗
+x′,q′] = δx,x′δq,q′ ,
+[ax,q, ax′,q′] = [a∗
+x,q, a∗
+x′,q′] = 0 ,
+and we choose the dispersion law ω(q) = |q| + δq,0.
+Note that this dispersion law corresponds to photons
+or phonons, except for q = 0, where we have modiﬁed this dispersion law at q = 0 by adding an infrared
+regularization that does not aﬀect any of our results; e.g., if we replace δ0,q by Kδ0,q, with K > 0, then all
+inﬁnite-volume objects studied in this paper are independent of K.
+2.3.2. Equilibrium state. Next, we introduce the Gibbs state of the reservoir at inverse temperature β, 0 < β < ∞.
+It is given by the density matrix
+ρR,β :=
+1
+ZR,β
+e−βHR ,
+where ZR,β = TrR[e−βHR] ,
+(2.4)
+where TrR[ · ] denotes the trace over HR.
+An alternative way to describe this density matrix is to specify the expectation values of arbitrary observables,
+which we denote by ⟨O⟩ρR,β := TrR [OρR,β]. For ϕ ∈ℓ2(¯Λ∗), we write ax(ϕ) = P
+q∈¯Λ∗ϕ(q)ax,q, and we choose
+observables, O, to be polynomials in the operators ax(ϕ). One then ﬁnds that, for any x, x′ and ϕ, ϕ′ ∈ℓ2(¯Λ∗):
+1 Later, we will consider T Λ as an operator on ℓ2(Zd) by the natural embedding of ℓ2(Λ) into ℓ2(Zd). As such, it has the kernel
+T Λ(x, x′) =
+(
+ˆǫ(x −x′) ,
+if
+x, x′ ∈Λ
+0
+else
+,
+(2.2)
+i.e., we impose Dirichlet boundary conditions.
+6
+
+i. Gauge-invariance:
+⟨a∗
+x(ϕ)⟩ρR,β = ⟨ax(ϕ)⟩ρR,β = 0 ;
+(2.5)
+ii. Two-point correlations: Let ̺β := (eβω −1)−1, with the one-particle dispersion law ω(q) = |q| + δq,0, be the
+Bose-Einstein density (operator). Then
+ 
+⟨a∗
+x(ϕ)ax′(ϕ′)⟩ρR,β
+⟨a∗
+x(ϕ)a∗
+x′(ϕ′)⟩ρR,β
+⟨ax(ϕ)ax′(ϕ′)⟩ρR,β
+⟨ax(ϕ)a∗
+x′(ϕ′)⟩ρR,β
+!
+= δx,x′
+ 
+⟨ϕ′, ̺βϕ⟩
+0
+0
+⟨ϕ, (1 + ̺β)ϕ′)⟩
+!
+;
+iii. Wick’s theorem:
+⟨a#
+x2n(ϕ2n) . . . a#
+x1(ϕ1)⟩ρR,β =
+X
+π∈Pair(n)
+Y
+(r,s)∈π
+⟨a#
+xs(ϕs)a#
+xr(ϕr)⟩ρR,β ,
+(2.6)
+⟨a#
+x2n+1(ϕ2n+1) . . . a#
+1 (ϕ1)⟩ρR,β = 0 ,
+(2.7)
+where Pair(n) denotes the set of partitions of {1, . . . , 2n} into n pairs and the product is over these pairs
+(r, s), with the convention that r < s. Here, # stands either for ∗or nothing.
+2.4. The interaction.We deﬁne the Hilbert space of state vectors of the coupled system (particle and reservoirs)
+by
+H := HS ⊗HR .
+We pick a smooth ‘structure factor’ φ ∈L2(Rd) and we deﬁne its ﬁnite volume version φΛ ∈ℓ2(¯Λ∗) by
+φΛ(q) := (2π/L)d/2φ(q), with the normalization chosen such that ∥φ∥L2(Rd) =
+lim
+L→∞∥φΛ∥ℓ2(¯Λ∗). We will drop
+the superscript Λ. The interaction between the particle and the reservoir at site x is given by
+1x ⊗Ψx(φ),
+where
+Ψx(φ) = ax(φ) + a∗
+x(φ)
+is the ﬁeld operator, and
+1x = |x⟩⟨x| denotes the projection onto the lattice site x. The interaction Hamiltonian
+is taken to be
+HSR :=
+X
+x∈Λ
+1x ⊗Ψx(φ)
+on
+HS ⊗HR .
+The total Hamiltonian of the interacting system on H is then given by
+H := T ⊗
+1 −λ2χ · X ⊗
+1 +
+1 ⊗HR + λHSR ,
+(2.8)
+where λ ∈R is a coupling constant. The interaction term HSR is relatively bounded w.r.t. HS+HR with arbitrarily
+small relative bound. It follows that H is essentially selfadjoint on the domain HS ⊗Dom(HR), (where Dom(HR)
+denotes the domain of HR).
+2.5. Eﬀective dynamics. The time-evolution in the Schr¨odinger picture is given by
+ρt = e−itHρ eitH ,
+ρ ∈B1(H ) .
+We will usually choose an initial state ρ of the form ρ = ρS ⊗ρR,β, with ρR,β as deﬁned above. Of course, ρt, with
+t > 0, will in general not be a simple tensor product, but we can always take the partial trace, TrR[ · ], over HR
+to obtain the ‘reduced density matrix’ ρS,t of the system;
+ρS,t = TrR
+
+e−itH(ρS ⊗ρR,β)eitH
+=: Z[0,t]ρS ,
+and we call Z[0,t] : B1(HS) →B1(HS) : ρS 7→ρS,t the reduced or eﬀective dynamics. It is a trace-preserving and
+completely positive map.
+In the present paper, we will mainly consider observables of the form O ⊗
+1 with O ∈B(HS), in which case
+we can also write
+⟨O(t)⟩ρS⊗ρR,β := Tr[O(t)ρS ⊗ρR,β] = TrS[OρS,t] ,
+(2.9)
+where the trace Tr[ · ] is over the Hilbert space H , the trace TrS[ · ] is over the particle Hilbert space HS and O(t)
+is the Heisenberg picture time evolution of the observable O ⊗
+1, i.e.,
+O(t) := eitH(O ⊗
+1) e−itH .
+(2.10)
+Note that O(t) is, in general, not of the product form O′ ⊗
+1, for some O′.
+7
+
+2.6. Time-reversal. We deﬁne an anti-linear time-reversal operator Θ = ΘS ⊗ΘR, where ΘS is given by
+ΘSf(x) = f(x) ,
+f ∈ℓ2(Λ) ,
+and ΘR by ΘR := Γs(θR), with the one-particle operator θR given by
+θRϕx(q) = ϕx(−q) ,
+ϕx ∈ℓ2(¯Λ∗) ,
+x ∈Λ .
+If the dispersion law ε of the particle and the form factor φ are invariant under time-reversal, i.e., ε(k) = ε(−k),
+φ(q) = φ(−q) (as will be assumed) then we have that
+ΘHχ=0Θ = Hχ=0 ,
+expressing time-reversal invariance of the model.
+3. Assumptions and Results
+3.1. Assumptions.The model introduced in the last section is parametrized by two functions: the dispersion
+law ε : Td →R, and the form factor φ : Rd →C. Here, we formulate our assumptions on these two functions.
+The (multi-) strip Vδ is deﬁned by
+Vδ := {z ∈(T + iT)d : | Im z| ≤δ} .
+(3.1)
+Assumption A.
+[Particle dispersion] The function ε extends to an analytic function in a region containing a
+strip Vδ, δ > 0. In particular, the norm
+∥ε∥∞,δ := sup
+p∈Vδ
+|ε(p)|
+is ﬁnite, for some δ > 0. Furthermore, there does not exist any v ∈Rd such that the function
+Td ∋k 7→(v, ∇ε(k))
+vanishes identically.
+This assumption allows us to estimate the free particle propagator e−itHS on the particle Hilbert space
+HS = ℓ2(ΛL) as follows:
+ e−itHS
+(x, x′)
+ ≤Ce−ν|x−x′|et∥Im ε∥∞,ν .
+(3.2)
+For L = ∞, the bound (3.2) is the Combes-Thomas bound; for ﬁnite L, it can be established in an analogous
+way. If we replace Zd by Rd, any physically acceptable dispersion law ε is unbounded, and there is no exponential
+decay in |x −x′|. This is the main reason why the system studied in this paper is deﬁned on a lattice.
+The next assumption deals with the ‘time-dependent’ correlation function deﬁned (in ﬁnite-volume) as
+ˆψΛ(t) :=
+X
+q∈¯Λ∗
+|φΛ(q)|2
+ e−itω(q)
+eβω(q) −1 +
+eitω(q)
+1 −e−βω(q)
+
+,
+(3.3)
+and in the thermodynamic limit as
+ˆψ(t) :=
+Z
+dq |φ(q)|2
+ e−it|q|
+eβ|q| −1 +
+eit|q|
+1 −e−β|q|
+
+.
+(3.4)
+Since the correlation function ˆψ is determined by the form factor φ, the following assumption is in fact a constraint
+on the choice of φ. Deﬁne the strip Hβ by
+Hβ := {z ∈C : 0 ≤Im z ≤β} .
+(3.5)
+8
+
+Assumption B. [Decay of reservoir correlation function] The form factor φ is a spherically symmetric function,
+i.e., φ(q) =: φ(|q|). The correlation functions ˆψΛ(z), ˆψ(z) are uniformly bounded in Λ and z ∈Hβ, and
+limΛ ˆψΛ(z) = ˆψ(z)
+holds uniformly on compacts in Hβ, where limΛ stands for limL→∞(recall that Λ ≡ΛL). Furthermore, the
+number
+X
+q∈¯Λ∗
+ω(q)−1|φΛ(q)|2
+(3.6)
+is bounded uniformly in Λ. Most importantly, ˆψ(z) is continuous on Hβ and
+| ˆψ(z)| ≤C e−gR|z| ,
+z ∈Hβ .
+This assumption mainly states that the reservoirs exhibit exponential loss of memory. This is a key ingredient
+for our analysis.
+Often, one also considers the ‘spectral density’
+ψ(ω) = 1
+2π
+Z ∞
+−∞
+dt ˆψ(t) eitω .
+(3.7)
+It satisﬁes the so-called ‘detailed balance’ property eβωψ(ω) = ψ(−ω), which expresses, physically, that the
+reservoir is in thermal equilibrium at inverse temperature β.
+Assumptions A and B are henceforth required and will not be repeated.
+3.2. Thermodynamic limit.Up to this point, we have considered a system in a ﬁnite volume (cube), Λ or ¯Λ,
+characterized by its linear size L. However, if we wish to study dissipative eﬀects, we must, of course, pass to
+the thermodynamic limit, in order to eliminate ﬁnite-volume eﬀects such as Poincar´e recurrence. This amounts
+to taking Λ = Zd, ¯Λ = Rd and is accomplished below.
+In this section, we will explicitly put a label Λ on all quantities referring to a system in a ﬁnite volume.
+As an example, HS now stands for ℓ2(Zd), and we write H Λ
+S
+for ℓ2(Λ). The shorthand limΛ stands for the
+thermodynamic limit, limL→∞.
+3.2.1. Observables of the system.We begin by deﬁning some classes of inﬁnite-volume system observables, (i.e.,
+certain types of bounded operators on HS). We say that an operator O ∈B(HS) is exponentially localized
+whenever
+|O(x, x′)| ≤Ce−ν(|x|+|x′|),
+for some ν > 0 .
+An important rˆole is played by the so-called quasi-diagonal operators. These are operators O ∈B(HS) with the
+property that
+|O(x, x′)| ≤Ce−ν(|x−x′|),
+for some ν > 0 .
+We denote by
+◦
+A the class of quasi-diagonal operators and by A its norm-closure.
+An observable O ∈B(HS) is said to be translation-invariant whenever TyO = O, for arbitrary y ∈Zd, where
+TyO(x, x′) := O(x + y, x′ + y). Translation-invariant operators on HS form a commutative C∗-algebra denoted
+by Cti. We also introduce the algebras
+◦
+Ati := Cti ∩
+◦
+A ,
+Ati := Cti ∩A .
+An operator O ∈Cti/
+◦
+Ati/Ati can be identiﬁed with a multiplication operator, Mf, on the Hilbert space L2(Td),
+i.e., Mfg = fg, g ∈L2(Td), with f : Td 7→C a bounded and measurable/real-analytic/continuous function.
+Physically, the variable in Td is the momentum of the particle.
+These classes of operators are introduced because certain expansions used in our analysis will apply to quasi-
+diagonal operators or translation-invariant quasi-diagonal operators, and they can be extended to the closures of
+these algebras by density.
+In analyzing diﬀusion and in the proof of the Einstein relation we also need to consider certain observables
+that are unbounded operators: We introduce the ∗-algebra X that consists of polynomials in the components, Xi,
+i = 1, . . . , d, of the particle-position operator X.
+Given an inﬁnite-volume observable O ∈B(HS), HS = ℓ2(Zd), or O ∈X, we associate an observable
+OΛ =
+1ΛO
+1Λ on H Λ
+S = ℓ2(Λ) with it, where
+1Λ is the orthogonal projection ℓ2(Zd) →ℓ2(Λ).
+9
+
+3.2.2. Dynamics.
+We choose not to construct directly the time-evolution of inﬁnite-volume observables and
+inﬁnite-volume states, although this could be done by using the Araki-Woods representation of the system in
+the thermodynamic limit. Instead, we will analyze the inﬁnite-volume dynamics of ‘reduced’ states, i.e., of states
+restricted to particle observables and correlation (Green) functions of particle-observables by constructing these
+objects as thermodynamic limits of ﬁnite-volume expressions.
+An inﬁnite-volume density matrix of the particle system ρS ∈B1(HS) is called exponentially localized if
+|ρS(x, x′)| ≤Ce−ν(|x|+|x′|) ,
+for some ν > 0 .
+(3.8)
+Given such an inﬁnite-volume density matrix ρS, we associate ﬁnite-volume density matrices
+ρΛ
+S :=
+1
+ZΛ
+ρS
+1ΛρS
+1Λ ∈B1(H Λ
+S ) ,
+ZΛ
+ρS := TrS[1ΛρS
+1Λ] ,
+(3.9)
+with it. Note that, due to the normalization by ZΛ
+ρS, ρΛ
+S is a density matrix on H Λ
+S .
+Recall the deﬁnition of the reduced dynamics, ZΛ
+[0,t], introduced in Section 2.5, and set
+Z[0,t]ρS := limΛZΛ
+[0,t]ρΛ
+S .
+(3.10)
+The next lemma asserts that the thermodynamic limit (as Λ and ¯Λ increase to Zd, Rd, respectively) in (3.10)
+exists, and that the resulting reduced dynamics Z[0,t] is translation-invariant.
+Lemma 3.1. The limit on the right side of Equation (3.10) exists in B1(HS), and this deﬁnes the map Z[0,t] :
+B1(HS) →B1(HS). The map Z[0,t] preserves the trace, i.e., TrS[Z[0,t]ρS] = TrS[ρS], positivity and exponential
+localization of the state of the particle, i.e., if ρS has any of these properties, then so does Z[0,t]ρS. Moreover,
+Z[0,t] is translation-invariant; T−yZ[0,t]Ty = Z[0,t] for y ∈Zd with Ty as in Subsection 3.2.1. As a consequence
+of the above, for O in A or X, and for an exponentially localized state ρS, we can deﬁne
+⟨O(t)⟩ρS⊗ρR,β := TrS[OZ[0,t]ρS] .
+3.3. Results.Next, we summarize our main results. Throughout this section, it is understood that we consider
+the inﬁnite-volume system; i.e., Λ = Zd, ¯Λ = Rd.
+Our ﬁrst result describes the approach of the state of the system to a ‘non-equilibrium stationary state’
+(NESS), in the limit of large times.
+In the theorems below, we use the notation O(t) for Oχ(t), even if χ ̸= 0. Recall also the multiplication
+operator Mf on L2(Td) deﬁned in Section 3.2.
+Theorem 3.2. [Approach to NESS] There are constants kλ, kχ, g > 0, such that, for 0 < |λ| < kλ, |χ| < kχ,
+there exists a real-analytic function ζ ≡ζχ,λ on Td, satisfying ζ ≥0 and
+R
+Td dk ζ(k) = 1, i.e., ζ is a probability
+density, such that the following statements hold for any exponentially localized density matrix, ρS, and continuous
+function f : Td →R:
+i. For χ ̸= 0,
+1
+T
+Z T
+0
+dt ⟨Mf(t)⟩ρS⊗ρR,β = ⟨f, ζχ,λ⟩L2(Td) + O(1/T ) ,
+as T →∞.
+(3.11)
+ii. For χ ≡0,
+⟨Mf(t)⟩ρS⊗ρR,β = ⟨f, ζ0,λ⟩L2(Td) + O(e−λ2gt) ,
+as t →∞,
+(3.12)
+and ζ0,λ satisﬁes ‘time reversal invariance’; ζ0,λ(k) = ζ0,λ(−k).
+Our next result asserts that the motion of the particle is diﬀusive around an average uniform motion (i.e., a
+drift at a constant velocity).
+Theorem 3.3. [Diﬀusion] Under the same assumptions as in Theorem 3.2,
+lim
+t→∞
+1
+t ⟨X(t)⟩ρS⊗ρR,β = v(χ) ,
+10
+
+where v(χ) is the ‘asymptotic velocity’ of the particle and is given by v(χ) = ⟨∇ε, ζχ,λ⟩. For χ ̸= 0, we have
+v(χ) ̸= 0. The dynamics of the particle is diﬀusive, in the sense that the limits
+Dij(χ) := lim
+T →∞
+1
+T 2
+Z ∞
+0
+dt e−t
+T ⟨(Xi(t) −vi(χ)t)(Xj(t) −vj(χ)t)⟩ρS⊗ρR,β
+(3.13)
+exist, where the ‘diﬀusion tensor’ D(χ) is positive-deﬁnite, with D(χ) = O(λ−2), as λ →0.
+Note that the claim about the asymptotic velocity follows formally from Theorem 3.2 by deﬁning the velocity
+operator as
+V j := i[H, Xj] = i[T, Xj] = M∇jε ,
+(3.14)
+and writing X(t) = X(0) +
+R t
+0 dsV (s). Although it is quite easy to make this reasoning precise, we warn the
+reader that, at this point, it is formal, because the Heisenberg-picture observables X(t) and V (t) have not been
+constructed as operators in the thermodynamic limit. They are formal objects appearing in correlation functions
+that are constructed as thermodynamic limits of ﬁnite-volume correlation functions.
+3.4. Correlation functions and Einstein relation.
+In this section, we present some more results on our
+model, that are proven in [6]. We begin with introducing correlation functions. Let O1, O2 be two observables, i.e.,
+O1, O2 belong to the algebras A or X; see Section 3.2. For Λ = ΛL, with L ∈2N, we set OΛ
+i =
+1ΛOi
+1Λ. Similarly,
+given an exponentially localized density matrix ρS ∈B1(ℓ2(Zd)), its ﬁnite-volume version ρΛ
+S ∈B1(ℓ2(Λ)) is
+deﬁned in (3.9). Let t1, t2 ∈R, then we deﬁne the (ﬁnite-volume) correlation function as
+⟨OΛ
+2 (t2)OΛ
+1 (t1)⟩ρΛ
+S ⊗ρΛ
+R,β := Tr[OΛ
+2 (t2)OΛ
+1 (t1)(ρΛ
+S ⊗ρΛ
+R,β)] ,
+(3.15)
+the trace being over the Hilbert space ℓ2(Λ) ⊗L2(¯Λ). The inﬁnite-volume correlation function is deﬁned as the
+limit
+⟨O2(t2)O1(t1)⟩ρS⊗ρR,β := limΛ Tr[OΛ
+2 (t2)OΛ
+1 (t1)(ρΛ
+S ⊗ρΛ
+R,β)] ,
+(3.16)
+and we claim that this limit exists for any exponentially localized ρS and any O1, O2 in A or X. We refer to [6]
+for a proof of this claim.
+Apart from an initial state (density matrix) of the product form ρS ⊗ρR,β, we also consider the Gibbs state
+of the coupled system when the external force ﬁeld vanishes, χ = 0. In ﬁnite volume, it is deﬁned by
+ρΛ
+β :=
+1
+ZΛ
+β
+e−βHχ=0,
+ZΛ
+β = Tr e−βHχ=0,
+Hχ=0 = T ⊗
+1 +
+1 ⊗HR + λHSR ,
+and one easily checks that ρΛ
+β ∈B1(ℓ2(Λ) ⊗L2(¯Λ)). We then deﬁne, for O1, O2 as above,
+⟨OΛ
+1 (t1)⟩ρΛ
+β := Tr[OΛ
+1 (t1)ρΛ
+β] ,
+(3.17)
+⟨OΛ
+2 (t2)OΛ
+1 (t1)⟩ρΛ
+β := Tr[OΛ
+2 (t2)OΛ
+1 (t1)ρΛ
+β] .
+(3.18)
+One observes that, for χ = 0, ⟨OΛ
+2 (t2+t)OΛ
+1 (t1+t)⟩ρΛ
+β = ⟨OΛ
+2 (t2)OΛ
+1 (t1)⟩ρΛ
+β , for any t, i.e., the correlation functions
+are time-translation invariant. More generally, one checks that, for χ = 0, the correlation function (3.18) satisﬁes
+the KMS condition. In particular, we have that
+⟨O1(t1)O2(t2)⟩ρΛ
+β = ⟨O2(t2)O1(t1 + iβ)⟩ρΛ
+β ,
+(χ = 0) .
+(3.19)
+For O1, O2 ∈Ati, the inﬁnite-volume versions of (3.17) and (3.18) are well-deﬁned as the limits
+⟨O1(t1)⟩ρβ := limΛ Tr[OΛ
+1 (t1)ρΛ
+β] ,
+⟨O2(t2)O1(t1)⟩ρβ := limΛ Tr[OΛ
+2 (t2)OΛ
+1 (t1)ρΛ
+β] .
+(3.20)
+Note that we construct the thermodynamic limit of equilibrium correlation functions only for translation-invariant
+observables, since, pictorially, the particle is uniformly distributed in space and hence the expectation values of
+localized observables vanish. For more details we refer to [6].
+11
+
+Before we discuss the Einstein relation, let us mention that our model relaxes exponentially fast to equilibrium
+at vanishing external ﬁeld; cf., Theorem 3.3. in [6]: For O1, O2 ∈Ati, t1, t2 ∈R+, there is g > 0, such that
+⟨O2(t2)O1(t1)⟩ρS⊗ρR,β = ⟨O2(t2)O1(t1)⟩ρβ + O(e−λ2gt1) ,
+(t2 > t1) ,
+(3.21)
+as t1 →∞, for λ suﬃciently small and χ = 0. Moreover, the equilibrium correlation functions (3.18) exhibit the
+following ‘exponential cluster property’:
+⟨O2(t2)O1(t1)⟩ρβ = ⟨O2⟩ρβ⟨O1⟩ρβ + O(e−λ2g(t2−t1)) ,
+(3.22)
+as t2 −t1 →∞, for λ suﬃciently small and χ = 0.
+Finally, we mention that the equilibrium correlation
+function (3.20) satisﬁes the KMS condition on the algebra Ati of translation-invariant observables; cf., Lemma 3.2
+in [6]. Of course, there is nothing special about the restriction to correlation functions with one or two observables
+and one can prove the statements above for any number of observables.
+Our next result states that the equilibrium diﬀusion matrix D(χ = 0) (which is in fact a multiple of the
+identity matrix) is related to the response of the particle’s motion to the ﬁeld χ. The corresponding identity is
+known as the ‘Einstein relation’:
+Theorem 3.4. [Einstein relation] Under the same assumptions as in Theorem 3.2,
+∂
+∂χi
+
+χ=0
+vj(χ) = λ2βDij(χ = 0) ,
+(3.23)
+where D(χ = 0) is deﬁned in Equation (3.13) and it equals
+Dij(χ = 0) = 1
+2
+Z
+R
+dt ⟨V i(t)V j⟩ρβ .
+Note that, by the positivity and isotropy of the diﬀusion matrix, this theorem also shows that, for small but
+non-zero χ, v(χ) does not vanish. The origin of the unfamiliar factor λ2 on the right side of (3.23) is found in
+the fact that the driving force ﬁeld in the Hamiltonian is λ2χ, rather than χ.
+4. Strategy of proofs and discussion
+Before we are able to present a comprehensible overview of the strategy of the proofs, we have to introduce some
+further notions and concepts, such as the ﬁber decomposition introduced next.
+4.1. Fiber decomposition.To start with, we note that B1(HS) ⊂B2(HS), HS = ℓ2(Zd). Hence, we may view
+density matrices on HS as elements of the space of Hilbert-Schmidt operators, B2(HS) ≃L2(Td × Td, dkldkr).
+We deﬁne
+bO(kl, kr) :=
+1
+(2π)d
+X
+xl,xr∈Zd
+O(xl, xr)e−ikl·xl+ikr·xr ,
+O ∈B2(ℓ2(Zd)) .
+In what follows, we write O for bO. To cope with the translation-invariance of our model, we make the following
+change of variables
+k := kl + kr
+2
+,
+p := kl −kr ,
+and, for a.a. p ∈Td, we obtain a well-deﬁned function Op ∈L2(Td) by putting
+(Op)(k) := O(k + p
+2, k −p
+2) .
+(4.1)
+This follows from the fact that the Hilbert space B2(HS) ≃L2(Td × Td, dkldkr) can be represented as a direct
+integral
+B2(HS) ≃
+Z ⊕
+Td dp Hp ,
+O =
+Z ⊕
+Td dp Op ,
+(4.2)
+12
+
+where each ‘ﬁber space’ Hp can be identiﬁed with L2(Td). Next, we deﬁne, for θ = (θl, θr) ∈Cd×Cd, operators Jθ
+by
+Jθ O := e−i(θl,X)O e−i(θr,X) ,
+O ∈B(HS) .
+(4.3)
+Note that Jθ is unbounded if θ has an imaginary part.
+Also note that a density matrix ρS ∈B2(HS) is
+exponentially localized iﬀ∥JθρS∥2 < ∞, for θ = (θl, θr) in some complex neighborhood of (0, 0).
+The following lemma captures some identities used later on. Recall the deﬁnition of the strip Vδ in (3.1).
+Lemma 4.1. Let O ∈B1(HS), then
+TrS[O eip·X] = ⟨1, Op⟩L2(Td) =
+Z
+Td dk Op(k) ,
+p ∈Td .
+(4.4)
+If there is a δ > 0 such that ∥Jθ/2O∥2 < ∞, for |θ| ≤δ, then p 7→Op is analytic in the interior of the strip Vδ.
+(In the discussion above, for O ∈B2(HS) the ﬁber operator Op was deﬁned for a.a. p, but in the context
+of Lemma (4.1), Op can be deﬁned for any p.) The ﬁrst statement of the lemma follows from the singular-
+value decomposition for trace-class operators and standard properties of the Fourier transform.
+The second
+statement of Lemma (4.1) is the Paley-Wiener theorem, i.e., the relation between exponential decay of functions
+and analyticity of their Fourier transforms; see [19].
+The ﬁber decomposition in Equation (4.2) is useful when one deals with operators A acting on B2(HS) that
+are translation invariant (TI), i.e., TzAT−z = A, with Tz deﬁned as in Section 3.2. An important example of a TI
+operator A is the reduced time-evolution Z[0,t]; see Lemma 3.1. For TI operators A, we ﬁnd that (AO)p depends
+on Op only, and hence it makes sense to write
+(AO)p = ApOp ,
+A =
+Z ⊕
+Td dp Ap .
+(4.5)
+Similarly to Lemma 4.1 above, we ﬁnd that, if Jθ/2AJ−θ/2 is bounded for all θ = (θl, θr), with |θ| ≤δ, then
+the map p 7→Ap is analytic in a strip Vδ. Or, in other words, the kernel of the operator A, satisﬁes
+|A(xl, xr, x′
+l, x′
+r)| ≤Ce−ν|xl−x′
+l|−ν|xr−x′
+r| ,
+for ν < |θ|/2 ,
+(xl, xr, x′
+l, x′
+r ∈Zd) .
+(4.6)
+In particular, (4.6) means that A preserves the subspace of exponentially localized operators in B2(HS). We call
+such an A a quasi-diagonal operator on B2(HS).
+4.2. Strategy of proofs of main results.
+4.2.1. Kinetic theory. For small values of the coupling constant λ, one can, at least heuristically, understand the
+model studied in this paper with the help of semiclassical kinetic theory. The reasoning proceeds as follows: If λ
+approaches zero one must wait a time of order λ−2 before one sees an eﬀect of the particle-reservoir interactions.
+The eﬀect is that the particle emits or absorbs a ﬁeld quantum (i.e., a ‘photon’ or ‘phonon’) of one of the thermal
+reservoirs and thus changes its momentum. Since such emission/absorption processes are well separated in time,
+one can assume them to be independent, and this leads to a description of the particle motion in terms of a
+stochastic process. Since the maximal velocity of the particle is bounded (this is an eﬀect of the lattice) and of
+order one, despite the presence of the driving ﬁeld χ, the particle travels a distance of order λ−2 during a time
+of order λ−2. This motivates the introduction of the kinetic scale: We deﬁne ‘macroscopic’ variables, (ξ, τ), by
+setting ξ := λ2x and τ := λ2t, where the variables (x, t) are the variables used in the deﬁnition of the model,
+henceforth called ‘microscopic’ variables. The fact that, for small enough λ, our model is ‘well-described’ by
+kinetic theory can be expressed, impressionistically, as follows:
+Hamiltonian evolutionλ(λ−2ξ, λ−2τ)
+−→
+λ→0
+Stochastic evolution (ξ, τ) .
+The stochastic evolution appearing on the right side is discussed next.
+13
+
+4.2.2. Boltzmann equation.Consider a classical particle with position ξ ∈Rd and (quasi-) momentum k ∈Td.
+The momentum k evolves according to a Poisson process with rate r(k, k′)dk′ for a jump from momentum k to
+momentum k′, where r(k, k′) is given by
+r(k, k′) := ψ[ε(k′) −ε(k)] ,
+(4.7)
+and ψ is the spectral density given in Equation (3.7). Between two consecutive jumps, at times τ and τ + ∆τ,
+the momentum grows linearly in time k(τ + ∆τ) = k(τ) + χ∆τ (where addition is deﬁned on the torus Td). The
+change in position is governed by the (group-) velocity ∇ε(k):
+ξ(τ + ∆τ) = ξ(τ) +
+Z τ+∆τ
+τ
+ds ∇ε(k(s)) .
+From this, a Markov process on Rd × Td can be constructed using standard methods.
+We present here the
+associated Master Equation describing the time-evolution of the probability density, ντ(ξ, k) ≥0, on phase space
+Rd × Td (with normalization R dξ R dk ντ(ξ, k) = 1):
+∂
+∂τ ντ(ξ, k) = (∇ε)(k) · ∇ξντ(ξ, k) −χ · ∇kντ(ξ, k) +
+Z
+Td dk′
+r(k′, k)ντ(ξ, k′) −r(k, k′)ντ(ξ, k)
+
+.
+(4.8)
+For our purposes, it is convenient to consider the Fourier transform
+ˆντ(κ, k) :=
+1
+(2π)d/2
+Z
+Rd dξ e−i(κ, ξ) ντ(ξ, k) ,
+where κ ∈Rd is the variable dual to ξ ∈Rd. One veriﬁes that ˆντ(κ, k) satisﬁes the evolution equation
+∂
+∂t ˆντ = M κ,χˆντ,
+where, for smooth functions g on Td,
+(M κ,χg)(k) := iκ · (∇ε)(k)g(k) −χ · ∇kg(k) +
+Z
+Td dk′r(k′, k)g(k′) −
+Z
+Td dk′r(k, k′)g(k) .
+One can easily check that M κ,χ generates a strongly continuous semigroup on L2(Td). Its signiﬁcance in under-
+standing dynamical properties of our model stems from the fact that it describes the evolution Z[0,λ−2τ] in the
+ﬁber indexed by λ2κ, in the limit λ →0.
+Theorem 4.2. [Kinetic limit] For any χ and arbitrary τ ≥0,
+(Z[0,λ−2τ])λ2κ
+−→
+λ→0
+eτMκ,χ ,
+(4.9)
+strongly on L2(Td).
+The restriction to ﬁbers of order λ2 is equivalent to considering a macroscopic length scale ∼λ−2. One can
+also convince oneself that (ρ)λ2κ ∈L2(Td) (the space which the operator on the left side of (4.9) acts on) is the
+rescaled Wigner transform of ρ ∈B2(HS), and one may check that the claim (4.9) is equivalent to the results
+in [11].
+4.2.3. Perturbation around the kinetic limit. The strategy we follow to control the long-time behavior when λ is
+small but non-zero, is basically the same as in [20]: We represent the Laplace transform of the ﬁbered dynamics
+(Z[0,λ−2τ])λ2κ as a small (in λ) perturbation of the resolvent of the Boltzmann generator M κ,χ. This is accom-
+plished by appropriately resumming diagrams, and this is the tedious part of our analysis, which is described
+in [6]. The ideas underlying this analysis are elementary, and our technique is actually a time-dependent coun-
+terpart of the use of ‘translation-analyticity in the spectral form factor’ ﬁrst applied to the study of ‘conﬁned’
+open quantum systems by [14]. Later, these conﬁned open quantum systems, where the particle does not have
+translational degrees of freedom, have been treated in greater generality; see [1, 8, 18].
+A complication not present in [20], is that we need to keep track of the dependence of the poles in the Laplace
+transform on λ, κ, χ. However, the Hamiltonian at χ ̸= 0 is not relatively bounded w.r.t. the one at χ = 0. This
+means that we need to develop some version of asymptotic (rather than analytic) perturbation theory, and this
+is done in Section 7.
+14
+
+4.2.4. Einstein relation.In this subsection, we derive the Einstein relation in ﬁnite volume (now dropping the
+superscript Λ, because all formulae of this subsection refer to a ﬁnite volume). We deﬁne the velocity operator as
+V j := i[H, Xj] = i[T, Xj] .
+(4.10)
+Note that, because of the ﬁnite lattice, this operator is not translation-invariant; however, its thermodynamic
+limit is. Using Duhamel’s principle we obtain
+∂
+∂χi
+
+χ=0
+⟨V j,χ(t)⟩ρβ = −iλ2
+Z t
+0
+ds ⟨[Xi,0(t −s), V j,0(t)]⟩ρβ.
+(4.11)
+For simplicity, we drop the spatial indices i, j in the following.
+Note that the right-hand side of (4.11) is
+independent of χ.
+By stationarity of the state ρβ, it can be written as −iλ2 R t
+0 ds ⟨[X0(−s), V ]⟩ρβ.
+In the
+remainder of this section, we always set χ = 0 and we drop this symbol from our notation. Using the KMS
+condition we ﬁnd
+Z t
+0
+ds ⟨[X(−s), V ]⟩ρβ =
+Z t
+0
+ds ⟨XV (s)⟩ρβ −
+Z t
+0
+ds ⟨XV (iβ + s)⟩ρβ
+= i
+Z β
+0
+du ⟨XV (iu)⟩ρβ −i
+Z β
+0
+du ⟨XV (iu + t)⟩ρβ
+= i
+Z β
+0
+du ⟨XV (iu)⟩ρβ −i
+Z β
+0
+du ⟨X(−t)V (iu)⟩ρβ ,
+where, in the second line, we have used that the integral of the function z 7→⟨XV (z)⟩β vanishes along the contour
+0, t, t + iβ, iβ, 0. The third line follows by time-translation invariance. Next, using X(−t) =
+R −t
+0
+ds V (s) + X(0),
+by (3.14), we get
+Z t
+0
+ds ⟨[X(−s), V ]⟩ρβ =
+Z β
+0
+du
+Z t
+0
+ds ⟨V (s)V (iu)⟩ρβ
+=
+Z β
+0
+du
+Z t
+0
+ds ⟨V (−s)V (iβ −iu)⟩ρβ
+= 1
+2
+Z β
+0
+du
+Z t
+−t
+ds ⟨V V (s + iu)⟩ρβ
+= β
+2
+Z t
+−t
+ds ⟨V V (s)⟩ρβ + Q(t) .
+The second and third equality follow from time-reversal invariance and the KMS condition. To arrive at the
+last equality, we have used that the integral of the map z 7→⟨V V (z)⟩ρβ vanishes along the contour −t, t, t + iβ,
+−t + iβ, −t, and we have introduced the remainder term
+Q(t) := i
+2
+Z β
+0
+du
+Z u
+0
+ds ⟨V V (is + t)⟩ρβ −i
+2
+Z β
+0
+du
+Z u
+0
+ds ⟨V V (is −t)⟩ρβ .
+Recalling our starting point (4.11), we conclude that
+∂
+∂χ
+
+χ=0
+⟨V χ(t)⟩ρβ = −iλ2β
+2
+Z t
+−t
+ds ⟨V V (s)⟩ρβ + Q(t) ,
+where the dynamics used on the right side is taken at χ = 0. We now claim that, in the thermodynamic limit,
+Q(t) →0, as t →∞; we refer to [6] for a proof. This proves the Einstein relation, which relates a non-equilibrium
+response (left-hand side) to an equilibrium correlation function (right-hand side).
+5. Kinetic limit: Linear Boltzmann evolution
+As announced in the previous section, we have to study the operator M ≡M κ,χ introduced in Subsection 4.2.2,
+in order to unravel properties of the long-time dynamics of the particle. This operator is of the form
+M κ,χ = iκ · (∇ε) −χ · ∇+ G + L ,
+(5.1)
+15
+
+with the gain- and loss terms given by
+(Gg)(k) :=
+Z
+Td dk′r(k′, k)g(k′) ,
+(Lg)(k) := −
+Z
+Td dk′r(k, k′)g(k) .
+The operator M κ,χ is closable (as an operator deﬁned on a domain dense in L2(Td)), because it is a bounded
+perturbation of the anti-selfadjoint operator χ · ∇, a core being, e.g., C∞(Td). Our main aim is to control the
+spectrum of M κ,χ and to establish good bounds on the resolvent (z−M κ,χ)−1. In our analysis, we will emphasize
+the usefulness of the C0-semigoup generated by M κ,χ.
+5.1. Concepts from the theory of C0-semigroups.First, we recall some deﬁnitions and results from the
+theory of strongly continuous semigroups (hereafter C0-semigroups). For a detailed discussion we refer to [10, 13].
+For deﬁniteness, we assume from the onset that the semigroup acts on L2(Td). We say that f ∈L2(Td) is positive
+(f ≥0), or strictly positive (f > 0) iﬀf(k) ≥0, or f(k) > 0, respectively, for almost every k ∈Td.
+A C0-semigroup (Tt)t≥0 is called
+– positivity-preserving (or positive) if 0 ≤f implies 0 ≤Ttf, for each t ≥0;
+– positivity-improving if 0 ≤f, f ̸≡0, implies 0 < Ttf, for each t > 0.
+For a C0-semigroup (Tt)t≥0, the growth bound, ω0, is deﬁned by
+ω0 := inf{ω ∈R : ∃Kω, with 1 ≤Kω < ∞, such that ∥Tt∥≤Kωeωt , ∀t ≥0 }.
+Here and in the following we use the symbol ∥·∥for the norm on L2(Td) and for the operator norm on B(L2(Td)).
+A C0-semigroup (Tt)t≥0 has a closed generator, A, and we use the standard notation Tt = etA. The spectral
+bound, s(A), of A is deﬁned as
+s(A) := sup{Re z : z ∈σ(A)} ,
+where σ(A) is the spectrum of A. For any z ∈C with Re z > ω0, (z −A)−1 =
+R ∞
+0
+dt e−zt Tt exists, and we infer
+the bound ∥(z −A)−1∥≤
+Kω0
+Rez−ω0 and the inequality s(A) ≤ω0.
+Let O be a densely deﬁned closed operator whose spectrum is not all of C. We say (following [4], see also [15])
+that z ∈C belongs to the essential spectrum, σess(O), of O, iﬀz
+1 −O is not a Fredholm operator. We call
+ress(O) = sup{|z| : z ∈σess(O)} the essential spectral radius.
+A C0-semigroup Tt is called quasi-compact if
+ress(Tt) < 1, for t > 0.
+5.2. Spectral analysis of M 0,χ: Preliminaries. For now, we neglect the advection term iκ · (∇ǫ), i.e., we
+put κ = 0, and study M 0,χ = −χ · ∇+ G + L. We therefore omit the superscript κ everywhere in this section,
+and we simply write M χ ≡M 0,χ. Our main results are summarized in Lemma 5.2.
+We say that a function f on Td is real-analytic if it is analytic in a region containing a multistrip Vδ, for
+some δ > 0. Starting from Assumptions A and B, it is straightforward to verify that function r(k, k′), as deﬁned
+in (4.7), is real-analytic in k and k′, for some δ > 0 determined by gR and δε. Moreover, r(k, k′) is strictly
+positive almost everywhere for real arguments. Thus the functions r(·, k′), r(k, ·) can vanish only in isolated
+points. Therefore,
+a0 := inf
+k∈Td
+Z
+dk′r(k, k′) > 0 .
+(5.2)
+Setting L(k) := −
+R
+dk′r(k, k′) (the loss operator L being deﬁned as multiplication by L(k)), we have that
+L(k) ≤−a0, for all k ∈Td. The strict positivity of the rates r(·, ·) implies that the gain operator G is positivity
+improving. Moreover, by the smoothness of r(·, ·), G is a compact operator.
+Lemma 5.1. The operator −χ · ∇+ L generates a positivity-preserving C0-semigroup (St)t≥0 on L2(Td) with
+growth bound ω0 ≤−a0, and
+∥(z + χ · ∇−L)−1∥≤|Re z + a0|−1 ,
+for
+Re z > −a0 .
+(5.3)
+The operator M 0,χ generates a positivity-improving C0-semigroup, (Tt)t≥0, on L2(Td). It has the constant func-
+tion 1 as a left-eigenvector corresponding to the eigenvalue 1, i.e., ⟨1, Ttf⟩= ⟨1, f⟩, for all f ∈L2(Td) and all
+t ≥0.
+16
+
+Proof. Deﬁne the C0-semigroup (St)t≥0 by
+(Stf)(k) := f(k −χt)e
+R t
+0 ds L(k+χ(s−t)) ,
+t ≥0 ,
+f ∈L2(Td) .
+(5.4)
+It is easy to check that −χ·∇+L is the generator of (St)t≥0, and the growth bound of (St)t≥0 is smaller than −a0.
+Since G is bounded, the construction of the semigroup (Tt)t≥0 is standard, e.g., by using the norm-convergent
+Dyson series
+Tt := St +
+∞
+X
+n=1
+Z
+0≤t1<...tn≤t
+dt1 . . . dtn St−tnGStn−tn−1G · · · St1 .
+(5.5)
+Clearly, we have that ∥Tt∥≤et(−a0+∥G∥). Observe that the semigroup (St)t≥0 deﬁned in Equation (5.4) has the
+property that f > 0 implies Stf > 0, for any ﬁnite t ≥0. Together with the fact that G is positivity-improving,
+this implies that (Tt)t≥0 is positivity-improving, for any t > 0. One easily checks that, for smooth f,
+d
+dt⟨1, ft⟩= −⟨1, χ · ∇ft⟩+ ⟨1, (G + L)ft⟩= 0 ,
+ft := Ttf ,
+(note that both terms vanish separately), and ⟨1, Ttf⟩= ⟨1, f⟩holds for arbitrary f ∈L2(Td), by a limiting
+argument.
+From this lemma, we obtain information on the spectrum of the generator M χ.
+Lemma 5.2. [Spectrum of M χ] All statements below hold for any χ ∈Rd:
+i. The essential spectrum of M χ is contained in the region {z ∈C : Re z ≤−a0}. Furthermore, the semigroup
+generated by M χ is quasi-compact.
+ii. Let z /∈σ(M χ). If f is real-analytic then (z −M χ)−1f is real-analytic, too.
+iii. The spectrum of M χ in the region {z ∈C : Re z > −a0} consists of isolated eigenvalues of ﬁnite (algebraic)
+multiplicity. The associated eigenvectors are real-analytic functions.
+iv. There is a constant m > 0 (independent of χ) such that the region {z ∈C : | Im z| ≥m, Re z > −a0/2}
+does not contain any spectrum.
+v. The only eigenvalue µ of M χ with Re µ ≥0 is µ = 0, and it is simple. The spectral projection associated
+with the eigenvalue µ = 0, P 0,χ ≡P χ, is of the form P χ = |ζχ⟩⟨1|, where ζχ is a strictly positive function,
+with ⟨1, ζχ⟩= 1. Moreover, supχ ∥ζχ∥< ∞.
+Proof. i. By Lemma 5.1, we know that s(−χ·∇+ L) = −a0. Since G is compact, Weyl’s theorem on the stability
+of the essential spectrum implies σess(−χ · ∇+ L) = σess(−χ · ∇+ L + G). Moreover, compact perturbations of
+generators with strictly negative growth bound generate quasi-compact semigroups; see [10].
+ii. By the analyticity of the function r(k, k′) in a strip, we have that
+∥eγ·∇M χe−γ·∇−M χ∥≤O(γ) ,
+(5.6)
+for suﬃciently small γ ∈Cd. Hence, by standard perturbation theory, eγ·∇(z −M χ)−1e−γ·∇remains bounded
+for suﬃciently small γ (depending on z), for any z /∈σ(M χ), and hence
+∥eγ·∇(z −M χ)−1f∥≤C(z, γ)∥eγ·∇f∥.
+The claim on analyticity follows then from the Paley-Wiener theorem.
+iii. For any z ∈C with Re z > −a0, we write
+z −(−χ · ∇+ L + G) = (z −(−χ · ∇+ L))(1 −
+1
+z + χ · ∇−LG) .
+It follows that z −(−χ·∇+L+G) is invertible if and only if (1−
+1
+z+χ·∇−LG) is. Since G is compact, the analytic
+Fredholm theorem implies that (1−
+1
+z+χ·∇−LG)−1 is a meromorphic function with only ﬁnitely or countably many
+17
+
+isolated poles of ﬁnite (algebraic and geometric) multiplicity, the residues of which are ﬁnite rank operators. It
+follows that the spectrum of M χ in the region {z ∈C : Re z > −a0} consists of isolated eigenvalues of ﬁnite
+multiplicity. Let M χf = µf, f ̸≡0, with Re µ > −a0. Since µ ̸∈σ(−χ · ∇+ L), we can rewrite this eigenvalue
+equation as
+f = (µ + χ · ∇−L)−1Gf .
+(5.7)
+Consequently, for suﬃciently small γ ∈Cd,
+∥eγ·∇f∥≤∥(µ + χ · ∇−eγ·∇Le−γ·∇)−1∥∥eγ·∇G∥∥f∥
+≤
+C
+| Re µ −a0| + O(γ) ∥f∥.
+(5.8)
+Indeed, the bound on the resolvent follows by Neumann series expansion, using (5.6), with M χ replaced by L,
+and the resolvent bound on (z + χ · ∇−L)−1 from Lemma 5.1, whereas the bound ∥eγ·∇G∥< ∞follows from
+the analyticity of the kernel r(·, ·) of G. By the Paley-Wiener theorem, f is real-analytic.
+iv. Let M χf = µf, with ∥f∥= 1. Then, on one hand,
+| Im µ −⟨f, iχ · ∇f⟩| ≤| Re µ| + ∥(G + L)f∥.
+(5.9)
+On the other hand, by the functional calculus,
+|⟨f, iχ · ∇f⟩| ≤1
+ν ⟨f, eν|χ·∇|f⟩,
+ν > 0 .
+Since Re µ ≥−a0/2, the right-hand side of this equation can, for suﬃcient small ν, be bounded independently
+of Im µ. This follows from statement iii and Equation (5.8). Combining this Im µ-independent bound with (5.9)
+yields the claim iv.
+v. The claim that there is a unique simple eigenvalue with maximal real part (and strictly positive eigen-
+vector ζχ) follows from a Perron-Frobenius-type argument; see, e.g., Chapter 6, Thm 3.5, in [10]. This theorem
+uses the quasi-compactness and the fact that, for suﬃciently large real z, (z −M 0,χ)−1 is positivity-improving,
+which in our case follows from the fact that Tt is positivity-improving. The claim that this eigenvalue is zero,
+follows then immediately from the relation ⟨1, Ttζχ⟩= ⟨1, ζχ⟩and the spectral mapping theorem for generators
+of quasi-compact semigroups; see, e.g., Chapter 5, Theorem 4.7 in [10]. Finally, the uniformity in χ of the bound
+on ∥ζχ∥follows from (5.8), applied to f = ζχ, since
+∥ζχ∥≤∥(−χ · ∇+ L)−1∥∥Gζχ∥≤(1/a0) sup
+k′ ∥r( · , k′)∥∥ζχ∥1 ,
+where ∥ζχ∥1 :=
+R
+dk|ζχ| = ⟨1, ζχ⟩= 1, and we have used the explicit form of G.
+5.3. Reﬁned spectral analysis of M χ = M 0,χ. In this subsection, we reﬁne the conclusions of Lemma 5.2.
+The main diﬃculty we face is that the operator M χ is not analytic (in any reasonable sense) in the parameter χ,
+and hence, a priori, perturbation theory does not apply to the isolated eigenvalue at 0 and the corresponding
+eigenvector. This diﬃculty is overcome in the next lemma that shows that the resolvent and the spectrum of M χ
+can be controlled in terms of M 0, for χ suﬃciently small. Note that this would be obvious if M χ were analytic
+in χ. Afterwards, we also comment on the case of large χ.
+Lemma 5.3. There are constants C , C′ such that
+
+1
+z −M χ
+ ≤
+C
+|Re z + gM + O(χ)| + C′
+|z| ,
+for
+Re z > −gM + O(χ) ,
+(5.10)
+as χ →0, where gM := dist(iR, σ(M 0) \ {0}).
+In the proof of this lemma we make use of the transformation Bε := e
+β
+2 εBe−β
+2 ε, for any operator B acting
+on L2(Td). Here ε is the dispersion law of the particle. Since ε is positive and bounded, it immediately follows
+that the spectra of Bε and B coincide. In particular, we will consider
+M χ
+ε = Gε + L + β
+2 (χ · ∇ε) −χ · ∇.
+(5.11)
+18
+
+This transformation is useful, because the rates satisfy the identity
+r(k, k′) = r(k′, k) e−β(ε(k′)−ε(k)) ,
+(5.12)
+where β is the inverse temperature of the reservoirs. This identity is known as the detailed balance condition. It
+is a consequence of the KMS condition for the reservoirs and the time-reversal symmetry; (recall the discussion
+following Assumption B in Section 3.1). Equation (5.12) implies that Gε and Gε + L + β
+2 (χ · ∇ε) are selfadjoint.
+But note that −χ · ∇is anti-selfadjoint. By P χ we denote the spectral projection associated to the eigenvalue
+µ = 0 of M χ, and we set ¯P χ :=
+1−P χ. For χ = 0, we infer from the detailed balance condition that P 0 = |ζ0⟩⟨1|,
+with ζ0 the ‘Gibbs state’ ζ0(k) =
+1
+⟨1,e−βε⟩e−βε(k). Finally, we note that P 0
+ε and ¯P 0
+ε are orthogonal projections.
+Proof of Lemma 5.3. We split
+(z −M χ)−1 = P χ(z −M χ)−1P χ + ¯P χ(z −M χ)−1 ¯P χ ,
+and we remark that the ﬁrst term is bounded by
+C
+|z|, since the eigenvalue µ = 0 is simple and ∥ζχ∥is bounded
+uniformly in χ, by Lemma 5.2, v. To deal with the second term, note that the left-eigenvector at µ = 0 does not
+depend on χ, i.e., P χ = |ζχ⟩⟨1|, which implies
+P χP χ′ = P χ ,
+¯P χ ¯P χ′ = ¯P χ′ ,
+P χ ¯P χ′ = 0 ,
+(5.13)
+(however, ¯P χP χ′ ̸= 0, for χ ̸= χ′). In particular, we have that
+M χ = ¯P 0M χ ¯P 0 + ¯P 0M χP 0 ,
+and, by straightforward algebra,
+(z −M χ)−1 = z−1P 0 + ¯P 0(z ¯P 0 −¯P 0M χ ¯P 0)−1 ¯P 0 + ¯P 0(z ¯P 0 −¯P 0M χ ¯P 0)−1 ¯P 0M χP 0.
+Using (5.13), this leads to
+¯P χ(z −M χ)−1 ¯P χ = ¯P χ( ¯P 0(z −M χ) ¯P 0)−1 ¯P χ .
+We recall the conjugation B →Bε, introduced above, and write
+( ¯P 0
+ε (z −M χ
+ε ) ¯P 0
+ε )−1 = (R + iI)−1 ,
+where R is deﬁned by R := ¯P 0
+ε (Re z −(G + L)ε + β
+2 (χ · ∇ε)) ¯P 0
+ε and I := ¯P 0
+ε (Im z + iχ · ∇) ¯P 0
+ε . Note that R and I
+are selfadjoint operators. By the spectral calculus and the boundedness of χ · ∇ε,
+R ≥Re z −gM + O(χ) .
+Hence, R > 0 (strictly positive in the sense that inf σ(R) > 0), for Re z > gM + O(χ), and we ﬁnd that
+(R + iI)−1 =
+1
+√
+R
+
+1 + i 1
+√
+R
+I 1
+√
+R
+−1
+1
+√
+R
+.
+Using the selfadjointness of I, the boundedness of eβε/2 and P χ (uniform in χ), we obtain the bound
+(z −M χ)−1 ¯P χ ≤C |gM + O(χ) + Re z|−1 ,
+Re z > −gM + O(χ) .
+As promised, we now turn to a discussion of the model for large χ. For simplicity, we restrict our attention
+to the one-dimensional case, d = 1, and comment on higher dimensions at the end of this discussion.
+Lemma 5.4. Let d = 1. There are constants C, C′ such that, for suﬃciently large |χ|,
+
+1
+z −M χ −1
+z Q
+ ≤C
+|χ| ,
+(5.14)
+for z ∈C, with | Im z| ≤C′. Here Q is the orthogonal projection on the space of constant functions on T.
+19
+
+Proof. In d = 1, the spectrum of the self-adjoint operator χ · X is the lattice χ Z, and each of the eigenvalues
+corresponds to a one-dimensional eigenspace. The eigenspace corresponding to 0 is the space of constant functions.
+Hence, we may write
+M χ = QM 0Q + ¯Q(χ · X) ¯Q + W ,
+with
+W = QM 0 ¯Q + ¯QM 0Q ,
+and ¯Q =
+1 −Q. As argued previously, Q(G + L) = 0 (the constant function is a left eigenvector of M χ). Since
+¯Q(χ · X) ¯Q has spectrum in the region | Im z| ≥|χ| and W is bounded, we obtain the claim of the lemma by a
+straightforward Neumann series expansion.
+In higher dimensions, things are more subtle. If χ is a multiple of some element in Zd, then the above lemma
+is easily generalized by replacing Q with the (inﬁnite-dimensional) projection corresponding to the kernel of χ·X
+and the term 1
+z Q in (5.14) by Q
+1
+z−QM0QQ. In this situation, the spectrum of χ · X is a lattice and the gap
+between 0 and the rest of the spectrum increases proportionally to |χ|. Since the spectral analysis of QM 0Q can
+be carried out similarly to that of M 0, this allows us to control the eigenvalue at 0 by perturbation theory, as
+χ →∞. However, if the line χR does not hit any lattice point Zd, then the spectrum of χ · X covers the whole
+real line and we need more subtle considerations to perform the limit χ →∞. This is expected to be manageable;
+but we do not wish to address this point here.
+5.4. Asymptotics of the semigroup etMχ.
+In this section, we discuss the large time asymptotics of the
+semigroup generated by M κ,χ. In particular, we show that the diﬀusion tensor at vanishing external ﬁeld is
+positive-deﬁnite.
+Our interest is in the asymptotic behavior of solutions of the linear Boltzmann equation, i.e., of the probability
+density νt(x, k) satisfying the evolution Equation (4.8). The distribution ˆν0
+t (k) :=
+R
+dx νt(x, k) of the particle’s
+momentum evolves according to the semigroup etM0,χ. We recall that this semi-group is quasi-compact (and
+positivity improving) and that µ = 0 is an isolated eigenvalue of M χ, by Lemma 5.2. Hence, we conclude (see,
+e.g., [10]) that, for any ˆν0
+t=0 ∈L2(Td),
+ˆν0
+t = ζχ + O(e−gM (χ)t) ,
+t →∞,
+where gM(χ) = dist(iR, σ(M 0,χ) \ {0}). We know that gM(χ) > 0, for all χ; but only for small χ we have
+established uniformity in χ; see Lemma 5.3. Information on the distribution of the particle’s position is obtained
+from operators on ﬁbers at non-zero κ, (as explained in Section 4). Hence we have to determine the asymptotic
+behavior of etMκ,χ, for small κ. Recall that M κ,χ = M 0,χ + iκ · ∇ε. Since iκ · ∇ε is a bounded operator, analytic
+perturbation theory in κ implies that the operator M κ,χ has an isolated, simple eigenvalue, uM(κ), close to 0, for
+small κ ∈Cd. Moreover, by the resolvent bound in Lemma 5.3, gM(κ, χ) := dist(iR, σ(M 0,χ) \ {uM(κ)}) equals
+gM(χ) + O(κ). For κ small enough, the semigroup generated by M κ,χ is quasi-compact, and we conclude, by
+similar reasoning as above, that
+etMκ,χ = P κ,χ
+M etuM(κ,χ) + O(et(uM (κ,χ)−gM (κ,χ))) ,
+with P κ,χ
+M
+a rank-one operator that is a small perturbation of |ζχ⟩⟨1|.
+Following the discussion in Section 4, we know that the asymptotic velocity vM(χ) and diﬀusion constant
+DM(χ) can be derived from uM, with
+vi
+M(χ) = i ∂
+∂κi
+
+κ=0
+uM(κ, χ),
+Dij
+M(χ) = −1
+2
+∂
+∂κi∂κj
+
+κ=0
+uM(κ, χ) .
+These expressions can be computed using the standard Rayleigh-Schr¨odinger expansion of analytic perturbation
+theory:
+uM(κ, χ) = i⟨1, (κ, ∇ǫ)ζ0,χ⟩−⟨1, (κ, ∇ǫ)Sχ(κ, ∇ǫ)ζ0,χ⟩+ O(κ3) ,
+|κ| →0 ,
+where by Sχ we denote the ‘reduced resolvent’ of M 0,χ at z = 0, i.e., Sχ = (χ·∇−G−L)−1 ¯P χ, with ¯P χ =
+1−P χ,
+P χ = |ζχ⟩⟨1|. Note that uM(κ, χ) = uM(−κ, χ), so that vM(χ) and DM(χ) have real entries.
+For χ = 0, the detailed balance condition implies that ζχ=0(k) ∝e−βǫ(k), hence vM(χ = 0) = 0. To prove
+that the diﬀusion constant at vanishing external ﬁeld is strictly positive, we use the transformation B 7→Bǫ (as
+deﬁned in Section 5.3) to ﬁnd that, for any a ∈Rd,
+(a, DM(χ = 0)a) = −1
+2⟨1, (a, ∇ǫ)S0(a, ∇ǫ)ζ0⟩= −
+1
+2⟨1, e−βǫ⟩⟨e−βǫ/2, (a, ∇ǫ)S0
+ǫ (a, ∇ǫ)e−βǫ/2⟩.
+20
+
+By the spectral calculus and Lemma 5.2, we know that −S0
+ǫ is strictly positive. Moreover, by Assumption A,
+(a, ∇ǫ) does not vanish identically. It follows that DM(χ = 0) is a positive-deﬁnite matrix.
+For χ ̸= 0, one can establish smoothness (but not analyticity) of uM(κ, χ), vM(χ) and DM(χ) in χ, using
+asymptotic perturbation expansions in χ, for χ small enough. This method is outlined in Lemma 6.1 of [6]. Re-
+lying on these expansions and using the ideas just presented, it is straightforward to prove that (χ, vM(χ)) ̸= 0,
+for χ ̸= 0, and that DM(χ) > 0, for small external forces χ. Moreover, one can also conﬁrm the validity of the
+Einstein relation within the kinetic theory:
+∂
+∂χ
+
+χ=0vM(χ) = βDM(0).
+Finally, let us turn to the large-χ regime. In dimension d = 1, Lemma 5.4 allows us to apply perturbation
+theory in the parameter 1/|χ|, and we derive easily that both v(χ) and DM(χ) vanish as 1/|χ|, for |χ| →∞.
+The main gap in our knowledge is for moderate |χ|: We are not able to prove that DM(χ) > 0. The fact that
+this is diﬃcult using spectral methods should not come as a surprise. In fact, modern approaches to the central
+limit theorem often use martingale techniques. However, a standard method we are aware of, which one may
+want to apply to prove the positivity of the diﬀusion constant and a central limit type theorem, the graded sector
+condition introduced in [16], does not appear to be applicable here.
+6. Results from expansions
+The aim of this section is to summarize properties of the eﬀective dynamics Z[0,t] that can be proven using
+expansion techniques. We only describe the main ideas and present formal arguments. Mathematically precise
+arguments are given in [6], Sections 4 and 5, where elaborate expansion techniques are developed that can also
+be used to analyze correlation functions.
+6.1. Survey of expansions. Here we sketch expansion techniques that are used to study the reduced dynamics
+of the tracer particle. Let I ⊂R+ be a ﬁnite interval. We deﬁne the free particle dynamics, UΛ
+I , on B2(HS),
+with HS = ℓ2(Λ), by
+UΛ
+I := e−i|I|ad(HS) ,
+HS ≡HΛ
+S = T Λ −λ2χ · XΛ ,
+(6.1)
+and the particle-reservoir interaction, HSR(t) ≡HΛ
+SR(t) in the interaction picture, which we may write as a sum
+over spatially localized terms, by
+HSR(t) := eitHR HSRe−itHR =
+X
+x∈Λ
+1x ⊗eitHR(ax(φ) + a∗
+x(φ)) eitHR .
+(6.2)
+Iterating Duhamel’s formula
+eitad(HR)e−itad(H) = U[0,t] −iλ
+Z t
+0
+ds U[s,t] ad(HSR(s)) eisad(HR) e−isad(H) ,
+we ﬁnd the (Lie-Schwinger-) Dyson series for ZI:
+ZΛ
+I ( · ) =
+X
+n≥0
+(−iλ)n
+Z
+t−(I)<t1<...<tn<t+(I)
+dt1 · · · dtn TrR
+
+UΛ
+[tn,t+(I)]ad(HSR(tn)) · · · ad(HSR(t1))UΛ
+[t−(I),t1](·) ⊗ρΛ
+R,β
+
+,
+where t−(I), t+(I) denote the inﬁmum and supremum of the interval I, respectively. The trace over the reservoir
+Hilbert space can be evaluated using Wick’s theorem; see (2.7). For this purpose, we introduce the shorthand
+notations
+1x,ς := (1x)ς ,
+Ψx,ς(t) := (−iΨx(t))ς ,
+for x ∈Λ, ς ∈{l, r} (the left- and right multiplications, ( · )ς, were introduced in (2.1)). We denote by Pair(n),
+the set of pairings of 2n elements and denotes by x, ς elements of Λ2n, {l, r}2n, respectively. In this notation, the
+formal Dyson series for ZI can, upon using Wick’s theorem, be written as
+ZΛ
+I =
+X
+n≥0
+Z
+t−(I)<t1<t2<...t2n<t+(I)
+ 2n
+Y
+i=1
+dti
+! X
+x,ς
+X
+π∈Pair(n)
+ζΛ((x, t, ς), π)
+× UΛ
+[t2n,t+(I)]
+1x2n,ς2nUΛ
+[t2n−1,t2n] · · ·
+1x1,ς1UΛ
+[t−(I),t1] ,
+(6.3)
+21
+
+where ζΛ denotes a reservoir correlation function given by
+ζΛ((x, t, ς), π) :=
+Y
+(r,s)∈π
+λ2hΛ(ts, tr, ςs, ςr)δxr,xs ,
+(6.4)
+with
+hΛ(u, v, ς, ς′) :=
+
+
+
+
+
+
+
+
+
+−ˆψΛ(u −v) ,
+if ς = l , ς′ = l ,
+−ˆψΛ(v −u) ,
+if ς = r , ς′ = r ,
+ˆψΛ(v −u) ,
+if ς = r , ς′ = l ,
+ˆψΛ(u −v) ,
+if ς = l , ς′ = r .
+(6.5)
+The reservoir two-point correlation function ˆψΛ has been deﬁned in (3.3).
+In the next step, we decompose the expansion (6.3) into a sum/integral over irreducible pairings: A pairing π
+is irreducible whenever for any m = 1, . . . , 2n −1, there is a pair (r, s) ∈π such that s ≤m < r.
+To that end, we deﬁne an operator VΛ
+I , by
+VΛ
+I :=
+∞
+X
+n=0
+Z
+t−(I)=t1<...<t2n=t+(I)
+ 2n−1
+Y
+i=2
+dti
+! X
+x,l
+X
+π∈Pair(n)
+π is irreducible
+ζΛ((x, t, ς), π)
+×
+1x2n,ς2nUΛ
+[t2n−1,t2n] · · · UΛ
+[t1,t2]
+1x1,ς1 ,
+(6.6)
+where the second sum is over irreducible pairings, and we only integrate over 2n −2 time coordinates, with
+t1 = t−(I) and t2n = t+(I) ﬁxed. It is then easy to check that expression (6.3) can be rewritten as
+ZΛ
+I =
+X
+l≥0
+Z
+t−(I)<t1<...<tl<t+(I)
+dt UΛ
+[t2l,t+(I)]VΛ
+[t2l−1,t2l] UΛ
+[t2l−2,t2l−1] · · · VΛ
+[t1,t2] UΛ
+[t−(I),t1] .
+(6.7)
+Representation (6.7) is the starting point for the proof of Lemma 3.1. The details of our proof can be found
+in [6]; Section 5.1. Here we just indicate some of the main ideas underlying it: First, we recall the bound on UI
+from (3.2):
+|UΛ
+I (x, y, x′, y′)| ≤Cect∥Im ǫ∥∞,νe−ν|x−x′|−ν|y−y′| ,
+(6.8)
+which holds uniformly in Λ ⊆Zd. We observe that Assumption A ensures that limΛUΛ
+I = UI, in the sense of
+convergence of kernels. Furthermore, the reservoir two-point correlation functions ΨΛ(t) and Ψ(t) are bounded
+uniformly in t and Λ, and, by Assumption B, we have that limΛΨΛ(t) = Ψ(t), uniformly in t on compact subsets
+of R. One then proves that VΛ
+I deﬁnes a bounded operator on B2(HS), for any Λ, including Λ = Zd, and that
+limΛVΛ
+I = VI, in the sense of kernels. It is then straightforward to show that the expansion for ZΛ
+I converges
+absolutely in norm as an operator on B2(HS), the bounds being uniform in Λ, and that limΛZΛ
+I has a limit ZI,
+in the sense of convergence of kernels. Moreover, repeated use of (6.8) reveals that
+|ZΛ
+I (x, y, x′, y′)| ≤Ce−ν|x−x′|−ν|y−y′| ,
+|ZI(x, y, x′, y′)| ≤Ce−ν|x−x′|−ν|y−y′| ,
+(6.9)
+for some ν > 0, where the constant C is independent of Λ ⊆Zd and is uniform in I, for I contained in compact
+subsets of R. Thus, for any exponentially localized density matrix ρS ∈B1(HS) and any ﬁnite time t, we can
+deﬁne
+⟨O(t)⟩ρS⊗ρR,β = TrS[OZ[0,t]ρS] := limΛ TrS[OΛZΛ
+[0,t]ρΛ
+S ] ,
+(6.10)
+where OΛ =
+1ΛO
+1Λ, with O ∈
+◦
+A or X. By the same reasoning, one also establishes that the inﬁnite-volume
+objects are translation-invariant, i.e., A = T−yATy, for A = Z[0,t], UI, VI and y ∈Zd. This becomes plausible
+if one recalls that translation-invariance in ﬁnite volume was broken only because of the Dirichlet boundary
+condition.
+22
+
+The advantage of representation (6.7) over (6.3) is that, after Laplace transformation, it can be resummed:
+For z ∈C, with Re z suﬃciently large, we deﬁne
+R(z) :=
+Z ∞
+0
+dt e−ztZ[0,t] .
+(6.11)
+In order to identify the leading contributions to Z[0,t] and R, respectively, we deﬁne an operator
+V(2)
+I
+:=
+∞
+X
+n=2
+Z
+t−(I)=t1<...<t2n=t+(I)
+ 2n−1
+Y
+i=2
+dti
+! X
+x,l
+X
+π∈Pair(n)
+π is irreducible
+ζ((x, t, ς), π)
+×
+1x2n,ς2nU[t2n−1,t2n] · · · U[t1,t2]
+1x1,ς1 ,
+(6.12)
+and the Laplace transforms
+M(z) :=
+Z ∞
+0
+dt
+
+V[0,t] −V(2)
+[0,t]
+
+,
+Rex(z) :=
+Z ∞
+0
+dt e−ztV(2)
+[0,t] .
+(6.13)
+Recalling the deﬁnition of ζ in (6.4) and of V and V(2), we observe that, roughly speaking, M(z) contains all
+contributions to second order in λ from the correlation functions ζ, but higher orders of λ enter M(z) trough the
+ﬁeld term λ2χ · X.
+Recall the deﬁnition of the operator Jθ in (4.3).
+Lemma 6.1. The operator-valued function (z, θ) 7→JθA(z)J−θ, with A = M, Rex is analytic in the region
+|θ| < kθ, Re z > −kz, for some kz, kθ > 0, and satisﬁes the bounds (as λ →0)
+sup
+|θ|<θ0 , Re z>−g0
+
+
+
+∥JθM(z)J−θ∥
+= O(λ2) ,
+∥JθRex(z)J−θ∥
+= O(λ4) .
+(6.14)
+Moreover, for Re z > 0,
+R(z) = (z −LS −M(z) −Rex(z))−1 ,
+(6.15)
+where LS = ad(HS) is the Liouvillian of the particle system.
+The proof of this Lemma is contained in [6], Section 5.3. Here we just sketch the main key ideas. First, one
+observes that the time integrals in (6.7) are convolutions. Thus, when taking the Laplace transform, it suﬃces to
+consider the Laplace transforms of U[0,t] and V[0,t]. The former being given by the resolvent of LS = ad(HS), it
+suﬃces to consider the operators V[0,t] −V(2)
+[0,t] and V(2)
+[0,t], respectively. The Laplace transform of V[0,t] −V(2)
+[0,t] can
+be computed explicitly (see below), and the claims concerning M in Lemma 6.1 can be checked easily. It remains
+to analyze V(2)
+[0,t], as deﬁned in (6.12). The sum over the spatial coordinates x in (6.12) can be bounded using the
+Combes-Thomas bound for the propagators UI (see (3.2)), at the price of a ‘mild’ exponential growth in time; (it
+is ‘mild’ because ν on the right hand side of (3.2) can be chosen arbitrarily small, as long as it does not depend
+on λ). To bound the integrals over the time coordinates t, we use the exponential decay in time of the correlation
+function ζ. We can cope with the ‘mild’ exponential growth coming from the sum over the spatial coordinates
+by slightly reducing the decay rate in the exponential decay coming from the correlations ζ. Then we are left
+with the problem of analyzing a one-dimensional ‘gas’ of pairings between points conﬁned to an interval of the
+real line, with integrable (in fact, exponential) decay in the distance between points in each pair. It has been
+remarked repeatedly that, for such systems, one can integrate over all times and sum over all possible pairings.
+For more details, we refer to an earlier paper [20] and to the companion paper [6].
+From here on, our analysis proceeds as follows: In the next subsection, we explicitly calculate the term M(z)
+and show that, in some sense to be made precise, it is close to the generator M of the linear Boltzmann equation
+discussed in Section 5. In a next step, carried out in Section 7, we show that R(z) is comparable to the resolvent
+of M when restricted to ﬁbers corresponding to ‘small’ momenta.
+23
+
+6.2. Calculation of M(z).We start with the calculation of M deﬁned in (6.13), i.e.,
+M(z) =λ2
+Z ∞
+0
+dt e−zt X
+x∈Zd
+X
+ς1,ς2∈{l,r}
+h(0, t, ς1, ς2)1x,ς2e−itad(HS)
+1x,ς1 .
+(6.16)
+We recall the ﬁber decomposition introduced in Section 4.1. Identifying the ﬁber spaces Hp with L2(Td), we
+interpret M(z)p as an operator acting on L2(Td). The action of the unitary group e−itHS, with HS = T −λ2χ · X,
+is given by
+(e−itHSf)(k) = f(k −λ2χt)e−iΦk(t) ,
+f ∈L2(Td) ,
+(6.17)
+where Φk(t) :=
+R t
+0 ds ε(k −λ2χs). We split M(z) into M(z) = P
+ς1,ς2 Mς1,ς2(z), corresponding to the second
+sum in (6.16). A tedious but straightforward calculation, using (6.17), yields the ﬁber operators
+(Mll(z)pf)(k) = −λ2
+Z ∞
+0
+dt ˆψ(t)
+Z
+Td dk′e
+−zt−iΦk′+ p
+2 (t)+iΦk−p
+2 (t)f(k −λ2tχ) ,
+(Mrr(z)pf)(k) = −λ2
+Z ∞
+0
+dt ˆψ(−t)
+Z
+Td dk′e
+−zt−iΦk+ p
+2 (t)+iΦk′−p
+2 (t)f(k −λ2tχ) ,
+(Mlr(z)pf)(k) = λ2
+Z ∞
+0
+dt ˆψ(−t)
+Z
+Td dk′e
+−zt−iΦk′+ p
+2 (t)+iΦk−p
+2 (t)f(k′ −λ2tχ) ,
+(Mrl(z)pf)(k) = λ2
+Z ∞
+0
+dt ˆψ(t)
+Z
+Td dk′e
+−zt−iΦk+ p
+2 (t)+iΦk′−p
+2 (t)f(k′ −λ2tχ) ,
+where f ∈L2(Td).
+6.3. Analysis of ladder diagrams.The idea of our analysis is to expand the restrictions to the ﬁbers Hλ2κ of
+the operators R(z), i.e., (R(z))λ2κ, for small z, around the contributions of order λ2. Note that, because of the
+small ﬁber momentum, λ2κ, there are no contributions of order 1. To capture these contributions, we will deﬁne
+an operator f
+M ≡f
+M λ,κ,χ acting on L2(Td) ≃Hλ2κ that satisﬁes
+(LS + M(0) + Rex(0))λ2κ = λ2 f
+M + O(λ4(1 + |κ|)) ,
+(6.18)
+as λ →0, κ →0. Note that we have set the spectral parameter z in M and Rex to zero. As the notation
+suggests, f
+M is closely related to M ≡M κ,χ, the operator introduced and analyzed in Section 5; (note that, for
+χ = 0, f
+M = M). The norms below refer to B(L2(Td)).
+Lemma 6.2. Deﬁne f
+M := M + δM with
+δM = δM χ,λ := K(χ) −K(0),
+where K(χ) = (M(z = 0, χ))λ2κ .
+The operator δM is bounded, ∥δM χ,λ∥≤C, and relatively bounded w.r.t. to χ · ∇and M, with a bound of
+order λ2. More precisely,
+∥δMf∥≤λ2C(∥f∥+ ∥χ · ∇f∥) ,
+(6.19)
+for any function f in the domain of χ · ∇. Furthermore, (6.18) holds.
+Proof. By inspection of the expressions for M in Section 6.2, we get
+∥K(χ)f −K(0)f∥≤C
+Z
+dt |ψ(t)|
+ min(|λ2tχ|, 1)∥f∥+ ∥f(· + λ2tχ) −f(·)∥
+
+,
+and (6.19) follows from the exponential decay of ψ(t). To prove (6.18) we verify that
+λ−2(LS)λ2κ = iκ · ∇ε −χ · ∇+ O(λ2κ) ,
+λ−2(M(z = 0, χ = 0))λ2κ = G + L + O(λ2κ) ,
+by explicit computation. (The l-l and r-r terms in M give rise to L, the mixed ones to G.)
+24
+
+We conclude with the remark that, presumably, Lemma 6.2 cannot be improved to
+lim
+χ→0 ∥δM∥= 0 .
+(6.20)
+Such an estimate can easily be obtained for the l-r and r-l terms but not for l-l and r-r. To get a feeling for this,
+let us consider a constant dispersion law, ε(k) = ε(0) (which would actually violate our assumptions, but this
+should not matter here). Then Φk(t) = tε(0), and, by spectral calculus,
+(Mll(0)p + Mrr(0)p)f(k) = −(2π)dλ2
+Z ∞
+−∞
+dt ˆψ(t) f(k −λ2tχ) = −(2π)dλ2ψ(iχ · ∇)f(k) .
+(6.21)
+Obviously limχ→0 ∥ψ(iχ · ∇) −ψ(0)∥→0 holds only if the function ψ is constant.
+6.4. Analysis of f
+M. In this subsection, we show that, in a small open neighborhood of the origin, f
+M has an
+isolated simple eigenvalue λ2-close to that of M. We recall the deﬁnition of the gap gM(χ) (see Section 5) and
+deﬁne Br to be the disk Br := {z ∈C : |z| ≤r}.
+Lemma 6.3. There is a constant r > 0, r ∝gM(0), such that, inside the ball Br, M and f
+M = M + δM
+have unique simple eigenvalues uM ≡uM(κ, χ) and uf
+M ≡uf
+M(λ, κ, χ), respectively, with |uf
+M −uM | = O(λ2).
+Moreover, for z ∈Br,
+1
+z −f
+M
+=
+1
+z −uf
+M
+Pf
+M + O(z0) .
+Proof. For M, this has already been proven at κ = 0 in Section 5 and extended to κ ̸= 0 by using perturbation
+theory of isolated eigenvalues (Section 5.4). Since δM is relatively bounded w.r.t. M, we can again use perturba-
+tion theory to prove the claim for f
+M. Estimating the resolvent (z −f
+M)−1 by using a Neumann series expansion
+in δM and applying (6.19), we obtain that
+∥δM(z −M)−1∥≤λ2C
+ 1 + |z| + ∥(z −M)−1∥
+
+,
+(6.22)
+which can be used to complete the proof of the lemma. (We refer the reader to [15] for details on the perturbation
+theory for isolated eigenvalues.)
+Although this will not be used in our analysis, it is worthwhile pointing out an important diﬀerence between
+the spectral analysis of M and that of f
+M: Thanks to the resolvent bound (5.3), we know that the spectrum
+of M, apart from the eigenvalue u, is bounded away from the real axis. In the nomenclature of Section 5.4,
+gM(κ, χ) > 0. In fact, by Lemma 5.2, item iv, we have an explicit bound, uniform in χ, on the real part of
+eigenvalues with large imaginary part. For f
+M, analogous statements do not hold, because δM is not small in
+norm, but only relative to M; see (6.22). To guarantee that z /∈σ(f
+M), the right-hand side of (6.22) should be
+strictly smaller than one. Clearly, for any ﬁxed λ, this is not the case when Im z →±∞.
+7. Analysis of R(z) around z = 0
+In this section, we analytically continue the operator R(z) (see (6.11)), a priori only deﬁned for Re z > 0, to
+the region {z ∈C : |z| < λ2r}, for some r > 0 and λ suﬃciently small. This is accomplished by applying
+perturbation theory to the ﬁber operators (R(z))λ2κ. The guiding idea is that (R(z))λ2κ is a small perturbation
+of (z −λ2M κ)−1, where M κ has been analyzed in Section 5. However, it turns out to be more convenient to
+replace M by the operator f
+M introduced in Section 6.3. In Section 7.1, we implement the perturbation theory
+developed on the basis of Lemma 6.1. The small parameters are the coupling constant λ, the (scaled) ﬁber
+momentum κ and the ﬁeld χ. All these three parameters must be assumed to be suﬃciently small throughout
+our analysis, and we do not repeat this assumption in every step.
+25
+
+7.1. Perturbation around the kinetic limit.Recall the deﬁnition of R(z) in equation (6.11).
+R(z) =
+Z ∞
+0
+dt e−zt Z[0,t] .
+The main results of this subsection state that the operator (R(z))λ2κ has a unique simple pole in a neighborhood
+of z = 0, whose residue, P ≡P λ,κ,χ, is a rank-one operator (see Lemma 7.3) with the property that, in the ﬁber
+indexed by κ = 0,
+P λ,κ=0,χ = |ζ⟩⟨1| ,
+with
+∥ζ −ζM∥L2(Td) = O(λ2) ,
+(7.1)
+where ζM is the invariant state of the generator, M, of the linear Boltzmann evolution; see Section 5. This result
+is stated in Lemma 7.5. Moreover, we show that P λ,κ,χ is an analytic function of κ and a regular function of
+χ; see Lemma 7.4. On an intuitive level, this means that the long-time dynamics of (Z[0,t])λ2κ, is dominated by
+the linear Boltzmann evolution etM. This statement is formalized in Section 8.1, for χ = 0, and in Section 8.2,
+for χ ̸= 0.
+To start with, we deﬁne an operator, S, acting on L2(Td) by
+S ≡S(z, χ, λ, κ) := (LS + M(z) + Rex(z))λ2κ .
+(7.2)
+Note that (R(z))λ2κ = (z −S)−1 (whenever both sides are well-deﬁned), and that S(z) is a closed operator
+on L2(Td). It is bounded except for the term χ · ∇that originates from LS.
+For simplicity, we often abbreviate S(z, χ, λ, κ) by, for example, S(z), when we consider the operator-valued
+function z 7→S(z), with the other variables kept ﬁxed. We use similar shorthand notation for uM ≡uM(λ, κ, χ),
+P ≡P λ,κ,χ, etc. in this and the remaining sections.
+Let D ⊂L2(Td) be the dense subspace of real-analytic functions on Td; cf. Section 5. Recall the constant kz
+from Lemma 6.1.
+Lemma 7.1.
+i. D is a core for S and SD ⊂D. For all z ∈C satisfying Re z ≥−kz and such that (z −S(z))−1 exists (i.e.,
+as a bounded operator), we have that (z −S(z))−1D ⊂D.
+ii. The diﬀerences S(z) −S(z = 0) and S(κ) −S(κ = 0) are bounded operators, and they are analytic in the
+variables κ, z in the region Rez > −kz and |κ| < kθ.
+Proof. D is a core for S because it is a core for χ · ∇. Further, we ﬁrst establish that, for γ ∈Cd suﬃciently
+small,
+eγ·∇S e−γ·∇−S = O(γ) .
+(7.3)
+Note that for θ ∈C2d suﬃciently small, JθAJ−θ −A = O(θ), where A = LS + M(z) + Rex(z). This follows from
+the analyticity of the dispersion law ε in LS and from Lemma 6.1 for M(z) + Rex(z). The bound (7.3) is then
+obtained by restricting to a ﬁber. A Neumann series expansion of (z −S(z))−1, using (7.3), for some suﬃciently
+small γ (depending on z), yields boundedness of eγ·∇(z −S(z))−1e−γ·∇. Together with (7.3), this implies part i,
+after an application of the Paley-Wiener theorem.
+To prove part ii, it suﬃces to observe that the term −χ · ∇in S is independent of z and κ.
+Next, we argue that the condition z ∈σ(S(z)) has a unique solution z∗in a neighborhood of z = 0:
+Lemma 7.2. Fix some r > 0 suﬃciently small, e.g., r = gM(0)/4. Then there is a unique z = z∗(λ, κ, χ) in Bλ2r
+such that z −S(z) is not invertible, i.e., such that z ∈σ(S(z)). This unique z∗is an isolated simple eigenvalue
+of S(z∗).
+Proof. We write
+S(z) = λ2 f
+M + λ2(M(z) −M(0))λ2κ + (Rex(z))λ2κ =: λ2 f
+M + A(z, λ) .
+Recall that f
+M has a unique, simple eigenvalue u f
+M in Br, for some r > 0. Since
+∥A(z, λ)∥≤C(λ4 + λ2|z|) ≤Cλ4 ,
+26
+
+for z ∈Bλ2r, an application of spectral perturbation theory shows that S(z) has a unique simple eigenvalue s(z)
+in (to be concrete) the disk B3λ2r/4. This eigenvalue is given by
+s(z) = λ2u f
+M + Tr
+
+P f
+M A(z, λ)
+
++ O(∥A(z, λ)∥2) ,
+(7.4)
+where Pf
+M is the spectral projection of f
+M associated with the eigenvalue uf
+M and the trace is over L2(Td).
+Next, we show that there is a unique z ∈Br such that z ∈σ(S(z)). First, we show uniqueness of z: Assume
+that there are two solutions z1, z2 of z ∈σ(S(z)). Then
+|z1 −z2| = |s(z1) −s(z2)| ≤C|z1 −z2| sup
+z∈Bλ2r
+
+∂
+∂z A(z, λ)
+ ≤Cλ2|z1 −z2| ,
+which is a contradiction, for λ small enough. From (7.4), we also get |s(z) −λ2u f
+M | ≤C|λ|4.
+Second, we show that there is at least one z ∈Br such that z ∈σ(S(z)): Assume there is no solution of
+z ∈σ(S(z)). By taking κ suﬃciently small, we can make sure that u f
+M lies in the ball Br/4. Then, denoting by
+C the positively oriented integration contour
+C := {z : |z| = λ2r/2} ,
+(7.5)
+we note that
+sup
+z∈C
+
+1
+z −λ2 f
+M
+ ≤Cλ−2,
+sup
+z∈C
+
+1
+z −S(z)
+ ≤Cλ−2 .
+The ﬁrst bound is stated in Lemma 6.3. The second bound follows from the ﬁrst one by Neumann series expansion,
+using the bound on A(z, λ). Next, we note the identity
+1
+z −S(z) −
+1
+z −λ2 f
+M
+=
+1
+z −S(z)A(z, λ)
+1
+z −λ2 f
+M
+and integrate both sides along the contour C. The right-hand side is bounded in norm by C, thus, after integration,
+it is bounded by Cλ2. On the left-hand side, the contour integral of
+1
+z−λ2 f
+M yields the spectral projection P f
+M .
+We therefore arrive at a contradiction with the assumption that
+1
+z−S(z) has no singular points.
+Lemma 7.3. The pole at z∗of z 7→(z −S(z))−1 is simple and its residue, P, is a rank-one operator.
+Proof. Simplicity of the pole has already been established in the above proof. To get hold of the residue, we
+expand S(z) in some neighborhood of z∗:
+z −S(z) = z −z∗
+| {z }
+=:y
+−(S(z∗) −z∗)
+|
+{z
+}
+=:F0
+−(z −z∗)S1(z∗)
+|
+{z
+}
+=:yF1
+−S>1(z −z∗)
+|
+{z
+}
+=:F2(y)
+,
+where S1(z∗) = ∂zS(z∗) and S>1(z −z∗) = P
+n≥2
+(z−z∗)n
+n!
+(∂z)nS(z∗). First, we rewrite
+1
+y −F0 −yF1
+=
+1
+y −(1 −F1)−1F0
+·
+1
+1 −F1
+.
+(7.6)
+From the considerations above, we know that F0 has an isolated simple eigenvalue at 0. It follows that 0 is also
+an eigenvalue of (1 −F1)−1F0. Since F1 = O(λ2), ((1 −F1)−1 −1)F0 is a relatively bounded perturbation of F0
+with small relative bound and hence perturbation theory ensures that this eigenvalue is again simple and isolated,
+and we call PF the corresponding one-dimensional spectral projector. It follows that PF
+1
+1−F1 is the residue of
+the function (7.6) at y = 0. Then, we write
+1
+y −F0 −yF1 −F2(y) =
+1
+1 + (y −F0 −yF1)−1F2(y) ·
+1
+y −F0 −yF1
+.
+(7.7)
+Since ∥F2(y)∥≤C|y|2 and ∥(y −F0 −yF1)−1∥≤C|y|−1, the ﬁrst factor on the right side of (7.7) is analytic in
+a neighborhood of y = 0 and it reduces to 1 at y = 0. It follows that the residue at y = 0 of the function (7.7) is
+PF
+1
+1−F1 . Since PF is one-dimensional, this is a rank-one operator.
+27
+
+To continue, we denote the pole by u(λ, κ, χ) = z∗(λ, κ, χ).
+In the statement of the next lemma, it is convenient to extend S to a function of γ deﬁned in a complex
+neighborhood of γ = 0 by setting S(γ) := eγ·∇Se−γ·∇. As argued in the proof of Lemma 7.1, γ 7→S(γ) is
+analytic, and the statements of the Lemmas 7.1 and 7.3 remain valid for suﬃciently small γ. We write
+(R(z))λ2κ =
+1
+z −S(z) =
+1
+z −uP κ + Rκ(z) ,
+(7.8)
+with z 7→Rκ(z) bounded and analytic in Bλ2r, for some r > 0. In the following, we often use the shorthand
+notations P ≡P κ and R(z) ≡Rκ(z).
+Lemma 7.4. The pole u and the operators P κ, Rκ(z) are analytic in κ and γ.
+Proof. Residue and pole can be expressed as contour integrals, namely
+P =
+1
+2πi
+Z
+C
+dz
+1
+z −S(z),
+uP =
+1
+2πi
+Z
+C
+dz
+z
+z −S(z) ,
+(7.9)
+where the contour C is deﬁned in (7.5). Then the analyticity in κ and γ follows from the analyticity of S(z), as
+established in Lemma 7.1.
+We now summarize our ﬁndings and derive some additional algebraic properties of the residue P.
+Lemma 7.5. For κ = 0, the residue, P, can be written as P κ=0 = |ζλ,κ=0,χ⟩⟨1|, with ζ ≡ζλ,κ,χ ∈L2(Td) a
+real-analytic function satisfying
+∥ζ −ζM∥= O(λ2) ,
+where ζM is the invariant state of M; see Section 5. For κ = 0, ζ is a probability density on Td. The function
+u ≡u(λ, κ, χ) ∈C satisﬁes
+u(κ) = u(−κ) ,
+|u −λ2uM| = O(λ2) .
+Moreover, we have that
+u(κ = 0) = 0 ,
+P κ=0Rκ=0(z) = 0 .
+(7.10)
+Proof. For an arbitrary exponentially localized density matrix ρS,
+TrS[eiλ2κ·XZ[0,t]ρS] = TrS[(eiλ2κ·X)∗(Z[0,t]ρS)∗] = TrS[e−iλ2κ·XZ[0,t]ρS] ,
+where we have used that Z[0,t] preserves positivity, in particular, hermiticity. Writing this in terms of ﬁbers,
+taking the Laplace transforms and comparing the singular parts, we get u(−¯κ) = u(κ). For real z, the operator
+R(z) =
+R
+dt e−tzZt preserves positivity, hence R(z)ρS ≥0, for an arbitrary positive-deﬁnite ρS, which implies
+the positivity of the function P 0(ρS)0, where 0 refers to the zero ﬁber. Writing P κ = |ζκ⟩⟨˜ζκ|, it then follows
+that ζ0 can be chosen to be positive. Since Z[0,t] preserves the trace, it follows that TrS [R(z)ρS] = 1/z. Hence,
+from (7.8) (evaluated in the ﬁber indexed by κ = 0),
+1
+z =
+1
+z −u(κ = 0)⟨1, P 0(ρS)0⟩+ ⟨1, R0(z) (ρS)0⟩= 1
+z ⟨1, ζ0⟩⟨˜ζ0, (ρS)0⟩+ ⟨1, R0(z) (ρS)0⟩.
+Since this identity has to hold for any density matrix ρS, and because R0(z) is an analytic function, we conclude
+that u(κ = 0) = 0, P 0R0(z) = 0 and ˜ζ0 = c1. Choosing the normalization c = 1, it follows that
+R
+Td ζ0 = 1,
+i.e., ζ0 is a probability density. The analyticity of γ 7→eγ·∇Pe−γ·∇implies boundedness of eγ·∇ζκ, eγ·∇˜ζκ, and
+hence analyticity of k 7→ζκ(k), ˜ζκ(k). The bounds by terms O(λ2) follow immediately from the perturbation
+theory outlined above.
+28
+
+8. Proof of main results
+Before we prove our main results for χ ̸= 0, we ﬁrst address the equilibrium regime, χ = 0.
+8.1. The equilibrium regime.If the ﬁeld χ vanishes, our results can be strengthened, because δM = 0. For
+χ = 0, the function z 7→(R(z))λ2κ has only one pole, u(λ, κ, χ = 0), in the region Re z > −λ2gM(κ, χ = 0)+O(λ4);
+(cf. the remark following Lemma 6.3). Then the pole u(λ, κ, χ = 0) determines the long-time properties of the
+dynamics. By applying an inverse Laplace transform, one then easily proves the following theorem.
+Theorem 8.1. [Equilibrium asymptotics] We set χ = 0. Then, for 0 < λ and κ suﬃciently small, there is a
+constant g > 0 such that
+(Z[0,t])λ2κ −eu(κ)tP κ = O
+ e−gλ2t
+,
+as t →∞,
+as operators on L2(Td).
+Note that g can be chosen as g = gM(0)/5, for example. Also recall that u(κ = 0) = 0, by Lemma 7.5. For
+the proof, we refer to Theorem 4.5 of [20].
+8.2. Proof of Theorems 3.2 and 3.3.
+Proof of Theorem 3.2. We ﬁrst set χ = 0. Let f be a continuous function on Td, (hence
+Mf ∈Ati). Then
+Lemma 4.1 and Theorem 8.1 yield
+TrS[MfZ[0,t]ρS] = ⟨f, ζ0⟩+ O(e−gλ2t) ,
+as
+t →∞,
+proving (3.12).
+To prove (3.11), we choose χ ̸= 0 and deﬁne X := B(L2(Td)). Then the function t 7→Z[0,t] is in L∞(R+, X).
+A standard Tauberian theorem, see e.g. [17] or [13], states the equivalence of
+lim
+T →∞
+1
+T
+Z T
+0
+dt (Z[0,t])0 = x ,
+and
+lim
+z→0, Re z≥0 z
+Z ∞
+0
+dt e−zt(Z[0,t])0 = x ,
+for some x ∈X. Existence of the ﬁrst limit yields Theorem 3.2. We show that the second limit exists: By
+Equation (7.8) we have that, for |z| suﬃciently small,
+z
+Z ∞
+0
+dt e−zt(Z[0,t])0 =
+z
+z −u(κ = 0)P 0 + zR0(z) .
+(8.1)
+Since u(0) = 0 and z 7→R0(z) is analytic in a neighborhood of z = 0, the limit equals P 0.
+Proof of Theorem 3.3. We start from the identity
+⟨X(t)⟩ρS⊗ρR,β =
+Z t
+0
+ds ⟨V (s)⟩ρS⊗ρR,β + ⟨X⟩ρS⊗ρR,β ,
+which follows from the deﬁnition of the velocity operator (4.10) in ﬁnite-volume and can be easily justiﬁed, using
+Lemma 3.1, in the thermodynamic limit, for exponentially localized density matrices ρS; see Section 5.2 of [6] for
+details. Hence
+1
+t ⟨X(t)⟩ρS⊗ρR,β = 1
+t
+Z t
+0
+ds ⟨V (s)⟩ρS⊗ρR,β + 1
+t ⟨X(0)⟩ρS⊗ρR,β
+= ⟨∇ε, ζχ,λ⟩+ O(t−1) ,
+(8.2)
+as t →∞. Since ρS is exponentially localized, the second term on the right-hand side of the last line vanishes
+as t →∞, and we conclude that v(χ) = ⟨∇ε, ζχ,λ⟩. The statement that v(χ) ̸= 0, for 0 < |χ| suﬃciently small,
+follows from vM(χ) ̸= 0, for λ small enough.
+29
+
+We deﬁne the diﬀusion tensor D ≡D(χ) by
+Dij := −λ−4
+∂2
+∂κiκj
+
+κ=0
+u(κ) ,
+(8.3)
+where the factor λ−4 is attributed to the fact that the ﬁber momentum is λ2κ, rather than κ. From u(κ) = u(−κ),
+we conclude that D has real entries. For χ ̸= 0 suﬃciently small, positive-deﬁniteness follows from the fact
+that u(k) is a C∞function in χ (see Lemma 6.1 in [6]), and the positive-deﬁniteness of D(χ = 0). It remains to
+argue that the above deﬁnition in terms of the eigenvalue u is equivalent to the one given in (3.13), namely,
+Dij = lim
+T →∞
+1
+T 2
+Z ∞
+0
+dt e−t
+T ⟨(Xi(t) −vi(χ)t)(Xj(t) −vj(χ)t)⟩ρS⊗ρR,β .
+This is straightforward, and we omit details. But we do explain an analogous argument relating the expression
+for the asymptotic velocity v(χ) in terms of the eigenvalue to the one involving moments of X; i.e., we check that
+v(χ) = ⟨∇ε, ζχ,λ⟩= i ∂
+∂κ
+
+κ=0
+u(κ) .
+(8.4)
+It follows from our discussion in Section 4.1 that
+TrS[XρS,t] = i ∂
+∂κ
+
+κ=0
+⟨1, (ρS,t)λ2κ⟩,
+and we obtain, using TrS[XρS,t] = O(t), that
+z2
+Z ∞
+0
+dt e−zt TrS [XρS,t] = z2i
+Z ∞
+0
+dt e−zt ∂
+∂κ
+
+κ=0
+⟨1, (ρS,t)λ2κ⟩
+= z2i ∂
+∂κ
+
+κ=0
+Z ∞
+0
+dt e−zt⟨1, (ρS,t)λ2κ⟩,
+for Re z > 0. By straightforward manipulations, using (8.2), the limit z →0 of the left-hand side equals v(χ).
+We abbreviate
+∂
+∂κ
+
+κ=0f(κ) by f ′(0). Thanks to Lemma 7.5, it follows that
+z2
+Z ∞
+0
+dt e−zt TrS [XρS,t] = iz2⟨1,
+1
+z −u(0)P 0(ρS)0⟩′ + iz2⟨1, R0(z) (ρS))0⟩′
+=
+iz2u′(0)
+(z −u(0))2 ⟨1, P 0(ρS)0⟩+
+iz2
+z −u(0)⟨1, P 0(ρS)0⟩′ + O(z2)
+= iu′(0) + O(z) ,
+as z →0, where we have used that P κ, Rκ(z) are analytic in z, κ and that u(0) = 0, ⟨1, P 0(ρS)0⟩= 1. Passing
+to the limit z →0, we conﬁrm (8.4).
+Note that, with our present methods, we cannot prove the existence of the limit
+lim
+T →∞
+1
+T
+Z T
+0
+dt 1
+t ⟨(Xi(t) −vi(χ)t)(Xj(t) −vj(χ)t)⟩ρS⊗ρR,β.
+The problem is that Tauberian theorems only hold if one can bound the integrand by a constant, whereas we
+only have a rough a priori bound, namely ⟨X2(t)⟩ρS⊗ρR,β ≤C|t|2. When χ ̸= 0 we therefore have to state our
+results in terms of Laplace transforms of time-dependent quantities in t.
+30
+
+References
+[1] V. Bach, J. Fr¨ohlich, and I. Sigal. Return to equilibrium. J. Math. Phys., 41:3985, 2000.
+[2] L. Bruneau, S. De Bievre, and C.-A. Pillet. Scattering induced current in a tight-binding band. J. Math.
+Phys., 52(2), 2011.
+[3] Y.C. Chen and J.L. Lebowitz. Quantum particle in a washboard potential. I. Linear mobility and the Einstein
+relation. Physical Review B, 46(17):10743, 1992.
+[4] E. B. Davies. Linear Operators and their spectra. Cambridge University Press, 2007.
+[5] W. De Roeck and J. Fr¨ohlich. Diﬀusion of a massive quantum particle coupled to a quasi-free thermal
+medium. Communications in Mathematical Physics, 303:613–707, 2011.
+[6] W. De Roeck, J. Fr¨ohlich, and K. Schnelli.
+Quantum diﬀusion with drift and the Einstein relation II.
+download from arXiv.
+[7] J. Derezi´nski. Introduction to Representations of Canonical Commutation and Anticommutation Relations,
+volume 695 of Lecture Notes in Physics. Springer-Verlag, 2006.
+[8] J. Derezi´nski and V. Jakˇsi´c. Return to equilibrium for Pauli-Fierz systems. Ann. H. Poincar´e, 4:739–793,
+2003.
+[9] D. Egli, J. Fr¨ohlich Z. Gang, A. Shao, and I.M. Sigal. Hamiltonian dynamics of a particle interacting with
+a wave ﬁeld. http://arxiv.org/abs/1211.6154.
+[10] K.-J. Engel and R. Nagel. A short course on operator semigroups. Universitext. Springer, 2006.
+[11] L. Erd¨os. Linear Boltzmann equation as the long time dynamics of an electron weakly coupled to a phonon
+ﬁeld. J. Stat. Phys., 107(85):1043–1127, 2002.
+[12] J. Fr¨ohlich and Z. Gang. On the theory of slowing down gracefully. Pramana, 78(6):865–874, 2012.
+[13] E. Hille and R. S. Phillips. Functional Analysis and Semi-groups, volume XXXI of AMS Colloquium Public-
+ations. American Mathematical Society, 1957.
+[14] V. Jakˇsi´c and C.-A. Pillet. On a model for quantum friction. ii: Fermi’s golden rule and dynamics at positive
+temperature. Comm. Math. Phys., 176:619–644, 1996.
+[15] T. Kato. Perturbation Theory for Linear Operators. Springer, Berlin, second edition, 1976.
+[16] T. Komorowski and S. Olla. On the sector condition and homogenization of diﬀusions with a gaussian drift.
+Journal of Functional Analysis, 197(1):179–211, 2003.
+[17] Y. C. Li, R. Sato, and S. Y. Shaw. Convergence theorems and tauberian theorems for functions and sequences
+in banach spaces and banach lattices. Israel Journal of Mathematics, 162(1):109–149, 2007.
+[18] M. Merkli. Positive commutators in non-equilibrium statistical mechanics. Comm. Math. Phys., 62:223–327,
+2001.
+[19] M. Reed and B. Simon. Methods of Modern Mathematical physics, volume 2. Academic Press, New York,
+1972.
+[20] W. De Roeck, J. Fr¨ohlich, and A. Pizzo. Quantum Brownian motion in a simple model system. Comm.
+Math. Phys, 293(2):361–398, 2010.
+[21] W.
+De
+Roeck
+and
+A.
+Kupiainen.
+Diﬀusion
+for
+a
+quantum
+particle
+coupled
+to
+phonons.
+http://arxiv.org/abs/1107.4832.
+[22] M. Sassetti, P. Saracco, E. Galleani d’Agliano, and F. Napoli. Linear mobility for coherent quantum tunneling
+in a periodic potential. Zeitschrift f¨ur Physik B Condensed Matter, 77(3):491–495, 1989.
+[23] U. Weiss and M. Wollensak. Dynamics of the dissipative multiwell system. Physical Review B, 37(5):2729,
+1988.
+31

@@ -1,0 +1,1372 @@
+Spatial Dynamics with Heterogeneity
+Denis D. Patterson∗1, Simon A. Levin2, A. Carla Staver3, and Jonathan D.
+Touboul4,5
+1High Meadows Environmental Institute, Princeton University, Princeton, NJ
+(denispatterson@princeton.edu)
+2Department of Ecology and Evolutionary Biology, Princeton University, Princeton, NJ
+(slevin@princeton.edu)
+3Department of Ecology and Evolutionary Biology, Yale University, New Haven, CT
+(carla.staver@yale.edu)
+4 Department of Mathematics, Brandeis University, Waltham MA (jtouboul@brandeis.edu)
+5Volen Centre for Complex Systems, Brandeis University, Waltham MA
+May 10, 2023
+Abstract
+Spatial systems with heterogeneities are ubiquitous in nature, from precipitation, tempera-
+ture and soil gradients controlling vegetation growth to morphogen gradients controlling gene
+expression in embryos. Such systems, generally described by nonlinear dynamical systems, often
+display complex parameter dependence and exhibit bifurcations. The dynamics of heterogeneous
+spatially extended systems passing through bifurcations are still relatively poorly understood,
+yet recent theoretical studies and experimental data highlight the resulting complex behaviors
+and their relevance to real-world applications. We explore the consequences of spatial hetero-
+geneities passing through bifurcations via two examples strongly motivated by applications.
+These model systems illustrate that studying heterogeneity-induced behaviors in spatial sys-
+tems is crucial for a better understanding of ecological transitions and functional organization
+in brain development.
+Keywords:
+PDEs, integro-diﬀerential equations, ecology, savanna-forest, brain development
+Mathematics Subject Classiﬁcation(s):
+35B32, 45K05, 92D40, 92B05
+∗Corresponding author.
+Simon Levin and Denis Patterson thank the NSF for support via the grant DMS-1951358, and Simon Levin also
+appreciates support from the Army Research Oﬃce Grant W911NF-18-1-0325. Carla Staver appreciates support from
+NSF Grant DMS-1951394 and Jonathan Touboul appreciates support from NSF Grant DMS-1951369.
+1
+arXiv:2305.05007v1  [math.DS]  8 May 2023
+
+1
+Introduction
+In a variety of spatial natural systems, nonlinear dynamics and spatial interaction are aﬀected by
+heterogeneities.
+Such systems have been widely studied, in a variety of settings.
+Systems with
+gradients that transition from one dominant state to another, and including a spatially transient
+region of bistability, generally show a more-or-less sharp transition between the two regions; the
+position of this transition point depends on the intrinsic nonlinear dynamics as well as the nature of
+the spatial interactions. The existence of such solutions in bistable systems was recently rigorously
+established for a wide class of competitive reaction-diﬀusion equations in the limit of vanishing
+diﬀusion [49]; other aspects of sharp boundary formation in heterogeneous media have also been
+considered by numerous authors [11, 40, 41, 64]. Systems with transient bistability are only the
+simplest case of what we will refer to as spatially transient bifurcation scenarios, which we deﬁne as
+spatially extended systems with heterogeneities whereby the parameter varying in space is associated
+with the crossing of one or more bifurcations. The behavior of more general spatially transient
+bifurcations remains largely open and, to the best of our knowledge, has not been addressed in a
+systematic manner. We argue however that understanding these dynamics is essential to better
+describe the behavior of complex biological systems in heterogeneous environments.
+We study
+here two particular systems paradigmatic for this problem: an ecological system describing the
+competition between savannas and forests within a gradient of precipitation, as well as a recently
+developed model of brain development featuring gradients of morphogens.
+The models presented here exhibit a rich phenomenology that, in line with the topic of this
+special issue, have strong potential both for applications and mathematical developments. In the
+case of front pinning stemming from transient passage through a bistable regime, ﬁrst applications
+of the so-called Maxwell point theory to ecology appeared recently [57], and were applied to the
+so-called Staver-Levin forest-savanna model [53, 54] in the presence of a gradient in [63], or in a
+similar forest-savanna model in [20]. There are also some classical results in mathematical ecology
+regarding the ability of species to invade, survive and coexist in heterogeneous environments [3, 8, 7].
+The recent work [2] on climate tipping considers a bistable nonspatial model subject to diﬀusion
+and a non-monotonic heterogeneous forcing term, and is arguably closest to the mechanisms studied
+here. Similarly, researchers in mathematical neuroscience have studied how the shape of the input
+into neural ﬁeld models can induce interesting dynamics in the output function [16, 32, 31, 30].
+However, in these cases, the complexity of the dynamics are induced by the shape of the gradients.
+In contrast, we will focus on simpler monotonically varying heterogeneities and, as we will show,
+complex dynamics can emerge simply from the interaction of the underlying non-spatial dynamics
+and the slope of the gradient (or the length scale of the problem). Moreover, we aim to highlight the
+importance of the speed (or size of the region of space) for which the heterogeneity crosses diﬀerent
+dynamical regimes of the underlying non spatial model. As we illustrate, this crucially inﬂuences
+the emergence or non emergence of new spatial patterns or spatio-temporal dynamics.
+Turing pattern formation in heterogeneous systems (but not including transient passages through
+Turing instabilities) has also been widely explored, and it was shown that dispersal can sharpen
+boundaries [19]. Numerous authors have developed criteria for pattern formation in speciﬁc reaction-
+diﬀusion models where some parameters are allowed to vary across the spatial domain in a stepwise
+manner [5, 46]. However, we believe that smooth variation of the gradient to be a key ingredient
+in many applications (cf. section 3); it changes the mathematical approaches to the problem of
+characterizing patterns signiﬁcantly and also produces qualitatively diﬀerent solutions, e.g. blending
+of spot, stripes and labyrinths, as well as multi-frequency patterns [17].
+Researchers have also
+pursued perturbative results about the homogeneous case. For example, Benson et al. [4] carried
+out a remarkably detailed bifurcation analysis of a reaction-diﬀusion system with diﬀusion coeﬃcient
+D(x) = D + ηx2 in the limit as η ↓0, illustrating that a rich array of dynamics can be spawned by
+small heterogeneity. The dynamics of spiked solutions to pattern forming reaction diﬀusion systems
+subject to spatially localized heterogeneity have also attracted considerable attention (see [61] and
+2
+
+the references therein), while other work on this topic has allowed more general heterogeneous
+structure by working in asymptotic regimes of the diﬀusivity strengths [59]. However, biological
+problems (such as the one we present in section 3) often exhibit spatial heterogeneity on the same
+scale of the spatial domain itself, rendering many asymptotic or perturbative results of relatively
+limited utility in applications.
+There has been recent and growing interest in revisiting and generalizing the classical Turing
+pattern paradigm to account for general spatial heterogeneity [35, 58]. Although the literature has
+focused mainly on heterogeneity in the diﬀusion coeﬃcient(s), several investigators have recently
+employed series-approximation approaches to derive conditions for the onset of patterns with het-
+erogeneity in the reaction dynamics [34, 37]. While these results are undoubtedly promising, the
+vast bulk of the existing literature deals with reaction-diﬀusion systems. Many applications require
+models incorporating more complex spatial operators, such as chemotaxis, nonlocal spatial operators
+or advection (which can alter pattern forming dynamics even when present at very low levels [33]),
+thus demanding the development of new mathematical machinery. The inclusion of heterogeneity in
+pattern forming systems has also recently been reported by several authors to induce spatio-temporal
+oscillations [12, 36], posing yet more interesting mathematical questions in this area.
+In section 2, we begin our exploration of heterogeneity-induced dynamics by ﬁrst investigating the
+forest-grass Staver-Levin model with nonlocal interactions and a rainfall gradient that increasingly
+favors forest tree expansion. Turning next to a more detailed version of the model with four functional
+types, we incorporate the impact of the rainfall on the various types of vegetation by allowing the
+forest and savanna tree birth rates to vary spatially, since they are likely to exhibit the most spatial
+variation and impact outcomes most strongly. Our approach is to adopt qualitatively appropriate
+gradients, as opposed to trying to quantitatively estimate the impact of increasing rainfall on the
+productivity of each of the functional types in the model. We are guided by a detailed bifurcation
+analysis of the corresponding nonspatial model and this allows us to predict potential emergent
+behaviors caused by the heterogeneity and illustrate interesting spatio-temporal dynamics. Through
+a numerical bifurcation analysis of the system of integro-diﬀerential equations, we ﬁnd multistability
+between several nonhomogeneous solutions for a signiﬁcant range of the dispersal parameter; we
+ﬁnd front-pinned solutions (which connect stable solution branches from the nonspatial model), and
+nonhomogeneous grass and forest dominated solutions. In the four-functional-type spatial Staver-
+Levin model there is a much greater variety of solutions in the presence of heterogeneity.
+We
+highlight several plausible transition mechanisms for the empirically observed savanna to forest
+transition with increasing rainfall. Once more, we uncover front-pinned solutions, including a front-
+pinned solution predicting a grassland band mediating the savanna-forest transition, as well as
+multistability and changes in stability as the dispersal parameters vary. Additionally, we observe
+periodic waves of invasion for gradients that intersect a large region of parameter space that produces
+stable oscillations in the nonspatial Staver-Levin model. Intriguingly, as we vary the width or speed
+at which the gradient cuts through oscillatory region, we see period doubling of the waves and
+eventually more complex solutions that appear to display the hallmarks of spatio-temporal chaos.
+This illustrates how the speed at which the gradient crosses through diﬀerent dynamical regimes or
+bifurcations crucially determines the resulting dynamics.
+In section 3, we discuss a PDE model of arealization in the mammalian forebrain featuring
+transcription factor gradients that mediate the competition between diﬀerent neural fates in early
+embryonic development [17]. This model explained unexpected patterning and dislocation of the
+typically sharp boundary between abutting cortical regions upon artiﬁcial manipulation of the tran-
+scription factor gradients in mice. Mathematically, the dramatic breakdown of the boundary-forming
+mechanism in the mice corresponds to a transient passage of the gradient through a region of pa-
+rameter space with pattern-forming instabilities. For a 1D spatial domain, we demonstrate that the
+structure of the resulting solutions of the mathematical model depend crucially on how the gradient
+transits the pattern forming region and emphasize the qualitative diﬀerences when comparing these
+3
+
+solutions to those for a typical pattern forming system on a homogeneous domain.
+2
+The savanna-forest transition with a rainfall gradient
+The ﬁrst example we shall study is a transient passage through a family of periodic orbits, in the
+case of the transition between savannas and forest within a gradient of precipitation.
+2.1
+Spatially extended savanna-forest dynamics
+The vegetation model that we shall use for this, hereafter referred to as the Staver-Levin (SL)
+model [54], describes the interaction between savanna trees with an age structure (S for savanna
+saplings, T for adult savanna trees), forest trees (F), and grass patches (G). Grass patches are
+locations that carry ﬁres that limit the expansion of forest trees and delay the maturation of savanna
+saplings, but are also the locations where new trees of both types can grow. In [47], we introduced
+a spatially explicit stochastic model accounting for birth, death and interaction rules between these
+ecological species proved that the fractions of the diﬀerent components at location x and time t1
+satisfy the following system of nonlinear integro-diﬀerential equations in an appropriate mean-ﬁeld
+limit:
+∂tG(x, t) = µS + νT + φ
+Z
+Ω
+w(x −y)G(y, t) dy
+
+F −αG
+Z
+Ω
+JF (x −y)F(y, t) dy
+−β G
+Z
+Ω
+JT (x −y)T(y, t) dy,
+(1a)
+∂tS(x, t) = −µS −ω
+Z
+Ω
+w(x −y)G(y, t) dy
+
+S −αS
+Z
+Ω
+JF (x −y)F(y, t) dy
++ β G
+Z
+Ω
+JT (x −y)T(y, t) dy,
+(1b)
+∂tT(x, t) = −νT + ω
+Z
+Ω
+w(x −y)G(y, t) dy
+
+S −αT
+Z
+Ω
+JF (x −y)F(y, t) dy,
+(1c)
+∂tF(x, t) = α(G + S + T)
+Z
+Ω
+JF (x −y)F(y, t) dy −φ
+Z
+Ω
+w(x −y)G(y, t) dy
+
+F,
+(1d)
+for each (x, t) ∈Ω× R+ for some Ω⊂R2.
+Since the system of equations given by (1) describes the evolution of probability densities, we
+have
+G(x, t) + S(x, t) + T(x, t) + F(x, t) = 1 for each (x, t) ∈Ω× R+.
+(2)
+In this model, the constants µ and ν are the mortality rates of saplings and savanna trees respec-
+tively. The functions φ and ω represent the burning rates of forest trees and saplings due to ﬁre;
+they are theoretically predicted, and empirically observed, to have sharp threshold or sigmoidal
+proﬁles as functions of the available ﬂammable cover (grass in this framework) [51]. For numerical
+investigations, we employ the following smooth approximations to a sigmoid for φ and ω:
+ω(G) = ω0 +
+ω1 −ω0
+1 + e−(G−θ1)/s1 ,
+φ(G) = φ0 +
+φ1 −φ0
+1 + e−(G−θ2)/s2
+for G ∈[0, 1].
+(3)
+with parameter values as given in Table 1 below.
+The kernel function w measures the ability of ﬁre to spread spatially from a point that is already
+burning. The constants α and β account for the strength of forest-tree and savanna-tree invasion via
+1Also representing the probability for a site at location x to be of a given type at time t.
+4
+
+seed dispersal, with the spatial distribution of these seeds captured by the kernels JF and JT . The
+inclusion of nonlocal or long-range interactions is considered by many most appropriate for spatial
+vegetation models as dispersal of seeds is often long range or even heavy-tailed [43, 55]. The spatial
+interaction (ﬁre spread and seed dispersal) are assumed isotropic so all kernels are of convolution
+type and the model (1) is thus (for now) posed on a homogeneous spatial domain. For simplicity,
+and in all numerical results, we use zero mean Gaussian kernels with diﬀerent standard deviations
+(to reﬂect the relative length scales of the diﬀerent spatial process). In particular, we have
+G(x, σ) :=
+1
+√
+2πσ2 e−x2/2σ2,
+σ > 0,
+x ∈Ω,
+with w(x) = G(x, σW ), JT (x) = G(x, σT ), and JF (x) = G(x, σF ). In the main text, we will always
+consider the system with reﬂecting boundary conditions, which are appropriate for both the nonlocal
+operators and the heterogeneous nature of the models (see Appendix A.2). The results are quali-
+tatively similar for open boundary conditions and the Supplementary Materials contain simulations
+with open boundaries for comparison purposes.
+In this work, we allow α and β to be functions of spatial position, x, to mimic heterogeneous eﬀects
+due to environmental gradients observed in reality, particularly the pronounced rainfall gradients
+in sub-Saharan Africa and the Amazon [6, 62].
+We will neglect the inﬂuence of environmental
+variation on the ﬁre and natural mortality processes in the model since we expect these eﬀects to be
+less impactful on the dynamics. However, we note that ﬁre frequency and intensity tend to increase
+and then decrease with increasing rainfall [22] and that tree mortality tends to decrease and then
+increase with increasing rainfall and varies substantially with soil properties [50].
+Table 1 below summarizes the parameters of the SL model, along with their ecological inter-
+pretations and default numerical values. Further details on the parameter gradients and numerical
+schemes can be found in Appendix A.1.
+Table 1: Summary of parameters for the SL model
+Ecological interpretation
+Expression
+Default Value
+Forest tree birth rate
+α(x)
+[piecewise linear]
+Savanna saplings birth rate
+β(x)
+[piecewise linear]
+Savanna sapling-to-adult recruitment rate
+ω
+ω(G) = ω0 +
+ω1−ω0
+1+e−(G−θ1)/s1
+ω0 = 0.9, ω1 = 0.4,
+θ1 = 0.4, s1 = 0.01
+Forest tree mortality rate
+φ
+φ(G) = φ0 +
+φ1−φ0
+1+e−(G−θ2)/s2
+φ0 = 0.1, φ1 = 0.9,
+θ2 = 0.4, s2 = 0.05
+Savanna sapling mortality rate
+µ
+0.1
+Adult savanna tree mortality rate
+ν
+0.05
+Forest tree seed dispersal parameter
+σF
+-
+Savanna tree seed dispersal parameter
+σT
+-
+Fire spread (dispersal) parameter
+σW
+-
+In addition to the four-functional-type SL model stated above, numerous other related models
+with the same (or very similar) underlying interaction rules have been studied in the literature [14,
+13, 25, 39, 51, 56, 63]. One important special case is that in which only the grass and forest types are
+present, essentially reducing the model to a direct competition between ﬁre and seed dispersal eﬀects.
+In this case, allowing α to vary in space, the system (1) reduces to the single integro-diﬀerential
+5
+
+equation
+∂tG(x, t) = φ
+Z
+Ω
+w(x −y)G(y, t) dy
+
+(1 −G(x, t))−α(x)G(x, t)
+
+1 −
+Z
+Ω
+JF (x −y)G(y, t) dy
+
+,
+(4)
+where the normalization condition G(x, t) + F(x, t) = 1 and the assumption that JF and w are
+probability density functions on Ω(and hence have unit integrals) enable this reduction.
+2.2
+Heterogeneities
+In the tropics, empirical data show that while savanna landscapes tend to dominate at low rainfall
+levels, there is evidence of bistability between savanna-dominated and forest-dominated biomes at
+intermediate rainfall, and forest naturally tends to dominate at suﬃciently high rainfall levels [52,
+53]. Consequently, any model purporting to explain the savanna-forest transition should explicitly
+account for the spatial heterogeneity arising from the signiﬁcant diﬀerences in rainfall levels across
+the domain. To this end, and for the sake of tractability, we consider a one-dimensional bounded
+spatial domain Ω= [0, 1] throughout and allow both the forest-tree birth rate α and the savanna-tree
+birth rate β to vary with position in the domain; in particular, we choose both to be increasing linear
+functions of x ∈Ωso that the domain becomes progressively wetter (and more forest favored) as
+x increases (see [54] and the references therein). Intuitively, we expect the slope of the forest birth
+rate to be larger than that of the savanna trees since eventually the forest trees must out-compete
+the savanna trees at high rainfall levels.
+We primarily study the dynamics of the heterogeneous model in the small-dispersal limit since
+the seed and ﬁre dispersal scale is several orders of magnitude smaller than the scale on which
+the rainfall gradient is signiﬁcant. We focus on the case of centered Gaussian dispersal kernels as
+a representative class of kernels which illustrate our main qualitative conclusions. However, our
+conclusions should hold for a broad class of nonnegative even kernels, although spreading speeds
+will diﬀer for heavy-tailed kernels and it would undoubtedly be interesting to investigate the impact
+of heavy-tailed dispersal on the nonequilibrium solutions shown in section 2.5.
+2.3
+Front pinning in the grass-forest model
+Consider the grass-forest model given by equation (4) on the 1D spatial domain Ω= [0, 1].
+If
+we assume completely localized interactions, our model reduces to a family of ordinary diﬀerential
+equations indexed by the spatial variable x:
+˙G = φ(G)(1 −G) −α(x)G(1 −G),
+x ∈[0, 1],
+(5)
+Equation (5) thus describes the evolution of the grass cover proportion in an isolated patch of
+landscape (i.e. one without spatial interactions). We study the corresponding spatial model, given
+by (4), subject to a rainfall gradient which spans from a grass-dominated regime at the left end-
+point of the domain x = 0 to a forest-dominated regime at the right-most point of the domain
+x = 1; we reﬂected this in the model by choosing α(x) linear with positive slope. Such a gradient in
+the forest tree birth rate reﬂects the increasing productivity of forest trees at progressively higher
+rainfall. Figure 1 B shows the time-evolution of grass cover in the spatial grass-forest model (4) with
+dispersal parameter σ = 0.01 with rainfall gradient chosen as outlined above. Figure 1 A shows the
+ﬁnal steady-state solution proﬁle from Figure 1 B (dashed green line) overlaid with the bifurcation
+diagram from the corresponding nonspatial model (5) (red for stable equilibria, black for unstable).
+Solutions to equation (5) and their stability are computed for each value of x in XPP using
+AUTO [15]. Solutions to the corresponding spatial model (4) are computed using a ﬁnite-diﬀerence
+spatial discretization of the integrodiﬀerence equation so that it can be solved via time stepping
+6
+
+schemes and with a ﬁxed point approach in MATLAB for bifurcation analysis. We recall that all
+simulations shown in the main text are with Gaussian kernels and for reﬂecting boundary conditions
+(see Appendix A.2). However, the results are very similar for other centered univariate kernels and
+for other types of boundary conditions since in the small to moderate dispersal cases we study,
+boundary eﬀects are minimal. We also systematically explored the space of initial conditions to
+uncover multistability, which was observed in a number of cases. Grid convergence and time-step
+convergence studies were carried out to verify that the stability of computed solutions was robust.
+By overlaying the nonspatial bifurcation diagram onto the spatial solution in Figure 1 A, we see
+that the spatial solution essentially interpolates between the two stable solution branches from the
+nonspatial model with a sharp transition between the grass and forest dominated parts of the domain.
+As per Figure 1 A, the gradient begins before the ﬁrst saddle node bifurcation of the nonspatial
+model and hence the lower solution branch is not a candidate solution across the whole domain in
+the spatial model, as we might have expected. Likewise, the gradient extends beyond the upper
+nonspatial saddle-node bifurcation and so the upper solution branch is similarly not a candidate
+spatial solution either (at least for small dispersal). This is a completely new type of solution not
+present without spatial interactions and heterogeneity. Numerous authors have proposed this type
+of mechanism as an explanation for the empirically observed sharp savanna-forest boundaries in
+sub-Saraharan Africa, the Amazon, and other tropical regions with similarly abrupt savanna-forest
+transitions [9, 20, 21, 62].
+A
+B
+Figure 1: A: ODE bifurcation diagram with space as the bifurcation parameter (stable equilibrium
+solution curves in red and unstable equilibria in black) overlaid with a stable steady-state solution
+of the IDE for dispersal σ = 0.01 on the heterogeneous domain (dashed green line). B: Space time
+plot of convergence to the steady-state solution plotted in A; the speed of the wave of invasion forest
+into grass slowly tends to zero before equilibrium is reached.
+Convergence to the steady-state in Figure 1 B proceeds via a wave of invasion that fails to
+propagate beyond a point in the spatial domain and where a sharp front forms in the solution.
+This phenomenon has been termed “front pinning” or “range pinning” in the literature and has
+been demonstrated in many bistable PDE-based ecological models [9, 57, 63], and other applied
+contexts [38]. The point in the spatial domain at which the front forms in the solution is referred to
+as the Maxwell point, and is a generically stable conﬁguration in heterogeneous systems. Front pinned
+solutions can also be stable in certain spatially homogeneous systems [41, 40]. Heuristically, pinning
+is harder to observe in a homogeneous system because waves of invasion will select some constant
+wave speed c with which to propagate on a homogeneous domain. If the system parameters are set to
+exactly generate c = 0, then front-pinning can occur, but this parameter set will have measure zero
+7
+
+in parameter space and hence a pinned front solution is not generic (and thus physically unrealistic).
+In our model, we have nonconstant wave speeds c(x) due to the heterogeneity in the system and
+bistability persists for a large parameter region in the absence of spatial interactions (see Figure 1),
+so stable front-pinned solutions are expected for appropriate gradient choices. Various authors have
+considered calculation of the Maxwell point for reaction diﬀusion versions of the Staver-Levin model
+and other ecological models [63, 20]. However, this approach appears technically limited to scalar
+systems with diﬀusion as the dominant spatial interaction, meaning the method is approximate for
+models with nonlocal interactions. Moreover, the Maxwell point calculations are only approximate
+when the values of the nonspatial steady states vary as a function of the gradient (as they do in our
+model, see Figure 1 A). The existence of front-pinned solutions has been established rigorously in
+reaction-diﬀusion models via asymptotic analysis in the small diﬀusion limit [49], but, to the best
+of our knowledge, this question remains open for systems involving nonlocal operators.
+A
+B
+C
+D
+0
+0.5
+1
+0
+0.5
+1
+0
+0.5
+1
+0
+0.5
+1
+0.5
+1
+0.75
+B
+C
+D
+Figure 2: A: Bifurcation diagram as the dispersal parameter σ = σF = σW is varied with the
+L1 norm of the grass component of the solution on the y-axis (reﬂecting boundary conditions and
+Gaussian kernels for both seeds and ﬁre). Red lines: Stable solutions, Black lines: Unstable solutions,
+B/C/D: Solutions from the grass dominated branch, the front-pinned branch and the forest branch,
+respectively.
+The existence and stability of these solutions are functions of the spatial interactions. In Figure
+2 we investigate the impact of the dispersal parameter σ on front pinning and multistability in the
+system2. The standard deviations of the Gaussian ﬁre and seed kernels, σW and σF , are chosen
+equal to a common value σ, which serves as the bifurcation parameter. We observe that there is a
+large dispersal range (or range of spatial scales) for which the model supports three stable solutions,
+a grass-dominated solution (Figure 2 B1), a forest-dominated solution (Figure 2 B3) and a front-
+pinned solution with a sharp transition between forest and grass (Figure 2 B2). This latter solution
+disappears for high dispersal values through a saddle-node bifurcation. Heuristically, when dispersal
+2Note that varying the dispersal parameter in this way is equivalent to varying the size of the spatial domain (with
+a smaller dispersal parameter corresponding to a larger domain).
+8
+
+is large compared to the spatial heterogeneity, it eﬀectively rapidly homogenizes the system and the
+system can no longer support such a heterogeneous solution and instead converges to more well-
+mixed solutions. We further observe that the forest-dominated solution branch exists and remains
+stable for all but very low dispersal values, eventually disappearing in a saddle-node bifurcation
+around σ ≈0.026. The grass-dominated solutions disappear at low dispersal rates, in favor of mixed
+equilibria associated with unavoidable forests in most humid regions and grass at driest regions. The
+all-grass solution (i.e. G(x) = 1 for all x ∈[0, 1]) is a solution for every value of σ but is always
+unstable.
+2.4
+Front-pinning in the four-functional-type forest-savanna model
+stable oscillations 
+forest (1 stable FP)
+forest/savanna bistable
+GH
+GH
+GH
+4
+5C
+5B
+5A
+0
+0.4
+0.8
+1.2
+1.2
+1.6
+0.15
+0
+1
+0.5
+Grass
+5A
+5B
+5C
+S=T=0
+savanna
+4
+A
+B
+S=T=0
+forest (2 stable FPs)
+0.4
+0.8
+GH
+1.6
+Figure 3: A: One-parameter bifurcation diagrams corresponding to each of the rainfall gradients
+studied. Stable/unstable equilibria denoted by red/black, stable/unstable limit cycles in green/blue
+and heteroclinics denoted by dashed black lines. B: Two-parameter bifurcation diagram in α and
+β for the nonspatial Staver-Levin model (i.e. completely localized interactions). Transcritical bi-
+furcation curves in blue, saddle node curves in magenta, supercritical Hopf curves in purple and
+subcritical Hopf curves in dark green, with switching points from one type to the other at Bautin
+(Generalized Hopf, label GH) points.
+9
+
+We introduce the eﬀects of a rainfall gradient phenomenologically by allowing both α and β to be
+linearly increasing in x, meaning that both kinds of trees become more productive as we move along
+the gradient, or moving rightwards in the 1D spatial domain Ω= [0, 1]. To reﬂect the empirical
+observation that forest trees dominate at high rainfall, the slope of α will be larger than that of
+β in all scenarios. Estimating the real quantitative impact of sub-Saharan African rainfall on each
+of these functional types is a formidable and outstanding challenge, but we can glean considerable
+insight into the range of dynamics and savanna-forest transitions with our more qualitative approach.
+Previous studies have noted the array of behaviors that emerge upon introducing a realistic rainfall
+gradient into this model [63], but it can be diﬃcult to motivate and understand the resulting spatial
+dynamics without reference to the already complex dynamics of the nonspatial version of (1). Figure
+3 B shows the two-parameter bifurcation diagram for the (nonspatial) four-functional-type Staver-
+Levin model as a function of the forest tree birth rate α and the savanna tree birth rate β. We
+immediately see that a rainfall gradient tracing a linear path in α-β space may connect regions with
+very diﬀerent dynamics in the absence of spatial interactions, including stable limit cycles involving
+all four functional types (see [56] for more details). The top row of subﬁgures in Figure 3 A shows
+various one parameter bifurcation diagrams (only the grass component of the solution is shown)
+along gradients in α-β space for which we discuss the corresponding spatial dynamics below.
+A
+B
+C
+S=T=0
+D
+Figure 4: A: For x ∈[0, 0.4], the system is in a savanna state, for x ∈[0.4, 0.7] there is a grass
+dominated state with a small number of forest trees and then after the Maxwell point around x = 0.7,
+the system transitions to a forest dominated state. B: Alternative stable state with savanna on the
+left side of the domain with grass dominant on the right of the domain. C: Alternative stable state
+with forest dominant across the entire domain. Dispersal parameters are set to σ = 0.025 for all
+panels and boundary conditions are reﬂecting. D: Nonspatial bifurcation diagram for (1) with the
+spatial variable x as the bifurcation parameter.
+Figure 4 shows three multi-stable solutions for a ﬁxed parameter set and a linear rainfall gradient
+(shown in α-β space in Figure 3) in the savanna-forest model given by (1); the dispersal parameters
+are identically σ = 0.025 in all panels. Panels A and B of Figure 4 show a pair of stable solutions in
+which all four functional types are present. The solution in 4 A follows the upper stable branch in
+the nonspatial bifurcation diagram (Figure 4 D) until a Maxwell point around x ≈0.7 where there
+is a rapid transition to forest dominance (and the lower stable branch in Figure 4). This solution
+has both a stable savanna and a stable forest domain separated by a grass band suﬃciently high to
+suppress forest trees; this is a novel prediction in terms of the savanna-forest transition in the tropics
+and does not seem to appear in the existing literature, but anecdotally is consistent with the low
+tree biomass and density observed in, e.g., the Bateke Plateau bordering the Congo rainforest [44].
+The grass band is caused by a transcritical bifurcation in the nonspatial model (marked by the
+vertical pink dashed line), up to which, grass steadily increases at the expense of savanna trees; this
+high level of grass exceeds the ignition threshold for ﬁre (at least locally) and hence keeps forest at
+a low level. At the transcritcal, the savanna loses stability and the system enters the forest-grass
+subsystem, in the grass-dominated state. Figure 4 panel C shows a forest dominated solution that
+10
+
+is stable for all levels of the dispersal parameter. As in the forest-grass front-pinning example, the
+front-pinned solutions eventually lose stability at suﬃciently large levels of dispersal (equivalent to
+a smaller spatial domain); this occurs around σ ≈0.05 for the gradient chosen in this particular
+example. In the Supplementary Materials, we show that this example is robust to stochasticity and
+nonlinearity in the rainfall gradient (see SM1.).
+2.5
+Transient passage through a family of periodic orbits
+C
+B
+A
+Figure 5: A: Simple (period 1) waves of invasion of savanna into forest led by a grass/ﬁre front. B:
+More complex waves of invasion (period 2). C: Solution from the chaotic regime.
+Figure 5 shows solutions for three diﬀerent rainfall gradients which intersect the stable oscillations
+region of the nonspatial bifurcation diagram shown in Figure 3 B. The solution in Figure 5 A
+varies from forest ≈0.5 on the extreme left of the domain up to forest ≈1 on the right but this
+forest dominance is punctuated by waves of invasion by the other functional types. These waves
+are triggered by a wave of grass (carrying ﬁre), which burns the forest trees and allows savanna
+to outcompete grass in the wake of the initial wave.
+The savanna then becomes vulnerable to
+replacement by forest as it eliminates the grass, which carried ﬁre to suppress the forest. This cycle
+repeats in a similar manner to the simple periodic oscillations observed in the nonspatial Staver-
+Levin model [56]. The left and right endpoints of the gradient anchor the system in the savanna and
+forest states respectively, although the “savanna state” has unusually high forest tree presence. The
+solution shown in Figure 5 B is a period-two wave that appears to be caused when we enlarge the
+region of space which the gradient spends in the stable oscillation region of the nonspatial system.
+When this region is large enough, waves take suﬃciently long to reach the right-hand termination
+point that another wave has already begun on the left side of the domain, eventually leading to
+period-doubling due to the interaction of the two waves. Finally, in Figure 5 C, we enlarge the
+oscillating region that the gradient passes through yet further and observe what appears to be
+a complicated quasi-periodic behavior or spatio-temporal chaos in the solution. The solutions in
+Figure 5 were computed using reﬂecting boundary conditions but the solutions are qualitatively
+similar with open boundary conditions so the phenomena shown are not sensitive to this choice
+11
+
+(see the Supplementary Materials for the corresponding simulations). To further investigate the
+0
+0.5
+1
+Precipitation
+B
+C
+E
+F
+0
+0.5
+1
+Figure 6: A-E: Forest component of each solution with the same gradient as Figure 5B but for
+varying slopes (σ = 0.02 in all cases). The slopes in panels A-E are: A - 1.5, B - 2, C - 2.5, D - 3.4,
+E - 3.42. F: Illustration of how the gradient slopes change across the other panels (blue gradient
+with slope 1, red gradient with slope 2, and yellow gradient with slope 3.5).
+phenomenon of wave generation shown above, we considered the gradient from Figure 5 B once
+more, but this time we allowed the slope of the gradient to vary in order to change the region of the
+spatial domain in the oscillatory regime (slope changes are illustrated in Figure 6 F). Panels A, B
+and C of Figure 6 show the forest component of the solution for slopes of 1, 2 and 2.5 respectively.
+As the slope of the gradient increases, we soon revert from period-two waves to simpler period-one
+waves. The left vertical red dashed line in panels A-F of Figure 6 indicates the onset of oscillations
+without spatial interactions, corresponding to the start of the fold of limit cycles associated with
+the subcritical Hopf curve marked by a solid dark green line in Figure 3 B; the right vertical red
+dashed line indicates the oﬀest of oscillations, corresponding to the heteroclinic-to-saddle connection
+marked by a dashed light blue line in Figure 3 B. Even as the region of oscillations predicted by the
+nonspatial model shrinks, the waves continue to travel remarkably far past the right hand red line
+marking the non-spatial heteroclinic. Figures 6 D and E show solutions for slope values of 3.4 and
+3.5, with oscillations ﬁnally abating in panel E as the oscillatory region ﬁnally becomes too small to
+support stable oscillations in the spatial model. This example illustrates the phenomenon of transient
+passage through a family of periodic orbits in a spatial model; it shows that real systems may pass
+through regimes that support oscillations without spatial interactions but that these oscillations will
+only be seen in spatially-extended models if the gradient passes through this region of parameter
+space suﬃciently slowly.
+It is evidently of both theoretical and applied interest to understand
+in more detail when transient passage through oscillations will result in periodic solutions in the
+spatial system and how these periodic solutions may further bifurcate, as they do above in Figure 5.
+Immediate questions and challenges in this domain include identifying criteria to determine the onset
+or oﬀset of spatio-temporal oscillations and characterizing transitions between diﬀerent oscillatory
+regimes (e.g. period doubling, quasi-periodic and chaotic behaviors) for representative classes of
+spatial operators.
+12
+
+3
+Transient patterns at the frontiers: Applications to brain
+development
+Physiological formation of cortical regions relies on the precise positioning of sharp and regular
+boundaries during embryonic development, which are thought to be guided by the presence of
+positional cues (typically, gradients of morphogens) [18, 29]. Failures to forming cortical regions
+with sharp and regular boundaries at speciﬁed location in brain were implicated in many serious
+pathologies [26, 48, 60]. Each territory is characterized by the expression of a speciﬁc combination
+of molecular marks that compete with each other and according to the gradients of morphogens
+promoting or repressing speciﬁc genes [45]. As an example, in the mammalian forebrain, cells arising
+from divisions of a common populations of progenitors are fated to become medial entorhinal cortex
+(MEC) cells or neocortical (NC) cells based on their exposure to patterning transcription factors
+(TFs) expressed in a graded fashion. In [17], it was shown that changes in morphogen gradients
+not only led to simple boundary shifts, but also to the possibility of a shattered boundary with the
+formation of regular patterns of ectopic cortical domains. A mathematical model introduced in this
+paper proposed that this phenomenon could be related to a slow passage through a pattern-forming
+instability that we explore here in more detail.
+3.1
+A model of brain arealization
+The model proposed in Feng et al. [17] was based principally on the following three experimentally
+and biologically motivated mechanisms:
+(I.) Competition: The diﬀerentiation into MEC or NC neuronal identity is a competitive process
+(e.g.,competition on the genetic resources).
+(II.) External cues (heterogeneity): Extracellular TF gradients favor diﬀerentiation into MEC cells
+on the posterior side and into NC cells on the anterior side of the brain.
+(III.) Aggregation/diﬀerential adhesion mechanisms: Neurons, having a tendency to diﬀuse slowly,
+also have the ability to aggregate preferentially with cells of their own type (Feng et al. [17]
+showed that diﬀerential adhesion was the primary driver of cells preferentially aggregating
+with other cells of their own type).
+We thus arrive at the following continuum mathematical model of MEC and NC identity marker
+levels across the cortex:
+∂tE(x, t) = E(1 −E −k1N) + DE∆E −χ1 ∇· (Φ(E) ∇CE) + ρE(x),
+(6a)
+∂tCE(x, t) = E −CE + DCE∆CE,
+(6b)
+∂tN(x, t) = N(1 −N −k2E) + DN∆N −χ2∇· (Φ(N)∇CN) + ρN(x),
+(6c)
+∂tCN(x, t) = N −CN + DCN ∆CN,
+(x, t) ∈Ω× R+,
+(6d)
+where the species E accounts for MEC cell fate markers, N accounts for NC cell fate markers, ∇
+denotes the gradient operator, ∇· denotes the divergence operator and ∆is the diﬀusion operator.
+The competition between E and N is reﬂected by classical Lotka-Volterra competitive reaction
+dynamics; we choose k1 = k2 = 2 to inhabit a bistable regime mirroring the common lineage of
+MEC and NC progenitor cells when spatial interactions are neglected. External signals promote
+the expression of each gene: E is promoted at a rate ρE(x) at position x (COUP-TFI eﬀects and
+other signals promoting MEC fate) and N is promoted at a rate ρN(x) (TF eﬀects promoting NC
+fate) at position x. We account for cell aggregation via two monitor species, CE and CN, generated
+respectively by cells expressing E or N markers and subject to degradation and diﬀusion. CE and CN
+attract E and N cells respectively with χ1 and χ2 denoting the strengths of the aggregation forces.
+13
+
+Considering our intended application, it makes sense to always consider (6) with no-ﬂux boundary
+condition for Ω⊂Rn with n ≤3. It should be stressed that our model is phenomenological in
+nature and we have not aimed at a detailed biophysical description of the physical and cellular
+process involved, but rather we have tried to capture their eﬀects qualitatively in a parsimonious
+and interpretable model.
+The model (6) follows the classical framework of Keller-Segel chemotaxis systems with cell aggre-
+gation limited by saturation eﬀects at high cell density by Φ : R 7→R [24, 27, 28]. Mathematically,
+this makes the model more stable and avoids the potential for ﬁnite-time blow-up of solutions, as
+often arises in other Keller-Segel-like models (cf. [23]). We employ a Ricker-type saturation func-
+tion, i.e. Φ(z) = αze−αz with α > 0, but other choices appropriate for capturing saturation produce
+qualitatively similar results to that shown below and in Feng et al. [17].
+Table 2 summarizes the parameters, their biological interpretations, and their default values in
+the brain patterning model.
+Table 2: Summary of parameters for the brain arealization model
+Biological interpretation
+Expression
+Default Value
+Entorhinal marker level
+E
+[dynamic]
+Entorhinal monitor concentration
+CE
+[dynamic]
+Neocortex marker level
+N
+[dynamic]
+Neocortex monitor concentration
+CN
+[dynamic]
+COUP-TFI eﬀects
+ρE(x)
+[piecewise linear]
+Patterning TF eﬀects promoting neocortex
+ρN(x)
+[piecewise linear]
+Entorhinal competition
+k1
+2
+Neocortex competition
+k2
+2
+Aggregation saturation parameter
+α
+1.2
+Entorhinal adhesion strength
+χ1
+1.5
+Neocortex adhesion strength
+χ2
+1.5
+Entorhinal cell diﬀusion
+DE
+0.2
+Entorhinal monitor diﬀusion
+DCE
+0.2
+Neocortex cell diﬀusion
+DN
+0.2
+Neocortex monitor diﬀusion
+DCN
+0.2
+3.2
+Transient passage through a pattern forming instability
+Our primary goal in this paper is to illustrate the mathematical mechanism by which the model (6)
+explains the experimental observations of ectopic MEC from Feng et al. [17] and hence we refer the
+interested reader to that paper for further biological details. Indeed, with appropriately chosen TF
+gradients (i.e. ρE(x) and ρN(x)), the system (6) qualitatively matches all observed brain patterning
+phenotypes from the Feng experiments [17]. The only modiﬁcation we make to the model (6) is to
+choose χ1 and χ2 as ﬁxed constants. It turns out that these coeﬃcients are also inﬂuenced somewhat
+by COUP-TFI and this dual role of COUP-TFI is at the heart of the complex boundary shattering
+phenomenon observed in vivo, but this is not necessary to explain the dynamics of interest here from
+a mathematical perspective.
+First, consider the system (6) posed on a homogenous domain, i.e.
+ρE(x) ≡ρE ∈R+ and
+ρN(x) ≡ρN ∈R+.
+Homogeneous solutions ( ¯E, ¯CE ¯N, ¯CN) to (6) obey the following system of
+14
+
+nonlinear equations:
+0 = ¯E(1 −¯E −2 ¯N) + ρE,
+(7a)
+0 = ¯N(1 −¯N −2 ¯E) + ρN,
+(7b)
+with ¯CE = ¯E and ¯N = ¯CN. The system (7) has between one and three solutions depending on the
+values of ρE and ρN. In the absence of spatial interactions, the stability of these equilbria is shown as
+a function of ρE and ρN in Figure 7 panels A and B. Figure 7 A tracks the stability of homogeneous
+solutions as a function of ρE with ρN = 0.1 and shows that there is a region of bistability (in light
+blue) with two stable homogeneous solutions separated by an unstable equilibrium. In Figure 7 B
+we allow both ρE and ρN to vary and we observe that the two saddle-node bifurcations from panel A
+collide in a codimension 2 cusp bifurcation at (0.25, 0.25) in ρE-ρN space. Between these saddle-node
+curves there is a signiﬁcant region of bistability (in light blue) while outside of this region there is
+a single solution that is N dominated above the line ρE = ρN and E dominated below that line.
+B
+0.2
+0.2
+0
+0
+0.2
+0.2
+0
+0
+0.1
+0.1
+0.1
+0.1
+0.3
+0.3
+A
+0.3
+0.3
+Figure 7: A: One-parameter bifurcation diagram for solutions of (6) without spatial interactions
+with ρN = 0.1. B: Two-parameter bifurcation diagram for (6) without spatial interactions. Magenta
+lines are curves of saddle-nodes which collide in a cusp bifurcation.
+Turning now to the full spatial model, we can linearize about the homogeneous equilibria dis-
+cussed above and classical linear stability analysis reveals pattern forming instabilities will emerge
+for a range of values of the diﬀusion coeﬃcients and chemotactic strength parameters (see Feng et
+al. [17] supplementary information for details). Figure 8 D shows the potential instability region in
+ρE-ρN-space via a heatmap of the maximum of the principal eigenvalues of the linearized operators
+about each of the homogeneous equilibria that were stable in the absence of spatial interactions;
+this red region is typically referred to as the Turing space [42]. Numerical simulations of solutions
+to (6) conﬁrm the presence of patterns in the red regions of Figure 8 D, and reveal the nature and
+diversity of these patterns (spots, mixed spot-stripe and labyrinths patterns were observed for this
+system in 2D domains).
+The analysis above is valid for ρE and ρN equal to some constant ﬁxed values but, biologically,
+they both vary across the cortex. In our idealized model, we assume ρE simply promotes E and ρN
+promotes N. Moreover, E should dominate at one side of the spatial domain, while N dominates
+at the other. Thus a reasonable choice of the gradient must start above the line ρE = ρN (which
+represents perfectly balanced competition) and end below it. One such choice is shown in Figure 8 D
+by the solid black line giving a linear gradient varying from points P1 to P2 and cutting through the
+red instability region. However, as alluded to earlier in the discussion of spatio-temporal oscillations
+in section 2, the key question in terms of the resulting spatial dynamics is: how quickly does this
+gradient cross the pattern forming region? In Figure 8 E, we illustrate how we can vary the slope
+of the gradient or in other words, vary the length of the region R2 to adjust how long the gradient
+15
+
+spends in the pattern forming regime from the homogeneous domain problem. Figure 8 panels A,
+B and C show three solutions of the model (6) using the piecewise linear gradient from Figure 8 D
+on the 1D spatial domain Ω= [0, 40] with the edges of the region R2 marked by red vertical lines
+in each case. In Figure 8 A, we don’t observe standard pattern formation but rather a type of front
+pinned solution similar to those discussed earlier for the SL model (see section 2). In panel B, we
+see the solution form a couple of small amplitude spikes, coming closer to standard pattern forming
+behavior, and in panel C, the solution now supports a multiple spikes and resembles the expected
+solution for a pattern forming system in the subdomain R2.
+0
+40
+0
+0.5
+1
+E
+A
+C
+0
+0.4
+0.8
+0
+0.4
+0.8
+-0.8
+-0.4
+0
+0.2
+P1
+P2
+D
+R1
+R3
+R2
+0
+40
+B
+20
+20
+0
+40
+0
+0.5
+1
+20
+0
+40
+0
+0.5
+1
+20
+R1
+R3
+R2
+Figure 8: A-C: Model simulations with a linear morphogen gradient in the region marked by red
+vertical lines; constant morphogen levels ﬁxed at the gradient endpoints outside the red marked
+region. All solutions shown at time t = 200. D: Heatmap of the maximum principal eigenvalue
+obtained when linearizing around all homogeneous equilibria that are stable without spatial inter-
+actions (diﬀusion coeﬃcients all 0.2 and χ1 = χ2 = 1.5). E: Illustration of how we vary the gradient
+in ρE-ρN-space across the 1D spatial domain Ω= [0, 40].
+Notably, the spikes in Figure 8 F do not have a single wavelength or frequency. Multiple wave-
+lengths appear to be present as we cross the instability region; this is distinct from a standard Turing
+pattern with a single dominant wavelength, and analogous to the model and experiments reported
+in [17] where there appears to be a blend of spot, stripe and labyrinthine patterns, mirroring exactly
+the phenomenology observed in vivo. Clearly, the width of R2 crucially inﬂuences the ability of the
+system to form patterns and the nature of those patterns. Moreover, the wavelength of the pat-
+terns supported by the system posed on a homogeneous domain relative to the width of R2 appears
+important in determining whether patterns can “ﬁt” into potential patterning region.
+To the best of our knowledge, the biologically motivated dynamics above, which we term “tran-
+sient passage through a pattern forming instability”, do not ﬁt into any of the established frameworks
+that provide criteria for the onset of Turing-like patterns, not even those designed to incorporate
+16
+
+heterogeneity (e.g. [34, 37, 58]). Moreover, it would evidently be of interest to characterize the
+nature of the patterns further to understand if diﬀerent qualitative patterns are possible (for two
+or three dimensional domains), as these may have diﬀerent implications for applications in biology.
+Thus, this applied example provides strong motivation for the continued development of mathemat-
+ical tools for studying pattern formation in the presence of spatial heterogeneities, particularly for
+non-reaction-diﬀusion systems and large continuously-varying heterogeneities.
+4
+Conclusions and Discussion
+Despite the prevalence of pattern formation in heterogeneous domains in nature, the abundant theo-
+retical literature in pattern formation has still not developed the tools to address these questions for
+general transient passages through instabilities. The two biologically motivated examples introduced
+here do not ﬁt into any of the established frameworks that provide criteria for the onset of Turing-
+like patterns, not even those designed to incorporate heterogeneity. We hope that highlighting these
+examples will motivate new mathematical theory to better understand the underlying dynamics in
+each case.
+Existing work to allow heterogeneity in pattern forming systems has achieved great progress
+in characterizing small heterogeneous perturbations of homogeneous systems [4] or bifurcations of
+heterogeneous systems with steady states that are explicitly derived. There has also been signiﬁcant
+work in the neuroscience literature studying more complex heterogeneities as inputs to neural ﬁeld
+equations [16, 32, 31, 30], and some recent work in theoretical ecology highlighting the complexity
+of dynamics that non-monotonic gradients can generate in bistable systems [2]. In contrast, we
+are concerned with characterizing the properties of solutions to spatially heterogeneous systems as
+they relate to a bifurcating behavior in the underlying homogeneous (typically non-spatial) system.
+In other words, the mechanism of interest here is rather spatial models with multistable behavior
+which have spatial gradients (heterogeneities) connecting regions with diﬀerent underlying dynam-
+ical behaviour. Thus, the complexity in the dynamics emerges from the rate at which (monotonic)
+gradients connect regions with diﬀerent dynamic behaviors. For example, a much studied paradigm
+for the two species SL model (forest-grass) presented in Section 2.3 is one in which there are es-
+sentially three regions of the spatial domain: a region where the grassland state is stable, a region
+of bistability between forest and grass, and a region where forest is stable. Similarly, in the brain
+arealization model, there is a spatial gradient crossing from a region of enthorinal fate dominance to
+a region of neocortical fate dominance. However, in this case, the complex dynamics emerge when
+we increase the adhesion strength suﬃciently to introduce a third distinct region in which pattern
+formation occurs, leading to what we term transient passage through a pattern forming instability.
+Mathematically, we expect some asymptotic regimes to be amenable to analysis. In particular,
+we expect that situations with very localized interactions (e.g., vanishing diﬀusion for instance) will
+closely match the non-spatial dynamics away from bifurcations and in regions of space with unique
+homogeneous stable attractors, with rapid transitions between distinct patterns at bifurcations or
+within multi-stable regions. Existing mathematical works in this domain have focused on compe-
+tition models that may include bistability, and only recently qualitative properties in asymptotic
+regimes were derived [49]. These situations are in fact only among the simplest cases of the general
+question of pattern formation in heterogeneous domains and through bifurcations. Mathematically,
+we expect that tools from perturbative analysis, geometric (singular) perturbation theory [1], or
+changes of parameterization of solutions as used in [49] to derive viscosity solutions could allow
+rigorous characterizations of those regimes. Regimes with ﬁxed diﬀusion but very slow variations
+of the environment in space are likely similar, and will sometimes be precisely matching regimes of
+very localized interactions in space through appropriate changes of variables. Another asymptotic
+regime that will likely be amenable to analysis is systems with sigmoidal gradients of heterogeneity
+in the limit of very sharp gradients. In these regimes, we expect to observe a convergence towards
+17
+
+the solution of a system with patchy heterogeneity (Heaviside step function) with a single transition
+between the leftmost and rightmost regimes and no impact of the transient patterns, as in Figures
+6E and 8A, and as studied in [34, 46]. For all these questions, systems with multiple spatially ho-
+mogeneous solutions (and possibly transient equilibria in space) will constitute the ﬁrst models to
+analyze.
+Systems with spatially transient oscillations or patterns will be associated with a richer phe-
+nomenology. In systems with spatially transient Turing-like patterns, we expect not only the diﬀu-
+sion properties to play a role in the emergence of a pattern at the transition, but also the intrinsic
+properties of the pattern itself (as its length scale or the modes of instability associated). Indeed, we
+expect that contrasting with transient spatially homogeneous regimes, the emergence of a pattern
+at the transition will also depend on whether or not multiple patterns “ﬁt” in the region of insta-
+bility, and possibly not fully expressed patterns may emerge as well as in Figure 8 A. In multiple
+dimensions, the nature of the pattern and progressive morphing of it along the gradient will also
+arise, and this already plays a role in the patterns observed both from numerical simulations of the
+model and the corresponding experiments in [17]. In systems with spatially transient oscillations,
+not only the question of the mere existence of an oscillation at the transition arises, but problems
+related to the waves generated, their regularities and their bifurcations have a strong impact on
+the qualitative behavior of the solution. The prospects for theoretical results in this case seems
+somewhat more pessimistic for nonlocal spatial models, such as the SL model studied here, but it
+is likely that this phenomenon can fruitfully be studied for reduced form phase models with simple
+coupling structures. Moreover, while the theoretical predictions related to the wave-like solutions of
+the SL model presented here are not easily testable, similar mechanisms could be tested in smaller
+scale experimental systems, such as chemical oscillators [10].
+A
+The Staver-Levin Model
+A.1
+Parameters and numerics
+All codes to generate the ﬁgures from this paper are maintained on Github at
+github.com/patterd2/SL model rainfall gradient.
+The parameter gradients used in the paper for α and β are linear, i.e.
+α(x) = αc + αsx,
+β(x) = βc + βsx,
+x ∈Ω= [0, 1].
+(8)
+Parameter
+αc
+αs
+βc
+βs
+Figures 1 & 2
+0.5
+1.25
+N/A
+N/A
+Figure 4
+0.8
+0.5
+0.15
+0.1
+Figure 5A
+0.2
+0.8
+1.9
+0.1
+Figures 5B & 6
+0.2
+0.8
+1.5
+0.1
+Figure 5C
+0.2
+0.8
+0.4
+0.1
+Table 3: Parameter values for the gradients for each ﬁgure from the main text.
+In Figure 6 of the main text we adjust the speed at which we move along the rainfall gradient in
+the following way. We choose:
+α(x) = αc + αsP(x),
+β(x) = βc + βsP(x),
+x ∈Ω= [0, 1].
+(9)
+18
+
+where for slope parameter Ps ≥1, we deﬁne
+P(x) =
+
+
+
+
+
+0,
+x ∈[0, (1 −1/Ps)/2) ,
+Ps (x −0.5),
+x ∈((1 −1/Ps)/2, (1 + 1/Ps)/2) ,
+1,
+x ∈((1 + 1/Ps)/2, 1] .
+We refer to Ps as the “slope parameter” in the main text. The solution shown in Figure 6 A has
+Ps = 1.5, panel B is for Ps = 2, panel C is for Ps = 2.5, panel D is for Ps = 3.4 and panel E is with
+Ps = 3.42.
+We computed approximate numerical solutions to the spatial two-species SL model, given by
+equation (4), by ﬁrst discretizing time with an explicit Euler scheme to obtain
+G(x, n + 1) = G(x, n) + h
+
+(1 −G(x, n)) φ
+Z
+R
+w(x −y) G(y, n) dy
+
+−G(x, n)
+
+1 −
+Z
+R
+JF (x −y) G(y, n) dy
+ 
+,
+h > 0,
+(x, n) ∈[0, 1] × Z+.
+(10)
+We then discretize the integrals in (10) using the 1D trapezoidal rule and approximate the solution
+on the evenly spaced grid {0, ∆, 2∆, . . . , 5} for some ∆> 0. In practice, we found that a step size
+h < 0.1 and 200 spatial grid points was suﬃcient to ensure numerical stability of the scheme and
+consistency of the qualitative dynamics, and the scheme remained stable as we decreased the time
+step and increased the number of grid points. Solutions shown in the main text are for 400 grid
+points. A similar discretization was used for the four-species SL model.
+A.2
+Boundary Conditions for nonlocal operators
+To ﬁx ideas, consider the (ill-posed) nonlocal operator given by
+K[u](x, t) =
+Z
+R
+J(x −y)u(y, t) dy,
+t ∈R+,
+(11)
+where the function u is deﬁned on [0, L] × R+. From an applied perspective, the value of K[u](x, t)
+represents the cumulative impact of seed dispersal (or ﬁre signal) on u(x, t), the vegetation present
+at position x at time t. The value of the integrand in this formula, J(x−y)u(y, t), is dispersal (either
+seed or ﬁre transmission) from vegetation present at position y ∈R but for numerical simulations
+the solution is only deﬁned on a ﬁnite domain, i.e. u(y, t) is only deﬁned for y ∈[0, L] for each
+t ∈R+. Hence we must ask: what choice of boundary conditions extends u from a function on [0, L]
+to a function on R and respects the character of the ecological application at hand?
+Periodic boundary conditions: Nonlocal operators similar in structure to (1) feature extensively
+in the neuroscience literature in so-called neural mass or neural ﬁeld models, virtually always with
+periodic boundary conditions. With periodic boundary conditions one takes the standard periodic
+extension of u given by
+˜u(x, t) = u(x mod L, t),
+x ∈R.
+This type of boundary is typically favored in a spatially homogeneous problem in which boundary
+eﬀects on the dynamics are not expected be signiﬁcant.
+Although we do not expect signiﬁcant
+boundary eﬀects in our problem, periodic boundaries will not be a appropriate for the heterogeneous
+medium problem we wish to consider; it will also eﬀectively make the heterogeneity itself spatially
+periodic and this can lead to signiﬁcant undesirable boundary eﬀect (e.g. forest at high rainfall
+invading into savanna at low rainfall via the boundary, cf. Figure 9).
+Open boundary conditions: The most intuitively appealing option is to take inspiration from the
+real-world and assume that seeds (resp. ﬁre transmission) which exit the domain boundaries at 0
+19
+
+and L are simply removed from the system, i.e. the boundaries are “open”. Additionally, no seeds or
+ﬁres are transmitted into the domain from outside. We refer to this as an open boundary condition
+and it implies that we extend the deﬁnition of u as follows:
+˜u(x, t) =
+(
+u(x, t),
+x ∈[0, L],
+0,
+x /∈[0, L].
+This type of boundary condition has the advantage of being physically realistic for both seed dispersal
+and ﬁre transmission but will introduce noticeable boundary eﬀects in the solutions. If the dispersal
+kernels are suﬃciently localized relative to the domain, these boundary eﬀects will not qualitatively
+impact which stable solutions are selected. For suﬃciently long range dispersal, stability of solutions
+can be eﬀected by boundary eﬀects with this boundary condition but this will not be relevant at the
+length scales we consider for our applications.
+Reﬂecting boundary conditions: This is a particular type of periodic extension of the solution
+which we employ in some of our numerical investigations because it minimizes boundary eﬀects for
+even (symmetric) kernels. First extend u from a function on [0, L] to [−L, L] by reﬂection:
+uR(x, t) =
+(
+u(x, t),
+x ∈[0, L],
+u(−x, t),
+x ∈[−L, 0].
+Now let ˜u be the standard 2L periodic extension of uR (as deﬁned above) so that ˜u is deﬁned on all
+of R. The reﬂection symmetry introduced in this extension, plus the choice of even kernels, ensures
+that the solutions to the IDE system (1) closely approximate those of the underlying nonspatial
+model in the limit as dispersal tends to zero. This choice also has the virtue of putting “wetter”
+regions next to “wetter” regions in the context of the rainfall gradient model (see Figure 9) and
+hence we choose to show solutions using this boundary condition in the main text.
+A.3
+Non-monotonic gradients and robustness in the SL model
+In Figure 10 we show simulations corresponding to the setup of Figure 4 of the main text, but with
+non-monotonic rainfall gradients to emphasize the robustness of the multistability observed in this
+example. In addition to our default linear gradient, we also show qualitatively similar solutions for a
+(stochastic) noisy version of the linear gradient (row B) and a nonlinear gradient with the same start
+and end points (row C). These simulations were carried out with reﬂecting boundary conditions.
+20
+
+0
+L
+Rainfall
+  level
+Periodic boundary conditions
+0
+L
+-L
+.....
+.....
+2L
+Open boundary conditions
+0
+L
+-L
+.....
+.....
+2L
+Reflecting boundary conditions
+0
+L
+-L
+.....
+.....
+2L
+Figure 9: Comparison of the practical eﬀects of the diﬀerent boundary conditions on the heteroge-
+neous medium structure in the rainfall gradient model.
+Rainfall gradient
+A
+B
+C
+Figure 10: Row A shows the solutions from Figure 4 along with the corresponding linear rainfall
+gradient.
+Row B shows solutions for the same parameters but with noise added to the rainfall
+gradient. Row C shows solutions for a similar parameter regime but with a nonlinear, but still
+monotonic, rainfall gradient that starts and ends at the same points in α-β space.
+21
+
+B
+Wave-like solutions to the SL model under diﬀerent bound-
+ary conditions
+Figure 11 below shows more detail on the potentially chaotic solutions observed in Figure 6 of the
+main text. In particular, the spatial averages of the solution components show no periodic character,
+even over a very long time interval.
+Figure 11: Row 1 shows the solutions from Figure 6C over a longer time horizon. Row 2 shows
+the dynamics of the spatial averages of the solution components versus time (saplings component
+omitted).
+The simulations in Figure 12 are for the same parameters as Figure 6 but in this case with an
+“open” boundary condition, as opposed to the reﬂective boundary condition used in the main text.
+These results show that the complex dynamics shown in Figure 6 are not dependent on the choice
+of boundary condition, but some small boundary eﬀects are noticeable at the right-hand boundary
+in the third solution.
+22
+
+Figure 12: Solutions corresponding to those shown in Figure 6 for an “open” boundary condition.
+Figure 13 shows a wider range of gradients intersecting the region of stable oscillations in α-β
+space. We vary the parameter βc from 0.2 (top solution) to 2 (bottom solution) and observe a
+transition from chaotic dynamics to increasing regular waves.
+23
+
+Figure 13: Solutions for a range of gradients between those shown in Figures 6A and 6C from the
+main text.
+24
+
+C
+The Brain Patterning Model
+C.1
+Numerical parameters and schemes
+The PDEs were solved numerically using the open source ﬁnite element solver FreeFEM (version
+4.2.1 - available at https://freefem.org). We used a semi-implicit discretization scheme to evolve
+the weak formulation of the PDEs forward in time. We used a ﬁxed step-size scheme, a uniformly
+spaced mesh and piecewise linear continuous ﬁnite elements (P1 elements in FreeFEM notation).
+For the 1D spatial simulations shown in the main text, we chose Ω= [0, 40] and a uniformly spaced
+mesh with 400 points, along with a stepsize of h = 0.1 (convergence was observed for h < 0.2).
+The FreeFEM routines for solving the PDEs and the accompanying MATLAB code for processing
+output is available at github.com/Touboul-Lab.
+References
+[1] R. Bastiaansen, M. Chirilus-Bruckner, and A. Doelman. Pulse solutions for an extended klaus-
+meier model with spatially varying coeﬃcients. SIAM Journal on Applied Dynamical Systems,
+19(1):1–57, 2020.
+[2] R. Bastiaansen, H. A. Dijkstra, and A. S. von der Heydt. Fragmented tipping in a spatially
+heterogeneous world. Environmental Research Letters, 17(4):045006, 2022.
+[3] F. Belgacem and C. Cosner. The eﬀects of dispersal along environmental gradients on the dy-
+namics of populations in heterogeneous environment. Canadian Applied Mathematics Quarterly,
+3(4):379–397, 1995.
+[4] D. L. Benson, P. K. Maini, and J. A. Sherratt. Unravelling the Turing bifurcation using spatially
+varying diﬀusion coeﬃcients. Journal of Mathematical Biology, 37(5):381–417, 1998.
+[5] D. L. Benson, J. A. Sherratt, and P. K. Maini. Diﬀusion driven instability in an inhomogeneous
+domain. Bulletin of Mathematical Biology, 55(2):365–384, 1993.
+[6] G. Bucini and N. P. Hanan. A continental-scale analysis of tree cover in African savannas.
+Global Ecology and Biogeography, 16(5):593–605, 2007.
+[7] R. S. Cantrell, C. Cosner, and V. Hutson. Ecological models, permanence and spatial hetero-
+geneity. The Rocky Mountain Journal of Mathematics, pages 1–35, 1996.
+[8] R. S. Cantrell, C. Cosners, and V. Hutson. Permanence in ecological systems with spatial hetero-
+geneity. Proceedings of the Royal Society of Edinburgh Section A: Mathematics, 123(3):533–559,
+1993.
+[9] A. R. Champneys, F. Al Saadi, V. F. Bre˜na-Medina, V. A. Grieneisen, A. F. Mar´ee, N. Ver-
+schueren, and B. Wuyts. Bistability, wave pinning and localisation in natural reaction-diﬀusion
+systems. Physica D: Nonlinear Phenomena, 416:132735, 2021.
+[10] M. F. Crowley and I. R. Epstein. Experimental and theoretical studies of a coupled chemical
+oscillator: phase death, multistability and in-phase and out-of-phase entrainment. The Journal
+of Physical Chemistry, 93(6):2496–2502, 1989.
+[11] N. Dirr and N. K. Yip. Pinning and de-pinning phenomena in front propagation in heterogeneous
+media. Interfaces and Free Boundaries, 8(1):79–109, 2006.
+[12] V. Dornelas, E. H. Colombo, C. L´opez, E. Hern´andez-Garc´ıa, and C. Anteneodo. Landscape-
+induced spatial oscillations in population dynamics. Scientiﬁc Reports, 11(1):1–11, 2021.
+25
+
+[13] R. Durrett and R. Ma. A heterogeneous spatial model in which savanna and forest coexist in
+a stable equilibrium. arXiv preprint arXiv:1808.08159, 2018.
+[14] R. Durrett and Y. Zhang. Coexistence of grass, saplings and trees in the Staver-Levin forest
+model. The Annals of Applied Probability, 25(6):3434–3464, 2015.
+[15] B. Ermentrout and A. Mahajan. Simulating, analyzing, and animating dynamical systems: a
+guide to XPPAUT for researchers and students. Applied Mechanics Reviews, 56(4):B53–B53,
+2003.
+[16] G. Faye and J. Touboul.
+Pulsatile localized dynamics in delayed neural ﬁeld equations in
+arbitrary dimension. SIAM Journal on Applied Mathematics, 74(5):1657–1690, 2014.
+[17] J. Feng, W.-H. Hsu, D. Patterson, C.-S. Tseng, H.-W. Hsing, Z.-H. Zhuang, Y.-T. Huang,
+A. Faedo, J. L. Rubenstein, J. Touboul, and S.-J. Chou.
+COUP-TFI speciﬁes the medial
+entorhinal cortex identity and induces diﬀerential cell adhesion to determine the integrity of its
+boundary with neocortex. Science Advances, 7(27):eabf6808, 2021.
+[18] J. G. Flanagan.
+Neural map speciﬁcation by gradients.
+Current Opinion in Neurobiology,
+16(1):59–66, 2006.
+[19] G. Garc´ıa-Ramos, F. S´anchez-Gardu˜no, and P. K. Maini. Dispersal can sharpen parapatric
+boundaries on a spatially varying environment. Ecology, 81(3):749–760, 2000.
+[20] N. Goel, V. Guttal, S. A. Levin, and A. C. Staver. Dispersal increases the resilience of tropical
+savanna and forest distributions. The American Naturalist, 195(5):833–850, 2020.
+[21] N. Goel, E. S. Van Vleck, J. C. Aleman, and A. C. Staver. Dispersal limitation and ﬁre feedbacks
+maintain mesic savannas in Madagascar. Ecology, 101(12):e03177, 2020.
+[22] T. He and B. B. Lamont. Baptism by ﬁre: the pivotal role of ancient conﬂagrations in evolution
+of the Earth’s ﬂora. National Science Review, 5(2):237–254, 2018.
+[23] T. Hillen and K. Painter. Global existence for a parabolic chemotaxis model with prevention
+of overcrowding. Advances in Applied Mathematics, 26(4):280–301, 2001.
+[24] T. Hillen and K. J. Painter. A user’s guide to PDE models for chemotaxis. Journal of Mathe-
+matical Biology, 58(1):183–217, 2009.
+[25] A. Hoyer-Leitzel and S. Iams. Impulsive ﬁre disturbance in a savanna model: Tree–grass coex-
+istence states, multiple stable system states, and resilience. Bulletin of Mathematical Biology,
+83(11):1–25, 2021.
+[26] B. T. Hyman, G. W. Van Hoesen, and A. R. Damasio. Some cytoarchitectural abnormalities
+of the entorhinal cortex in schizophrenia. Archives of General Psychiatry, 48(7):625–632, 1991.
+[27] E. F. Keller and L. A. Segel. Initiation of slime mold aggregation viewed as an instability.
+Journal of Theoretical Biology, 26(3):399–415, 1970.
+[28] E. F. Keller and L. A. Segel. Model for chemotaxis. Journal of Theoretical Biology, 30(2):225–
+234, 1971.
+[29] C. Kiecker and A. Lumsden. Compartments and their boundaries in vertebrate brain develop-
+ment. Nature Reviews Neuroscience, 6(7):553–564, 2005.
+[30] Z. P. Kilpatrick and B. Ermentrout. Wandering bumps in stochastic neural ﬁelds. SIAM Journal
+on Applied Dynamical Systems, 12(1):61–94, 2013.
+26
+
+[31] Z. P. Kilpatrick, B. Ermentrout, and B. Doiron. Optimizing working memory with heterogeneity
+of recurrent cortical excitation. Journal of Neuroscience, 33(48):18999–19011, 2013.
+[32] Z. P. Kilpatrick, S. E. Folias, and P. C. Bressloﬀ. Traveling pulses and wave propagation failure
+in inhomogeneous neural media. SIAM Journal on Applied Dynamical Systems, 7(1):161–185,
+2008.
+[33] V. Klika, M. Koz´ak, and E. A. Gaﬀney. Domain size driven instability: Self-organization in
+systems with advection. SIAM Journal on Applied Mathematics, 78(5):2298–2322, 2018.
+[34] M. Koz´ak, E. A. Gaﬀney, and V. Klika. Pattern formation in reaction-diﬀusion systems with
+piecewise kinetic modulation: An example study of heterogeneous kinetics. Physical Review E,
+100(4):042220, 2019.
+[35] A. L. Krause, E. A. Gaﬀney, P. K. Maini, and V. Klika.
+Modern perspectives on near-
+equilibrium analysis of Turing systems.
+Philosophical Transactions of the Royal Society A,
+379(2213):20200268, 2021.
+[36] A. L. Krause, V. Klika, T. E. Woolley, and E. A. Gaﬀney. Heterogeneity induces spatiotemporal
+oscillations in reaction-diﬀusion systems. Physical Review E, 97(5):052206, 2018.
+[37] A. L. Krause, V. Klika, T. E. Woolley, and E. A. Gaﬀney. From one pattern into another:
+Analysis of Turing patterns in heterogeneous domains via WKBJ. Journal of the Royal Society
+Interface, 17(162):20190621, 2020.
+[38] A. Kulka, M. Bode, and H.-G. Purwins. On the inﬂuence of inhomogeneities in a reaction-
+diﬀusion system. Physics Letters A, 203(1):33–39, 1995.
+[39] Q. Li, A. C. Staver, W. E, and S. A. Levin. Spatial feedbacks and the dynamics of savanna and
+forest. Theoretical Ecology, 12(2):237–262, 2019.
+[40] Y. Mori, A. Jilkine, and L. Edelstein-Keshet. Wave-pinning and cell polarity from a bistable
+reaction-diﬀusion system. Biophysical Journal, 94(9):3684–3697, 2008.
+[41] Y. Mori, A. Jilkine, and L. Edelstein-Keshet. Asymptotic and bifurcation analysis of wave-
+pinning in a reaction-diﬀusion model for cell polarization. SIAM Journal on Applied Mathe-
+matics, 71(4):1401–1427, 2011.
+[42] J. Murray. Parameter space for Turing instability in reaction diﬀusion mechanisms: A compar-
+ison of models. Journal of Theoretical Biology, 98(1):143–163, 1982.
+[43] R. Nathan, E. Klein, J. J. Robledo-Arnuncio, and E. Revilla. Dispersal Kernels, volume 15.
+Oxford University Press, Oxford, UK, 2012.
+[44] P. Nieto-Quintano, E. T. Mitchard, R. Odende, M. A. Batsa Mouwembe, T. Rayden, and C. M.
+Ryan. The mesic savannas of the Bateke Plateau: Carbon stocks and ﬂoristic composition.
+Biotropica, 50(6):868–880, 2018.
+[45] D. D. O’Leary, S.-J. Chou, and S. Sahara. Area patterning of the mammalian cortex. Neuron,
+56(2):252–269, 2007.
+[46] K. Page, P. K. Maini, and N. A. Monk. Pattern formation in spatially heterogeneous Turing
+reaction-diﬀusion models. Physica D: Nonlinear Phenomena, 181(1-2):80–101, 2003.
+[47] D. D. Patterson, S. A. Levin, C. Staver, and J. D. Touboul. Probabilistic foundations of spatial
+mean-ﬁeld models in ecology and applications. SIAM Journal on Applied Dynamical Systems,
+19(4):2682–2719, 2020.
+27
+
+[48] D. T. Pederick, K. L. Richards, S. G. Piltz, R. Kumar, S. Mincheva-Tasheva, S. A. Mandelstam,
+R. C. Dale, I. E. Scheﬀer, J. Gecz, and S. Petrou. Abnormal cell sorting underlies the unique
+X-linked inheritance of PCDH19 epilepsy. Neuron, 97(1):59–66, 2018.
+[49] B. Perthame, C. Qui˜ninao, and J. Touboul. Competition and boundary formation in hetero-
+geneous media: Application to neuronal diﬀerentiation. Mathematical Models and Methods in
+Applied Sciences, 25(13):2477–2502, 2015.
+[50] C. A. Quesada, O. L. Phillips, M. Schwarz, C. I. Czimczik, T. R. Baker, S. Pati˜no, N. M. Fyllas,
+M. G. Hodnett, R. Herrera, and S. Almeida. Basin-wide variations in Amazon forest structure
+and function are mediated by both soils and climate. Biogeosciences, 9(6):2203–2246, 2012.
+[51] E. Schertzer, A. Staver, and S. Levin. Implications of the spatial dynamics of ﬁre spread for
+the bistability of savanna and forest. Journal of Mathematical Biology, 70(1-2):329–341, 2015.
+[52] A. Staal, I. Fetzer, L. Wang-Erlandsson, J. H. Bosmans, S. C. Dekker, E. H. van Nes, J. Rock-
+str¨om, and O. A. Tuinenburg. Hysteresis of tropical forests in the 21st century. Nature Com-
+munications, 11(1):1–8, 2020.
+[53] A. C. Staver, S. Archibald, and S. Levin. Tree cover in sub-saharan africa: Rainfall and ﬁre
+constrain forest and savanna as alternative stable states. Ecology, 92(5):1063–1072, 2011.
+[54] A. C. Staver and S. Levin. Integrating theoretical climate and ﬁre eﬀects on savanna and forest
+systems. The American Naturalist, 180(2):211–224, 2012.
+[55] S. Thompson and G. Katul. Plant propagation fronts and wind dispersal: An analytical model
+to upscale from seconds to decades using superstatistics. The American Naturalist, 171(4):468–
+479, 2008.
+[56] J. D. Touboul, A. C. Staver, and S. A. Levin. On the complex dynamics of savanna landscapes.
+Proceedings of the National Academy of Sciences, 115(7):E1336–E1345, 2018.
+[57] I. A. van de Leemput, E. H. van Nes, and M. Scheﬀer. Resilience of alternative states in spatially
+extended ecosystems. PLOS One, 10(2), 2015.
+[58] R. A. Van Gorder. Pattern formation from spatially heterogeneous reaction-diﬀusion systems.
+Philosophical Transactions of the Royal Society A, 379(2213):20210001, 2021.
+[59] M. J. Ward, D. McInerney, P. Houston, D. Gavaghan, and P. Maini. The dynamics and pinning
+of a spike for a reaction-diﬀusion system. SIAM Journal on Applied Mathematics, 62(4):1297–
+1328, 2002.
+[60] F. Watrin, J.-B. Manent, C. Cardoso, and A. Represa. Causes and consequences of gray matter
+heterotopia. CNS Neuroscience & Therapeutics, 21(2):112–122, 2015.
+[61] T. Wong and M. J. Ward. Spot patterns in the 2-D Schnakenberg model with localized hetero-
+geneities. Studies in Applied Mathematics, 146(4):779–833, 2021.
+[62] B. Wuyts, A. R. Champneys, and J. I. House. Amazonian forest-savanna bistability and human
+impact. Nature Communications, 8(1):15519, 2017.
+[63] B. Wuyts, A. R. Champneys, N. Verschueren, and J. I. House. Tropical tree cover in a hetero-
+geneous environment: A reaction-diﬀusion model. PLOS One, 14(6), 2019.
+[64] J. Xin. Front propagation in heterogeneous media. SIAM Review, 42(2):161–230, 2000.
+28

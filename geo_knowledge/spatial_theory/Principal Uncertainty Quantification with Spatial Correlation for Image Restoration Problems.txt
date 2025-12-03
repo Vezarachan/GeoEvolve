@@ -1,0 +1,2393 @@
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+1
+Principal Uncertainty Quantification with Spatial
+Correlation for Image Restoration Problems
+Omer Belhasin, Yaniv Romano, Daniel Freedman, Ehud Rivlin, Michael Elad
+Abstract—Uncertainty quantification for inverse problems in
+imaging has drawn much attention lately. Existing approaches
+towards this task define uncertainty regions based on probable
+values per pixel, while ignoring spatial correlations within the
+image, resulting in an exaggerated volume of uncertainty. In this
+paper, we propose PUQ (Principal Uncertainty Quantification)
+– a novel definition and corresponding analysis of uncertainty
+regions that takes into account spatial relationships within the
+image, thus providing reduced volume regions. Using recent ad-
+vancements in generative models, we derive uncertainty intervals
+around principal components of the empirical posterior distribu-
+tion, forming an ambiguity region that guarantees the inclusion
+of true unseen values with a user-defined confidence probability.
+To improve computational efficiency and interpretability, we also
+guarantee the recovery of true unseen values using only a few
+principal directions, resulting in more informative uncertainty
+regions. Our approach is verified through experiments on image
+colorization, super-resolution, and inpainting; its effectiveness is
+shown through comparison to baseline methods, demonstrating
+significantly tighter uncertainty regions.
+Index Terms—Uncertainty and probabilistic reasoning, Prob-
+ability and Statistics, Restoration, Inverse problems, Stochastic
+processes, Correlation and regression analysis.
+I. INTRODUCTION
+R
+ESTORATION tasks in imaging are widely encoun-
+tered in various disciplines, including cellular cam-
+eras, surveillance, experimental physics, and medical imaging.
+These inverse problems are broadly defined as the need to
+recover an unknown image given corrupted measurements
+of it. Such problems, e.g., colorization, super-resolution, and
+inpainting, are typically ill-posed, implying that multiple so-
+lutions can explain the unknown target image. In this context,
+uncertainty quantification aims to characterize the range of
+possible solutions, their spread, and variability. This has an
+especially important role in applications such as astronomy
+and medical diagnosis, where it is necessary to establish
+statistical boundaries for possible gray-value deviations. The
+ability to characterize the range of permissible solutions with
+accompanying statistical guarantees has thus become an im-
+portant and useful challenge, addressed in this paper.
+Prior work on this topic [1], [2] has addressed the uncer-
+tainty assessment by constructing intervals of possible values
+for each pixel via quantile regression [3], or other heuristics
+such as estimations of per-pixel residuals. While this line
+of thinking is appealing due to its simplicity, it disregards
+O.
+Belhasin
+(omerbe@verily.com),
+D.
+Freedman
+(danielfreed-
+man@verily.com),
+Ehud
+Rivlin
+(ehud@verily.com)
+and
+M.
+Elad
+(melad@verily.com) are with Verily Life Sciences, Israel.
+O.
+Belhasin
+(omer.be@cs.technion.ac.il)
+and
+Y.
+Romano
+(yromano@technion.ac.il) are with the Department of Computer Science,
+Technion - Israel Institute of Technology, Haifa, Israel.
+Fig. 1.
+Comparison of PUQ’s performance on the CelebA-HQ dataset in
+image colorization, super-resolution, and inpainting tasks using the E-PUQ
+procedure (Section IV-B1) applied on RGB image patches of varying size.
+As seen, our method provides tighter uncertainty regions with significantly
+smaller uncertainty volumes (×10 in super-res. and inpainting, and ×100 in
+colorization). The compared methods are im2im-uq [1] and Conffusion [2].
+spatial correlations within the image, and thus provides an
+exaggerated uncertainty range. The study in [4] has improved
+the above by quantifying the uncertainty in a latent space, thus
+taking spatial dependencies into account. However, by relying
+on a non-linear, non-invertible and uncertainty-oblivious trans-
+formation, this method suffers from interpretability limitations
+– See Section II for further discussion.
+In this paper, we propose Principal Uncertainty Quan-
+tification (PUQ) – a novel approach that accounts for spa-
+tial relationships while operating in the image domain, thus
+enabling a full and clear interpretation of the quantified
+uncertainty region. PUQ uses the principal components of
+the empirical posterior probability density function, which
+describe the spread of possible solutions. PCA essentially ap-
+proximates this posterior by a Gaussian distribution that tightly
+encapsulates it. Thus, this approach reduces the uncertainty
+volume1, as demonstrated in Figure 1. This figure presents
+a comparison between our proposed Exact PUQ procedure
+(see Section IV-B1) and previous work [1], [2], showing a
+much desired trend of reduced uncertainty volume that further
+decreases as the size of the patch under consideration grows.
+Our work aims to improve the quantification of the uncer-
+tainty volume by leveraging recent advancements in generative
+models serving as stochastic solvers for inverse problems.
+While our proposed approach is applicable using any such
+solver (e.g., conditional GAN [5]), we focus in this work
+on diffusion-based techniques, which have recently emerged
+as the leading image synthesis approach, surpassing GANs
+and other alternative generators [6]. Diffusion models offer a
+systematic and well-motivated algorithmic path towards the
+task of sampling from a prior probability density function
+1The definition of this volume, which plays a critical part in this work, is
+further discussed in later sections and given in Equation (3).
+arXiv:2305.10124v3  [cs.CV]  20 Jan 2024
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+2
+(PDF), Py, through the repeated application of a trained image-
+denoiser [7], [8]. An important extension of these models
+allows the sampler to become conditional, drawing samples
+from the posterior PDF, Py|x, where x represents the observed
+measurements. This approach has recently gained significant
+attention [6], [9], [10], [11], yielding a fascinating viewpoint
+to inverse problems, in which a variety of candidate high
+perceptual quality solutions to such problems are obtained.
+In this work, we generalize the pixelwise uncertainty as-
+sessment, as developed in [1], [2], so as to incorporate spatial
+correlations between pixels. This generalization is obtained
+by considering an image-adaptive basis for a linear space
+that replaces the standard basis in the pixelwise approach.
+To optimize the volume of the output uncertainty region, we
+propose a statistical analysis of the posterior obtained from a
+diffusion-based sampler (e.g., [10], [11]), considering a series
+of candidate restorations. Our method may be applied both
+globally (on the entire image) or locally (on selected portions
+or patches), yielding a tighter and more accurate encapsulation
+of statistically valid uncertainty regions. For the purpose of
+adapting the basis, we compute and leverage the principal
+components of the candidate restorations. As illustrated in
+Figure 2 for a simple 2-dimensional PDFs, the pixelwise
+regions are less efficient and may contain vast empty areas, and
+especially so in cases where pixels exhibit strong correlation.
+Clearly, as the dimension increases, the gap between the
+standard and the adapted uncertainty quantifications is further
+amplified.
+Our proposed method offers two conformal prediction [12],
+[13], [14] based calibration options (specifically, using the
+Learn then Test [15] scheme) for users to choose from, with
+a trade-off between precision and complexity. These include
+(i) using the entire set of principal components, (ii) using
+a predetermined subset of them2. The proposed calibration
+procedures ensure the validity of the uncertainty region to
+contain the unknown true values with a user-specified con-
+fidence probability, while also ensuring the recovery of the
+unknown true values using the selected principal components
+when only a subset is used. Applying these approaches allows
+for efficient navigation within the uncertainty region of highly
+probable solutions.
+We conduct various local and global experiments to ver-
+ify our method, considering three challenging tasks: image
+colorization, super-resolution, and inpainting, all described
+in Section V, and all demonstrating the advantages of the
+proposed approach. For example, when applied locally on
+8×8×3 patches, our experiments show a reduction in the guar-
+anteed uncertainty volume by a factor of ∼10-100 compared to
+previous approaches, as demonstrated in Figure 1. Moreover,
+this local approach can have a substantially reduced compu-
+tational complexity while retaining the statistical guarantees,
+by drawing far fewer posterior samples and using a small
+subset of the principal components. As another example, the
+global tests on the colorization task provide an unprecedented
+tightness in uncertainty volumes. This is accessible via a
+2We also propose a reduced complexity variation of this option that controls
+the number of necessary principal components to be used.
+Fig. 2.
+An illustration of uncertainty regions (in red) of 2d posterior
+distributions and considering three different PDF behaviors, shown in blue,
+orange, and green. The uncertainty regions are formed from intervals, as
+defined in Equation (1), where ˆl(x) and ˆu(x) represent the 0.05 and 0.95
+quantiles over the dashed black axes. The top row presents the uncertainty
+region in the pixel domain using standard basis vectors that ignores the spatial
+correlations, while the lower row presents the regions using the principal
+components as the basis. The uncertainty volume, defined in Equation (3), is
+indicated in the top left corner of each plot. The 90% coverage guarantee,
+outlined in Equation (2) with wi := 1/2, is satisfied by all. As can be seen, the
+lower row regions take spatial dependencies into account and are significantly
+smaller than the pixelwise corresponding regions in the upper row.
+reduced set of drawn samples, while also allowing for efficient
+navigation within the solution set.
+In summary, our contributions are the following:
+1) We introduce a novel generalized definition of uncer-
+tainty region that leverages an adapted linear-space basis
+for better posterior coverage.
+2) We propose a new method for quantifying the uncer-
+tainty of inverse problems that considers spatial corre-
+lation, thus providing tight uncertainty regions.
+3) We present two novel calibration procedures for the un-
+certainty quantification that provide statistical guarantees
+for unknown data to be included in the uncertainty re-
+gion with a desired coverage ratio while being recovered
+with a small error by the selected linear axes.
+4) We provide a comprehensive empirical study of three
+challenging image-to-image translation tasks: coloriza-
+tion, super-resolution, and inpainting, demonstrating the
+effectiveness of the proposed approach in all modes.
+II. RELATED WORK
+Inverse problems in imaging have been extensively studied
+over the years; this domain has been deeply influenced by
+the AI revolution [16], [17], [18], [19], [5]. A promising
+recent approach towards image-to-image translation problems
+relies on the massive progress made on learned generative
+techniques. These new tools enable to model the conditional
+distribution of the output images given the input, offering a
+fair sampling from this PDF. Generative-based solvers of this
+sort create a new and exciting opportunity for getting high
+perceptual quality solutions for the problem in hand, while
+also accessing a diverse set of such candidate solutions.
+Recently,
+Denoising
+Diffusion
+Probabilistic
+Models
+(DDPM) [7], [8] have emerged as a new paradigm for image
+generation, surpassing the state-of-the-art results achieved by
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+3
+GANs [20], [6]. Consequently, several conditional diffusion
+methods have been explored [6], [9], [10], [11], including SR3
+[10] – a diffusion-based method for image super-resolution,
+Palette [11] – a diffusion-based unified framework for
+image-to-image translation tasks, and more (e.g. [21], [22],
+[23], [24], [25], [26], [27]). Note that current conditional
+algorithms for inverse problems do not offer statistical
+guarantees against model deviations and hallucinations.
+Moving to uncertainty quantification, the field of machine
+learning has been seeing rich work on the derivation of
+statistically rigorous confidence intervals for predictions [28],
+[29], [30], [31], [32]. One key paradigm in this context is
+conformal prediction (CP) [12], [13], [14] and risk-controlling
+methods [33], [15], [34], which allow to rigorously quantify
+the prediction uncertainty of a machine learning model with
+a user-specified probability guarantee. Despite many proposed
+methods, only a few have focused on mitigating uncertainty
+assessment in image restoration problems, including im2im-
+uq [1] and Conffusion [2]. The work reported in [35] is
+closely related as it introduced a generalized, and thus im-
+proved, calibration scheme for Conffusion [2]. All these works
+have employed a risk-controlling paradigm [33] to provide
+statistically valid prediction intervals over the pixel domain,
+ensuring the inclusion of ground-truth solutions in the output
+intervals. However, these approaches share the same limitation
+of operating in the pixel domain while disregarding spatial
+correlations within the image or the color layers. This leads
+to an unnecessarily exaggerated volume of uncertainty.
+An exception to the above is [4], which quantifies uncer-
+tainty in the latent space of GANs. Their migration from
+the image domain to the latent space is a rigid, global, non-
+linear, non-invertible and uncertainty-oblivious transformation.
+Therefore, quantification of the uncertainty in this domain
+is quite limited. More specifically, rigidity implies that this
+approach cannot adapt to the complexity of the problem by
+adjusting the latent space dimension; Globality suggests that
+it cannot be operated locally on patches in order to better
+localize the uncertainty assessments; Being non-linear implies
+that an evaluation of the uncertainty volume (see Section III)
+in the image domain is hard and next to impossible; Non-
+invertability of means that some energy is lost from the image
+in the analysis and not accounted for, thus hampering the
+validity of the statistical guarantees; Finally, note that the
+latent space is associated with the image content, but does
+not represent the prime axes of the uncertainty behavior. Note
+that due to the above, and especially the inability to provide
+certified volumes of uncertainty, an experimental comparison
+of our method to [4] is impossible.
+Inspired by the above contributions, we propose a novel
+alternative uncertainty quantification approach that takes spa-
+tial relationships into account. Our work provides tight un-
+certainty regions, compared to prior work, with user-defined
+statistical guarantees through the use of a CP-based paradigm.
+Specifically, we adopted the Learn then Test [15] that provides
+statistical guarantees for controlling multiple risks.
+III. PROBLEM FORMULATION
+Let Px,y be a probability distribution over X × Y, where X
+and Y represent the input and the output space, respectively,
+for the inverse problem at hand. E.g., for the task of image
+colorization, Y could represent full-color high-quality images,
+while X represents their colorless versions to operate on. We
+assume that X, Y ⊂[0, 1]d ⊂Rd, where, without loss of
+generality, d is assumed to be the dimension of both spaces.
+In the context of examining patches within output images,
+we define Ypatch as the patch space of the output images. For
+simplicity, we use the same notation, d, for Y and Ypatch, while
+it is clear that the dimension of Ypatch is smaller and controlled
+by the user through the patch size to work on.
+Given an input measurement x ∈Rd, we aim to quantify the
+uncertainty of the possible solutions to the inverse problem, as
+manifested by the estimated d-dimensional posterior distribu-
+tion, ˆPy|x. The idea is to enhance the definition of pixelwise
+uncertainty intervals by integrating the spatial correlations
+between pixels to yield a better structured uncertainty region.
+To achieve this, we propose to construct uncertainty intervals
+using a designated collection of orthonormal basis vectors
+for Rd instead of intervals over individual pixels. We denote
+this collection by ˆB(x) = {ˆv1(x), ˆv2(x) . . . ˆvd(x)}, where
+ˆvi(x) ∈Rd. These vectors are instance-dependent, thus best
+adapted to their task. An intuitive example of such a basis is
+the standard one, ˆB(x) = {e1, e2 . . . ed}, where ei ∈Rd is
+the one-hot vector with value 1 in the ith entry. In our work,
+we use a set of principal components of ˆPy|x, which will be
+discussed in detail in Section IV.
+Similar to [1], [2], we use an interval-based method cen-
+tered around the conditional mean image, i.e., an estimate of
+E[y|x] ∈Rd, denoted by ˆµ(x). Formally, we utilize the follow-
+ing interval-valued function that constructs prediction intervals
+along each basis vector around the estimated conditional mean:
+T (x; ˆB(x))i :=
+h
+ˆvi(x)T ˆµ(x) −ˆl(x)i, ˆvi(x)T ˆµ(x) + ˆu(x)i
+i
+. (1)
+In the above, i ∈{1, 2 . . . d} is a basis vector index, and
+ˆl(x)i ∈R+ and ˆu(x)i ∈R+ are the lower and upper interval
+boundaries for the projected values of candidate solutions
+emerging from ˆPy|x. That is, if ˆy ∼ˆPy|x is such a solution,
+ˆvi(x)T ˆy is its i-th projection, and this value should fall within
+T (x; ˆB(x))i with high probability. Returning to the example
+of the standard basis, the above equation is nothing but pixel-
+wise prediction intervals, which is precisely the approach taken
+in [1], [2]. By leveraging this generalization, the uncertainty
+intervals using these basis vectors form a d-dimensional hyper-
+rectangle, referred to as the uncertainty region.
+Importantly, we propose that the interval-valued function,
+T , should produce valid intervals that contain a user-specified
+fraction of the projected ground-truth values within a risk level
+of α ∈(0, 1). In other words, more than 1−α of the projected
+ground-truth values should be contained within the intervals,
+similar to the approach taken in previous work in the pixel
+domain. To achieve this, we propose a holistic expression that
+aggregates the effect of all the intervals, T (x; ˆB(x)). This
+expression leads to the following condition:
+E
+" d
+X
+i=1
+ˆwi(x) · 1
+n
+ˆvi(x)T y ∈T (x; B(x))i
+o#
+> 1 −α,
+(2)
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+4
+where y ∈Rd is the unknown ground-truth and ˆwi(x) ∈[0, 1]
+s.t. Pd
+i=1 ˆwi(x) = 1 are the weight factors that set the
+importance of covering the projected ground-truth values along
+each interval. In Section IV we discuss the proposed holistic
+expression and a specific choice of these weights. As an
+example, we could set α = 0.1 and ˆwi(x) := 1/d, indicating
+that more than 90% of the projected ground-truth values onto
+the basis vectors are contained in the intervals, as illustrated
+in a 2d example in Figure 2 for different kinds of ˆPy|x.
+As discussed above and demonstrated in Figure 2, if the
+orthonormal basis in Equation (1) is chosen to be the standard
+one, we get the pixel-based intervals that disregard spatial
+correlations within the image, thus leading to an exaggerated
+uncertainty region. In this work, we address this limitation by
+transitioning to an instance-adapted orthonormal basis of Rd
+that allows the description of uncertainty using axes that are
+not necessarily pixel-independent, thereby providing tighter
+uncertainty regions. While such a basis could have been
+defined analytically using, for example, orthonormal wavelets
+[36], we suggest a learned and thus a better-tuned one. The
+choice to use a linear and orthonormal representation for the
+uncertainty quantification comes as a natural extension of
+the pixelwise approach, retaining much of the simplicity and
+efficiency of treating each axis separately. Note that the or-
+thogonality enables the decomposition of y around ˆµ(x) via its
+projected values, y = ˆµ(x)+Pd
+i=1
+
+ˆvi(x)T (y −ˆµ(x))
+
+ˆvi(x),
+which we refer to as the exact reconstruction property.
+To evaluate the uncertainty across different uncertainty
+regions, we introduce a new metric called the uncertainty
+volume, V(x; T (x; ˆB(x))), which represents the dth root of
+the uncertainty volume with respect to intervals T (x; ˆB(x)),
+defined in the following equation:
+V(x; T (x; ˆB(x))) :=
+d
+v
+u
+u
+t
+d
+Y
+i=1
+h
+ˆu(x)i + ˆl(x)i
+i
+(3)
+≈exp
+ 
+1
+d
+d
+X
+i=1
+log
+
+ˆu(x)i + ˆl(x)i + ϵ
+!
+−ϵ ,
+where ϵ > 0 is a small hyperparameter used for numerical
+stability. In Section V we demonstrate that our approach results
+in a significantly reduction in these uncertainty volumes when
+compared to previous methods.
+When operating in high dimensions (e.g. on the full image),
+providing uncertainty intervals for all the d-dimensions poses
+severe challenges, both in complexity and interpretability.
+In this case, constructing and maintaining the basis vectors
+becomes infeasible. Moreover, the uncertainty quantification
+using these intervals may be less intuitive compared to the con-
+ventional pixelwise approach because of the pixel-dependency
+between the basis vectors, which makes it difficult to commu-
+nicate the uncertainty to the user. To mitigate these challenges,
+we propose an option of using K ≪d basis vectors that
+capture the essence of the uncertainty. In Section IV, we
+discuss how to dynamically adjust K to provide fewer axes.
+While reducing the number of basis vectors benefits in
+interpretability and complexity, this option does not fulfill
+the exact reconstruction property. Therefore, we propose an
+extension to the conventional coverage validity of Equation (2)
+y
+x
+ˆyi ∼ˆPy|x
+Fig. 3. The sampling procedure for two image restoration problems using a
+conditional stochastic generator. The top row corresponds to super-resolution
+in local mode with patches, while the bottom row shows colorization in global
+mode. The implementation details are described in Section IV-A.
+Pixels Axes
+PCs Axes
+Approximation
+Calibration
+Fig. 4. Illustration of our PUQ procedure in 2D (d = 2) for a single instance
+x ∈X. The top row corresponds to the case when K = d = 2 (as in
+E-PUQ), while the bottom row depicts the case when K = 1 < d = 2
+(as in DA-PUQ and RDA-PUQ). The procedure begins by drawing samples
+ˆyi ∼ˆPy|x. Next, these samples are projected onto the PCs domain: ˆV T ˆyi,
+where ˆV
+:= [ˆv1, . . . , ˆvK] ∈Rd×K. Then, we compute bounds along
+the PCs to contain the samples at the correct ratio, forming the intervals
+specified in Equation (1). Finally, the intervals are scaled to statistically
+guarantee Equation (2) and contain the correct ratio over solutions for unseen
+input instances. In the bottom row, the procedure also statistically guarantees
+Equation (4) by ensuring a small recovery error of solutions to unseen input
+instances, as demonstrated by the small variance around the single PC.
+that takes into account the reconstruction error of the decom-
+posed ground-truth images. Specifically, the user sets a ratio
+of pixels, q ∈R, and a maximum acceptable reconstruction
+error over this ratio, β ∈(0, 1). This approximation allows
+us to reduce the number of basis vectors used to formulate
+ˆB(x), such that the reconstruction will be valid according to
+the following condition:
+E
+"
+ˆQq
+ 
+
+
+
+K
+X
+j=1
+ˆvj(x)T ycˆvj(x) −yc
+
+i
+
+
+
+d
+i=1
+!#
+≤β ,
+(4)
+where yc := y −ˆµ(x) is the ground-truth image centered
+around ˆµ(x), and ˆQq(·) is the empirical quantile function de-
+fined by the smallest z satisfying 1
+d
+Pd
+i=1 1{zi ≤ˆQq(z)} ≥q.
+In Section IV, we discuss this expression for assessing the
+validity of the basis vectors. As an example, setting q = 0.9
+and β = 0.05 would mean that the maximal reconstruction
+error of 90% of the ground-truth pixels is no more than 5%
+of the [0, 1] dynamic range.
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+5
+IV. PUQ: PRINCIPAL UNCERTAINTY QUANTIFICATION
+In this section, we present Principal Uncertainty Quantifica-
+tion (PUQ), our method for quantifying the uncertainty in in-
+verse problems while taking into account spatial dependencies
+between pixels. PUQ uses the principal components (PCs) of
+the solutions to the inverse problem for achieving its goal. In
+Appendix A, we provide an intuition behind the choice of the
+PCs as the basis. Our approach can be used either globally
+across the entire image, referred to as the global mode; or
+locally within predefined patches or segments of interest,
+referred to as the local mode. Local uncertainty quantification
+can be applied to any task, where the dimensionality of
+the target space is fully controlled by the user. In contrast,
+global quantification is particularly advantageous for tasks that
+exhibit strong spatial correlations between pixels.
+Our proposed method consists of two phases. In the first,
+referred to as the approximation phase, a machine learning
+system is trained to predict the PCs of possible solutions, de-
+noted by ˆB(x) = {ˆv1(x), ˆv2(x), . . . , ˆvK(x)} (where K ≤d),
+as well as a set of importance weights, ˆw(x) ∈RK, referring
+to the vectors in ˆB(x). In addition, the system estimates the
+necessary terms in Equation (1), which include the conditional
+mean, ˆµ(x) ∈Rd, and the lower and upper bounds, ˜l(x) ∈RK
+and ˜u(x) ∈RK 3, for the spread of projected solutions over
+ˆB(x). All these ingredients are obtained by a diffusion-based
+conditional sampler as described in Figure 3. More details on
+this computational process are brought in Section IV-A.
+The above-described approximation phase is merely an
+estimation, as the corresponding heuristic intervals of Equa-
+tion (1) may not contain the projected ground-truth values
+with a desired ratio. Additionally, the basis vectors may not
+be able to recover the ground-truth pixel values within an
+acceptable threshold when K < d, or the basis set may
+contain insignificant axes in terms of variability. Therefore,
+in the second, calibration phase, we offer two calibration
+procedures on an held-out set of calibration data, denoted by
+Scal := {(xi, yi)}n
+i=1. These assess the validity of our proposed
+uncertainty region over unseen data, which is composed by the
+intervals defined in Equation (1). The choice between the two
+calibration procedures depends on the user, taking into account
+the trade-off between precision and complexity. The steps of
+our proposed method are summarized in Algorithm 1, and the
+two calibration strategies are as follows:
+(1) Exact PUQ (E-PUQ - Section IV-B1): In the setting of an
+exact uncertainty assessment, while assuming that d PCs can
+be constructed and maintained in full, the exact reconstruction
+property is satisfied. Consequently, the calibration procedure
+is straightforward, involving only scaling of the intervals
+until they contain the user-specified miscoverage preference,
+denoted by α ∈(0, 1), of the projected ground-truth values
+falling outside the uncertainty region. This is similar to the
+approach taken in previous work over the pixel domain.
+(2) Dimension-Adaptive PUQ (DA-PUQ - Section IV-B2,
+RDA-PUQ - Appendix D): In the setting of an approximate
+3Note that these bounds are meant for ˆPy|x and not for Py|x, and thus
+marked with tilde. The ˆl(x), ˆu(x) bounds that are related to Equation (1) are
+defined later in the calibration schemes (Section IV-B).
+uncertainty assessment, while allowing for a small recovery
+error of projected ground-truth instances to full-dimensional
+instances, either due to complexity or interpretability reasons
+(see Section III), the exact reconstruction property is no longer
+satisfied. Hence, in addition to the scaling procedure outlined
+above, we must verify that the K PCs can decompose the
+ground-truth pixel values with a small error. In this calibration
+process, we also control the minimum number of the first ˆk(x)
+PCs out of the K PCs, such that a small reconstruction error
+can be guaranteed for unseen data. This number is dynamically
+determined per input image, so that instances with greater
+pixel correlations are assigned more PCs than those with
+weaker correlations. As manually determining K might be
+challenging, we introduce the Reduced Dimension-Adaptive
+PUQ (RDA-PUQ) procedure that also controls that value as
+part of the calibration - see Appendix D.
+Algorithm 1 Generating PUQ Axes and Intervals
+Input: Training set. Calibration set. Number of PCs K ∈N. An
+unseen input instance x ∈Rd.
+Output: Statistically valid uncertainty axes and intervals for x.
+▷Approximation phase
+1: Train a machine learning system (e.g., Section IV-A) to estimate
+the following:
+K PCs of ˆPy|x
+Importance weights of PCs
+The conditional mean
+Lower and upper bounds on the PCs
+▷Calibration phase
+2: if Exact uncertainty (accurate) then
+3:
+Apply E-PUQ using the calibration data
+4: else if Approximate uncertainty (reduced complexity) then
+5:
+Apply DA-PUQ / RDA-PUQ using the calibration data
+6: end if
+▷Inference
+7: Provide statistically valid uncertainty axes and intervals in terms
+of Equation (2) and Equation (4), applied to an unseen input
+instance x
+In Section V we demonstrate a significant decrease in
+the uncertainty volume, as defined in Equation (3) for each
+procedure, whether applied globally or locally, compared to
+prior work. On the one hand, the E-PUQ procedure is the
+simplest and can be applied locally to any task, and globally
+to certain tasks where the computation of d PCs is feasible.
+On the other hand, the DA-PUQ and RDA-PUQ procedures
+are more involved and can be applied both globally or locally
+to any task, while these are particularly effective in cases
+in which pixels exhibit strong correlations, such as in the
+image colorization task. Our method is visually illustrated in
+Figure 4, showing a sampling methodology and a calibration
+scheme using the full PCs or only a subset of them.
+A. Diffusion Models for the Approximation Phase
+The approximation phase, summarized in Algorithm 1 in RED,
+can be achieved in various ways. In this section, we describe
+the implementation we used to obtain the results in Section V.
+While we aim to construct the uncertainty axes and intervals
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+6
+in the most straightforward way, further exploration of more
+advanced methods to achieve the PCs is left for future work.
+In our implementation, we leverage the recent advances in
+stochastic regression solvers for inverse problems based on
+diffusion models, which enable to train a machine learning
+model to generate high-quality samples from ˆPy|x. Formally,
+we define fθ : X × Z →Y as a stochastic regression
+solver for an inverse problem in global mode, where Z is
+the noise seed space. Similarly, in local mode, we consider
+fθ : X × Z →Ypatch. Given an input instance x ∈Rd, we
+propose to generate K samples, denoted by {fθ(x, zi)}K
+i=1,
+where, fθ(x, zi) ∼ˆPy|x. These samples are used to estimate
+the PCs of possible solutions and their importance weights
+using the SVD decomposition of the generated samples. The
+importance weights assign high values to axes with large
+variance among projected samples, and low ones to those with
+small variance. In Section IV-B, we elaborate on how these
+weights are used in the calibration phase. Additionally, the
+samples are utilized to estimate the conditional mean, ˆµ(x),
+and the lower and upper bounds, ˜l(x) and ˜u(x), necessary
+for Equation (1). ˜l(x) and ˜u(x) are obtained by calculating
+quantiles of the projected samples onto each PC, with a user-
+specified miss-coverage ratio α ∈(0, 1).
+To capture the full spread and variability of ˆPy|x, it is
+necessary to generate at least K = d samples to feed to
+the SVD procedure, which is computationally challenging for
+high-dimensional data. As a way out, we suggest working
+locally on patches, where d is small and fully controlled by
+the user by specifying the patch size to work on. However, for
+tasks with strong pixel correlation, such as image colorization,
+a few PCs can describe the variability of ˆPy|x with a very small
+error. Therefore, only a few samples (i.e., K ≪d) are required
+for the SVD procedure to construct meaningful PCs for the
+entire image, while capturing most of the richness in ˆPy|x.
+We formally summarize our sampling-based methodology, in
+either global or local modes, in Algorithm 2.
+B. Calibration Phase
+In order to refine the approximation phase and obtain valid
+uncertainty axes and intervals that satisfy the guarantees of
+Equation (2) and Equation (4), it is necessary to apply a
+calibration phase, as summarized in Algorithm 1 in BLUE.
+This phase includes two different options based on particular
+conditions on the number of PCs to be constructed and main-
+tained during the calibration procedure or during inference,
+when applied either globally or locally. Below we outline each
+of these options in more details.
+1) Exact PUQ: The Exact PUQ (E-PUQ) procedure pro-
+vides the complete uncertainty of the d-dimensional posterior
+distribution, Py|x. In this case, the exact reconstruction prop-
+erty discussed in Section III is satisfied, and Equation (4) is
+fulfilled with 0% error (β = 0) across 100% (q = 1.0) of
+the pixels. Therefore, the calibration is simple, involving only
+a scaling of intervals to ensure Equation (2) is satisfied with
+high probability, similar to previous work [1], [2].
+Formally, for each input instance x and its corresponding
+ground-truth value y ∈Rd in the calibration data, we use the
+estimators obtained in the approximation phase to get d PCs
+Algorithm 2 Approximation Phase via Sampling
+Input: Instance x ∈X. Conditional stochastic generative model fθ :
+X →Y or fθ : X →Ypatch. Maximal PCs / samples number
+K ≤d. Misscoverage ratio α ∈(0, 1).
+▷Generate samples drawn from ˆPy|x
+1: for i = 1 to K do
+2:
+ˆyi(x) ←fθ(x, zi)
+3: end for
+▷Compute conditional mean
+4: ˆµ(x) ←
+1
+K
+PK
+i=1 ˆyi(x)
+▷Apply SVD decomposition and extract the PCs and weights
+5: ˆY (x) ←[ˆy1(x), ˆy2(x) . . . ˆyK(x)] ∈Rd×K
+6: ˆY (x) −ˆµ(x) · 1T
+K = ˆV (x)ˆΣ(x) ˆU(x)T
+7: ˆB(x) ←{ˆv1(x), ˆv2(x) . . . ˆvK(x)}, where ˆvi(x) = [ ˆV (x)]i
+8: ˆw(x) ←
+
+ˆσ1(x)2, . . . , ˆσK(x)2
+/c ∈RK, where ˆσi(x) =
+[ˆΣ(x)]i and c = PK
+j=1 ˆσj(x)2.
+▷Compute α/2 and 1 −α/2 empirical quantiles of projected
+samples onto each PC
+9: for i = 1 to K do
+10:
+˜l(x)i ←ˆQα/2({ˆvi(x)T (ˆyj(x) −ˆµ(x))}K
+j=1)
+11:
+˜u(x)i ←ˆQ1−α/2({ˆvi(x)T (ˆyj(x) −ˆµ(x))}K
+j=1)
+12: end for
+Output: K PCs ˆB(x), importance weights ˆw(x), conditional mean
+ˆµ(x), lower and upper bounds ˜l(x) and ˜u(x).
+of possible solutions ˆB(x), their corresponding importance
+weights ˆw(x), the conditional mean ˆµ(x), and the lower and
+upper bounds, denoted by ˜l(x) and ˜u(x). We then define
+the scaled intervals to be those specified in Equation (1),
+with the upper and lower bounds defined as ˆu(x) := λ˜u(x)
+and ˆl(x) := λ˜l(x), where λ ∈R+ is a tunable parameter
+that controls the scaling. Notably, the size of the uncertainty
+intervals decreases as λ decreases. We denote the scaled
+uncertainty intervals by Tλ(x; ˆB(x)). The following weighted
+coverage loss function is used to guide our design of λ:
+L(x, y; λ) :=
+d
+X
+i=1
+ˆwi(x) · 1
+n
+ˆvi(x)T y ̸∈Tλ(x; ˆB(x))i
+o
+.
+(5)
+This loss is closely related to the expression in Equation (2),
+and while it may seem arbitrary at first, this choice is a direct
+extension to the one practiced in [1], [2]. In Appendix B we
+provide an additional justification for it, more tuned to the
+realm discussed in this paper.
+Our goal is to ensure that the expectation of L(x, y; λ)
+is below a pre-specified threshold, α, with high probability
+over the calibration data. This is accomplished by a conformal
+prediction based calibration scheme, and in our paper we use
+the LTT [15] procedure, which guarantees the following:
+P
+
+E[L(x, y; ˆλ)] ≤α
+
+≥1 −δ ,
+(6)
+for a set of candidate values of λ, given as the set ˆΛ. δ ∈(0, 1)
+is an error level on the calibration set and ˆλ is the smallest
+value within ˆΛ satisfying the above condition, so as to provide
+the smallest uncertainty volume over the scaled intervals, as
+defined in Equation (3), which we denote by Vˆλ.
+Put simply, the above guarantees that more than 1 −α of
+the ground-truth values projected onto the full d PCs of ˆPy|x
+are contained in the uncertainty intervals with probability at
+least 1−δ, where the latter probability is over the randomness
+of the calibration set. The scaling factor takes into account the
+weights to ensure that uncertainty intervals with high variabil-
+ity contain a higher proportion of projected ground-truth values
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+7
+than those with low variability. This is particularly important
+for tasks with strong pixel correlations, where the first few
+PCs capture most of the variability in possible solutions. We
+describe in detail the E-PUQ procedure in Algorithm 3.
+Algorithm 3 Exact PUQ Procedure
+Input: Calibration set Scal
+:= {xi, yi}n
+i=1. Scanned calibration
+parameter values Λ = [1 . . . λmax]. Approximation phase esti-
+mations ˆB, ˆw, ˆµ, ˜u, ˜l. Misscoverage ratio α ∈(0, 1). Calibration
+error level δ ∈(0, 1).
+1: for (x, y) ∈Scal do
+2:
+ˆB(x), ˆw(x), ˆµ(x), ˜u(x), ˜l(x) ←Apply Algorithm 2 to
+x, with the choice of K = d samples
+3:
+for λ ∈Λ do
+▷Scale uncertainty intervals
+4:
+ˆu(x) ←λ˜u(x) and ˆl(x) ←λ˜l(x)
+5:
+Tλ(x; ˆB(x)) ←Equation (1) using ˆµ(x), ˆu(x), ˆl(x)
+▷Compute weighted coverage loss, Equation (5)
+6:
+L(x, y; λ) ←
+7:
+Pd
+i=1 ˆwi(x) · 1
+n
+ˆvi(x)T y ̸∈Tλ(x; ˆB(x))i
+o
+8:
+end for
+9: end for
+10: ˆΛ ←Extract valid λs from LTT [15] applied on {L(x, y; λ) :
+(x, y) ∈Scal, λ ∈Λ} at risk level α and error level δ, referring
+to Equation (6).
+▷Compute the minimizer for the uncert. volume, Equation (3)
+11: ˆλ ←arg minλ∈ˆΛ
+n
+1
+n
+Pn
+i=1 Vλ(xi; ˆB(x))
+o
+Output: Given a new instance x ∈X, obtain valid uncertainty
+intervals for it, Tˆλ(x; ˆB(x)).
+2) Dimension-Adaptive PUQ: The E-PUQ procedure as-
+sumes the ability to construct and maintain d PCs, which
+can be computationally challenging both locally and globally.
+Furthermore, an uncertainty quantification over these axes may
+be less intuitive, due to the many axes involved, thus harming
+the method’s interpretability (see discussion in Section III).
+To address these, we propose the Dimension-Adaptive PUQ
+(DA-PUQ) procedure, which describes the uncertainty region
+with fewer axes, K ≤d. The use of only a few leading
+dimensions, e.g., K = 3, can lead to a more interpretable
+uncertainty region, enabling an effective visual navigation
+within the obtained uncertainty range.
+While this approach does not satisfy the exact reconstruction
+property (see Section III), the decomposed ground-truth values
+can still be recovered through the K PCs with a small user-
+defined error in addition to the coverage guarantee. By doing
+so, we can achieve both the guarantees outlined in Equation (2)
+and Equation (4) with high probability.
+To satisfy both the coverage and reconstruction guarantees
+while enhancing interpretability, we use a dynamic function,
+ˆk(x) : X →N, and a scaling factor to control the recon-
+struction and coverage risks. The function ˆk(x) determines the
+number of top PCs (out of K) to include in the uncertainty
+region, focusing on the smallest number that can satisfy both
+Equation (2) and (4), so as to increase interpretability.
+Formally, for each input instance x and its corresponding
+ground-truth value y ∈Rd in the calibration data, we use
+the estimators obtained in the approximation phase to esti-
+mate K ≤d PCs of possible solutions, denoted by ˆB(x),
+their corresponding importance weights, denoted by ˆw(x),
+the conditional mean denoted by ˆµ(x), and the lower and
+upper bounds denoted by ˜l(x) and ˜u(x), respectively. We
+then introduce a threshold λ1 ∈(0, 1) for the decay of
+the importance weights over the PCs of solutions to x. The
+adaptive number of PCs to be used is defined as follows:
+ˆk(x; λ1) :=
+min
+1≤k≤K
+(
+k
+s.t.
+k
+X
+i=1
+ˆwi(x) ≥λ1
+)
+.
+(7)
+Obviously, the importance weights are arranged in a descend-
+ing order, starting from the most significant axis and ending
+with the least significant one. Furthermore, let q ∈(0, 1) be
+a specified ratio of pixels, and β ∈(0, 1) be a maximum al-
+lowable reconstruction error over this ratio. The reconstruction
+loss function to be controlled is defined as:
+L1(x, y; λ1) := ˆQq
+
+
+
+
+
+
+
+ˆk(x;λ1)
+X
+j=1
+ˆvj(x)T ycˆvj(x) −yc
+
+i
+
+
+
+d
+i=1
+
+
+,
+(8)
+where ˆQq(·) selects the empirical q-quantile of the recon-
+struction errors, and yc = y −ˆµ(x) is the ground-truth image
+centered around ˆµ(x). In Appendix C, we discuss further this
+specific loss function for controlling the capability of the linear
+subspace to capture the richness of the complete d-dimensional
+posterior distribution.
+At the same time, we also control the coverage risk over
+the ˆk(x) PCs, with α ∈(0, 1) representing a user-specified
+acceptable misscoverage rate and λ2 ∈R+ representing the
+calibration factor parameter. To control this coverage risk,
+we define the coverage loss function to be the same as in
+Equation (5), but limited to the ˆk(x) PCs, that is:
+L2(x, y; λ1, λ2) :=
+(9)
+ˆk(x;λ1)
+X
+i=1
+ˆwi(x) · 1
+n
+ˆvi(x)T y ̸∈Tλ2(x; ˆB(x))i
+o
+.
+Finally, using the reconstruction loss function of Equa-
+tion (8) and the coverage loss function of Equation (9), we seek
+to minimize the uncertainty volume, defined in Equation (3),
+for the scaled intervals where any unused axes (out of d) are
+fixed to zero. We denote this uncertainty volume as Vλ1,λ2.
+The minimization of Vλ1,λ2 is achieved by minimizing λ1 and
+λ2, while ensuring that the guarantees of Equation (2) and
+Equation (4) hold with high probability over the calibration
+data. This can be provided, for example, through the LTT [15]
+calibration scheme, which guarantees the following:
+P
+
+E[L1(x, y; ˆλ1)] ≤β
+E[L2(x, y; ˆλ1, ˆλ2)] ≤α
+
+≥1 −δ ,
+(10)
+where ˆλ1 and ˆλ2 are the minimizers for the uncertainty
+volume among valid calibration parameter results, ˆΛ, obtained
+through the LTT procedure. In other words, we can reconstruct
+a fraction q of the ground-truth pixel values with an error
+no greater than β, and a fraction of more than 1 −α of
+the projected ground-truth values onto the first ˆk(x; ˆλ1) PCs
+of Py|x are contained in the uncertainty intervals, with a
+probability of at least 1 −δ. A detailed description of the
+DA-PUQ procedure is given in Algorithm 4.
+The above-described DA-PUQ procedure reduces the num-
+ber of PCs to be constructed to K
+≤
+d while using
+ˆk(x; ˆλ1) ≤K PCs, leading to increased efficiency in both time
+and space during inference. However, determining manually
+the smallest K value that can guarantee both Equation (2)
+and Equation (4) can be challenging. To address this, we
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+8
+propose an expansion of the DA-PUQ procedure; the Reduced
+Dimension-Adaptive PUQ (RDA-PUQ) procedure that also
+controls the maximum number of PCs, K, required for the
+uncertainty assessment. This approach is advantageous for
+inference as it reduces the number of samples required to
+construct the PCs using Algorithm 2, while ensuring both the
+coverage and reconstruction guarantees of Equation (2) and
+Equation (4) with high probability. The RDA-PUQ procedure
+is fully described in Appendix D.
+Algorithm 4 Dimension-Adaptive PUQ Procedure
+Input: Calibration set Scal
+:= {xi, yi}n
+i=1. Scanned calibration
+parameter values Λ1 ←[1 . . . λ1max] and Λ2 ←[1 . . . λ2max].
+Maximal PCs number K ≤d. Approximation phase estimators
+ˆB, ˆw, ˆµ, ˜u, ˜l. Recovered pixels ratio q ∈(0, 1). Reconstruction
+error β ∈(0, 1). Misscoverage ratio α ∈(0, 1). Calibration error
+level δ ∈(0, 1). For an effective calibration, α, β, δ should be
+close to 0 while q should be close to 1.
+1: for (x, y) ∈Scal do
+2:
+ˆB(x), ˆw(x), ˆµ(x), ˜u(x), ˜l(x) ←Apply Algorithm 2 to
+x, with the choice of K samples
+3:
+for λ1 ∈Λ1 do
+▷Compute adaptive dimensionality, Equation (7)
+4:
+ˆk(x; λ1) ←mink
+n
+k : PK
+i=1 ˆwi(x) ≥λ1
+o
+▷Compute reconstruction loss, Equation (8)
+5:
+yc ←y −ˆµ(x)
+6:
+L1(x, y; λ1) ←
+ˆQq
+
+Pˆk(x;λ1)
+j=1
+ˆvj(x)T ycˆvj(x) −yc
+
+i
+d
+i=1
+
+7:
+for λ2 ∈Λ2 do
+▷Scale uncertainty intervals
+8:
+ˆu(xi) ←λ2˜u(x) and ˆl(x) ←λ2˜l(x)
+9:
+Tλ2(x; ˆB(x)) ←Eq. (1) using ˆµ(x), ˆu(x), ˆl(x)
+▷Compute weighted coverage loss, Equation (5)
+10:
+L2(x, y; λ1, λ2) ←Pˆk(x;λ1)
+i=1
+ˆwi(x)·
+1
+n
+ˆvi(x)T y ̸∈Tλ2(x; ˆB(x))i
+o
+11:
+end for
+12:
+end for
+13: end for
+14: ˆΛ
+←
+Extract
+valid
+λs
+from
+LTT
+[15]
+ap-
+plied
+on
+{(L1(x, y; λ1), L2(x, y; λ1, λ2))
+:
+(x, y) ∈Scal, λ1 ∈Λ1, λ2 ∈Λ2}
+at
+risk
+levels
+(β, α)
+and
+error level δ, referring to Equation (10)
+▷Compute the minimizers for the uncer. volume, Equation (3)
+15: ˆλ1, ˆλ2 ←arg minλ1,λ2∈ˆΛ
+n
+1
+n
+Pn
+i=1 Vλ1,λ2(xi; ˆB(xi))
+o
+Output: Given a new instance x ∈X, obtain valid uncertainty
+intervals for it, Tˆλ2(x; ˆB(x)) over ˆk(x; ˆλ1) ≤K PCs.
+V. EMPIRICAL STUDY
+This section presents a comprehensive empirical study of our
+proposed method PUQ, applied to three challenging tasks:
+image colorization, super-resolution, and inpainting, over the
+CelebA-HQ dataset [37]. Our approximation phase starts with
+a sampling from the posterior, applied in our work by the
+SR3 conditional diffusion model [10]. Figure 5 presents typical
+sampling results for these three tasks, showing the expected
+diversity in the images obtained.
+The experiments we present herein verify that our method
+satisfies both the reconstruction and coverage guarantees and
+demonstrate that PUQ provides more confined uncertainty
+regions compared to prior work, including im2im-uq [1] and
+Conffusion [2]. Through the experiments, we present superi-
+ority in uncertainty volume, as defined in Equation (3), and in
+interpretability through the use of only a few PCs to assess the
+uncertainty of either a patch or a complete image. All the ex-
+periments were conducted over 100 calibration-test splits. For
+in-depth additional details of our experiments and the settings
+used, we refer the reader to Appendix E. Additionally, an ab-
+lation study has been conducted, as elaborated in Appendix H.
+This study presents an analysis of user-defined parameters: α,
+β, q, and δ, aiming to provide a comprehensive insight into
+their selection. Furthermore, we have investigated the trade-
+off between precision and complexity in Appendix I to offer
+a complete understanding of our method’s performance.
+A. Evaluation Metrics
+Before presenting the results, we discuss the metrics used to
+evaluate the performance of the different methods. Although
+our approach is proved to guarantee Equation (6) for E-PUQ
+and Equation (10) for DA-PUQ, (through LTT [15]), we assess
+the validity and tightness of these guarantees as well.
+Empirical coverage risk.
+We measure the risk associated
+with the inclusion of projected unseen ground-truth values in
+the uncertainty intervals. In E-PUQ, we report the average
+coverage loss, defined in Equation (5). In the case of DA-PUQ
+and RDA-PUQ, we report the value defined by Equation (9).
+Empirical reconstruction risk.
+We measure the risk in
+recovering unseen ground-truth pixel values using the selected
+PCs. In the case of E-PUQ, this risk is zero by definition.
+However, for DA-PUQ and RDA-PUQ, we report the average
+reconstruction loss, defined by Equation (8).
+Interval-Size.
+We report the calibrated uncertainty inter-
+vals’ sizes of Equation (1), and compare them with baseline
+methods. For E-PUQ, we compare intervals over the full basis
+set of PCs with the intervals in the pixel domain used in
+previous work. In the DA-PUQ and RDA-PUQ procedures,
+we apply dimensionality reduction to K ≪d dimensions. To
+validly compare the intervals’ sizes of these methods to those
+methods over the full d dimensions, we pad the remaining
+d −K dimensions with zeros as we assume that the error
+in reconstructing the ground-truth from the dimensionally
+reduced samples is negligible.
+Uncertainty Volume. We report these volumes, defined
+in Equation (3), for the calibrated uncertainty regions and
+compare them with previous work. A smaller volume implies
+a higher level of certainty in probable solutions to Py|x. In
+E-PUQ, we compare volumes over the full basis set of PCs,
+whereas for the DA-PUQ and RDA-PUQ procedures, we pad
+the remaining dimensions with zeros.
+B. Local Experiments on Patches
+We apply our proposed methods on RGB patches of increasing
+size — 1x1, 2x2, 4x4, and 8x8 — for image colorization,
+super-resolution, and inpainting tasks. The obtained results are
+illustrated in Figure 6 and Figure 7, where Figure 6 compares
+our exact procedure, E-PUQ, to baseline methods, and Figure 7
+examines our approximation procedures, DA-PUQ and RDA-
+PUQ. In Table I we present a numerical comparison of
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+9
+x
+y
+Samples
+Fig. 5. The three image recovery tasks, colorization (top), super-resolution (middle) and inpainting (bottom). For each we present a given measurement x,
+the ground-truth y, and 10 candidate samples from the (approximated) posterior distribution. These samples fuel the approximation phase in our work.
+TABLE I
+LOCAL EXPERIMENTS: QUANTITATIVE COMPARISON OF THE MEANS
+AND STANDARD DEVIATIONS OF OUR LOCALLY APPLIED PUQ METHOD
+ON RGB PATCH RESOLUTION OF 8X8, UTILIZING THE TWO PROPOSED
+PROCEDURES. NOTE THAT IN THIS EXPERIMENT d = 8 × 8 × 3 = 192
+AND ϵ = 1e −10 FOR THE VOLUME COMPUTATION.
+Recons. Risk
+Dim. ˆk(x) / K
+Uncert. Volume
+Colorization
+im2im-uq [1]
+0
+192 / 192
+1.6e−1 ± 7.2e−2
+Conffusion [2]
+0
+192 / 192
+1.7e−1 ± 1.3e−1
+E-PUQ
+0
+192 / 192
+2.3e−3 ± 9.8e−4
+DA-PUQ
+2.5e−2 ± 5.3e−4
+1.6 ± 0.77 / 100
+2.4e−11 ± 1.3e−11
+RDA-PUQ
+1.7e−2 ± 9.7e−4
+3.8 ± 1.8 / 11.8 ± 6.4
+6.8e−11 ± 3.9e−11
+Super-
+Resolution
+im2im-uq [1]
+0
+192 / 192
+8.8e−2 ± 5.7e−2
+Conffusion [2]
+0
+192 / 192
+8.8e−2 ± 6.9e−2
+E-PUQ
+0
+192 / 192
+1.3e−2 ± 7.5e−3
+DA-PUQ
+2.5e−2 ± 3.4e−4
+11.1 ± 5.5 / 192
+3.4e−10 ± 3.5e−10
+RDA-PUQ
+2.0e−2 ± 0.0e−0
+22.8 ± 6.8 / 70.0 ± 0.0
+1.6e−9 ± 1.3e−9
+Inpainting
+im2im-uq [1]
+0
+192 / 192
+2.8e−1 ± 1.4e−1
+Conffusion [2]
+0
+192 / 192
+2.7e−1 ± 1.6e−1
+E-PUQ
+0
+192 / 192
+1.9e−2 ± 1.0e−2
+DA-PUQ
+1.8e−2 ± 1.0e−4
+39.4 ± 11.8 / 192
+3.6e−8 ± 7.3e−8
+RDA-PUQ
+1.8e−2 ± 1.6e−3
+55.6 ± 10.2 / 72.6 ± 30.3
+1.3e−7 ± 8.8e−8
+uncertainty volumes across tasks at 8x8 patch resolution. We
+also provide visual representations of the uncertainty volume
+maps for patches at varying resolutions in Figure 8.
+The results shown in Figure 6 and Figure 7 demonstrate
+that our method provides smaller uncertainty volumes, and
+thus more confined uncertainty regions, when compared to
+previous work in all tasks and patch resolutions, and while
+satisfying the same statistical guarantees in all cases. More
+specifically, Figure 6 compares our exact procedure, E-PUQ,
+to baseline methods. Following this figure, one can see that
+using the E-PUQ procedure we obtained an improvement of
+∼×100 in the uncertainty volumes in colorization and an
+improvement of ∼×10 in super-resolution and inpainting,
+when applied to the highest resolution of 8x8. Additionally,
+as the patch resolution increases, we observe a desired trend
+of uncertainty volume reduction, indicating that our method
+takes into account spatial correlation to reduce uncertainty.
+Note that even a patch size of 1 × 1 brings a benefit in the
+evaluated volume, due to the exploited correlation within the
+three color channels. E-PUQ reduces trivially to im2im-uq [1]
+and Conffusion [2] when applied to scalars (1×1×1 patches).
+In Figure 7, we examine our approximation methods, DA-
+PUQ and RDA-PUQ, in which we set a relatively small recon-
+struction risk of β = 0.05. Observe the significantly smaller
+uncertainty volumes obtained; this effect is summarized in
+Fig. 6.
+Local Experiments: A comparison of E-PUQ (see Section IV-B1)
+with previous work – im2im-uq [1] and Conffusion [2]. These methods are
+applied locally on patches with α = δ = 0.1. Each column corresponds to a
+relevant metric (see Section V-A), and each row corresponds to a specific task.
+The uncertainty volume was computed with ϵ = 1e −10. Results indicate
+that our approach achieves superior uncertainty volume.
+Table I as well. Figure 7 also portrays the dimensionality
+of the uncertainty region used with our method using two
+overlapping bars. The outer bar in yellow refers to the number
+of PCs that need to be constructed, denoted as K in DA-
+PUQ and
+ˆK in RDA-PUQ. The smaller this number is,
+the lower the test time computational complexity. The inner
+bar in green refers to the average number of the adaptively
+selected PCs, denoted as ˆk(x). A lower value of ˆk(x) indicates
+better interpretability, as fewer PCs are used at inference than
+those that were constructed. For example, in the colorization
+task, it can be seen that the RDA-PUQ procedure is the
+most computationally efficient methodology, requiring only
+ˆK ≈12 PCs to be constructed at inference, while the DA-PUQ
+procedure is the most interpretable results, with uncertainty
+regions consisting of only ˆk(x) ∈{1, 2, 3} axes.
+In all experiments demonstrated in Figure 6 and Figure 7, it
+is noticeable that the standard deviation of the interval-size of
+our approach is higher than that of the baseline methods. This
+effect happens because a few intervals along the first few PCs
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+10
+Fig. 7. Local Experiments: A comparison of DA-PUQ (see Section IV-B2)
+and RDA-PUQ (see Appendix D), when applied locally on 8x8 patches with
+α = δ = 0.1, β = 0.05 and q = 0.9. Each column corresponds to a
+relevant metric (see Section V-A), and each row corresponds to a specific
+task. The uncertainty volume was computed with ϵ = 1e −10. Here, the
+dimensionality is presented by two overlapping bars, where the yellow bars
+represent the distribution of K in DA-PUQ and ˆ
+K in RDA-PUQ, and the
+inner bars represent the distribution of ˆk(x) in both cases.
+TABLE II
+GLOBAL EXPERIMENTS: QUANTITATIVE COMPARISON OF THE MEANS
+AND STANDARD DEVIATIONS OF OUR GLOBALLY APPLIED PUQ METHOD
+IN THE COLORIZATION TASK, UTILIZING THE PROPOSED DA-PUQ (SEE
+SECTION IV-B2) AND RDA-PUQ (SEE APPENDIX D) PROCEDURES.
+Recons. Risk
+Dim. ˆk(x) / K
+Uncert. Volume
+im2im-uq [1]
+0
+49152 / 49152
+1.4e−1 ± 3.2e−2
+Conffusion [2]
+0
+49152 / 49152
+1.4e−1 ± 5.5e−2
+DA-PUQ
+5.0e−2 ± 1.1e−3
+2.2 ± 0.93 / 100
+1.2e−13 ± 5.0e−14
+RDA-PUQ
+4.3e−2 ± 2.8e−3
+5.5 ± 4.5 / 22.3 ± 10.9
+3.1e−13 ± 2.4e−13
+are wider than those along the remaining PCs. However, the
+majority of the interval sizes are significantly smaller, resulting
+in a much smaller uncertainty volume. Interestingly, the un-
+certainty intervals of the DA-PUQ and RDA-PUQ procedures
+in Figure 7 exhibit larger standard deviation compared to the
+E-PUQ procedure in Figure 6. We hypothesize that this is
+caused when only a few intervals (e.g., 2 intervals) are used
+for the calibration process while small miscoverage ratio is set
+by the user (α = 0.1). As an example in the case of using 2
+intervals with all samples of the calibration set, it is necessary
+to enlarge all the intervals to ensure the coverage guarantee,
+resulting in wider intervals over the first few PCs.
+The heat maps presented in Figure 8 compare the un-
+certainty volumes of our patch-based E-PUQ procedure to
+baseline methods. Each pixel in the presented heat maps
+corresponds to the value of Equation (3) evaluated on its
+corresponding patch. The results show that as the patch resolu-
+tion increases, pixels with strong correlation structure, such as
+pixels of the background area, also exhibit lower uncertainty
+volume in their corresponding patches. This indicates that the
+proposed method indeed takes into account spatial correlation,
+leading to reduced uncertainty volume.
+C. Global Experiments on Images
+We turn to examine the effectiveness and validity of DA-
+PUQ and RDA-PUQ when applied to complete images at a
+resolution of 128 × 128. In this case, the E-PUQ procedure
+does not apply, as it requires computing and maintaining
+d = 128×128×3 PCs. We present results for the colorization
+task hereafter, and refer the reader to Appendix G for a similar
+analysis related to super-resolution and inpainting.
+While all PUQ procedures can be applied locally for any
+task, working globally is more realistic in tasks that exhibit
+strong pixel correlation. Under this setting, most of the image
+variability could be represented via DA-PUQ or RDA-PUQ
+while (i) maintaining a small reconstruction risk, and (ii)
+using only a few PCs to assess the uncertainty of the entire
+images. We should note that the tasks of super-resolution
+and inpainting are less-matched to a global mode since they
+require a larger number of PCs for an effective uncertainty
+representation – more on this is discussed in Appendix G.
+Figure 9 visually demonstrates the performance of our approx-
+imation methods, also summarized in Table II. These results
+demonstrate that our method provides significantly smaller
+uncertainty volumes compared to our local results in Figure 7
+and previous works, but this comes at the cost of introducing
+a small reconstruction risk of up to β = 0.1. Observe how our
+approximation methods improve interpretability: the uncer-
+tainty regions consist of only 2-5 PCs in the full dimensional
+space of the images. The DA-PUQ procedure produces the
+tightest uncertainty regions; see the uncertainty volumes in
+Table II. In addition, the mean interval-size with our proce-
+dures is very small and almost equal to zero, indicating that
+the constructed uncertainty regions are tight and narrow due
+to strong correlation structure of pixels. However, similar to
+the previous results, the standard deviation of interval-size is
+spread across a wide range. This is because few of the first
+PCs have wide intervals. The RDA-PUQ procedure is the most
+computationally efficient as it required to construct only ∼30
+PCs during inference to ensure statistical validity.
+Figure 10 presents selected uncertainty regions that were
+provided by our proposed RDA-PUQ procedure when applied
+globally. As can be seen, the projected ground-truth images
+using only ˆk(x) PCs results in images that are very close
+to the originals. This indicates that the uncertainty region can
+describe the spread and variability among solutions with small
+reconstruction errors. The first two axes of our uncertainty
+regions exhibit semantic content, which is consistent with a
+method that accounts for spatial pixel correlation. The fact
+that these PCs capture foreground/background or full-object
+content highlights a unique strength of our approach. We
+provide the importance weights of the first two PCs, indicating
+impressive proportions of variability among projected samples
+onto these components (see Section IV-A). For example, in
+the third row, we observe that 77% of the variability in ˆPy|x
+is captured by ˆv1(x), which mostly controls a linear color
+range of the pixels associated with the hat in the image. In
+Figure 11 we visually compare samples that were generated
+from the corresponding estimated uncertainty regions, by
+sampling uniformly a high dimensional point (i.e., an image)
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+11
+x
+y
+im2im-uq
+Conffusion
+Our-1x1x3 Our-2x2x3 Our-4x4x3 Our-8x8x3
+Fig. 8.
+Local Experiments: Uncertainty volume maps for patches applied in image colorization (top), super-resolution (middle), and inpainting (bottom)
+with E-PUQ, im2im-uq [1] and Conffusion [2]. Each pixel in the maps corresponds to the uncertainty volume, defined in Equation (3), of its corresponding
+patch. These results expose the effectiveness of our method that incorporates spatial correlations, resulting in a reduction of the uncertainty volume.
+Fig. 9. Global Experiments: A comparison of DA-PUQ (see Section IV-B2)
+and RDA-PUQ (see Appendix D), when applied globally on the colorization
+task with α = β = δ = 0.1 and q = 0.95. The uncertainty volume was
+computed with ϵ = 1e −10.
+x
+y
+Recons.
+ˆv1(x)
+ˆv2(x)
+Fig. 10. Global Experiments: Visual presentation of uncertainty regions pro-
+vided by RDA-PUQ (Appendix D) when applied globally for the colorization
+task. The reconstructed image is given by ˆµ(x) + Pˆk(x)
+i=1 ˆvi(x)T ycˆvi(x),
+where yc := y −ˆµ(x). The values of ˆk(x), ˆw1(x) and ˆw2(x) are shown in
+the top left corners of the corresponding columns.
+from the corresponding hyper-rectangle. For further details
+regarding this study, please refer to Appendix F. As can be
+seen, the samples extracted from our uncertainty region are of
+high perceptual quality, whereas im2im-uq [1] and Conffusion
+[2] produce highly improbable images. This testifies to the fact
+that our method provides much tighter uncertainty regions,
+|—————— Our ——————-|
+im2im-uq
+Conffusion
+Fig. 11. Global Experiments: Images sampled uniformly from the estimated
+global uncertainty regions, referring to the colorization task. Using RDA-PUQ
+results with high-perceptual images, while im2im-uq [1] and Conffusion [2]
+produce unlikely images. These results indicate that our uncertainty regions
+are significantly more confined than those of previous works.
+whereas previous work results in exaggerated regions that
+contain unlikely images. In addition to the above, we present
+in Appendix J a visualization of the lower and upper corners
+of the uncertainty regions produced by our method, comparing
+them to those produced by previous work [1], [2].
+VI. CONCLUDING REMARKS
+This paper presents “Principal Uncertainty Quantification”
+(PUQ), a novel and effective approach for quantifying un-
+certainty in any image-to-image task. PUQ takes into account
+the spatial dependencies between pixels in order to achieve
+significantly tighter uncertainty regions. The experimental
+results demonstrate that PUQ outperforms existing methods
+in image colorization, super-resolution and inpainting, by
+improving the uncertainty volume. Additionally, by allowing
+for a small reconstruction error when recovering ground-
+truth images, PUQ produces tight uncertainty regions with
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+12
+a few axes and thus improves computational complexity and
+interpretability at inference. As a result, PUQ achieves state-
+of-the-art performance in uncertainty quantification for image-
+to-image problems.
+Referring to future research, more sophisticated choices that
+rely on recent advancements in stochastic image regression
+models could be explored, so as to improve the complexity
+of our proposed approximation phase. Further investigation
+into alternative geometries for uncertainty regions could be
+interesting in order to reduce the gap between the provided
+region of uncertainty and the high-density areas of the true
+posterior distribution. This includes an option to divide the
+spatial domain into meaningful segments, while minimizing
+the uncertainty volume, or consider a mixture of Gaussians
+modeling of the samples of the estimated posterior distribu-
+tion. Additionally, exploring alternative diffusion models and
+various conditional stochastic samplers presents an interesting
+path for future investigation. This could involve comparing dif-
+ferent conditional samplers, potentially offering an alternative
+approach to the utilization of FID scores.
+REFERENCES
+[1] Anastasios N Angelopoulos, Amit Pal Kohli, Stephen Bates, Michael
+Jordan, Jitendra Malik, Thayer Alshaabi, Srigokul Upadhyayula, and
+Yaniv Romano.
+Image-to-image regression with distribution-free un-
+certainty quantification and applications in imaging. In International
+Conference on Machine Learning, pages 717–730. PMLR, 2022.
+[2] Eliahu Horwitz and Yedid Hoshen. Conffusion: Confidence intervals for
+diffusion models. arXiv preprint arXiv:2211.09795, 2022.
+[3] Roger Koenker and Gilbert Bassett Jr. Regression quantiles. Economet-
+rica: journal of the Econometric Society, pages 33–50, 1978.
+[4] Swami Sankaranarayanan, Anastasios N Angelopoulos, Stephen Bates,
+Yaniv Romano, and Phillip Isola.
+Semantic uncertainty intervals for
+disentangled latent spaces. arXiv preprint arXiv:2207.10074, 3, 2022.
+[5] Mehdi Mirza and Simon Osindero. Conditional generative adversarial
+nets. arXiv preprint arXiv:1411.1784, 2014.
+[6] Prafulla Dhariwal and Alexander Nichol. Diffusion models beat gans on
+image synthesis. Advances in Neural Information Processing Systems,
+34:8780–8794, 2021.
+[7] Jascha Sohl-Dickstein, Eric Weiss, Niru Maheswaranathan, and Surya
+Ganguli. Deep unsupervised learning using nonequilibrium thermody-
+namics. In International Conference on Machine Learning, pages 2256–
+2265. PMLR, 2015.
+[8] Jonathan Ho, Ajay Jain, and Pieter Abbeel. Denoising diffusion prob-
+abilistic models. Advances in Neural Information Processing Systems,
+33:6840–6851, 2020.
+[9] Jonathan Ho, Chitwan Saharia, William Chan, David J Fleet, Moham-
+mad Norouzi, and Tim Salimans. Cascaded diffusion models for high
+fidelity image generation. J. Mach. Learn. Res., 23(47):1–33, 2022.
+[10] Chitwan Saharia, Jonathan Ho, William Chan, Tim Salimans, David J
+Fleet, and Mohammad Norouzi.
+Image super-resolution via iterative
+refinement.
+IEEE Transactions on Pattern Analysis and Machine
+Intelligence, 2022.
+[11] Chitwan Saharia, William Chan, Huiwen Chang, Chris Lee, Jonathan
+Ho, Tim Salimans, David Fleet, and Mohammad Norouzi.
+Palette:
+Image-to-image diffusion models. In ACM SIGGRAPH 2022 Conference
+Proceedings, pages 1–10, 2022.
+[12] Vladimir Vovk, Alexander Gammerman, and Glenn Shafer. Algorithmic
+learning in a random world, volume 29. Springer, 2005.
+[13] Jing Lei, Max G’Sell, Alessandro Rinaldo, Ryan J Tibshirani, and
+Larry Wasserman. Distribution-free predictive inference for regression.
+Journal of the American Statistical Association, 113(523):1094–1111,
+2018.
+[14] Anastasios N Angelopoulos and Stephen Bates. A gentle introduction
+to conformal prediction and distribution-free uncertainty quantification.
+arXiv preprint arXiv:2107.07511, 2021.
+[15] Anastasios N Angelopoulos, Stephen Bates, Emmanuel J Cand`es,
+Michael I Jordan, and Lihua Lei. Learn then test: Calibrating predictive
+algorithms to achieve risk control.
+arXiv preprint arXiv:2110.01052,
+2021.
+[16] St´ephane Lathuili`ere, Pablo Mesejo, Xavier Alameda-Pineda, and Radu
+Horaud. A comprehensive analysis of deep regression. IEEE transac-
+tions on pattern analysis and machine intelligence, 42(9):2065–2081,
+2019.
+[17] Venkataraman Santhanam, Vlad I Morariu, and Larry S Davis. Gen-
+eralized deep image to image regression. In Proceedings of the IEEE
+Conference on Computer Vision and Pattern Recognition, pages 5609–
+5619, 2017.
+[18] Xinchen Yan, Jimei Yang, Kihyuk Sohn, and Honglak Lee.
+At-
+tribute2image: Conditional image generation from visual attributes. In
+Computer Vision–ECCV 2016: 14th European Conference, Amsterdam,
+The Netherlands, October 11–14, 2016, Proceedings, Part IV 14, pages
+776–791. Springer, 2016.
+[19] Karol Gregor, Ivo Danihelka, Alex Graves, Danilo Rezende, and Daan
+Wierstra.
+Draw: A recurrent neural network for image generation.
+In International conference on machine learning, pages 1462–1471.
+PMLR, 2015.
+[20] Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David
+Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Gen-
+erative adversarial networks. Communications of the ACM, 63(11):139–
+144, 2020.
+[21] Yang Song and Stefano Ermon.
+Generative modeling by estimating
+gradients of the data distribution.
+Advances in neural information
+processing systems, 32, 2019.
+[22] Zahra Kadkhodaie and Eero P Simoncelli.
+Solving linear inverse
+problems using the prior implicit in a denoiser.
+arXiv preprint
+arXiv:2007.13640, 2020.
+[23] Yang Song, Jascha Sohl-Dickstein, Diederik P Kingma, Abhishek
+Kumar, Stefano Ermon, and Ben Poole.
+Score-based generative
+modeling through stochastic differential equations.
+arXiv preprint
+arXiv:2011.13456, 2020.
+[24] Bahjat Kawar, Gregory Vaksman, and Michael Elad. Stochastic image
+denoising by sampling from the posterior distribution. In Proceedings
+of the IEEE/CVF International Conference on Computer Vision, pages
+1866–1875, 2021.
+[25] Bahjat Kawar, Gregory Vaksman, and Michael Elad.
+Snips: Solving
+noisy inverse problems stochastically. Advances in Neural Information
+Processing Systems, 34:21757–21769, 2021.
+[26] Bahjat Kawar, Michael Elad, Stefano Ermon, and Jiaming Song. De-
+noising diffusion restoration models. arXiv preprint arXiv:2201.11793,
+2022.
+[27] Zahra Kadkhodaie, Florentin Guth, St´ephane Mallat, and Eero P Si-
+moncelli. Learning multi-scale local conditional probability models of
+images. arXiv preprint arXiv:2303.02984, 2023.
+[28] Yaniv Romano, Evan Patterson, and Emmanuel Candes. Conformalized
+quantile regression. Advances in neural information processing systems,
+32, 2019.
+[29] Victor Chernozhukov, Kaspar W¨uthrich, and Yinchu Zhu. Distributional
+conformal prediction. Proceedings of the National Academy of Sciences,
+118(48):e2107794118, 2021.
+[30] Matteo Sesia and Yaniv Romano. Conformal prediction using condi-
+tional histograms. Advances in Neural Information Processing Systems,
+34:6304–6315, 2021.
+[31] Chirag Gupta, Arun K Kuchibhotla, and Aaditya Ramdas.
+Nested
+conformal prediction and quantile out-of-bag ensemble methods. Pattern
+Recognition, 127:108496, 2022.
+[32] Danijel Kivaranovic, Kory D Johnson, and Hannes Leeb.
+Adaptive,
+distribution-free prediction intervals for deep networks. In International
+Conference on Artificial Intelligence and Statistics, pages 4346–4356.
+PMLR, 2020.
+[33] Stephen Bates, Anastasios Angelopoulos, Lihua Lei, Jitendra Malik,
+and Michael Jordan. Distribution-free, risk-controlling prediction sets.
+Journal of the ACM (JACM), 68(6):1–34, 2021.
+[34] Anastasios N Angelopoulos, Stephen Bates, Adam Fisch, Lihua Lei, and
+Tal Schuster. Conformal risk control. arXiv preprint arXiv:2208.02814,
+2022.
+[35] Jacopo Teneggi, Matthew Tivnan, Web Stayman, and Jeremias Sulam.
+How to trust your diffusion model: A convex optimization approach
+to conformal risk control.
+In International Conference on Machine
+Learning, pages 33940–33960. PMLR, 2023.
+[36] Yves Meyer.
+Orthonormal wavelets.
+In Wavelets: Time-Frequency
+Methods and Phase Space Proceedings of the International Conference,
+Marseille, France, December 14–18, 1987, pages 21–37. Springer, 1990.
+[37] Tero Karras, Timo Aila, Samuli Laine, and Jaakko Lehtinen. Progressive
+growing of gans for improved quality, stability, and variation.
+arXiv
+preprint arXiv:1710.10196, 2017.
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+13
+Fig. 12. A visual representation demonstrating the intuition behind utilizing principal components (PCs) as the basis, ˆB(x), in Equation (1) for the colorization
+task. The left part illustrates that the PCs incorporate spatial correlation, with ˆv1(x) primarily controlling the hat color, ˆv2(x) governing the background
+color, and ˆv3(x) influencing the clothing color. On the right side, an illustration of the uncertainty region is presented, composed of these axes, where the
+origin is ˆµ(x), and each image is defined by ˆµ(x) + ˆvi(x)T yc + a, where yc := y −ˆµ(x), and a ∈R is a controllable parameter that moves along the axis.
+[38] Tero Karras, Samuli Laine, and Timo Aila.
+A style-based generator
+architecture for generative adversarial networks. In Proceedings of the
+IEEE/CVF conference on computer vision and pattern recognition, pages
+4401–4410, 2019.
+APPENDIX
+A. Visualizing the Principal Component Vectors
+Figure 12 depicts the role of the Principal Component (PCs)
+vectors in the context of the image colorization task. This
+figure provides an intuition behind employing these vectors for
+the uncertainty quantification. We show the estimation of the
+first three PCs using our globally applied PUQ and visualize
+the uncertainty region formed by these axes. Our approach
+facilitates efficient exploration within the uncertainty region,
+thanks to the linear axes that incorporate spatial correlation,
+as illustrated by the visualization of ˆv1(x), ˆv2(x), and ˆv3(x).
+B. Coverage Loss Justification
+This section aims to justify our choice for the loss-function
+for tuning λ in Equation (5), and the weights used in it, ˆwi(x).
+Recall, this expression is given as:
+L(x, y; λ) :=
+d
+X
+i=1
+ˆwi(x) · 1
+n
+ˆvi(x)T y ̸∈Tλ(x; ˆB(x))i
+o
+.
+Our starting point is the given d-dimensional hyper-
+rectangle obtained from the approximation phase, oriented
+along the d PC directions. This shape serves as our ini-
+tially estimated uncertainty region. Given the calibration data,
+Scal := {(xi, yi)}n
+i=1, our goal is to inflate (or deflate, if this
+body proves to be exaggerated) this shape uniformly across
+all axes so that it contains the majority of the ground truth
+examples.
+Focusing on a single pair from this dataset, (x, y), the
+degraded image x is used to ignite the whole approximation
+phase, while the ground truth y serves for assessing the
+obtained hyper-rectangle, by considering the projected coor-
+dinates {ˆvi(x)T yc}d
+i=1, where yc := y −ˆµ(x). The following
+function measures a potential deviation in the i-th axis,
+hi(x, y) := max
+
+ˆvi(x)T yc −ˆu(x)i, 0
+	
+(11)
++ max
+
+−ˆvi(x)T yc + ˆl(x)i, 0
+	
+.
+Written differently, this expression is also given by
+hi(x, y) :=
+
+
+
+
+
+ˆvi(x)T yc −ˆu(x)i
+if ˆvi(x)T yc > ˆu(x)i > 0
+ˆl(x)i −ˆvi(x)T yc
+if ˆvi(x)T yc < −ˆl(x)i < 0
+0
+otherwise.
+If positive, this implies that in this axis the example spills
+outside the range of the rectangle, and the value itself is the
+distance from it’s border.
+The following expression quantifies the weighted amount
+of energy that should be invested in projecting back the
+{ˆvi(x)T y}d
+i=1 coordinates to the closest border point:
+Energy(x, y) =
+d
+X
+i=1
+ˆσi(x)2hi(x, y)2.
+(12)
+Note that in our weighting we prioritize high-variance axes,
+in which deviation from the boundaries is of greater impact.
+Naturally, we should tune λ, which scales ˆu(x)i and ˆl(x)i,
+so as to reduce this energy below a pre-chosen threshold,
+thus guaranteeing that the majority of ground truth images fall
+within the hyper-rectangle. While this expression is workable,
+it suffers from two shortcomings: (1) It is somewhat involved
+to compute; and (2) The threshold to use with it is hard to
+interpret and thus to choose. Therefore, similar to previous
+approaches [1], [2], we opted in this work for a binary version
+of Equation (11) of the form
+bi(x, y) :=
+(
+1
+if hi(x, y) > 0
+0
+otherwise.
+(13)
+In addition, we divide the energy expression, defined in
+Equation (12), by the sum of squares of all the singular values,
+and this way obtain exactly L(x, y; λ) as in Equation (5).
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+14
+Observe that, by definition, we get that 0 ≤L(x, y; λ) ≤1,
+where the bottom bound corresponds to a point fully within
+the rectangle, and the upper bound for the case where the
+point is fully outside in all axes. Therefore, thresholding
+the expectation of this value with α ≪1 is intuitive and
+meaningful.
+C. Reconstruction Loss Justification
+This section aims to discuss our choice for the loss function
+for tuning λ1 in Equation (8), given by
+L1(x, y; λ1) := ˆQq
+
+
+
+
+
+
+
+ˆk(x;λ1)
+X
+j=1
+ˆvj(x)T ycˆvj(x) −yc
+
+i
+
+
+
+d
+i=1
+
+
+.
+Recall the process: We begin with K ≤d PCs obtained from
+the approximation phase, and then choose ˆk(x; λ1) ≤K of
+them as instance-specific number of PCs for the evaluation of
+the uncertainty.
+Given a calibration pair (x, y), x is used to derive
+ˆk(x; λ1), defining a low-dimensional subspace
+ˆV (x)
+:=
+[ˆv1(x), . . . , ˆvˆk(x;λ1)(x)] ∈Rˆk(x;λ1)×d. This, along with the
+conditional-mean, ˆµ(x), represent Py|x as an affine subspace.
+The ground-truth image y is then projected onto this slab via:
+Projection(y) := ˆµ(x) + ˆV (x) ˆV (x)T yc
+(14)
+= ˆµ(x) +
+ˆk(x;λ1)
+X
+j=1
+ˆvj(x)T ycˆvj(x) ,
+where yc := y −ˆµ(x).
+The parameter λ1 should be tuned so as to guarantee that
+this projection entails a bounded error, dist(y, Projection(y))
+in expectation. A natural distance measure to use here is
+the L2-norm of the difference, which aligns well with our
+choice to use SVD in the approximation phase. However,
+L2 accumulates the error over the whole support, thus los-
+ing local interpretability. An alternative is using L∞which
+quantifies the worst possible pixelwise error induced by the
+low-dimensional projection,
+dist(y, Projection(y)) :=
+
+ˆk(x;λ1)
+X
+j=1
+ˆvj(x)T ycˆvj(x) −yc
+
+∞
+.
+While this measure is applicable in many tasks, there are
+cases (e.g., inpainting) in which controlling a small maximum
+error requires the use of a large number of PCs, ˆk(x; λ1). To
+address this, we propose a modification by considering the
+maximum error over a user-defined ratio of pixels, q ∈(0, 1),
+a value close to 1. This is equivalent to determining the q-th
+empirical quantile, ˆQq, of the error values among the pixels,
+providing a more flexible and adaptive approach, which also
+aligns well with the rationale of uncertainty quantification, in
+which the statistical guarantees are given with probabilistic
+restrictions.
+D. Reduced Dimension-Adaptive PUQ
+The DA-PUQ procedure (see Section IV-B2) reduces the
+number of PCs to be constructed to K ≤d while using
+ˆk(x; ˆλ1) ≤K PCs, leading to increased efficiency in both time
+and space during inference. However, determining manually
+the smallest K value that can guarantee both Equation (2)
+and Equation (4) with high probability can be challenging.
+To address this, we propose an expansion of the DA-PUQ
+procedure; the Reduced Dimension-Adaptive PUQ (RDA-
+PUQ) procedure that also controls the maximum number
+of PCs required for the uncertainty assessment. While this
+approach is computationally intensive during calibration, it is
+advantageous for inference as it reduces the number of samples
+required to construct the PCs using Algorithm 2.
+Specifically, for each input instance x and its corresponding
+ground-truth value y in the calibration data, we use the estima-
+tors obtained in the approximation phase, to estimate ˆKλ3 PCs
+of possible solutions, denoted by ˆB(x), their corresponding
+importance weights, denoted by ˆw(x), the conditional mean
+denoted by ˆµ(x), and the lower and upper bounds denoted by
+˜l(x) and ˜u(x), respectively. Note that these estimates are now
+depend on λ3, we omit the additional notation for simplicity.
+Then, for each choice of λ3, we use these ˆKλ3-dimensional
+estimates exactly as in the DA-PUQ procedure to achieve both
+the coverage and reconstruction guarantees of Equation (2) and
+Equation (4) with high probability.
+Similar to previous approaches, we aim to minimize the
+uncertainty volume, defined in Equation (3), for the scaled
+ˆKλ3-dimensional intervals where any additional axis (d−ˆKλ3
+axes) is fixed to zero. We denote the uncertainty volume
+in this setting as Vλ1,λ2,λ3. The minimization of Vλ1,λ2,λ3
+is achieved by minimizing λ1, λ2 and λ3, while ensuring
+that the guarantees of Equation (2) and Equation (4) are
+satisfied with high probability. This can be provided using a
+conformal prediction scheme, for example, through the LTT
+[15] calibration scheme, which ensures that the following
+holds:
+P
+
+E[L1(x, y; ˆλ1, ˆλ3)] ≤β
+E[L2(x, y; ˆλ1, ˆλ2, ˆλ3)] ≤α
+
+≥1 −δ ,
+(15)
+where ˆλ1, ˆλ2 and ˆλ3 are the minimizers for the uncertainty
+volume among valid calibration parameter results, ˆΛ, obtained
+through the LTT procedure. Note that the loss functions,
+L1 and L2, in the above are exactly those of the DA-PUQ
+procedure, defined in Equation (8) and Equation (9), while
+replacing K with ˆKλ3.
+Intuitively, Equation (15) guarantees that a fraction q of the
+ground-truth pixel values is recovered with an error no greater
+than β using no more than ˆKˆλ3 principal components, and a
+fraction of more than 1−α of the projected ground-truth values
+onto the first ˆk(x; ˆλ1) principal components (out of ˆKˆλ3) are
+contained in the uncertainty intervals, with a probability of at
+least 1−δ. The RDA-PUQ procedure is formally described in
+Algorithm 5.
+E. Experimental Details
+This section provides details of the experimental method-
+ology employed in this study, including the datasets used,
+architectures implemented, and the procedural details and
+hyperparameters of our method.
+1) Datasets and Preprocessing: Our machine learning sys-
+tem was trained using the Flickr-Faces-HQ (FFHQ) dataset
+[38], which includes 70,000 face images at a resolution of
+128x128. We conducted calibration and testing on the CelebA-
+HQ (CelebA) dataset [37], which also consists of face images
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+15
+Algorithm 5 Reduced Dimension-Adaptive PUQ Proc.
+Input: Calibration set Scal
+:= {xi, yi}n
+i=1. Scanned calibration
+parameter values Λ1 ←[1 . . . λ1max], Λ2 ←[1 . . . λ2max] and
+Λ3 ←[1 . . . λ3max]. Maximal PCs number K ≤d. Approx-
+imation phase estimators ˆB, ˆw, ˆµ, ˜u, ˜l. Recovered pixels ratio
+q ∈(0, 1). Reconstruction error β ∈(0, 1). Misscoverage ratio
+α ∈(0, 1). Calibration error level δ ∈(0, 1).
+1: for (x, y) ∈Scal do
+2:
+for λ3 ∈Λ3 do
+▷Reduce dimensionality
+3:
+ˆKλ3 ←⌊K · λ3⌋
+4:
+ˆB(x), ˆw(x), ˆµ(x), ˜u(x), ˜l(x) ←Apply Algorithm 2
+to x, with the choice of ˆKλ3 samples
+5:
+for λ1 ∈Λ1 do
+▷Compute adaptive dimensionality, Equation (7)
+6:
+ˆk(x; λ1, λ3) ←
+mink
+
+k : P ˆ
+Kλ3
+i=1 ˆwi(x) ≥λ1
+
+▷Compute reconstruction loss, Equation (8)
+7:
+yc ←y −ˆµ(x)
+8:
+L1(x, y; λ1, λ3) ←
+ˆQq
+
+Pˆk(x;λ1,λ3)
+j=1
+ˆvj(x)T ycˆvj(x) −yc
+
+i
+d
+i=1
+
+9:
+for λ2 ∈Λ2 do
+▷Scale uncertainty intervals
+10:
+ˆu(x) ←λ2˜u(x) and ˆl(x) ←λ2˜l(x)
+11:
+Tλ2(x; ˆB(x)) ←
+Equation (1) using ˆµ(x), ˆu(x), ˆl(x)
+▷Compute weighted coverage loss, Equation (5)
+12:
+L2(x, y; λ1, λ2, λ3) ←Pˆk(x;λ1,λ3)
+i=1
+ˆwi(x)·
+1
+n
+ˆvi(x)T y ̸∈Tλ2(x; ˆB(x))i
+o
+13:
+end for
+14:
+end for
+15:
+end for
+16: end for
+17: ˆΛ
+←
+Extract
+valid
+λs
+from
+LTT
+[15]
+applied
+on
+{(L1(x, y; λ1, λ3), L2(x, y; λ1, λ2, λ3))
+:
+(x, y) ∈Scal, λ1 ∈Λ1, λ2 ∈Λ2, λ3 ∈Λ3}
+at
+risk
+levels
+(β, α).
+▷Compute the minimizers for the uncer. volume, Equation (3)
+18: ˆλ1, ˆλ2, ˆλ3 ←arg minλ1,λ2,λ3∈ˆΛ
+n
+1
+n
+Pn
+i=1 Vλ1,λ2(xi; ˆB(xi))
+o
+Output: Given a new instance x ∈X, obtain valid uncertainty
+intervals for it, Tˆλ2(x; ˆB(x)) over ˆk(x; ˆλ1) ≤ˆKˆλ3 PCs.
+and was resized to match the resolution of our training data. To
+this end, we randomly selected 2,000 instances from CelebA,
+of which 1,000 were used for calibration and 1,000 for testing.
+For the colorization experiments, a grey-scale transformation
+was applied to the input images. For the super-resolution
+experiments, patches at a resolution of 32x32 were averaged
+to reduce the input image resolution by a factor of 4 in
+each dimension. For the inpainting experiments, we randomly
+cropped pixels from the input images during the training phase,
+either in squares or irregular shapes; while for the calibration
+and testing data, we cropped patches at a resolution of 64x64
+at the center of the image.
+2) Architecture and Training: In all our experiments, we
+applied the approximation phase using recent advancements in
+conditional image generation through diffusion-based models,
+while our proposed general scheme in Algorithm 1 can accom-
+modate any stochastic regression solvers for inverse problems,
+such as conditional GANs [5]. In all tasks, we utilized the
+framework for conditional diffusion-based models proposed
+in the SR3 work [10], using a U-Net architecture. For each of
+the three tasks, we trained a diffusion model separately and
+followed the training regimen outlined in the code of [10].
+To ensure a valid comparison with the baseline methods, we
+implemented them using the same architecture and applied the
+same training regimen. All experiments, including the baseline
+methods, were trained for 10,000 epochs with a batch size of
+1,024 input images.
+3) PUQ Procedures and Hyperparameters: Our experi-
+mental approach follows the general scheme presented in
+Algorithm 1 and consists of 2 sets of experiments: local
+experiments on patches and global experiments on entire
+images. For the local experiments, we conducted 4 experi-
+ments of the E-PUQ procedure (detailed in Section IV-B1) on
+RGB patch resolutions of 1x1, 2x2, 4x4, and 8x8. We used
+K = 3, K = 12, K = 48, and K = 192 PCs for each
+resolution, respectively. We set α = δ = 0.1 to be the user-
+specified parameters of the guarantee, defined in Equation (6).
+In addition, we conducted another 2 experiments of the DA-
+PUQ (detailed in Section IV-B2), and RDA-PUQ (detailed in
+Appendix D) procedures on RGB patch resolution of 8x8. We
+set q = 0.9, β = 0.05 and α = δ = 0.1, to be the user-
+specified parameters of the guarantees of both Equation (10)
+and Equation (15). In total, we conducted 18 local experiments
+across three tasks. For the global experiments, we used entire
+images at a resolution of 128x128, in which we applied the
+DA-PUQ and the RDA-PUQ procedures. As global working
+is suitable for tasks that exhibit strong pixel correlation, we
+applied these experiment only on the task of image coloriza-
+tion. We set q = 0.95, β = α = δ = 0.1, to be the user-
+specified parameters of the guarantees of both Equation (10)
+and Equation (15). Both locally and globally, for the DA-PUQ
+and RDA-PUQ experiments, we used K = 100 PCs in the
+colorization task and K = 200 PCs in super-resolution and
+inpainting. We note that in the RDA-PUQ experiments, we
+used ˆK PCs during inference, as discussed in Appendix D. In
+all experiments we used ϵ = 1e −10 for the computation of
+the uncertainty volume, defined in Equation (3).
+F. Comparative Samples from Uncertainty Regions
+We provide here more details referring to the experiment
+involving a visualization of samples drawn from the uncer-
+tainty regions of baseline methods [1], [2] and our proposed
+approach. We note that the baseline methods lack such an
+experiment.
+This experiment was conducted across entire images, show-
+ing that our uncertainty region is much tighter, containing
+highly probable image candidates, compared to the pixelwise
+baseline methods. These methods tend to generate exaggerated
+uncertainty regions that encompass a range of noisy images,
+diverging from the posterior distribution of images given
+a measurement. Our success in producing more confined
+regions, encompassing the ground truth within them, is a direct
+consequence of the incorporation of spatial correlations.
+To justify this claim, we trained the identical architecture
+for each baseline method and applied the same training regime
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+16
+Fig. 13. Global Experiments: A comparison of DA-PUQ (see Section IV-B2)
+and RDA-PUQ (see Appendix D), when applied globally on super-resolution
+and inpainting tasks with α = β = δ = 0.1, where in super-resolution we
+set q = 0.95 and in inpainting we set q = 0.8. The uncertainty volume was
+computed with ϵ = 1e −10.
+x
+y
+Recons.
+ˆv1(x)
+ˆv2(x)
+Fig. 14.
+Global Experiments: Visual presentation of uncertainty regions
+provided by DA-PUQ when applied globally for the super-resolution task.
+The reconstructed image is given by ˆµ(x) + Pˆk(x)
+i=1 ˆvi(x)T ycˆvi(x), where
+yc := y −ˆµ(x). The values of ˆk(x), ˆw1(x) and ˆw2(x) are shown in the top
+left corners of the corresponding columns.
+that was utilized in our approach, leveraging the official code
+of both methods. Each baseline method generates uncertainty
+intervals via pixel-based uncertainty maps, which is equivalent
+to our general definition of uncertainty intervals defined by
+Equation (1), while employing standard basis vectors. There-
+fore, we uniformly sampled values within the uncertainty
+intervals of each approach, including our own, and showcased
+the resulting images.
+G. Additional Global Experiments
+In Section V we presented global studies of our DA-PUQ and
+RDA-PUQ, focusing on their deployment in the colorization
+task. Here, we extend this analysis by presenting additional
+global studies for super-resolution and inpainting, ensuring a
+more comprehensive assessment of our methods.
+It is worth mentioning that the tasks of super-resolution
+and inpainting differ in nature from colorization. In super-
+resolution and inpainting, the decay in the associated singular
+values of each posterior distribution occurs relatively slowly,
+|—————— Our ——————-|
+im2im-uq
+Conffusion
+Fig. 15. Global Experiments: Images sampled uniformly from the estimated
+global uncertainty regions, referring to the super-resolution task. Using DA-
+PUQ results with high-perceptual images, while im2im-uq [1] and Conffusion
+[2] produce unlikely images. These results indicate that our uncertainty regions
+are significantly more confined than those of previous works.
+x
+y
+Recons.
+ˆv1(x)
+ˆv2(x)
+Fig. 16.
+Global Experiments: Visual presentation of uncertainty regions
+provided by DA-PUQ when applied globally for the inpainting task. The
+reconstructed image is given by ˆµ(x)+Pˆk(x)
+i=1 ˆvi(x)T ycˆvi(x), where yc :=
+y −ˆµ(x). The values of ˆk(x), ˆw1(x) and ˆw2(x) are shown in the top left
+corners of the corresponding columns.
+indicating a more localized impact. This contrasts with the
+colorization task, where the decay in singular values is more
+rapid and pronounced, implying stronger pixel correlations.
+Consequently, constructing global representations of uncer-
+tainty regions in the colorization task is effective, with strong
+guarantees involving small reconstruction errors over a large
+number of pixels using far fewer axes.
+Nevertheless, we have applied our DA-PUQ and RDA-PUQ
+globally to the tasks of super-resolution and inpainting, and
+the quantitative results are depicted in Figure 13. In both
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+17
+|—————— Our ——————-|
+im2im-uq
+Conffusion
+Fig. 17. Global Experiments: Images sampled uniformly from the estimated
+global uncertainty regions, referring to the inpainting task. Using DA-PUQ
+results with high-perceptual images, while im2im-uq [1] and Conffusion [2]
+produce unlikely images. These results indicate that our uncertainty regions
+are significantly more confined than those of previous works.
+studies, we utilized 1500 samples for the calibration data
+and 500 samples for the test data. This is different from
+the global colorization study, where we used 1000 samples
+for both calibration and test data. This adjustment aims to
+narrow the gap between the true risks of unseen data and
+the concentration bounds employed in the calibration scheme,
+ultimately allowing us to provide more robust guarantees,
+including small coverage and reconstruction risks with high
+probability.
+Additionally, we set α = β = δ = 0.1 in both studies.
+However, in the super-resolution study, we maintained q =
+0.95, which is consistent with the setting used in the global
+colorization. In contrast, for inpainting, we chose q = 0.8,
+indicating a softer reconstruction guarantee applicable to 80%
+of the pixels within the missing window.
+The results depicted in Figure 13 reveal that our method
+consistently yields significantly smaller uncertainty volumes
+compared to our local results presented in Section V and pre-
+vious research. However, this reduction in uncertainty volume
+comes at the cost of introducing a reconstruction risk, reaching
+a maximum of β = 0.1, which applies to 95% of the pixels
+in super-resolution and 80% of the pixels in inpainting.
+Observe the improvement in interpretability that our DA-
+PUQ method brings to the table. Notably, the uncertainty
+regions generated by DA-PUQ consist of only ∼10 PCs within
+the full-dimensional space of the images. In contrast, the
+uncertainty regions produced by our RDA-PUQ experiments
+comprise ∼100 PCs, indicating a slower decay in the singu-
+lar values of the posterior distribution associated with each
+uncertainty region.
+Figures 14 and
+16 showcase selected uncertainty regions
+provided by our proposed DA-PUQ when applied globally
+to the super-resolution and inpainting tasks, respectively. No-
+tably, the projected ground-truth images using only ˆk(x) PCs
+resemble the originals. This observation indicates that the un-
+certainty region effectively captures the spread and variability
+among solutions while maintaining satisfying reconstruction
+errors.
+In the inpainting task presented in Figure 16, the first two
+axes of our uncertainty regions exhibit semantic content, an
+indicator to our method’s ability to consider spatial pixel
+correlation. The PCs effectively capture features such as
+sunglasses, eyebrows, and forehead, highlighting the unique
+strength of our approach in terms of interpretability. However,
+in the super-resolution task depicted in Figure 14, localized
+PCs emerge, implying that only a few pixel values are affected
+in each axis of uncertainty.
+In Figures 15 and 17, we visually compare samples gen-
+erated from the corresponding estimated uncertainty regions.
+These samples are obtained by uniformly sampling from the
+respective hyper-rectangle, then transforming to the image
+domain. For further details regarding this study, please refer
+to Appendix F. This visual comparison4 shows that sam-
+ples extracted from our uncertainty regions exhibit higher
+perceptual quality compared to those generated by im2im-
+uq [1] and Conffusion [2]. This observation implies that our
+method provides tighter uncertainty regions, whereas previous
+work results in exaggerated uncertainty regions that contain
+improbable images.
+H. Ablation Study
+We turn to introduce an ablation study on the user-specified
+parameters: α, β, q, and δ. These parameters are used in the
+context of the statistical guarantees provided by our proposed
+method, and our objective is to offer a comprehensive under-
+standing of how to select these parameters and their resulting
+impact on performance. To elaborate, α ∈(0, 1) is employed
+to ensure coverage, as indicated in Equation (2), while both
+β ∈(0, 1) and q ∈(0, 1) play a role in establishing the recon-
+struction guarantee, as defined in Equation (4). Additionally,
+the parameter δ ∈(0, 1) is used for controlling the error rate
+associated with both guarantees over the calibration data.
+An effective calibration process relies on these user-
+specified parameters, α, β, and δ approaching values close
+to zero, while q should ideally approach 1. The choice of
+these parameters is guided by the amount of available calibra-
+tion data. In cases where a substantial calibration dataset is
+accessible, it becomes feasible to establish robust statistical
+assessments. This is manifested by the ability to employ
+smaller values for α, β, and δ, while favoring a higher value
+for q. For instance, achieving a 90% coverage rate (α = 0.1),
+with a reconstruction error threshold of 5% (β = 0.05) across
+95% of the image pixels (q = 0.95) serves as an illustrative
+example of such robust assessments.
+It is worth noting that our primary aim in this work is
+to enhance the interpretability of the uncertainty assessment
+within the context of the inverse problems. This is achieved
+through the methods we propose, DA-PUQ and RDA-PUQ.
+Consequently, we strive to provide the user with a more
+4These results are better seen by zooming in, and especially so for the
+super-resolution task.
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+18
+Fig. 18. An ablation study of DA-PUQ in a locally applied colorization task on 8x8 RGB patch resolution. We examine the user-defined parameters α, β, q,
+and δ, showcasing their impact on the mean uncertainty volume, mean dimensionality, coverage risk, and reconstruction risk. The default values are α = 0.05,
+β = 0.05, q = 0.95, and δ = 0.05 using K = 200 PCs. Our results are depicted in green, with threshold values for guarantees highlighted in dashed black.
+concise set of uncertainty axes, referred to as the selected
+axes denoted as ˆB(x) = {ˆv1(x), ˆv2(x), . . . , ˆvˆk(x)(x)}. Our
+approach for selecting the reconstruction guarantee is geared
+towards a balance between precision and interpretability. On
+one hand, we aim to establish a robust and stringent recon-
+struction guarantee to accurately capture the uncertainty of
+the posterior distribution across the d dimensions. On the
+other hand, we aim to incorporate a softer reconstruction
+guarantee that results in providing fewer axes of uncertainty
+thus enhancing interpretability.
+Figure 18 illustrates the quantitative results of the abla-
+tion study conducted on DA-PUQ, where we investigate the
+influence of the user-defined parameters, α, β, q, and δ,
+on DA-PUQ’s performance. It is important to note that the
+default settings in each study are the following: α = 0.05,
+β = 0.05, q = 0.95, and δ = 0.05, representing a spectrum of
+strengthening and softening parameter choices.
+Analyzing the results, we observe that α primarily controls
+the coverage aspect. As α increases, the uncertainty intervals
+become narrower, leading to more tightly constrained uncer-
+tainty regions. This trend is evident in the reduction of the
+uncertainty volume metric. However, it is noteworthy that α
+has no impact on the reconstruction error, as the dimension and
+reconstruction risk remain relatively consistent across different
+choices of α.
+The parameter β influences the reconstruction error, with
+even slight alterations affecting the number of selected axes,
+denoted as ˆk(x). On the other hand, the parameter q has a rel-
+atively minor effect on performance. Adjusting q does impact
+the uncertainty volume, with smaller dimensions resulting in
+a reduction in uncertainty volume. Higher values for q lead
+to the selection of more PCs for the uncertainty assessment,
+involving more pixels in the reconstruction guarantee.
+Referring to the parameter δ, we observe minor changes
+in the coverage risk, while the reconstruction risk undergoes
+more significant changes. This suggests that errors in the
+uncertainty assessments tend to be more focused on the
+reconstruction guarantee rather than the coverage guarantee.
+In terms of the precision and interpretability trade-off, the
+ideal scenario would involve selecting the smallest possible
+value for β, as demonstrated in Figure 18 with β = 0.02.
+However, such a stringent guarantee would require the use
+Fig. 19. An analysis illustrating the precision-complexity trade-off of global
+DA-PUQ in the colorization task. The complexity aspect is presented by
+varying values of K, while precision is represented by the mean number
+of PCs provided for the user, denoted as ˆk(x). The parameters setting is:
+α = 0.1, β = 0.1, q = 0.95 and δ = 0.1. Smaller ˆk(x) values correspond
+to more accurate PCs, while lower values of K indicate improved method
+complexity.
+of approximately 188.3 PCs, which can harm interpretability.
+In this case, a softer guarantee, such as β = 0.04, results in
+the use of only around 5.13 PCs, striking a more balanced
+trade-off between precision and interpretability.
+I. Precision and Complexity Trade-off
+We now discuss the trade-off between precision and com-
+plexity in our work. Precision here stands for the ability to
+accurately capture uncertainty within the posterior distribution
+across the d dimensions, as reflected by the reconstruction
+risk. Conversely, complexity involves two key aspects: the
+complexity associated with our diffusion model for generating
+posterior samples and the computational demands of PCA.
+Both of these aspects are influenced by the chosen value of
+K ≤d, which serves both as the number of drawn samples
+and the overall number of initial PC’s to work with. As for the
+complexity: (i) Assuming that a single diffusion iteration can
+be achieved in constant time, the complexity of generating K
+samples is given by O(IK), where I ∈N denotes the number
+of iterations in the diffusion algorithm; and (ii) For the PCA,
+the complexity is provided by O(d2K + d3), where K refers
+to the number of PCs.
+Therefore, the value of K ≤d plays a pivotal role in
+governing the precision-complexity trade-off across all our
+proposed methods: E-PUQ, DA-PUQ, and RDA-PUQ, all of
+which involve sampling and PCA. The greater the number of
+PCs employed, the more precise our uncertainty assessment, at
+the expense of computational complexity, as discussed above.
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+19
+x
+y
+ˆµ(x)
+lo
+up
+lo
+up
+lo
+up
+|——— Our ———| |—– im2im-uq ——| |—– Conffusion —–|
+Fig. 20.
+Visual analysis (left) of the lower and upper corners generated by our global DA-PUQ across three tasks: image colorization, super-resolution,
+and inpainting. On the right side, a 2D example illustrates an uncertainty region constructed by our approach in contrast to one produced by the pixelwise
+approach, demonstrating the distinction between the lower and upper corners in each approach.
+In the case of E-PUQ, we achieve a complete uncertainty
+assessment at the computation cost of K = d. This leads to
+the effective reduction of the reconstruction risk to zero for
+all image pixels. However, it’s essential to recognize that in
+practical scenarios, such as the global applications illustrated
+in our empirical study in Section V and in Appendix G, con-
+ducting sampling and PCA with K = d on high-dimensional
+data, such as d = 3 × 128 × 128, becomes unfeasible.
+Hence, we introduced DA-PUQ to enhance the method’s
+computational efficiency by allowing K ≪d, thereby mitigat-
+ing complexity. To further enhance interpretability, we intro-
+duced ˆk(x) in Equation (7), which aims to reduce the number
+of PCs to be used (out of the already constructed K PCs),
+while ensuring that the reconstruction guarantee is maintained
+with as few PCs as possible. This balance is demonstrated
+in Figure 19, where various values of K showcase that the
+reconstruction risk remains unaffected, yet more uncertainty
+axes, ˆk(x), are needed to uphold this equilibrium.
+Given the challenge of determining an appropriate value
+for K that ensures robust statistical guarantees, we introduced
+RDA-PUQ. This variant tunes K to the lower value that fulfills
+the necessary statistical guarantees.
+In Figure 19, we visually depict the precision-complexity
+trade-off through experiments involving different values of K
+in the context of DA-PUQ’s global application in colorization.
+Here, we illustrate the complexity of our method through the
+selection of varying K values, where higher values imply
+higher complexity, as they require the generation of more sam-
+ples and the construction of more PCs. Meanwhile, precision is
+assessed by examining the resulting ˆk(x) values, where higher
+ˆk(x) values correspond to situations where the uncertainty
+assessment is less accurate, signifying a higher reconstruction
+risk when employing all the K PCs. Consequently, more axes
+are needed to maintain a balanced risk.
+J. Lower and Upper Corners
+We conclude this paper by providing a visual comparative
+analysis of lower and upper corners within uncertainty regions
+applied globally across the three tasks: image colorization,
+super-resolution, and inpainting.
+Formally, the lower and upper corners within the image
+domain of an uncertainty region, are constructed using the
+intervals outlined in Equation (1). These are defined as the
+following expressions: the lower corner is defined as ˆµ(x) −
+ˆV (x)ˆl(x), and the upper corner is defined as ˆµ(x)+ ˆV (x)ˆu(x).
+Here, ˆV (x) is a matrix comprising of the K selected PCs from
+ˆB(x) as it’s columns, and ˆl(x), ˆu(x) are column vectors of
+length K.
+For example, when choosing to work within the pixel
+domain by selecting the standard basis, ˆB(x) = e1, e2 . . . ed,
+where ei ∈Rd represents the one-hot vector with a value of
+1 in the ith entry, the lower and upper corners align with the
+lower and upper bounds presented in prior work [1], [2] that
+operates in the pixel domain.
+It is essential to note that in our work, we use the term
+corners to emphasize that the lower and upper corners in the
+image domain do not establish intervals. This is in contrast
+to the pixelwise approach, which constructs intervals around
+each pixel, making the terminology “lower and upper bound
+images” more conceptually suitable.
+In Figure 20 (right), we illustrate the difference between the
+lower and upper corners of our uncertainty region (depicted as
+green dots) and the lower and upper bounds of the pixelwise
+approach (depicted as red dots). This comparison is presented
+through a 2D example, demonstrating the process of construct-
+ing an uncertainty region for a posterior distribution using our
+method, in contrast to the pixelwise approach.
+In Figure 20 (left), we provide a visual comparison between
+the lower and upper corners generated by DA-PUQ and the
+lower and upper bounds produced by [1], [2]. It is evident that
+our lower and upper corners exhibit a higher perceptual quality
+compared to the lower and upper bounds from earlier pixel
+domain approaches. This suggests that the lower and upper
+corners represent more probable samples than those generated
+by the pixelwise approach. Therefore, the uncertainty regions
+constructed by our approach are more confined compared to
+those constructed using the pixelwise approach.
+Interestingly, by traversing between the two corners of DA-
+PUQ by their convex combination, we essentially walk in the
+main “boulevard” of the uncertainty region. Figure 21 shows
+the resulting images in this path for the three applications con-
+
+IEEE TRANSACTIONS ON PATTERN ANALYSIS AND MACHINE INTELLIGENCE
+20
+t = 0.0
+t = 0.1
+t = 0.2
+t = 0.3
+t = 0.4
+t = 0.5
+t = 0.6
+t = 0.7
+t = 0.8
+t = 0.9
+t = 1.0
+Fig. 21.
+Visualization of the main “boulevard” within the uncertainty regions of DA-PUQ applied globally across three tasks: image colorization, super-
+resolution, and inpainting. The traversal along this path is obtained by a convex combination of the lower and upper corners, given by: (1−t)·lo(x)+t·up(x),
+where t ∈[0, 1].
+sidered: image colorization, super-resolution and inpainting.

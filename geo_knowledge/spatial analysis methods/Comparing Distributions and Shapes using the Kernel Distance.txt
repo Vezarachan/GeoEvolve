@@ -1,0 +1,1487 @@
+arXiv:1001.0591v2  [cs.CG]  13 Mar 2011
+Comparing Distributions and Shapes using the Kernel Distance
+Sarang Joshi
+sjoshi@sci.utah.edu
+Raj Varma Kommaraju
+rajvarma@cs.utah.edu
+Jeff M. Phillips
+jeffp@cs.utah.edu
+Suresh Venkatasubramanian
+suresh@cs.utah.edu
+Abstract
+Starting with a similarity function between objects, it is possible to deﬁne a distance metric on pairs of
+objects, and more generally on probability distributions over them. These distance metrics have a deep basis
+in functional analysis, measure theory and geometric measure theory, and have a rich structure that includes
+an isometric embedding into a (possibly inﬁnite dimensional) Hilbert space. They have recently been applied
+to numerous problems in machine learning and shape analysis.
+In this paper, we provide the ﬁrst algorithmic analysis of these distance metrics. Our main contributions
+are as follows: (i) We present fast approximation algorithms for computing the kernel distance between two
+point sets P and Q that runs in near-linear time in the size of P ∪Q (note that an explicit calculation would
+take quadratic time). (ii) We present polynomial-time algorithms for approximately minimizing the kernel
+distance under rigid transformation; they run in time O(n+poly(1/ǫ,log n)). (iii) We provide several general
+techniques for reducing complex objects to convenient sparse representations (speciﬁcally to point sets or
+sets of points sets) which approximately preserve the kernel distance. In particular, this allows us to reduce
+problems of computing the kernel distance between various types of objects such as curves, surfaces, and
+distributions to computing the kernel distance between point sets. These take advantage of the reproducing
+kernel Hilbert space and a new relation linking binary range spaces to continuous range spaces with bounded
+fat-shattering dimension.
+1
+
+1
+Introduction
+Let K : Rd × Rd →R be a kernel function, such as a Gaussian kernel; K(p,q) describes how similar two points
+p,q ∈Rd are. For point sets P,Q we can deﬁne a similarity function κ(P,Q) =
+P
+p∈P
+P
+q∈Q K(p,q). Then the
+kernel distance is deﬁned as
+DK(P,Q) =
+p
+κ(P,P) + κ(Q,Q) −2κ(P,Q).
+(1.1)
+By altering the kernel K, and the weighting of elements in κ, the kernel distance can capture distance between
+distributions, curves, surfaces, and even more general objects.
+Motivation.
+The earthmover distance (EMD) takes a metric space and two probability distributions over the
+space, and computes the amount of work needed to "transport" mass from one distribution to another. It has
+become a metric of choice in computer vision, where images are represented as intensity distributions over a
+Euclidean grid of pixels. It has also been applied to shape comparison [8], where shapes are represented by
+point clouds (discrete distributions) in space.
+While the EMD is a popular way of comparing distributions over a metric space, it is also an expensive one.
+Computing the EMD requires solving an optimal transportation problem via the Hungarian algorithm, and
+while approximations exist for restricted cases like the Euclidean plane, they are still expensive, requiring either
+quadratic time in the size of the input or achieving at best a constant factor approximation when taking linear
+time [38, 2]. Further, it is hard to index structures using the EMD for performing near-neighbor, clustering
+and other data analysis operations. Indeed, there are lower bounds on our ability to embed the EMD into
+well-behaved normed spaces [4].
+The kernel distance has thus become an effective alternative to comparing distributions on a metric space.
+In machine learning, the kernel distance has been used to build metrics on distributions [42, 23, 41, 39, 32]
+and to learn hidden Markov models [40]. In the realm of shape analysis [45, 18, 19, 17], the kernel distance
+(referred to there as the current distance) has been used to compare shapes, whether they be point sets, curves,
+or surfaces.
+All of these methods utilize key structural features of the kernel distance. When constructed using a positive
+deﬁnite1 similarity function K, the kernel distance can be interpreted through a lifting map φ : Rd →H to a
+reproducing kernel Hilbert space (RKHS), H. This lifting map φ is isometric; the kernel distance is precisely
+the distance induced by the Hilbert space (DK({p},{q}) = ∥φ(p) −φ(p)∥H). Furthermore, a point set P has
+an isometric lifted representation Φ(P) =
+P
+p∈P φ(p) as a single vector in H so DK(P,Q) = ∥Φ(P) −Φ(Q)∥H.
+Moreover, by choosing an appropriately scaled basis, this becomes a simple ℓ2 distance, so all algorithmic tools
+developed for comparing points and point sets under ℓ2 can now be applied to distributions and shapes.
+Dealing with uncertain data provides another reason to study the kernel distance. Rather than thinking
+of K(·,·) as a similarity function, we can think of it as a way of capturing spatial uncertainty; K(p,q) is the
+likelihood that the object claimed to be at p is actually at q.
+For example, setting K(p,q) = exp(−∥p −
+q∥2/σ)/(
+p
+2πσ) gives us a Gaussian blur function. In such settings, the kernel distance D2
+K(P,Q) computes the
+symmetric difference |P△Q| between shapes with uncertainty described by K.
+Our work.
+We present the ﬁrst algorithmic analysis of the kernel distance. Our main contributions are as
+follows:
+(i) We present fast approximation algorithms for computing the kernel distance between two point sets P
+and Q that runs in near-linear time in the size of P ∪Q (note that an explicit calculation would take quadratic
+time). (ii) We present polynomial-time algorithms for approximately minimizing the kernel distance under
+rigid transformation; they run in time O(n + poly(1/ǫ,log n)). (iii) We provide several general techniques for
+reducing complex objects to convenient sparse representations (speciﬁcally to point sets or sets of points sets)
+which approximately preserve the kernel distance. In particular, this allows us to reduce problems of computing
+1A positive deﬁnite function generalizes the idea of a positive deﬁnite matrix; see Section 2.
+1
+
+the kernel distance between various types of objects such as curves, surfaces, and distributions to computing
+the kernel distance between point sets.
+We build these results from two core technical tools. The ﬁrst is a lifting map that maps objects into a ﬁnite-
+dimensional Euclidean space while approximately preserving the kernel distance. We believe that the analysis
+of lifting maps is of independent interest; indeed, these methods are popular in machine learning [41, 39, 40]
+but (in the realm of kernels) have received less attention in algorithms. Our second technical tool is an theorem
+relating ǫ-samples of range spaces deﬁned with kernels to standard ǫ-samples of range spaces on {0,1}-valued
+functions. This gives a simpler algorithm than prior methods in learning theory that make use of the γ-fat
+shattering dimension, and yields smaller ǫ-samples.
+2
+Preliminaries
+Deﬁnitions.
+For the most general case of the kernel distance (that we will consider in this paper) we associate
+a unit vector U(p) and a weighting µ(p) with every p ∈P. Similarly we associate a unit vector V(p) and
+weighting ν(q) with every q ∈Q. Then we write
+κ(P,Q) =
+Z
+p∈P
+Z
+q∈Q
+K(p,q)
+U(p), V(q) dµ(p)dν(q),
+(2.1)
+where 〈·,·〉is the Euclidean inner product. This becomes a distance DK, deﬁned through (1.1).
+When P is a curve in Rd we let U(p) be the tangent vector at p and µ(p) = 1. When P is a surface in R3 we
+let U(p) be the normal vector at p and µ(p) = 1. This can be generalized to higher order surfaces through the
+machinery of k-forms and k-vectors [45, 35].
+When P is an arbitrary probability measure2 in Rd, then all U(p) are identical unit vectors and µ(p) is the
+probability of p. For discrete probability measures, described by a point set, we replace the integral with a sum
+and µ(p) can be used as a weight κ(P,Q) =
+P
+p∈P
+P
+q∈Q K(p,q)µ(p)ν(q).
+From distances to metrics.
+When K is a symmetric similarity function (i.e. K(p, p) = maxq∈Rd K(p,q),
+K(p,q) = K(q, p), and K(p,q) decreases as p and q become “less similar”) then DK (deﬁned through (2.1)
+and (1.1)) is a distance function, but may not be a metric. However, when K is positive deﬁnite, then this is
+sufﬁcient for DK to not only be a metric3, but also for D2
+K to be of negative type [16].
+We say that a symmetric function K : Rd × Rd →R is a symmetric positive deﬁnite kernel if for any nonzero
+L2 function f it satisﬁes
+R
+p∈P
+R
+q∈Q f (q)K(p,q)f (p) dpdq > 0. The proof of DK being a metric follows by con-
+sidering the reproducing kernel Hilbert space H associated with such a K [5]. Moreover, DK can be expressed
+very compactly in this space. The lifting map φ : Rd →H associated with K has the “reproducing property”
+K(p,q) = 〈φ(p),φ(q)〉H. So by linearity of the inner product, Φ(P) =
+R
+p∈P φ(p) dµ(p) can be used to re-
+trieve DK(P,Q) = ∥Φ(P) −Φ(Q)∥H using the induced norm ∥· ∥H of H. Observe that this deﬁnes a norm
+∥Φ(P)∥H =
+p
+κ(P,P) for a shape.
+Examples.
+If K is the “trivial” kernel, where K(p, p) = 1 and K(p,q) = 0 for p ̸= q, then the distance between
+any two sets (without multiplicity) P,Q is D2
+K(P,Q) = |P∆Q|, where P∆Q = P ∪Q \ (P ∩Q) is the symmetric
+difference. In general for arbitrary probability measures, DK(P,Q) = ∥µ−ν∥2. If K(p,q) = 〈p,q〉, the Euclidean
+dot product, then the resulting lifting map φ is the identity function, and the distance between two measures
+is the Euclidean distance between their means, which is a pseudometric but not a metric.
+2We avoid the use of the term ’probability distribution’ as this conﬂicts with the notion of a (Schwarz) distribution that itself plays
+an important role in the underlying theory.
+3Technically this is not completely correct; there are a few special cases, as we will see, where it is a pseudometric [41].
+2
+
+Gaussian properties.
+To simplify much of the presentation of this paper we focus on the case where the
+kernel K is the Gaussian kernel; that is K(p,q) = e−||p−q||2/h. Our techniques carry over to more general
+kernels, although the speciﬁc bounds will depend on the kernel being used. We now encapsulate some useful
+properties of Gaussian kernels in the following lemmata. When approximating K(p,q), the ﬁrst allows us to
+ignore pairs of points further that
+p
+hln(1/γ) apart, the second allows us to approximate the kernel on a grid.
+Lemma 2.1 (Bounded Tails). If ||p −q|| >
+p
+hln(1/γ) then K(p,q) < γ.
+Lemma 2.2 (Lipschitz). For δ ∈Rd where ∥δ∥< ǫ, for points p,q ∈Rd we have |K(p,q) −K(p,q + δ)| ≤ǫ/
+p
+h.
+Proof. The slope for ψ(x) = e−x2/h is the function ψ′(x) = −(2/h)xe−x2/h. ψ′(x) is maximized when x =
+p
+h/2, which yields ψ′(
+p
+h/2) = −
+p
+2/he < 1/
+p
+h. Thus |ψ(x) −ψ(x + ǫ)| < ǫ/
+p
+h. And since translating by
+δ changes ∥p −q∥by at most ǫ, the lemma holds.
+2.1
+Problem Transformations
+In prior research employing the kernel distance, ad hoc discretizations are used to convert the input objects
+(whether they be distributions, point clouds, curves or surfaces) to weighted discrete point sets. This process
+introduces error in the distance computations that usually go unaccounted for. In this subsection, we provide
+algorithms and analysis for rigorously discretizing input objects with guarantees on the resulting error. These
+algorithms, as a side beneﬁt, provide a formal error-preserving reduction from kernel distance computation on
+curves and surfaces to the corresponding computations on discrete point sets.
+After this section, we will assume that all data sets considered P,Q are discrete point sets of size n with
+weight functions µ : P →R and ν : Q →R. The weights need not sum to 1 (i.e. need not be probability
+measures), nor be the same for P and Q; we will set W = max(
+P
+p∈P µ(p),
+P
+q∈Q ν(q)) to denote the total
+measure. This implies (since K(p, p) = 1) that κ(P,P) ≤W 2. All our algorithms will provide approximations
+of κ(P,Q) within additive error ǫW 2. Since without loss of generality we can always normalize so that W = 1,
+our algorithms all provide an additive error of ǫ. We also set ∆= (1/h)maxu,v∈P∪Q ∥u −v∥to capture the
+normalized diameter of the data.
+Reducing orientation to weights.
+The kernel distance between two oriented curves or surfaces can be
+reduced to a set of distance computations on appropriately weighted point sets. We illustrate this in the case of
+surfaces in R3. The same construction will also work for curves in Rd.
+For each point p ∈P we can decompose U(p) ≜(U1(p), U2(p), U3(p)) into three ﬁxed orthogonal components
+such as the coordinate axes {e1, e2, e3}. Now
+κ(P,Q) =
+Z
+p∈P
+Z
+q∈Q
+K(p,q)
+U(p), V(q) dµ(p)dν(q)
+=
+Z
+p∈P
+Z
+q∈Q
+K(p,q)
+3
+X
+i=1
+(Ui(p)Vi(q)) dµ(p)dν(q)
+=
+3
+X
+i=1
+Z
+p∈P
+Z
+q∈Q
+K(p,q)(Ui(p)Vi(q)) dµ(p)dν(q)
+=
+3
+X
+i=1
+κ(Pi,Qi),
+where each p ∈Pi has measure µi(p) = µ(p)∥Ui(p)∥. When the problem speciﬁes U as a unit vector in Rd, this
+approach reduces to d independent problems without unit vectors.
+Reducing continuous to discrete.
+We now present two simple techniques (gridding and sampling) to
+reduce a continuous P to a discrete point set, incurring at most ǫW 2 error.
+3
+
+We construct a grid Gǫ (of size O((∆/ǫ)d)) on a smooth shape P, so no point4 p ∈P is further than ǫ
+p
+h
+from a point g ∈Gǫ. Let Pg be all points in P closer to g than any other point in Gǫ. Each point g is assigned a
+weight µ(g) =
+R
+p∈Pg 1 dµ(p). The correctness of this technique follows by Lemma 2.2.
+Alternatively, we can sample n = O((1/ǫ2)(d + log(1/δ)) points at random from P. If we have not yet
+reduced the orientation information to weights, we can generate d points each with weight Ui(p). This works
+with probability at least 1 −δ by invoking a coreset technique summarized in Theorem 5.2.
+For the remainder of the paper, we assume our input dataset P is a weighted point set in Rd of size n.
+3
+Computing the Kernel Distance I: WSPDs
+The well-separated pair decomposition (WSPD) [9, 21] is a standard data structure to approximately compute
+pairwise sums of distances in near-linear time. A consequence of Lemma 2.2 is that we can upper bound the
+error of estimating K(p,q) by a nearby pair K(˜p, ˜q). Putting these observations together yields (with some
+work) an approximation for the kernel distance. Since D2
+K(P,Q) = κ(P,P) + κ(Q,Q) −2κ(P,Q), the problem
+reduces to computing κ(P,Q) efﬁciently and with an error of at most (ǫ/4)W 2.
+Two sets A and B are said to be α-separated [9] if max{diam(A),diam(B)} ≤αmina∈A,b∈B ||a −b||. Let
+A⊗B = {{x, y} | x ∈A, y ∈B} denote the set of all unordered pairs of elements formed by A and B. An α-WSPD
+of a point set P is a set of pairs W = {A1, B1},... ,{As, Bs}	 such that
+(i) Ai, Bi ⊂P for all i,
+(ii) Ai ∩Bi = ; for all i,
+(iii) disjointly
+Ss
+i=1 Ai ⊗Bi = P ⊗P, and
+(iv) Ai and Bi are α-separated for all i.
+For a point set P ⊂Rd of size n, we can construct an α-WSPD of size O(n/αd) in time O(nlogn+n/αd) [21, 14].
+We can use the WSPD construction to compute D2
+K(P,Q) as follows. We ﬁrst create an α-WSPD of P ∪Q
+in O(nlogn + n/αd) time. Then for each pair {Ai, Bi} we also store four sets Ai,P = P ∩Ai, Ai,Q = Q ∩Ai,
+Bi,P = P ∩Bi, and Bi,Q = Q ∩Bi. Let ai ∈Ai and bi ∈Bi be arbitrary elements, and let Di = ∥ai −bi∥. By
+construction, Di approximates the distance between any pair of elements in Ai × Bi with error at most 2αDi.
+In each pair {Ai, Bi}, we can compute the weight of the edges from P to Q:
+Wi =
+ X
+p∈Ai,P
+µ(p)
+ X
+q∈Bi,Q
+ν(q)
+
++
+ X
+q∈Ai,Q
+ν(q)
+ X
+p∈Bi,P
+µ(p)
+
+.
+We estimate the contribution of the edges in pair (Ai, Bi) to κ(P,Q) as
+X
+(a,b)∈Ai,P×Bi,Q
+µ(a)ν(b)e−D2
+i /h +
+X
+(a,b)∈Ai,Q×Bi,P
+µ(b)ν(a)e−D2
+i /h = Wie−D2
+i /h.
+Since Di has error at most 2αDi for each pair of points, Lemma 2.2 bounds the error as at most Wi(2αDi/
+p
+h).
+In order to bound the total error to (ǫ/4)W 2, we bound the error for each pair by (ǫ/4)Wi since
+P
+i Wi =
+P
+p∈P
+P
+q∈Q µ(p)ν(q) = W 2.
+By Lemma 2.1, if Di >
+p
+hln(1/γ), then e−D2
+i /h < γ.
+So for any pair with
+Di > 2
+p
+hln(4/ǫ), (for α < 1/2) we can ignore, because they cannot have an effect on κ(P,Q) of more than
+(1/4)ǫWi, and thus cannot have error more than (1/4)ǫWi.
+Since we can ignore pairs with Di > 2
+p
+hln(4/ǫ), each pair will have error at most Wi(2α(2
+p
+hln(4/ǫ)/
+p
+h)
+= Wi(4α
+p
+ln(4/ǫ)). We can set this equal to (ǫ/4)Wi and solve for α < (1/4)ǫ/
+p
+ln(4/ǫ). This ensures that
+each pair with Di ≤2
+p
+hln(4/ǫ) will have error less than (ǫ/4)Wi, as desired.
+4For distributions with decaying but inﬁnite tails, we can truncate to ignore tails such that the integral of the ignored area is at most
+(1 −ǫ/2)W 2 and proceed with this approach using ǫ/2 instead of ǫ.
+4
+
+Theorem 3.1. By building and using an ((ǫ/4)/
+p
+ln(4/ǫ))-WSPD, we can compute a value U in time O(nlogn +
+(n/ǫd)logd/2(1/ǫ)), such that
+U −D2
+K(P,Q)
+ ≤ǫW 2.
+4
+Computing the Kernel Distance II: Approximate Feature Maps
+In this section, we describe (approximate) feature representations Φ(P) =
+P
+p∈P φ(p)µ(p) for shapes and
+distributions that reduce the kernel distance computation to an ℓ2 distance calculation ∥Φ(P) −Φ(Q)∥H in
+an RKHS, H. This mapping immediately yields algorithms for a host of analysis problems on shapes and
+distributions, by simply applying Euclidean space algorithms to the resulting feature vectors.
+The feature map φ allows us to translate the kernel distance (and norm) computations into operations in a
+RKHS that take time O(nρ) if H has dimension ρ, rather than the brute force time O(n2). Unfortunately, H is in
+general inﬁnite dimensional, including the case of the Gaussian kernel. Thus, we use dimensionality reduction
+to ﬁnd an approximate mapping ˜φ : Rd →Rρ (where ˜Φ(P) =
+P
+p∈P ˜φ(p)) that approximates κ(P,Q):
+
+X
+p∈P
+X
+q∈Q
+K(p,q)µ(p)ν(q) −
+X
+p∈P
+X
+q∈Q
+¬ ˜φ(p), ˜φ(q)
+¶ ≤ǫW 2.
+The analysis in the existing literature on approximating feature space does not directly bound the dimension
+ρ required for a speciﬁc error bound5. We derive bounds from two known techniques: random projections [36]
+(for shift-invariant kernels, includes Gaussians) and the Fast Gauss Transform [48, 20] (for Gaussian kernel).
+We produce three different features maps, with different bounds on the number of dimensions ρ depending on
+log n (n is the number of points), ǫ (the error), δ (the probability of failure), ∆(the normalized diameter of
+the points), and/or d (the ambient dimension of the data before the map).
+4.1
+Random Projections Feature Space
+Rahimi and Recht [36] proposed a feature mapping that essentially applies an implicit Johnson-Lindenstrauss
+projection from H →Rρ. The approach works for any shift invariant kernel (i.e one that can be written as
+K(p,q) = k(p −q)). For the Gaussian kernel, k(z) = e−∥z∥2/2, where z ∈Rd. Let the Fourier transform of
+k : Rd →R+ is g(ω) = (2π)−d/2e−∥ω∥2/2. A basic result in harmonic analysis [37] is that k is a kernel if and
+only if g is a measure (and after scaling, is a probability distribution). Let ω be drawn randomly from the
+distribution deﬁned by g:
+k(x −y) =
+Z
+ω∈Rd
+g(ω)eι〈ω,x−y〉dω = Eω[
+ψω(x),ψω(y)],
+where ψω(z) = (cos(〈ω,z〉),sin(〈ω,z〉)) are the real and imaginary components of eι〈ω,z〉. This implies that
+
+ψω(x),ψω(y) is an unbiased estimator of k(x −y).
+We now consider a ρ-dimensional feature vector φΥ : P →Rρ where the (2i −1)th and (2i)th coordi-
+nates are described by µ(p)ψωi(p)/(ρ/2) = (2µ(p)cos(
+ωi,z)/ρ,2µ(p)sin(
+ωi,z)/ρ) for some ωi ∈Υ =
+{ω1,... ,ωρ/2} drawn randomly from g. Next we prove a bound on ρ using this construction.
+Lemma 4.1. For φΥ : P ∪Q →Rρ with ρ = O((1/ǫ2)log(n/δ)), with probability ≥1 −δ
+
+X
+p∈P
+X
+q∈Q
+K(p,q)µ(p)ν(q) −
+X
+p∈P
+X
+q∈Q
+
+φΥ(p),φΥ(q)
+ ≤ǫW 2.
+5Explicit matrix versions of the Johnson-Lindenstraus lemma [24] cannot be directly applied because the source space is itself
+inﬁnite dimensional, rather than Rd.
+5
+
+Proof. We make use of the following Chernoff-Hoeffding bound. Given a set {X1,... , Xn} of independent ran-
+dom variables, such that |Xi −E[Xi]| ≤Λ, then for M =
+Pn
+i=1 Xi we can bound Pr[|M −E[M]| ≥α] ≤
+2e−2α2/(nΛ2). We can now bound the error of using φΥ for any pair (p,q) ∈P × Q as follows:
+Pr
+
+φΥ(p),φΥ(q) −µ(p)ν(q)k(p −q)
+ ≥ǫµ(p)ν(q)
+
+=
+Pr
+
+φΥ(p),φΥ(q) −EΥ
+
+φΥ(p),φΥ(q) ≥ǫµ(p)ν(q)
+
+≤
+Pr
+
+
+
+X
+i
+2
+ρ µ(p)ν(q)
+¬
+ψωi(p),ψωi(q)
+¶
+−EΥ
+
+
+X
+i
+2
+ρ µ(p)ν(q)
+¬
+ψωi(p),ψωi(q)
+¶
+
+
+ ≥ǫµ(p)ν(q)
+
+
+≤
+2e−2(ǫµ(p)ν(q))2/(ρΛ2/2) ≤2e−ρǫ2/64,
+where the last inequality follows by Λ ≤2maxp,q(2/ρ)µ(p)ν(q)
+ψω(p),ψω(q) ≤8(2/ρ)µ(p)ν(q) since for
+each pair of coordinates ∥ψω(p)∥≤2 for all p ∈P (or q ∈Q). By the union bound, the probability that this
+holds for all pairs of points (p,q) ∈P × Q is given by
+Pr
+
+∀(p,q)∈P×Q
+
+φΥ(p),φΥ(q) −µ(p)ν(q)k(p −q)
+ ≥ǫµ(p)ν(q)
+
+≤(n2)2e−ρǫ2/64.
+Setting δ ≥n22e−ρǫ2/64 and solving for ρ yields that for ρ = O((1/ǫ2)log(n/δ)), with probability at least
+1 −δ, for all (p,q) ∈P × Q we have |µ(p)ν(q)k(p −q) −
+φΥ(x),φΥ(y)| ≤ǫµ(p)ν(q). It follows that with
+probability at least 1 −δ
+
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)K(p,q) −
+X
+p∈P
+X
+q∈Q
+
+φΥ(p),φΥ(q)
+ ≤ǫ
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q) ≤ǫW 2.
+Note that the analysis of Rahimi and Recht [36] is done for unweighted point sets (i.e. µ(p) = 1) and actually
+goes further, in that it yields a guarantee for any pair of points taken from a manifold M having diameter ∆.
+They do this by building an ǫ-net over the domain and applying the above tail bounds to the ǫ-net. We can
+adapt this trick to replace the (log n) term in ρ by a (d log(∆/ǫ)) term, recalling ∆= (1/h)maxp,p′∈P∪Q ∥p−p′∥.
+This leads to the same guarantees as above with a dimension of ρ = O((d/ǫ2)log(∆/ǫδ)).
+4.2
+Fast Gauss Transform Feature Space
+The above approach works by constructing features in the frequency domain. In what follows, we present an
+alternative approach that operates in the spatial domain directly. We base our analysis on the Improved Fast
+Gauss Transform (IFGT) [48], an improvement on the Fast Gauss Transform. We start with a brief review of
+the IFGT (see the original work [48] for full details).
+IFGT feature space construction.
+The goal of the IFGT is to approximate κ(P,Q). First we rewrite κ(P,Q)
+as the summation
+P
+q∈Q G(q) where G(q) = ν(q)
+P
+p∈P e−∥p−q∥2/h2µ(p). Next, we approximate G(q) in two
+steps. First we rewrite
+G(q) = ν(q)
+X
+p∈P
+µ(p)e−∥q−x∗∥2
+h2
+e−∥p−x∗∥2
+h2
+e
+2∥q−x∗∥·∥p−x∗∥
+h2
+,
+where the quantity x∗is a ﬁxed vector that is usually the centroid of P. The ﬁrst two exponential terms can
+be computed for each p and q once. Second, we approximate the remaining exponential term by its Taylor
+expansion ev =
+P
+i≥0
+vi
+i! . After a series of algebraic manipulations, the following expression emerges:
+G(q) = ν(q)e−∥q−x∗∥2
+h2
+X
+α≥0
+Cα
+q −x∗
+h
+α
+6
+
+where Cα is given by
+Cα =
+2|α|
+α!
+X
+p∈P
+µ(p)e−∥p−x∗∥2
+h2
+ p −x∗
+h
+α
+.
+The parameter α is a multiindex, and is actually a vector α = (α1,α2,...,αd) of dimension d. The expression
+zα, for z ∈Rd, denotes the monomial zα1
+1 zα2
+2 ... zαd
+d , the quantity |α| is the total degree
+P
+αi, and the quantity
+α! = Πi(αi!). The multiindices are sorted in graded lexicographic order, which means that α comes before α′ if
+|α| < |α′|, and two multiindices of the same degree are ordered lexicographically.
+The above expression for G(q) is an exact inﬁnite sum, and is approximated by truncating the summation at
+multiindices of total degree τ −1. Note that there are at most ρ =  τ+d−1
+d
+ = O(τd) such multiindices. We
+now construct a mapping ˜φ : Rd →Rρ. Let ˜φ(p)α =
+q
+2|α|
+α! µ(p)e−∥p−x∗∥2
+h2
+
+p−x∗
+h
+α
+. Then
+G(q) =
+X
+α
+˜φ(q)α
+X
+p∈P
+˜φ(p)α
+and S =
+P
+q∈Q G(q) is then given by
+S =
+X
+p∈P
+X
+q∈Q
+X
+α
+˜φ(q)α ˜φ(p)α =
+X
+p∈P
+X
+q∈Q
+〈˜φ(q), ˜φ(p)〉.
+IFGT error analysis.
+The error incurred by truncating the sum at degree τ −1 is given by
+Err(τ) =
+ X
+p∈P
+X
+q∈Q
+K(p,q)µ(p)ν(q) −
+X
+p∈P
+X
+q∈Q
+¬ ˜φ(p), ˜φ(q)
+¶ ≤
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)
+2τ
+τ! ∆2τ = W 2 2τ
+τ! ∆2τ.
+Set ǫW 2 = Err(τ). Applying Stirling’s approximation, we solve for τ in log(1/ǫ) ≥τlog(τ/4∆2). This yields
+the bounds τ = O(∆2) and τ = O(log(1/ǫ)). Thus our error bound holds for τ = O(∆2 + log(1/ǫ)). Using
+ρ = O(τd), we obtain the following result.
+Lemma 4.2. There exists a mapping ˜φ : P ∪Q →Rρ with ρ = O(∆2d + logd(1/ǫ)) so
+
+X
+p∈P
+X
+q∈Q
+K(p,q)µ(p)ν(q) −
+X
+p∈P
+X
+q∈Q
+¬ ˜φ(p), ˜φ(q)
+¶ ≤ǫW 2.
+4.3
+Summary of Feature Maps
+We have developed three different bounds on the dimension required for feature maps that approximate κ(P,Q)
+to within ǫW 2.
+IFGT: ρ = O(∆2d + logd(1/ǫ)). Lemma 4.2. Advantages: deterministic, independent of n, logarithmic depen-
+dence on 1/ǫ. Disadvantages: polynomial dependence on ∆, exponential dependence on d.
+Random-points: ρ = O((1/ǫ2)log(n/δ)). Lemma 4.1. Advantages: independent of ∆and d. Disadvantages:
+randomized, dependent on n, polynomial dependence on 1/ǫ.
+Random-domain: ρ = O((d/ǫ2)log(∆/ǫδ)). (above) Advantages: independent of n, logarithmic dependence
+on ∆, polynomial dependence on d. Disadvantages: randomized, dependence on ∆and d, polynomial
+dependence on 1/ǫ.
+For simplicity, we (mainly) use the Random-points based result from Lemma 4.1 in what follows. If appro-
+priate in a particular application, the other bounds may be employed.
+7
+
+Feature-based computation of DK.
+As before, we can decompose D2
+K(P,Q) = κ(P,P)+κ(Q,Q)−2κ(P,Q)
+and use Lemma 4.1 to approximate each of κ(P,P),κ(Q,Q), and κ(P,Q) with error ǫW 2/4.
+Theorem 4.1. We can compute a value U in time O((n/ǫ2)log(n/δ)) such that |U −D2
+K(P,Q)| ≤ǫW 2, with
+probability at least 1 −δ.
+A nearest-neighbor algorithm.
+The feature map does more than yield efﬁcient algorithms for the kernel
+distance. As a representation for shapes and distributions, it allows us to solve other data analysis problems on
+shape spaces using off-the-shelf methods that apply to points in Euclidean space. As a simple example of this,
+we can combine the Random-points feature map with known results on approximate nearest-neighbor search
+in Euclidean space [3] to obtain the following result.
+Lemma 4.3. Given a collection of m point sets C = {P1,P2,... ,Pm}, and a query surface Q, we can compute
+the c-approximate nearest neighbor to Q in C under the kernel distance in time O(ρm1/c2+o(1)) query time using
+O(ρm1+1/c2+o(1)) space and preprocessing.
+5
+Coresets for the Kernel Distance
+The kernel norm (and distance) can be approximated in near-linear time; however, this may be excessive for
+large data sets. Rather, we extract a small subset (a coreset) S from the input P such that the kernel distance
+between S and P is small. By triangle inequality, S can be used as a proxy for P. Speciﬁcally, we extend the
+notion of ǫ-samples for range spaces to handle non-binary range spaces deﬁned by kernels.
+Background on range spaces.
+Let ξ(P) denote the total weight of a set of points P, or cardinality if no
+weights are assigned. Let P ⊂Rd be a set of points and let A be a family of subsets of P. For examples of
+A, let B denote the set of all subsets deﬁned by containment in a ball and let E denote the set of all subsets
+deﬁned by containment in ellipses. We say (P,A) is a range space. Let ¯ξP(A) = ξ(A)/ξ(P). An ǫ-sample (or
+ǫ-approximation) of (P,A) is a subset Q ⊂P such that
+max
+A∈A
+¯ξQ(Q ∩A) −¯ξP(P ∩A)
+ ≤ǫ.
+To create a coreset for the kernel norm, we want to generalize these notions of ǫ-samples to non-binary
+((0,1)-valued instead of {0,1}-valued) functions, speciﬁcally to kernels. For two point sets P,Q, deﬁne ¯κ(P,Q) =
+(1/ξ(P))(1/ξ(Q))
+P
+p∈P
+P
+q∈Q K(p,q), and when we have a singleton set Q = {q} and a subset P′ ⊆P then we
+write ¯κP(P′,q) = (1/ξ(P))
+P
+p∈P′ K(p,q). Let K+ = maxp,q∈P K(p,q) be the maximum value a kernel can take
+on a dataset P, which can be normalized to K+ = 1. We say a subset of S ⊂P is an ǫ-sample of (P, K) if
+max
+q
+¯κP(P,q) −¯κS(S,q)
+ ≤ǫK+.
+The standard notion of VC-dimenion [47] (and related notion of shattering dimension) is fundamentally
+tied to the binary ({0,1}-valued) nature of ranges, and as such, it does not directly apply to ǫ-samples of
+(P, K). Other researchers have deﬁned different combinatorial dimensions that can be applied to kernels [15,
+25, 1, 46]. The best result is based on γ-fat shattering dimension Fγ [25], deﬁned for a family of (0,1)-valued
+functions F and a ground set P. A set Y ⊂P is γ-fat shattered by F if there exists a function α : Y →[0,1]
+such that for all subsets Z ⊆Y there exists some FZ ∈F such that for every x ∈Z FZ(x) ≥α(x) + γ and
+for every x ∈Y \ Z FZ(x) ≤α(x) −γ. Then Fγ = ξ(Y ) for the largest cardinality set Y ⊂P that can be
+γ-fat shattered. Bartlett et al. [7] show that a random sample of O((1/ǫ2)(Fγ log2(Fγ/ǫ) + log(1/δ)) elements
+creates an ǫ-sample (with probability at least 1 −δ) with respect to (P,F) for γ = Ω(ǫ). Note that the γ-
+fat shattering dimension of Gaussian and other symmetric kernels in Rd is d + 1 (by setting α(x) = .5 for
+8
+
+all x), the same as balls B in Rd, so this gives a random-sample construction for ǫ-samples of (P, K) of size
+O((d/ǫ2)(log2(1/ǫ) + log(1/δ)).
+In this paper, we improve this result in two ways by directly relating a kernel range space (P, K) to a similar
+(binary) range space (P,A). First, this improves the random-sample bound because it uses sample-complexity
+results for binary range spaces that have been heavily optimized. Second, this allows for all deterministic
+ǫ-sample constructions (which have no probability of failure) and can have much smaller size.
+Constructions for ǫ-samples.
+Vapnik and Chervonenkis [47] showed that the complexity of ǫ-samples is
+tied to the VC-dimension of the range space. That is, given a range space (X,A) a subset Y ⊂X is said to
+be shattered by A if all subsets of Z ⊂Y can be realized as Z = Y ∩R for R ∈A. Then the VC-dimension of
+a range space (X,A) is the cardinality of the largest subset Y ⊂X that can be shattered by A. Vapnik and
+Chervonenkis [47] showed that if the VC-dimension of a range space (X,A) is ν, then a random sample Y of
+O((1/ǫ2)(ν log(1/ǫ) + log(1/δ)) points from X is an ǫ-sample with probability at least 1 −δ. This bound was
+improved to O((1/ǫ2)(ν + log1/δ)) by Talagrand [44, 26].
+Alternatively, Matousek [28] showed that ǫ-samples of size O((ν/ǫ2)log(ν/ǫ)) could be constructed de-
+terministically, that is there is no probability of failure. A simpler algorithm with more thorough runtime
+analysis is presented in Chazelle and Matousek [12], which runs in O(d)3d|X|(1/ǫ)2ν logν(1/ǫ) time. Smaller
+ǫ-samples exist; in particular Matousek, Welzl, and Wernisch [31] and improved by Matousek [29] show
+that ǫ-samples exist of size O((1/ǫ)2−2/(ν+1)), based on a discrepancy result that says there exists a labeling
+χ : X →{−1,+1} such that maxR∈A
+P
+x∈R∩X χ(x) ≤O(|X|1/2−1/2ν log1/2 |X|). It is alluded by Chazelle [11]
+that if an efﬁcient construction for such a labeling existed, then an algorithm for creating ǫ-samples of size
+O((1/ǫ)2−2/(ν+1) log(ν/ǫ)2−1/d+1) would follow, see also Phillips [34]. Recently, Bansal [6] provided a ran-
+domized polynomial algorithm for the entropy method, which is central in proving these existential coloring
+bounds. This leads to an algorithm that runs in time O(|X| · poly(1/ǫ)), as claimed by Charikar et al. [10, 33].
+An alternate approach is through the VC-dimension of the dual range space (A, ¯A), of (primal) range space
+(X,A), where ¯A is the set of subsets of ranges A deﬁned by containing the same element of X. In our context,
+for range spaces deﬁned by balls (Rd,B) and ellipses of ﬁxed orientation (Rd,E) their dual range spaces have
+VC-dimension ¯ν = d. Matousek [30] shows that a technique of matching with low-crossing number [13] along
+with Haussler’s packing lemma [22] can be used to construct a low discrepancy coloring for range spaces where
+¯ν, the VC-dimension of the dual range space is bounded. This technique can be made deterministic and runs
+in poly(|X|) time. Invoking this technique in the Chazelle and Matousek [12] framework yields an ǫ-sample of
+size O((1/ǫ)2−2/(¯ν+1)(log(1/ǫ))2−1/(¯ν+1)) in O(|X|·poly(1/ǫ)) time. Speciﬁcally, we attain the following result:
+Lemma 5.1. For discrete ranges spaces (X,B) and (X,E) for X ∈Rd of size n, we can construct an ǫ-sample of
+size O((1/ǫ)2−2/(d+1)(log(1/ǫ))2−1/d+1) in O(n · poly(1/ǫ)) time.
+For speciﬁc range spaces, the size of ǫ-samples can be improved beyond the VC-dimension bound. Phillips [34]
+showed for ranges Rd consisting of axis-aligned boxes in Rd, that ǫ-samples can be created of size O((1/ǫ) ·
+log2d(1/ǫ)). This can be generalized to ranges deﬁned by k predeﬁned normal directions of size O((1/ǫ) ·
+log2k(1/ǫ)). These algorithms run in time O(|X|(1/ǫ3)polylog(1/ǫ)). And for intervals I over R, ǫ-samples of
+(X,I) can be created of size O(1/ǫ) by sorting points and retaining every ǫ|X|th point in the sorted order [27].
+ǫ-Samples for kernels.
+The super-level set of a kernel given one input q ∈Rd and a value v ∈R+, is the set
+of all points p ∈Rd such that K(p,q) ≥v. We say that a kernel is linked to a range space (Rd,A) if for every
+possible input point q ∈Rd and any value v ∈R+ that the super-level set of K(·,q) deﬁned by v is equal to
+some H ∈A. For instance multi-variate Gaussian kernels with no skew are linked to (Rd,B) since all super-
+level sets are balls, and multi-variate Gaussian kernels with non-trivial covariance are linked to (Rd,E) since
+all super-level sets are ellipses.
+Theorem 5.1. For any kernel K : M×M →R+ linked to a range space (M,A), an ǫ-sample S of (P,A) for S ⊆M
+is a ǫ-sample of (P, K).
+9
+
+A (ﬂawed) attempt at a proof may proceed by considering a series of approximate level-sets, within which each
+point has about the same function value. Since S is an ǫ-sample of (P,A), we can guarantee the density of S
+and P in each level set is off by at most 2ǫ. However, the sum of absolute error over all approximate level-sets
+is approximately ǫK+ times the number of approximate level sets. This analysis fails because it allows error to
+accumulate; however, a more careful application of the ǫ-sample property shows it cannot. A correct analysis
+follows using a charging scheme which prevents the error from accumulating.
+Proof. We can sort all pi ∈P in similarity to q so that pi < pj (and by notation i < j) if K(pi,q) > K(pj,q).
+Thus any super-level set containing pj also contains pi for i < j. We can now consider the one-dimensional
+problem on this sorted order from q.
+We now count the deviation E(P,S,q) = ¯κP(P,q) −¯κS(S,q) from p1 to pn using a charging scheme. That is
+each element sj ∈S is charged to ξ(P)/ξ(S) points in P. For simplicity we will assume that k = ξ(P)/ξ(S) is
+an integer, otherwise we can allow fractional charges. We now construct a partition of P slightly differently, for
+positive and negative E(P,S,q) values, corresponding to undercounts and overcounts, respectively.
+Undercount of ¯κS(S,q).
+For undercounts, we partition P into 2ξ(S) (possibly empty) sets {P′
+1, P1, P′
+2,
+P2,... , P′
+ξ(S), Pξ(S)} of consecutive points by the sorted order from q. Starting with p1 (the closest point to
+q) we place points in sets P′
+j or Pj following their sorted order. Recursively on j and i, starting at j = 1 and
+i = 1, we place each pi in P′
+j as long as K(pi,q) > K(sj,q) (this may be empty). Then we place the next k
+points pi into Pj. After k points are placed in Pj, we begin with P′
+j+1, until all of P has been placed in some set.
+Let t ≤ξ(S) be the index of the last set Pj such that ξ(Pj) = k. Note that for all pi ∈Pj (for j ≤t) we have
+K(sj,q) ≥K(pi,q), thus ¯κS({sj},q) ≥¯κP(Pj,q).
+We can now bound the undercount as
+E(P,S,q) =
+ξ(S)
+X
+j=1
+
+¯κP(Pj,q) −¯κS({sj},q)
+
++
+ξ(S)
+X
+j=1
+¯κP(P′
+j,q) ≤
+t+1
+X
+j=1
+¯κP(P′
+j,q)
+since the ﬁrst term is at most 0 and since ξ(P′
+j) = 0 for j > t + 1. Now consider a super-level set H ∈A
+containing all points before st+1; H is the smallest range that contains every non-empty P′
+j. Because (for j ≤t)
+each set Pj can be charged to sj, then
+Pt
+j=1 ξ(Pj ∩H) = k · ξ(S ∩H). And because S is an ǫ-sample of (P,A),
+then
+Pt+1
+j=1 ξ(P′
+j) =
+Pt+1
+j=1 ξ(P′
+j) +
+Pt
+j=1 ξ(Pj ∩H)
+
+−k · ξ(S ∩H) ≤ǫξ(P). We can now bound
+E(P,S,q) ≤
+t+1
+X
+j=1
+¯κP(P′
+j,q) =
+t+1
+X
+j=1
+X
+p∈P′
+j
+K(p,q)
+ξ(P)
+≤
+1
+ξ(P)
+t+1
+X
+j=1
+ξ(P′
+j)K+ ≤
+1
+ξ(P)(ǫξ(P))K+ = ǫK+.
+Overcount of ¯κS(S,q): The analysis for overcounts is similar to undercounts, but we construct the partition
+in reverse and the leftover after the charging is not quite as clean to analyze. For overcounts, we partition P
+into 2ξ(S) (possibly empty) sets {P1, P′
+1, P2, P′
+2,... , Pξ(S), P′
+ξ(S)} of consecutive points by the sorted order from q.
+Starting with pn (the furthest point from q) we place points in sets P′
+j or Pj following their reverse-sorted order.
+Recursively on j and i, starting at j = ξ(S) and i = n, we place each pi in P′
+j as long as K(pi,q) < K(sj,q) (this
+may be empty). Then we place the next k points pi into Pj. After k points are placed in Pj, we begin with P′
+j−1,
+until all of P has been placed in some set. Let t ≤ξ(S) be the index of the last set Pj such that ξ(Pj) = k (the
+smallest such j). Note that for all pi ∈Pj (for j ≥t) we have K(sj,q) ≤K(pi,q), thus ¯κS({sj},q) ≤¯κP(Pj,q).
+We can now bound the (negative) undercount as
+E(P,S,q) =
+t
+X
+j=ξ(S)
+
+¯κP(Pj,q) −¯κS({sj},q)
+
++
+1
+X
+j=t−1
+
+¯κP(Pj,q) −¯κS({sj},q)
+
++
+ξ(S)
+X
+j=1
+¯κP(P′
+j,q)
+≥ ¯κP(Pt−1,q) −¯κS({st−1},q) −
+1
+X
+j=t−2
+¯κS({sj},q),
+10
+
+since the ﬁrst full term is at least 0, as is each ¯κP(Pj,q) and ¯κP(P′
+j,q) term in the second and third terms. We
+will need the one term ¯κP(Pt−1,q) related to P in the case when 1 ≤ξ(Pt−1) < k.
+Now, using that S is an ǫ-sample of (P,A), we will derive a bound on t, and more importantly (t −2). We
+consider the maximal super-level set H ∈A such that no points H ∩P are in P′
+j for any j. This is the largest
+set where each point p ∈P can be charged to a point s ∈S such that K(p,q) > K(s,q), and thus presents the
+smallest (negative) undercount. In this case, H ∩P = ∪s
+j=1Pj for some s and H ∩S = ∪s
+j=1{sj}. Since t ≤s, then
+ξ(H ∩P) = (s −t + 1)k + ξ(Pt−1) = (s −t + 1)ξ(P)/ξ(S) + ξ(Pt−1) and ξ(H ∩S) = s. Thus
+ǫ ≥¯ξS(H ∩S) −¯ξP(H ∩P) =
+s
+ξ(S) −
+(s −t + 1)ξ(P)/ξ(S)
+ξ(P)
+−
+ξ(Pt−1)
+ξ(P)
+≥
+t −1
+ξ(S) −
+ξ(Pt−1)
+ξ(P) .
+Thus (t −2) ≤ǫξ(S) + ξ(Pt−1)(ξ(S)/ξ(P)) −1. Letting pi = mini′∈Pt−1 K(pi′,q) (note K(pi,q) ≥K(st−1,q))
+E(P,S,q) ≥
+κ(Pt−1,q)
+ξ(P)
+−
+K(st−1,q)
+ξ(S)
+−
+
+ǫξ(S) + ξ(Pt−1)
+ξ(S)
+ξ(P) −1
+ K+
+ξ(S)
+= −ǫK+ + K+
+k −ξ(Pt−1)
+ξ(P)
+
+−k · K(st−1,q) −κ(Pt−1,q)
+ξ(P)
+≥−ǫK+ + K+
+k −ξ(Pt−1)
+ξ(P)
+
+−K(pi,q)
+k −ξ(Pt−1)
+ξ(P)
+
+≥−ǫK+.
+Corollary 5.1. For a Gaussian kernel, any ǫ-sample S for (P,B) (or for (P,E) if we consider covariance) guarantees
+that for any query q ∈Rd that
+¯κP(P,q) −¯κS(S,q)
+ ≤ǫK+.
+Coreset-based computation of kernel distance.
+For convenience here we assume that our kernel has
+been normalized so K+ = 1. Let P be an ǫ-sample of (P, K), and all points p ∈P have uniform weights so
+ξ(P) = ξ(P) = W. Then for any q ∈Rd
+ǫ ≥|¯κP(P,q) −¯κP(P,q)| =
+
+κ(P,q)
+ξ(P) −κ(P,q)
+ξ(P)
+.
+and hence
+κ(P,q) −κ(P,q)
+ ≤ǫξ(P) = ǫW.
+It follows that if Q is also an ǫ-sample for (Q, K), then ∥κ(P,Q) −κ(P,Q)∥≤2ǫW 2. Hence, via known con-
+structions of ǫ-samples randomized [47, 44] or deterministic [28, 12, 31, 29, 43, 34] (which can be applied to
+weighted point sets to create unweighted ones [28]) and Theorem 5.1 we have the following theorems. The
+ﬁrst shows how to construct a coreset with respect to DK.
+Theorem 5.2. Consider any kernel K linked with (Rd,B) and objects P,Q ⊂M ⊂Rd, each with total weight W,
+and for constant d. We can construct sets P ⊂P and Q ⊂Q such that |DK(P,Q) −DK(P,Q)| ≤ǫW 2 of size:
+• O((1/ǫ2−1/(d+1))log2−1/d+1(1/ǫ)), via Lemma 5.1; or
+• O(1/ǫ2)(d + log(1/δ))) via random sampling (correct with probability at least (1 −δ)).
+We present an alternative sampling condition to Theorem 5.2 in Appendix A. It has larger dependence on ǫ,
+and also has either dependence on ∆or on log n (and is independent of K+). Also in Appendix A we show that
+it is NP-hard to optimize ǫ with a ﬁxed subset size k.
+The associated runtimes are captured in the following algorithmic theorem.
+Theorem 5.3. When K is linked to (Rd,B), we can compute a number ˜D such that |DK(P,Q) −˜D| ≤ǫ in time:
+• O(n · (1/ǫ2d+2)logd+1(1/ǫ)); or
+• O(n + (log n) · ((1/ǫ2)log(1/δ)) + (1/ǫ4)log2(1/δ)) that is correct with probability at least 1 −δ.
+Notice that these results automatically work for any kernel linked with (Rd,B) (or more generally with
+(Rd,E)) with no extra work; this includes not only Gaussians (with non-trivial covariance), but any other
+standard kernel such as triangle, ball or Epanechnikov.
+11
+
+6
+Minimizing the Kernel Distance under Translation and Rotation
+We attack the problem of minimizing the kernel distance between P and Q under a set of transformations:
+translations or translations and rotations. A translation T ∈Rd is a vector so Q ⊕T = {q + T | q ∈Q}. The
+translation T ∗= arg minT∈Rd DK(P,Q ⊕T), applied to Q minimizes the kernel norm. A rotation R ∈SO(d) can
+be represented as a special orthogonal matrix. We can write R ◦Q = {R(q) | q ∈Q}, where R(q) rotates q about
+the origin, preserving its norm. The set of a translation and rotation (T ⋆,R⋆) = arg min(T,R)∈Rd×SO(d) DK(P,R ◦
+(Q ⊕T)) applied to Q minimizes the kernel norm.
+Decomposition.
+In minimizing DK(P,R ◦(Q ⊕T)) under all translations and rotations, we can reduce this
+to a simpler problem. The ﬁrst term κ(P,P) =
+P
+p1∈P
+P
+p2∈P µ(p1)µ(p2)K(p1, p2) has no dependence on T or
+R, so it can be ignored. And the second term κ(Q,Q) =
+P
+q1∈Q
+P
+q2∈Q ν(q1)ν(q2)K(R(q1 + T),R(q2 + T)) can
+also be ignored because it is invariant under the choice of T and R. Each subterm K(R(q1 + T),R(q2 + T)) only
+depends on ||R(q1 + T) −R(q2 + T)|| = ||q1 −q2||, which is also independent of T and R. Thus we can rephrase
+the objective as ﬁnding
+(T ⋆,R⋆) = arg
+max
+(T,R)∈Rd×SO(d)
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)K(p,R(q + T)) = arg
+max
+(T,R)∈Rd×SO(d)
+κ(P,R ◦(Q ⊕T)).
+We start by providing an approximately optimal translation. Then we adapt this algorithm to handle both
+translations and rotations.
+6.1
+Approximately Optimal Translations
+We describe, for any parameter ǫ > 0, an algorithm for a translation ˆT such that D2
+K(P,Q⊕ˆT)−D2
+K(P,Q⊕T ∗) ≤
+ǫW 2. We begin with a key lemma providing analytic structure to our problem.
+Lemma 6.1. κ(P,Q ⊕T ∗) ≥W 2/n2.
+Proof. When T ∈Rd aligns q ∈Q so q + T = p for p ∈P it ensures that K(p,q) = 1.
+We can choose
+the points p and q such that µ(p) and ν(q) are as large as possible. They must each be at least W/n, so
+K(p,q)µ(p)ν(q) ≥W 2/n2. All other subterms in κ(P,Q ⊕T) are at least 0. Thus κ(P,Q ⊕T) ≥W 2/n2.
+Thus, if κ(P,Q⊕T ∗) ≥W 2/n2, then for some pair of points p ∈P and q ∈Q we must have µ(p)ν(q)K(p,q +
+T ∗) ≥µ(p)ν(q)/n2, i.e. K(p,q + T ∗) ≥1/n2. Otherwise, if all n2 pairs (p,q) satisfy µ(p)ν(q)K(p,q + T ∗) <
+µ(p)ν(q)/n2, then
+κ(P,Q ⊕T ∗) =
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)K(p,q + T ∗) <
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)/n2 = W 2/n2.
+Thus some pair p ∈P and q ∈Q must satisfy ||p −(q + T ∗)|| ≤
+p
+ln(n2), via Lemma 2.1 with γ = 1/(n2).
+Let Gǫ be a grid on Rd so that when any point p ∈Rd is snapped to the nearest grid point g ∈Gǫ, we
+guarantee that ||g −p|| ≤ǫ. We can deﬁne an orthogonal grid Gǫ = {(ǫ/
+p
+d)z | z ∈Zd}, where Zd is the
+d-dimensional lattice of integers. Let G[ǫ, p,Λ] represent the subset of the grid Gǫ that is within a distance Λ
+of the point p. In other words, G[ǫ, p,Λ] = {g ∈Gǫ | ||g −p|| ≤Λ}.
+Algorithm.
+These results imply the following algorithm. For each point p ∈P, for each q ∈Q, and for each
+g ∈G[ǫ/2, p,
+p
+ln(n2)] we consider the translation Tp,q,g such that q + Tp,q,g = g. We return the translation
+Tp,q,g which maximizes κ(P,Q ⊕Tp,q,g), by evaluating κ at each such translation of Q.
+Theorem 6.1. The above algorithm runs in time O((1/ǫ)dn4 logd/2 n), for ﬁxed d, and is guaranteed to ﬁnd a
+translation ˆT such that D2
+K(P,Q ⊕ˆT) −D2
+K(P,Q ⊕T ∗) ≤ǫW 2.
+12
+
+Proof. We know that the optimal translation T ∗must result in some pair of points p ∈P and q ∈Q such
+that ||p −(q + T ∗)|| ≤
+p
+ln(n2) by Lemma 6.1.
+So checking all pairs p ∈P and q ∈Q, one must have
+||p −q|| ≤
+p
+ln(n2). Assuming we have found this closest pair, p ∈P and q ∈Q, we only need to search in the
+neighborhood of translations T = p −q.
+Furthermore, for some translation Tp,q,g = g −q we can claim that κ(P,Q ⊕T ∗) −κ(P,Q ⊕Tp,q,g) ≤ǫ. Since
+||T ∗−Tp,q,g|| ≤ǫ/2, we have the bound on subterm |K(p,q + T ∗) −K(p,q + Tp,q,g)| ≤ǫ/2, by Lemma 2.2. In
+fact, for every other pair p′ ∈P and q′ ∈Q, we also know |K(p′,q′ + T ∗) −K(p′,q′ + Tp,q,g)| ≤ǫ/2. Thus the
+sum of these subterms has error at most (ǫ/2)
+P
+p∈P
+P
+q∈Q µ(p)ν(q) = (ǫ/2)W 2.
+Since, the ﬁrst two terms of D2
+K(P,Q⊕T) are unaffected by the choice of T, this provides an ǫ-approximation
+for D2
+K(P,Q ⊕T) because all error is in the (−2)κ(P,Q ⊕T) term.
+For the runtime we need to bound the number of pairs from P and Q (i.e. O(n2)), the time to calculate
+κ(P,Q ⊕T) (i.e.
+O(n2)), and ﬁnally the number of grid points in G[ǫ/2, p,
+p
+ln(n2)].
+The last term re-
+quires O((1/ǫ)d) points per unit volume, and a ball of radius
+p
+ln(n2) has volume O(logd/2 n), resulting in
+O((1/ǫ)d logd/2 n) points. This product produces a total runtime of O((1/ǫ)dn4 logd/2 n).
+For a constant dimension d, using Theorem 5.2 to construct a coreset, we can ﬁrst set n = O((1/ǫ2)log(1/δ))
+and now the time to calculate κ(P,Q ⊕T) is O((1/ǫ4)log2(1/δ)) after spending O(n + (1/ǫ2)log(1/δ)log n)
+time to construct the coresets. Hence the total runtime is
+O(n + log n(1/ǫ2)(log(1/δ)) + (1/ǫd+8) · logd/2((1/ǫ)log(1/δ))log4(1/δ)),
+and is correct with probability at least 1 −δ.
+Theorem 6.2. For ﬁxed d, in
+O(n + log n(1/ǫ2)(log(1/δ)) + (1/ǫd+8) · logd/2((1/ǫ)log(1/δ))log4(1/δ))
+time we can ﬁnd a translation ˆT such that D2
+K(P,Q ⊕ˆT) −D2
+K(P,Q ⊕T ∗) ≤ǫW 2, with probability at least 1 −δ.
+6.2
+Approximately Optimal Translations and Rotations
+For any parameter ǫ > 0, we describe an algorithm to ﬁnd a translation ˆT and a rotation ˆR such that
+D2
+K(P, ˆR ◦(Q ⊕ˆT)) −D2
+K(P,R⋆◦(Q ⊕T ⋆)) ≤ǫW 2.
+We ﬁrst ﬁnd a translation to align a pair of points p ∈P and q ∈Q within some tolerance (using a method
+similar to above, and using Lemma 2.1 to ignore far-away pairs) and then rotate Q around q. This deviates
+from our restriction above that ˆR ∈SO(d) rotates about the origin, but can be easily overcome by performing
+the same rotation about the origin, and then translating Q again so q is at the desired location. Thus, after
+choosing a q ∈Q (we will in turn choose each q′ ∈Q) we let all rotations be about q and ignore the extra
+modiﬁcations needed to ˆT and ˆR to ensure ˆR is about the origin.
+Given a subset S ⊂Q of fewer than d points and a pair (p,q) ∈P×Q where q /∈S, we can deﬁne a rotational
+grid around p, with respect to q, so that S is ﬁxed. Let Rd,S be the subset of rotations in d-space under which the
+set S is invariant. That is for any R ∈Rd,S and any s ∈S we have R(s) = s. Let τ = d −|S|. Then (topologically)
+Rd,S = SO(τ). Let RS,p,q = minR∈Rd,S ||R(q) −p|| and let ˆq = RS,p,q(q). Let H[p,q,S,ǫ,Λ] ⊂Rd,S be a set
+of rotations under which S is invariant with the following property: for any point q′ such that there exists a
+rotation R′ ∈Rd,S where R′(q) = q′ and where ||q′ −ˆq|| ≤Λ, then there exists a rotation R ∈H[p,q,S,ǫ,Λ]
+such that ||R(q) −q′|| ≤ǫ. For the sanity of the reader, we will not give a technical construction, but just note
+that it is possible to construct H[p,q,S,ǫ,Λ] of size O((Λ/ǫ)τ).
+13
+
+Algorithm.
+For each pair of ordered sets of d points (p1, p2,... , pd) ⊂P and (q1,q2,... ,qd) ⊂Q consider the
+following set of translations and rotations. Points in P may be repeated. For each g ∈G[ǫ/d, p1,
+p
+ln(max{1/ǫ, n2})]
+consider translation Tp1,q1,g such that q1 + Tp1,q1,g = g. We now consider rotations of the set (Q ⊕Tp1,q1,g).
+Let S = {q1} and consider the rotational grid H[p2,q2 + Tp1,q1,g,S,ǫ/d,
+p
+ln(1/ǫ)]. For each rotation R2 ∈
+H[p2,q2 + Tp1,q1,g,S,ǫ/d,
+p
+ln(1/ǫ)] we recurse as follows. Apply R2(Q ⊕Tp1,q1,g) and place R2(q2 + Tp1,q1,g)
+in S. Then in the ith stage consider the rotational grid H[pi,Ri−1(...R2(q2 + Tp1,q1,g)...),S,ǫ/d,
+p
+ln(1/ǫ)].
+Where Ri is some rotation we consider from the ith level rotational grid, let ¯R = Rd ◦Rd−1 ◦... ◦R2. Let (ˆT, ˆR)
+be the pair (Tp,q,g, ¯R) that maximize κ(P, ¯R ◦(Q ⊕Tp,q,g)).
+Theorem 6.3. The above algorithm runs in time
+O(n2d+2(1/ǫ)(d2−d+2)/2 log(d2−3d+2)/4(1/ǫ)logd/2(max{n2,1/ǫ})),
+for a ﬁxed d, and is guaranteed to ﬁnd a translation and rotation pair (ˆT, ˆR), such that
+D2
+K(P, ˆR ◦(Q ⊕ˆT)) −D2
+K(P,R⋆◦Q ⊕T ⋆) ≤ǫW 2.
+Proof. We compare our solution (ˆT, ˆR) to the optimal solution (T ⋆,R⋆). Note that only pairs of points (p,q) ∈
+P × Q such that ||p −R⋆(q + T ⋆)|| <
+p
+ln(1/ǫ) need to be considered.
+We ﬁrst assume that for the ordered sets of d points we consider (p1, p2,... , pd) ⊂P and (q1,q2,...,qd) ⊂Q
+we have (A1) ||pi −R⋆(qi + T ⋆)|| ≤
+p
+ln(1/ǫ), and (A2) for S = {q1,... ,qi−1}, let qi ∈Q be the furthest point
+from S such that ||pi −(qi + T ⋆)|| ≤
+p
+ln(1/ǫ). Note that (A2) implies that for any rotation R ∈Rd,S that
+||qi −R(qi)|| > ||q′ −R(q′)|| for all q′ ∈Q that can be within the distance threshold under (T ⋆,R⋆). In the case
+that fewer than d pairs of points are within our threshold distance, then as long as these are the ﬁrst pairs
+in the ordered sequence, the algorithm works the same up to that level of recursion, and the rest does not
+matter. Finally, by Lemma 6.1 we can argue that at least one pair must be within the distance threshold for our
+transition grid.
+For each point q ∈Q we can show there exists some pair (T,R) considered by the algorithm such that
+||R⋆(q + T ⋆) −R(q + T)|| ≤ǫ. First, there must be some translation T = Tp1,q1,g in our grid that is within a
+distance of ǫ/d of T ⋆. This follows from Lemma 2.2 and similar arguments to the proof for translations.
+For each qi we can now show that for some Ri ∈H (the rotational grid) we have ||Ri(Ri−1(...R2(qi +
+Tp1,q1,g)...)) −R⋆(qi + T ⋆)|| ≤ǫ. By our assumptions, the transformed qi must lie within the extents of H.
+Furthermore, there is a rotation R′
+j that can replace each R j for j ∈[2, i] that moves qi by at most ǫ/d such
+that R′
+i(R′
+i−1(...R′
+2(qi)...)) = R⋆(qi). Hence, the composition of these rotations affects qi by at most ǫ/(i −1),
+and the sum effect of rotation and translation errors is at most ǫ.
+Since each qi is invariant to each subsequent rotation in the recursion, we have shown that there is a pair
+(T,R) considered so ||R(qi + T) −R⋆(qi + T ⋆)|| ≤ǫ for qi in the ordered set (q1,q2,...,qd). We can now use
+our second assumption (A2) that shows that at each stage of the recursion qi is the point affected most by the
+rotation. This indicates that we can use the above bound for all points q ∈Q, not just those in our ordered set.
+Finally, we can use Lemma 2.2 to complete the proof of correctness. Since if each K(p,q) has error at most
+ǫ, then
+
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)K(p, ˆR(q + ˆT)) −
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)K(p,R∗(q + T ∗))
+
+≤
+X
+p∈P
+X
+q∈Q
+µ(p)ν(q)ǫ = ǫW 2.
+We can bound the runtime as follows. We consider all d! n
+d
+ = O(nd) ordered sets of points in Q and all nd
+ordered sets of points from P. This gives the leading O(n2d) term. We then investigate all combinations of grid
+14
+
+points from each grid in the recursion. The translation grid has size O((∆/ǫ)d) = O((1/ǫ)d logd/2(max{1/ǫ, n2})).
+The size of the ith rotational grid is O((
+p
+log(1/ǫ)/ǫ)d−i, starting at i = 2.
+The product of all the rota-
+tional grids is the base to the sum of their powers
+Pd−1
+i=1 (d −i) =
+Pd−1
+i=1 i = (d −1)(d −2)/2 = (d2 −3d +
+2)/2, that is O((1/ǫ)(d2−3d+2)/2 log(d2−3d+2)/4(1/ǫ)). Multiplying by the size of the translational grid we get
+O((1/ǫ)(d2−d+2)/2 log(d2−3d+2)/4(1/ǫ)logd/2(max{n2,1/ǫ})). Then for each rotation and translation we must
+evaluate κ(P,R ◦(Q ⊕T)) in O(n2) time. Multiplying these three components gives the ﬁnal bound of
+O(n2d+2(1/ǫ)(d2−d+2)/2 log(d2−3d+2)/4(1/ǫ)logd/2(max{n2,1/ǫ})).
+The runtime can again be reduced by ﬁrst computing a coreset of size O((1/ǫ2)log(1/δ)) and using this
+value as n. After simplifying some logarithmic terms we reach the following result.
+Theorem 6.4. For ﬁxed d, in
+O(n + log n(1/ǫ2)(log(1/δ)) + (1/ǫ)(d2+7d+6)/2(log(1/ǫδ))(d2+7d+10)/4),
+time we can ﬁnd a translation and rotation pair (ˆT, ˆR), such that
+D2
+K(P, ˆR ◦(Q ⊕ˆT)) −D2
+K(P,R⋆◦Q ⊕T ⋆) ≤ǫW 2,
+with probability at least 1 −δ.
+15
+
+References
+[1] Noga Alon, Shai Ben-David, Nocolò Cesa-Bianchi, and David Haussler. Scale-sensitive dimensions, uni-
+form convergence, and learnability. Journal of ACM, 44:615–631, 1997.
+[2] Alexandr Andoni, Khanh Do Ba, Piotr Indyk, and David Woodruff. Efﬁcient sketches for Earth-mover
+distance, with applications. In Proceedings 50th Annual IEEE Foundations of Computer Science, 2009.
+[3] Alexandr Andoni and Piotr Indyk. Near-optimal hashing algorithms for approximate nearest neighbor in
+high dimensions. In FOCS, pages 459–468. IEEE Computer Society, 2006.
+[4] Alexandr Andoni, Piotr Indyk, and Robert Krauthgamer. Earth mover distance over high-dimensional
+spaces. In SODA, 2008.
+[5] N. Aronszajn. Theory of reproducing kernels. Trans. AMS, 68:337–404, 1950.
+[6] Nikhil Bansal. Constructive algorithms for discrepancy minimization. In Proceedings 51st Annual IEEE
+Symposium on Foundations of Computer Science, 2010.
+[7] Peter L. Bartlett, Philip M. Long, and Robert C. Williamson. Fat-shattering and the learnability of real-
+valued functions. Journal of Computer and System Sciences, 52(3):434–452, 1996.
+[8] Sergio Cabello, Panos Giannopoulos, Christian Knauer, and Günter Rote. Matching point sets with respect
+to the earth mover’s distance. Comput. Geom., 39(2):118–133, 2008.
+[9] Paul B. Callahan and S. Rao Kosaraju. A decomposition of multidimensional point sets with applicatrions
+to k-nearest neighbors and n-body potential ﬁelds. J ACM, 42:67–90, 1995.
+[10] Moses Charikar, Alantha Newman, and Aleksandar Nikolov. Tight hardness results for minimizing dis-
+crepancy. In Proceedings 22nd Annual ACM-SIAM Symposium on Discrete Algorithms, 2011.
+[11] Bernard Chazelle. The Discrepancy Method. Cambridge University Press, 2000.
+[12] Bernard Chazelle and Jiri Matousek. On linear-time deterministic algorithms for optimization problems
+in ﬁxed dimensions. Journal of Algorithms, 21:579–597, 1996.
+[13] Bernard Chazelle and Emo Welzl. Quasi-optimal range searching in spaces of ﬁnite VC-dimension. Discrete
+and Computational Geometry, 4:467–489, 1989.
+[14] Kenneth L. Clarkson. Fast algorithms for the all nearest neighbors problem. In FOCS, 1983.
+[15] Luc Devroye, László Györﬁ, and Gábor Lugosi. A Probabilistic Theory of Pattern Recognition. Springer-
+Verlag, 1996.
+[16] Michel Marie Deza and Monique Laurent. Geometry of Cuts and Metrics. Springer, 1997.
+[17] Stanley Durrleman, Xavier Pennec, Alain Trouvé, and Nicholas Ayache. Sparse approximation of currents
+for statistics on curves and surfaces. In 11th International Conference on Medical Image Computing and
+Computer Assisted Intervention, 2008.
+[18] Joan Glaunès. Transport par difféomorphismes de points, de mesures et de courants pour la comparaison de
+formes et l’anatomie numérique. PhD thesis, Université Paris 13, 2005.
+[19] Joan Glaunès and Sarang Joshi. Template estimation form unlabeled point set data and surfaces for
+computational anatomy. In Math. Found. Comp. Anatomy, 2006.
+16
+
+[20] Leslie Greengard and John Strain. The fast Gauss transform. J. Sci. Stat. Computing, 12, 1991.
+[21] Sariel Har-Peled. Approximation Algorithms in Geometry. http://valis.cs.uiuc.edu/˜sariel/teach/notes/aprx/.
+[22] David Haussler.
+Sphere packing numbers for subsets of the boolean n-cube with bounded Vapnik-
+Chervonenkis dimension. Journal of Combinatorial Theory, Series A, 69:217–232, 1995.
+[23] Matrial Hein and Olivier Bousquet. Hilbertian metrics and positive deﬁnite kernels on probability mea-
+sures. In Proceedings 10th International Workshop on Artiﬁcial Intelligence and Statistics, 2005.
+[24] William B. Johnson and Joram Lindenstrauss. Extensions of Lipschitz maps into a Hilbert space. Contem-
+porary Mathematics, 26:189–206, 1984.
+[25] Michael Kerns and Robert E. Shapire. Efﬁcient distribution-free learning of probabilistic concepts. Journal
+of Computer and System Sciences, 48:464–497, 1994.
+[26] Yi Li, Philip M. Long, and Aravind Srinivasan. Improved bounds on the samples complexity of learning.
+Journal of Computer ans System Science, 62:516–527, 2001.
+[27] Maarten Löfﬂer and Jeff M. Phillips. Shape ﬁtting on point sets with probability distributions. In Proceed-
+ings 17th Annual European Symposium on Algorithms, 2009.
+[28] Jiri Matoušek. Approximations and optimal geometric divide-and-conquer. In Proceedings 23rd Sympo-
+sium on Theory of Computing, pages 505–511, 1991.
+[29] Jiri Matoušek. Tight upper bounds for the discrepancy of halfspaces. Discrete and Computational Geome-
+try, 13:593–601, 1995.
+[30] Jiri Matoušek. Geometric Discrepancy. Springer, 1999.
+[31] Jiri Matoušek, Emo Welzl, and Lorenz Wernisch.
+Discrepancy and approximations for bounded VC-
+dimension. Combinatorica, 13:455–466, 1993.
+[32] Alfred Müller. Integral probability metrics and their generating classes of functions. Advances in Applied
+Probability, 29:429–443, 1997.
+[33] Aleksandar Nikolov. Personal communication, 2011.
+[34] Jeff M. Phillips. Algorithms for ǫ-approximations of terrains. In Proceedings 35th International Colloquium
+on Automata, Languages, and Programming, 2008.
+[35] Jeff M. Phillips and Suresh Venkatasubramanian. A gentle introduction to the kernel distance. Technical
+report, arXiv:1103.1625, 2011.
+[36] Ali Rahimi and Benjamin Recht. Random features for large-scale kernel machines. In Neural Informations
+Processing Systems, 2007.
+[37] W. Rudin. Fourier analysis on groups. Wiley-Interscience, 1962.
+[38] Sameer Shirdhonkar and David W. Jacobs. Approximate Earth mover’s distance in linear time. In Pro-
+ceedings IEEE Conference on Compuer Vision and Pattern Recognition, 2008.
+[39] Alex J. Smola, Arthur Gretton, Le Song, and Bernhard Schölkopf. A Hilbert space embedding for distri-
+butions. In ICALT, 2007.
+[40] Le Song, Byron Boots, Sajid Siddiqi, Geoffrey Gordon, and Alex J. Smola. Hilbert space embeddings of
+hidden markov models. In ICML, 2010.
+17
+
+[41] Bharath K. Sriperumbudur, Arthur Gretton, Kenji Fukumizu, Bernhard Schölkopf, and Gert R. G. Lanck-
+riet. Hilbert space embeddings and metrics on probability measures. Journal of Machine Learning Research,
+11:1517–1561, 2010.
+[42] Ch. Suquet. Distances Euclidiennes sur les mesures signées et application à des théorèmes de Berry-
+Esséen. Bulletin Belgium Mathetics Society, 2:161–181, 1995.
+[43] Subhash Suri, Csaba D. Tóth, and Yunhong Zhou. Range counting over multidimensional data streams.
+In Proceedings 20th Symposium on Computational Geometry, pages 160–169, 2004.
+[44] M. Talagrand. Sharper bounds for Gaussian and emperical processes. Annals of Probability, 22:76, 1994.
+[45] Marc Vaillant and Joan Glaunès. Surface matching via currents. In Proceedings Information Processing in
+Medical Imaging, volume 19, pages 381–92, 2005.
+[46] Vladimir Vapnik. Inductive principles of the search for emperical dependencies. In Proceedings of the
+Second Annual Workshop on Computational Learning Theory, pages 3–21, 1989.
+[47] Vladimir Vapnik and Alexey Chervonenkis. On the uniform convergence of relative frequencies of events
+to their probabilities. Theory of Probability and its Applications, 16:264–280, 1971.
+[48] C. Yang, R. Duraiswami, N.A. Gumerov, and L. Davis. Improved fast Gauss transform and efﬁcient kernel
+density estimation. In Proceedings 9th International Conference on Computer Vision, pages 664–671, 2003.
+A
+Coresets for the Kernel Distance
+A.1
+Alternative Coreset Proof
+In Section 5 we presented a construction for a coreset for the kernel distance, that depended only on 1/ǫ for a
+ﬁxed kernel. This assumed that K+ = maxp,q K(p,q) was bounded and constant. Here we present an alternative
+proof (also by random sampling) which can be made independent of K+. This proof is also interesting because
+it relies on ρ the dimension of the feature map.
+Again, we sample k points uniformly from P and reweight η(p) = W/k.
+Lemma A.1. By constructing S with size k = O((1/ǫ3)log(n/δ)log((1/ǫδ)logn)) we guarantee D2
+K(P,S) ≤ǫW 2,
+with probability at least 1 −δ.
+Proof. The error in our approximation will come from two places: (1) the size of the sample, and (2) the
+dimension ρ of the feature space we perform the analysis in.
+Let φ : P × R+ →H describe the true feature map from a point p ∈P, with weight µ(p), to an inﬁnite
+dimensional feature space. As before, set Φ(P) =
+P
+p∈P µ(p)φ(p), and recall that DK(P,Q) = ∥Φ(P) −Φ(Q)∥H,
+for any pair of shapes P and Q.
+By the results in the previous section, we can construct ˜φ : P×R+ →Rρ (such as φΥ deﬁned for Lemma 4.1)
+such that ˜Φ(P) =
+P
+p∈P ˜φ(p) and for any pair of shapes P and S with weights W =
+P
+p∈P µ(p) =
+P
+p∈S η(p),
+we have
+∥Φ(P) −Φ(S)∥2
+H −∥˜Φ(P) −˜Φ(S)∥2 ≤(ǫ/2)W 2, with probability at least 1 −δ/2. This bounds the
+error in the approximation of the feature space.
+We now use the low dimension ρ of this approximate feature space to bound the sampling error. Speciﬁcally,
+we just need to bound the probability that ∥˜Φ(P) −˜Φ(S)∥2 = ∥E[˜Φ(S)] −˜Φ(S)∥2 ≥(ǫ/2)W 2, since E[˜Φ(S)] =
+˜Φ(P).
+This is always true if for each dimension (or pair of dimensions if we alter bounds by a factor 2)
+m ∈[1,ρ] we have
+˜Φ(S)m −E[˜Φ(S)m]
+ ≤
+p
+ǫW 2/(2ρ), so we can reduce to a 1-dimensional problem.
+We can now invoke the following Chernoff-Hoeffding bound. Given a set {X1,... , X r} of independent random
+variables, such that
+Xi −E[Xi]
+ ≤Λ, then for M =
+Pr
+i=1 Xi we can bound Pr[|M −rE[Xi]| ≥α] ≤2e−2α2/(rΛ2).
+18
+
+By letting α =
+p
+W 2ǫ/(2ρ) and Xi = ˜φ(pi)m, the mth coordinate of ˜φ(pi) for pi ∈S,
+Pr
+h˜Φ(S) −˜Φ(P)
+2 ≥(ǫ/2)W 2i
+=Pr
+˜Φ(S) −E
+˜Φ(S)
+
+2
+≥(ǫ/2)W 2
+
+≤ρ Pr
+Φ(S)m −kE
+ ˜φ(pi)m
+ ≥
+p
+ǫW 2/(2ρ)
+
+≤ρ2e−2 ǫW2
+2ρ /(kΛ2) ≤ρ2e−ǫW2
+ρk
+k2
+4W2 = ρ2e−kǫ/(4ρ),
+where the last inequality follows because Λ = maxp,q∈S || ˜φ(p) −˜φ(q)|| ≤2W/k since for any p ∈S we have
+|| ˜φ(p)|| = W/k. By setting δ/2 ≥ρ2e−kǫ/(4ρ), we can solve for k = O((ρ/ǫ)log(ρ/δ)). The ﬁnal bound
+follows using ρ = O((1/ǫ2)log(n/δ)) in Lemma 4.1.
+Again using the feature map summarized by Lemma 4.1 we can compute the norm in feature space in O(ρk)
+time, after sampling k = O((1/ǫ3)log(n/δ)log((1/ǫδ)logn)) points from P and with ρ = O((1/ǫ2)log(n/δ)).
+Theorem A.1. We can compute a vector ˆS = ˜Φ(S) ∈Rρ in time O(n + (1/ǫ5)log2(n/δ)log2((1/ǫδ)logn))) such
+that
+˜Φ(P) −ˆS
+2 ≤ǫW 2 with probability at least 1 −δ.
+A.2
+NP-hardness of Optimal Coreset Construction
+In general, the problem of ﬁnding a ﬁxed-size subset that closely approximates the kernel norm is NP-hard.
+Deﬁnition A.1 (KERNEL NORM). Given a set of points P = {Xi}n
+i=1, a kernel function K, parameter k and a
+threshold value t, determine if there is a subset of points S ⊂P such that |S| = k and DK(S,P) ≤t.
+Theorem A.2. KERNEL NORM is NP-hard, even in the case where k = n/2 and t = 0.
+Proof. To prove this, we apply a reduction from PARTITION: given a set Q = {xi}n
+i=1 of integers with sum to
+Pn
+i=1 = 2m, determine if there is a subset adding to exactly m. Our reduction transforms Q into a set of points
+P = {x′
+i}n
+i=1 which has subset S of size k = n/2 such that ||S −P|| ≤t if and only if Q has a partition of two
+subsets Q1 and Q2 of size n/2 such that the sum of integers in each is m.
+Let c = 1
+n
+P
+xi = 2m/n and x′
+i = xi −c and let t = 0. Let the kernel function K be an identity kernel deﬁned
+K(a, b) = 〈a, b〉, where the feature map is deﬁned φ(a) = a. This deﬁnes the reduction.
+Let s = (n/k)
+P
+x′
+i∈S x′
+i and p =
+P
+x′
+i∈P x′
+i. Note that p = 0 by deﬁnition. Since we have an identity kernel so
+φ(a) = a, DK(S,P) = ∥s −p∥. Thus there exists an S that satisﬁes DK(S,P) ≤0 if and only if s = 0.
+We now need to show that s can equal 0 if and only if there exists a subset Q1 ⊂Q of size n/2 such that its
+sum is m. We can write
+s =
+n
+k
+X
+x′
+i∈S
+x′
+i = 2
+X
+x′
+i∈S
+
+xi −
+2m
+n
+
+= −2m + 2
+X
+x′
+i∈S
+xi.
+Thus s = 0 if and only if
+P
+x′
+i∈S xi = m. Since S must map to a subset Q1 ⊂Q, where x′
+i ∈S implies xi ∈Q1,
+then s = 0 holds if and only if there is a subset Q1 ⊂Q such that
+P
+xi∈Q1 = m. This would deﬁne a valid
+partition, and it completes the proof.
+19

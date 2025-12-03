@@ -1,0 +1,2379 @@
+Two-Scale Optimization of Graded Lattice Structures
+respecting Buckling on Micro- and Macroscale
+Daniel H¨ubner1*, Fabian Wein1 and Michael Stingl1
+1Applied Mathematics, Continuous Optimization, Friedrich-Alexander Universit¨at
+Erlangen-N¨urnberg, Cauerstr. 11, Erlangen, 91058, Germany.
+*Corresponding author(s). E-mail(s): daniel.huebner@fau.de;
+Contributing authors: fabian.wein@fau.de; michael.stingl@fau.de;
+Abstract
+Interest in components with detailed structures increased with the progress in advanced manu-
+facturing techniques in recent years. Parts with graded lattice elements can provide interesting
+mechanical, thermal, and acoustic properties compared to parts where only coarse features are
+included. One of these improvements is better global buckling resistance of the component. How-
+ever, thin features are prone to local buckling. Normally, analyses with high computational eﬀort
+are conducted on high-resolution ﬁnite element meshes to optimize parts with good global and local
+stability. Until recently, works focused only on either global or local buckling behavior. We use
+two-scale optimization based on asymptotic homogenization of elastic properties and local buck-
+ling behavior to reduce the eﬀort of full-scale analyses. For this, we present an approach for
+concurrent local and global buckling optimization of parameterized graded lattice structures. It is
+based on a worst-case model for the homogenized buckling load factor, which acts as a safeguard
+against pure local buckling. Cross-modes residing on both scales are not detected. We support
+our theory with numerical examples and validations on dehomogenized designs, which show the
+capabilities of our method, and discuss the advantages and limitations of the worst-case model.
+Keywords: structural optimization, instability, buckling, two-scale, cellular materials
+1 Introduction
+The ongoing progress in additive manufacturing
+allows structures with ﬁne details to gain increas-
+ing focus. Lattice structures in particular, both
+homogeneous and graded, are utilized in many
+applications, e.g., thermal management, energy
+absorption, noise reduction, biomedical engineer-
+ing, etc. (Rahman et al. 2022). Lattice inﬁll is also
+recognized as potentially increasing global buck-
+ling resistance of a component (Clausen et al.
+2016). However, ﬁne features are prone to local
+buckling (Ferrari and Sigmund 2019).
+Two-scale optimization (Wu et al. 2021) can
+be used to design such structures without the need
+to resolve all the ﬁne details of the full design
+in a single setting. The idea of this approach
+started with the work of Bendsøe and Kikuchi
+(1988), in which the design process is divided into
+two scales: the macroscopic scale, which describes
+the overall component, and the microscopic scale,
+which shows the ﬁne details. Bendsøe and Kikuchi
+bridged the gap between these two scales by
+asymptotic homogenization (Allaire et al. 1997).
+This technique yields approximate material prop-
+erties of microstructures on the macroscopic scale,
+1
+arXiv:2303.08710v1  [cs.CE]  15 Mar 2023
+
+which can then be used in macroscopic con-
+stitutive equations. Choosing a parameterized
+microstructure, Bendsøe and Kikuchi were able
+to eﬀectively decouple the scales: Prior to any
+optimization procedure a discrete subset of the
+parameter space is chosen and homogenization is
+conducted for each of the microstructures gained
+from this parameter set. The obtained properties
+are then interpolated in the continuous param-
+eter space and the interpolated material model
+can later be reused to solve various optimization
+problems. This technique introduces an interpola-
+tion error, but requires less computational eﬀort
+when compared with on the ﬂy homogenization,
+i.e., homogenization performed for each ﬁnite ele-
+ment in the discretized design domain and for
+each update step of the design during an iterative
+optimization procedure. Moreover the interpola-
+tion error can be controlled in a rather straight
+forward way during preprocessing.
+Though there is exhaustive literature on opti-
+mal design considering the buckling behavior of
+structures using beam models (Ferrari and Sig-
+mund (2019) and references therein), only a rela-
+tively small number of publications for continuum
+models exist. The initial problems evolved around
+ﬁnding optimal cross-sections for columns of ﬁxed
+length and weight subject to uniaxial compression
+loads (Clausen 1851; Keller 1960; Tadjbakhsh and
+Keller 1962; Huang and Sheu 1968; Khot et al.
+1976). Neves et al. (1995) were the ﬁrst to conduct
+topology optimization with respect to buckling
+based on the method of Bendsøe and Kikuchi
+described above. However, they encountered vari-
+ous obstacles in the linear buckling analysis, which
+is stated as an eigenvalue problem (Bendsøe and
+Sigmund 2003). This includes localized modes in
+low density regions and clustering of eigenval-
+ues when approaching the ﬁnal design (Seyranian
+et al. 1994). Actions to alleviate issues with artiﬁ-
+cial, low-density modes have been proposed, e.g.,
+diﬀerent interpolation schemes for the stiﬀness
+and geometric stiﬀness matrices (Pedersen 2000;
+Bendsøe and Sigmund 2003) or applying an eigen-
+value shift based on the last iteration and iden-
+tifying artiﬁcial modes by their contribution to
+the total strain energy (Gao and Ma 2015). There
+are also methods for avoiding low-density regions
+like ﬁltering and projection of the pseudo-density
+(Larsen et al. 2018), penalization of intermedi-
+ate values in the objective (Allaire and Francfort
+1993; Allaire and Kohn 1993), or element removal
+strategies (Behrou et al. 2021; Dalklint et al. 2020;
+Giele et al. 2021). Clustering of eigenvalues can
+be prevented by enforcing gaps between the eigen-
+values (Bendsøe and Sigmund 2003). However, a
+large number of eigenvalues may still have to be
+computed to achieve good convergence (Bruyneel
+et al. 2008), which compels the use of eﬃcient
+eigenproblem solvers (Dunning et al. 2016; Ferrari
+and Sigmund 2020). Nevertheless, topology opti-
+mization with respect to buckling still currently
+poses a challenging problem.
+More recently, stability requirements have also
+been employed when tailoring microstructures
+(Neves et al. 2002b,a; Thomsen et al. 2018; Ander-
+sen et al. 2022), though models for the buckling
+of periodic microstructures have been investigated
+for decades. Homogenization theory for buck-
+ling load factors is well established (Neves et al.
+2002b; Thomsen et al. 2018), but several chal-
+lenges still arise in this context. Buckling modes
+can range from high-frequency modes with a wave-
+length shorter than the characteristic size of the
+microstructure to modes that span over multiple
+periods of the microstructure. Floquet-Bloch the-
+ory can be used to capture the latter in particular
+(Neves 2019).
+For dehomogenized designs scale eﬀects stem-
+ming from a ﬁnite cell size and eﬀects due to grad-
+ing of the microstructure might appear (Thomsen
+et al. 2018). Especially the latter might lead to
+an occurrence of undesired buckling modes at the
+boundary of the structure.
+The aforementioned works only investigate
+the buckling behavior of a structure on a sin-
+gle scale, either macroscopic or microscopic. Even
+with the ongoing ”competition for ultimately stiﬀ
+and strong architected materials” (Andersen et al.
+2021), these designed materials appear not to
+have been utilized so far in the optimization of
+components with stability requirements.
+In this article, we present a two-scale topol-
+ogy optimization approach, where we incorporate
+buckling on both scales individually, but neglect
+cross-modes spanning over both scales. Assuming
+separation of length scales, we use homogenization
+theory to upscale the elastic behavior and buck-
+ling stability of a periodic lattice that resides on
+the microscopic scale. On the macroscopic scale we
+
+search for an optimal lattice grading with respect
+to both local and global buckling. We parameter-
+ize the lattice by its porosity, precompute homog-
+enized properties for a selected set of porosities,
+and obtain a model on the continuous parameter
+space by piecewise cubic interpolation. This model
+is then used in macroscopic optimization problems
+with the local lattice porosity as design variable.
+Thus, our method can be classiﬁed as a multi-scale
+density optimization approach with a parameter-
+ized unit cell based on the microstructure porosity
+(category V/A in Wu et al. (2021)).
+Our contribution is a new approach to inte-
+grate the upscaled microscopic buckling informa-
+tion into the optimization. From the macroscopic
+local stress, we obtain the buckling response on
+the microscale via a worst-case model, which acts
+as a safeguard against pure microscopic buckling.
+The worst case is realized by reducing the macro-
+scopic local stress to its magnitude for reasons of
+computational eﬀort. This comes at the cost of
+underestimation of predicted critical loads for the
+microstructure.
+Recent work by Wang et al. (2021) is close to
+our approach. However, they deduce local stress
+constraints from the slenderness ratio of the lat-
+tice struts, while we directly use upscaled micro-
+scopic buckling information. Our approach has the
+advantage that essentially arbitrary microstruc-
+tures can be treated, including those for which a
+slenderness ratio could not be uniquely deﬁned.
+The work of Christensen et al. (2022) is similar
+to ours, with some key diﬀerences: They assume
+isotropic buckling behavior of the microstruc-
+ture, while our approach is applicable to arbitrary
+microstructures. They also ﬁt a Willam-Warnke
+failure criterion to homogenized data, which intro-
+duces an approximation error of the local buckling
+factor. In contrast, we build a worst-case model
+from homogenized data, which also comes with
+an approximation error; however, applying a full
+interpolation model in lieu of the worst case, it
+is possible to render this error negligible (see
+Remark 1 in Section 4.1). Moreover, Christensen
+et al. (2022) employ a two term interpolation
+scheme to interpolate the buckling strength as a
+function of the relative porosity, whereas we use
+more accurate piecewise cubic interpolation. On
+the other hand, our approach is limited to sizing
+problems with a lower bound on the lattice density
+everywhere, while a major contribution of Chris-
+tensen et al. (2022) is the possibility to allow for
+void regions in the design while still being able to
+maintain the lower bound on the density of the
+lattice using an auxiliary design ﬁeld.
+In this article, we restrict the analyses to
+linear elasticity and linearized buckling, though
+the general idea of the method can be extended
+to non-linear regimes. We also limit ourselves
+to a two-dimensional setting in this article to
+keep notations simple. However, it is straightfor-
+ward to extend our approach to three dimensions.
+We emphasize that our method is applicable to
+arbitrary, parameterized microstructures. As an
+example, we choose a lattice consisting of equilat-
+eral triangles that is parameterized by its porosity.
+More sophisticated geometries and parameteriza-
+tions are possible with higher computational eﬀort
+without changing the general method.
+The remainder of the article is structured as
+follows: In Section 2 we recap the state equations
+for linear elasticity and linearized buckling anal-
+ysis. Section 3 brieﬂy presents the main formulas
+for asymptotic homogenization of elasticity mod-
+ulus and buckling load factors. We describe our
+exemplary microstructure, its parameterization,
+and important aspects for the upscaling process in
+Section 4. We present our method for designing a
+lattice unit cell by rounding corners of an equilat-
+eral triangle, showing ﬁnite element convergence
+on the microscopic scale, and obtaining homoge-
+nized properties of a lattice. Section 4.1 provides
+the novel approach to include the upscaled prop-
+erties on the macroscopic scale via the suggested
+worst-case model for the homogenized buckling
+load factor. Section 4.2 demonstrates how to
+precompute homogenized properties on a dis-
+cretized parameter space and apply an interpo-
+lation scheme to yield values on the continuous
+parameter space. Section 5 outlines three diﬀerent
+two-scale optimization problems considering buck-
+ling on the macroscopic scale, on the microscopic
+scale and on both scales (without cross-modes).
+Associated numerical examples are presented in
+Section 6 together with a pre-study, which helps to
+develop a better understanding of the optimized
+designs. A numerical validation on dehomogenized
+designs is given in Section 7.1 accompanied by a
+study on scale separation. We examine the impact
+of the worst-case error closely in Section 7.2 by
+
+means of two numerical examples. Finally, we
+complete with conclusions in Section 8.
+2 Linear elasticity and
+buckling analysis
+In this section we brieﬂy recap the state equations
+for linear elasticity and buckling analysis on an
+algebraic level as given by Thomsen et al. (2018).
+For continuous formulations in weak form, inter-
+ested readers are referred to Neves (2019). We
+assume a linear elasticity setting and linear bifur-
+cation buckling condition. This means that the
+prebuckling displacement, stresses, and strains
+vary linearly with the applied load and that the
+load factor, which indicates stability, appears lin-
+early in the bifurcation eigenvalue problem. Linear
+buckling analysis consists of two steps: First, we
+solve the linear elasticity state equation for dis-
+placements of a structure under a given load.
+Then, an eigenvalue problem is solved, where the
+eigenvalues correspond to bifurcation points, and
+eigenvectors are interpreted as buckling modes of
+deﬂection.
+Throughout this article, we apply Voigt nota-
+tion for tensors and assume plane stress condi-
+tions.
+Let us consider a body Ω⊂R2 and its dis-
+cretization Ω△= SM
+e=1 Ωe by M ﬁnite elements.
+Then the state equation of linear elasticity for Ω△
+reads as (Zienkiewicz et al. 2005):
+K(ρ)u = f,
+(1)
+where u is the sought-for vector of displacements,
+ρ ∈(0, 1]M is the pseudo-density ﬁeld and f is the
+applied load vector (reference load). The stiﬀness
+matrix is given by
+K(ρ) =
+M
+^
+e=1
+Nip
+X
+k=1
+ce,kB⊤
+e,kE(ρe)Be,k
+(2)
+with assembly operator denoted by V and number
+of integration points Nip. E(ρe) is the elasticity
+tensor, which depends on the pseudo-density in
+element e. Be,k is the strain-displacement matrix
+of element e evaluated in the k-th integration
+point and contains derivatives of the ﬁnite ele-
+ment’s shape functions. The factor
+ce,k = det(Je)we,k
+(3)
+contains the Jacobian determinant det(Je) of ele-
+ment e and the integration weight we,k associated
+with the k-th integration point of said element.
+The buckling equation is given by the eigen-
+value problem,
+(K(ρ) −Λ G(ρ, u(ρ))) φ = 0,
+(4)
+and is solved for pairs of eigenvalues Λℓand eigen-
+vectors φℓ, ℓ≤M. Eigenvalues of (4) are also
+called load factors. The critical load, under which
+buckling occurs, can be computed by multiply-
+ing the reference load f with the eigenvalue with
+the smallest absolute value, which is also known
+as the critical load factor or buckling load fac-
+tor (BLF). If the critical load factor is less than
+or equal to one, the structure buckles; otherwise,
+the structure is stable with respect to the applied
+reference load. The stress stiﬀness matrix (or geo-
+metric stiﬀness matrix) (Nˇemec et al. 2016) in (4)
+is given by
+G(ρ, u(ρ)) =
+M
+^
+e=1
+Nip
+X
+k=1
+ce,k ˜
+Be,i,k(σe(ue(ρ)))i,j ˜
+Be,j,k,
+(5)
+where summation over i and j is implied. Again,
+ce,k includes the Jacobian determinant of element
+e and the integration weight at the k-th integra-
+tion point. The integrated stress in element e is
+numerically evaluated as
+σe(ue(ρ)) =
+Nip
+X
+k=1
+ce,kE(ρe)Be,kue(ρ),
+(6)
+and
+˜
+Be,i,k = ∂Ne
+∂xi (xk)
+(7)
+is the derivative of the matrix of the shape func-
+tions evaluated at integration point xk. Usually,
+solutions to (4) are considered ordered accord-
+ing to the absolute value of the load factors with
+Λ1 as the smallest value and eigenvectors are
+G-normalized, i.e.,
+φ⊤G φ = 1.
+(8)
+
+In single-scale topology optimization, (6) can lead
+to artiﬁcial buckling modes in low density regions
+(Neves et al. 1995). However, in our approach the
+macroscopic pseudo-density represents the local
+relative lattice volume. Thus, low density regions
+represent thin lattice, and modes in such regions
+are not artiﬁcial, but rather comply with buckling
+of the lattice.
+Following Rodrigues et al. (1995), the sensitiv-
+ity of an eigenvalue with algebraic multiplicity one
+with respect to density ρe is given as
+∂Λ
+∂ρe
+=
+
+φ⊤
+∂K
+∂ρe
+−Λ ∂G
+∂ρe
+
+φ −Λw⊤∂K
+∂ρe
+u
+
+.
+(9)
+Here, w is the adjoint state obtained from the
+solution of the equation
+K(ρ) w = φ⊤∇uG(ρ, u(ρ)) φ.
+(10)
+For eigenvalues with multiplicity greater one, the
+derivative of the load factor function does not exist
+in a strict sense. Nevertheless, using (9) still an
+element of the subdiﬀerential can be computed
+(Rodrigues et al. 1995). Alternatively, derivations
+for multiple eigenvalues can be used (Seyranian
+et al. 1994).
+Note that G is in general not positive deﬁnite,
+so sometimes a reformulation of the eigenvalue
+problem (4) to
+ G(ρ, u(ρ)) −1
+ΛK(ρ)
+
+φ = 0,
+(11)
+might be beneﬁcial, as K is always positive deﬁ-
+nite for ρ > 0.
+3 Asymptotic homogenization
+To obtain the mechanical properties of a lattice
+structure on the macroscopic scale, we perform
+asymptotic homogenization. We brieﬂy recall the
+homogenization formulas in the two-dimensional
+setting, which can be found, e.g., in Thomsen et al.
+(2018). Note that we do not perform topology
+optimization on the microscopic scale, but rather
+investigate given periodic lattice structures. Thus,
+there is only a ﬁnite element mesh for the solid
+material region.
+This prevents spurious modes, which typically
+arise in low density regions during topology opti-
+mization (Neves et al. 1995). However, we might
+get artiﬁcial modes owing to the ﬁnite element
+discretization. These modes are usually highly
+localized and can be ﬁltered by setting a thresh-
+old on the minimal number of nodes that have to
+exhibit deﬂection, e.g., 5% of all nodes in the ﬁnite
+element mesh.
+As we do not perform topology optimization
+on the microscopic scale and are only interested
+in obtaining the critical load factor of a given
+microstructure, sensitivities are not required here
+and thus clustering of eigenvalues as described in
+the work by Neves et al. (2002a) is not an issue.
+3.1 Linear elasticity
+We choose a representative volume element (RVE)
+Y , which is discretized with m ﬁnite elements
+Ye, i.e., Y
+= Sm
+e=1 Ye. We solve the equilib-
+rium equations on the microscopic scale for the
+Y -periodic ﬁelds χj using three test ﬁelds f j:
+Kχj = f j,
+j = 1, 2, 3
+(12)
+with stiﬀness matrix K and f j given by
+K =
+m
+^
+e=1
+nip
+X
+k=1
+ce,kB⊤
+e,kE0Be,k
+(13)
+and
+f j =
+m
+^
+e=1
+nip
+X
+k=1
+ce,kB⊤
+e,kE0˜ϵj.
+(14)
+nip is the number of integration points, E0 is the
+elasticity tensor for the base material and ˜ϵj are
+unit strain ﬁelds with ˜ϵj
+i = δij. We note that
+the Y -periodicity is realized by assuming same
+values for the solutions on opposite sides of Y .
+The homogenized constitutive tensor EH of the
+microstructure is then given by
+EH
+i,j =
+1
+|Y |
+m
+^
+e=1
+nip
+X
+k=1
+ce,k
+ ˜ϵi −Be,kχi
+e
+⊤E0  ˜ϵj −Be,kχj
+e
+
+.
+(15)
+3.2 Buckling
+The equilibrium equation for buckling on the
+microscopic scale is an eigenvalue problem as in
+the macroscopic setting (cf. (4)) and is solved for
+
+pairs of eigenvalues λℓand associated eigenvectors
+ϕℓ, ℓ≤m:
+(K −λ G(χ, ¯σ))ϕ = 0
+(16)
+As in the macroscopic setting, the eigenvalue with
+the smallest absolute value denotes the buckling
+load factor. G is the microscopic initial stress
+stiﬀness matrix (cf. (5))
+G(χ, ¯σ) =
+m
+^
+e=1
+nip
+X
+k=1
+ce,k ˜
+B⊤
+e,i,k(σe(χ, ¯σ))i,j ˜
+Be,j,k
+(17)
+with
+σe(χ, ¯σ) = E0(I −BeXe) ¯ϵ(¯σ).
+(18)
+The microscopic initial stress tensor σe describes
+how the macroscopic strain ¯ϵ is distributed in
+unit cell Y . We note that (18) already takes
+stress ampliﬁcation (see Ferrer et al. (2021)) into
+account. The macroscopic strain is given as solu-
+tion of the macroscopic constitutive equation
+¯ϵ(¯σ) = (EH)−1¯σ
+(19)
+and Xe = [χ1
+e χ2
+e χ3
+e] contains the solutions of
+(12). The macroscopic stress ¯σ is obtained via (1)
+and (6). Parameterization of the lattice geometry
+and linearity of the buckling analysis allows us
+to precompute homogenized properties. Thus, we
+can avoid solving homogenization problems during
+optimization (cf. Section 4.2).
+We want to emphasize that the buckling analy-
+sis in (4) and (16) yields pure global and pure local
+modes, respectively. In particular, cross-modes
+spanning over both scales and deﬁned as a solu-
+tion to Eq. (40) in the work of Neves (2019), are
+not detected.
+4 Microstructure
+parameterization and
+upscaling model
+In the following section, we present our method to
+integrate the microscopic buckling load factor into
+a macroscopic scale optimization problem. The
+explanation is done for an exemplary lattice struc-
+ture; however, we would like to stress again that
+d
+R1
+R2
+Fig. 1 Principal design of an equilateral triangular lattice
+structure with highlighted unit cell. The lattice geometry
+is given by primitive lattice vectors R1 and R2. For our
+enhanced version, see Fig. 8.
+the method can be applied to arbitrary base cell
+topologies. We ﬁrst demonstrate an approach to
+obtain the homogenized load factors of the lattice.
+The exemplary lattice we chose consists of
+equilateral triangles with edge length d, as the
+principal design of our microstructure. The primi-
+tive lattice vectors are thus given by R1 = (1, 0)⊤
+and R2 = (1/2,
+p
+(3)/2)⊤(Fig. 1). This design
+is known in literature to provide good macro-
+scopic buckling strength (Clausen et al. 2016).
+To get a periodic unit cell, we take two of these
+triangles, which together form a parallelogram,
+including its shorter diagonal (see Fig. 1). We
+parameterize the unit cell by one parameter ρ,
+which describes the relative volume or one minus
+porosity, respectively. With this parameterization
+the homogenization procedures from Section 3 can
+be written using two maps:
+EH : (0, 1] →S3,
+ρ 7→EH(ρ),
+(20)
+λ : R3 × (0, 1] →R,
+(¯σ, ρ) 7→λ(¯σ, ρ)
+(21)
+(20) assigns each relative volume ρ a symmet-
+ric, positive deﬁnite homogenized elasticity tensor
+computed from (15), while (21) maps a macro-
+scopic stress and a relative volume to the resulting
+homogenized buckling load factor λ(¯σ, ρ) obtained
+by solving (16).
+As material parameters, we chose a Young’s
+modulus of 10 Pa and a Poisson’s ratio of 0.3.
+Next, we present three aspects that are impor-
+tant for the upscaling process: the design of joints
+of lattice struts, the resolution of the ﬁnite element
+mesh on the microscopic level, and the number of
+
+M1
+r1
+M2
+r2
+r2
+w1
+w1
+w2
+w2
+Fig. 2 To prevent stress concentrations, lattice corners
+are rounded by circular arcs, which are deﬁned by a given
+radius. The ﬁgure shows the resulting lattice boundary for
+two conﬁgurations with diﬀerent radii r1 and r2. The arc
+midpoint M and lattice strut width w are determined by
+the radius via geometric calculations, forcing the relative
+volume fraction of the lattice constant.
+0
+0.02
+0.04
+0.06
+0.08
+0.1
+0.0
+0.5
+1.0
+relative corner radius / -
+buckling load factor / -
+volume 20%
+volume 30%
+volume 40%
+volume 50%
+Fig. 3 Normalized homogenized buckling load factor for
+¯σ) = (−1, 0, 0) and diﬀerent relative volumes as a function
+of the radius of rounded corners. The radius is given relative
+to a unit cells edge length d.
+unit cells in an RVE. We note that the latter is
+automatically covered if a Floquet-Bloch approach
+along with a suﬃciently ﬁne discretization of the
+Brillouin zone is used.
+Rounded corners
+A unit cell design with sharp corners where the
+lattice struts meet leads to local stress concentra-
+tions at those corners. To circumvent this issue, we
+round the corners with circular arcs with radius r,
+while keeping the overall volume of the structure
+constant (Fig. 2). A lattice with rounded unit cells
+can be seen in Fig. 8.
+0
+0.02
+0.04
+0.06
+0.08
+0.1
+0.0
+0.5
+1.0
+relative corner radius / -
+Young’s modulus / Pa
+volume 20%
+volume 30%
+volume 40%
+volume 50%
+Fig. 4 Normalized homogenized Young’s modulus for dif-
+ferent relative volumes as a function of the radius of
+rounded corners. The radius is given relative to a unit cells
+edge length d.
+0
+0.02
+0.04
+0.06
+0.08
+0.1
+0.80
+0.85
+0.90
+0.95
+1.00
+relative corner radius / -
+Poisson’s ratio / -
+volume 20%
+volume 30%
+volume 40%
+volume 50%
+Fig. 5 Normalized homogenized Poisson’s ratio for diﬀer-
+ent relative volumes as a function of the radius of rounded
+corners. The radius is given relative to a unit cells edge
+length d.
+It turns out that the choice of the radius
+parameterizing the arcs has only minor eﬀect on
+the Poisson’s ratio (Fig. 5). The Young’s modulus
+is aﬀected mainly for small relative lattice vol-
+ume (Fig. 4); for a small volume, a large radius
+leads to very thin lattice struts due to volume
+preservation (cf. Fig. 2) and the lattice loses stiﬀ-
+ness. The impact on the homogenized buckling
+load factor is more signiﬁcant as can be seen in
+Fig. 3. For small radii, the buckling resistance
+increases with increasing radius, because stress
+concentrations are avoided, lattice struts get bet-
+ter supported, and their relative length to width
+ratio gets smaller. For larger radii, the struts get
+thinner, their length to width ratio increases, and
+the load factor decreases. For diﬀerent volumes,
+the maximum of the smallest buckling load fac-
+tor is achieved at diﬀerent radii. The data in
+
+0
+0.5
+1
+0.0276
+0.0279
+0.0282
+0.0321
+0.0324
+0.0327
+0.0330
+0.0333
+number of ﬁnite elements / 106
+Young’s modulus / Pa
+Poisson’s ratio
+Young’s modulus
+Poisson’s ratio
+Fig. 6 Homogenized Young’s modulus and Poisson’s ratio
+for diﬀerent ﬁnite element discretizations of an RVE with
+a relative volume of 30%.
+Fig. 3 suggests that rounding corners with a radius
+depending on the volume leads to good buckling
+resistance. We note that we only investigated an
+uniaxial loading with ¯σ) = (−1, 0, 0), and the
+optimal radius might be diﬀerent for other stress
+situations. To keep things simple, we thus decided
+to use a constant radius of r = 0.05d for our
+subsequent calculations.
+Finite element convergence on the
+microscale
+We discretize the microstructure by triangles with
+second order shape functions. A convergence study
+with respect to the number of ﬁnite elements for
+homogenization, i.e., on the microscopic scale, can
+be seen in Figs. 6 and 7. Observing that the
+convergence graphs are already very ﬂat when
+approaching one million elements and taking into
+account that we want to keep the ﬁnite element
+error in the preprocessing small, we opt to choose
+for all subsequent homogenization procedures a
+discretization, which results for a density of ρ =
+0.5 in approximately one million ﬁnite elements
+per RVE. Geometries corresponding to lower den-
+sities are resolved using slightly less elements.
+Given this number of ﬁnite elements, a single anal-
+ysis is usually completed within a few minutes on
+a standard work station.
+Choice of RVE size
+Asymptotic homogenization can only detect high-
+frequency modes, i.e., modes with a wave length
+that is smaller than the size of the representa-
+tive volume element. However, buckling modes
+0
+0.2
+0.4
+0.6
+0.8
+1
+0.0274
+0.0276
+0.0278
+0.0280
+0.0282
+0.0284
+number of ﬁnite elements / 106
+buckling load factor / -
+buckling load factor
+Fig. 7 Homogenized buckling load factor for diﬀerent
+ﬁnite element discretizations of an RVE with a relative
+volume of 30%.
+might span over more than one cell. To identify
+these modes also in a homogeneous lattice struc-
+ture, we encompass more than one unit cell in
+the RVE. That is, the microstructure is considered
+Y
+κ -periodic, where κ2 is the number of unit cells
+inside the RVE. RVEs containing various unit cells
+can be seen in Fig. 8. It is noted that all modes
+of an RVE with a given number κ of cell repeti-
+tions can also be found using an RVE comprised
+of ℓκ×ℓκ unit cells, where ℓis an integer number,
+e.g., all modes of a 2 × 2 RVE appear also in the
+analysis of a 4 × 4 or 6 × 6 RVE. Using an anal-
+ogous argument, modes with periodicity
+κ
+n1 along
+R1 and periodicity
+κ
+n2 along R2 for n1, n2 ∈N are
+captured using a κ×κ RVE. Note that in practice
+there is a natural lower bound; this value is given
+by the resolution of the underlying ﬁnite element
+discretization.
+We observe that especially an RVE with only
+one unit cell results in quite high homogenized
+load factors. This is because the joint of the struts
+gets locked in rotation due to the periodicity of
+the RVE. In an RVE with more than one cell
+and in the analysis of dehomogenized designs in
+Section 7.1, joints of lattice structures are free to
+rotate (see Fig. 24).
+As we are interested in the smallest, i.e., criti-
+cal, load factor of the lattice, we pick the minimal
+load factor with respect to cell repetitions:
+λ(¯σ, ρ) = min
+κ∈N λκ(¯σ, ρ)
+(22)
+
+x
+y
+Fig. 8 Diﬀerent RVEs containing 1x1, 2x2, 3x3 and 4x4
+unit cells and the coordinate system for homogenization.
+In practice, one is not able to perform homogeniza-
+tion with κ ∈N cell repetitions, but has to resort
+to κ ≤K with an appropriately chosen upper
+bound K on the number of cell repetitions. We
+would like to stress that for a given cell layout, the
+optimal κ ∈{1, 2, . . . , K} cannot, in general, be
+determined without testing essentially all choices
+and might even vary for ﬁxed stress ¯σ but diﬀerent
+volume fractions ρ.
+We want to remark that the presented method
+of repeating the unit cell within the RVE is anal-
+ogous to applying Floquet-Bloch theory with a
+special discretization of the Brillouin zone (see
+Fig. 9). In Floquet-Bloch theory, periodicity con-
+ditions for modes φ are given as
+φ(y + Rj) = φ(y)eik⊤Rj,
+j = 1, 2,
+(23)
+where i refers to the complex unity, k is the wave
+vector, and y is a location inside a lattice unit
+cell (Thomsen et al. 2018). Rather than solving
+cell problems with boundary conditions (23) for
+all k ∈R2, in practice a number of k vectors
+on the boundary of the so called irreducible Bril-
+louin zone (IBZ) is selected. This corresponds to
+a discretization of the IBZ.
+Now, a ( κ
+n1 , κ
+n2 )-periodic mode with n1, n2 ≤
+κ corresponds to a wave vector, which solves the
+system
+
+R⊤
+1
+R⊤
+2
+
+k = 2π
+κ
+
+n1
+n2
+
+.
+(24)
+With that, we can plot all wave vectors corre-
+sponding to modes, covered by our κ × κ RVEs
+with κ from 1 to K, into a Floquet-Bloch diagram
+with an outline of the IBZ. Doing so for K = 7,
+we obtain the result depicted in Fig. 9.
+Fig. 9 Wave vectors in the Brillouin zone (see Thomsen
+et al. (2018)), which correspond to homogenization with
+1 to 7 cell repetitions in an RVE. Only 7 cell problems
+have to be solved to capture all modes corresponding to
+the marked wave vectors.
+We emphasize that the worst-case model pre-
+sented in the next Section 4.1 is independent of the
+method that is used to obtain the homogenized
+buckling load factor.
+4.1 Worst-case model
+This subsection describes our novel method to
+integrate the microscopic buckling load factor on
+the macroscopic scale. We stress that it is valid
+not only for our exemplary lattice but for any
+arbitrary, parameterized microstructure.
+Due
+to
+linearized
+buckling
+analysis
+((16)
+to (19)) the homogenized load factor depends
+linearly on the macroscopic stress:
+λ(¯σ, ρ) =
+1
+∥¯σ∥min
+κ∈N λκ
+
+¯σ
+∥¯σ∥, ρ
+
+(25)
+That is, homogenization can be conducted with
+macroscopic unit stress (in some given norm)
+and later, the homogenized load factor has to
+be divided by ∥¯σ∥. It is thus suﬃcient to
+examine stresses on the unit sphere surface S2
+instead of the whole three-dimensional stress space
+(σxx, σyy, σxy). We deﬁne
+λ : S2 × (0, 1] →R,
+λ(¯σ, ρ) = min
+κ∈N λκ(¯σ, ρ),
+(26)
+which assigns a homogenized buckling load fac-
+tor to each unit stress combined with a relative
+volume.
+We use a spherical coordinate system to char-
+acterize unit stresses on S2: the zenith reference
+(z-axis) is the axis from the origin through the
+biaxial compression stress σ = (−1, −1, 0) and
+
+Fig. 10 Representation of unit stresses as a unit sphere
+surface (¯σ)xy out of plane axis). Special stress types
+form circles (uniaxial/shear stress) or single points (biaxial
+stress) on the surface. Unit stresses are parameterized by
+spherical coordinates with zenith reference z and azimuthal
+reference x.
+the azimuth reference (x-axis) is the axis from the
+origin through σ = (1, −1, 0) (Fig. 10). In this
+coordinate system, biaxial compression and ten-
+sion stress conform to north and south pole, while
+all pure shear stresses rest on the equator. The
+inclination (or latitude if thinking of geographical
+coordinates) characterizes the type of stress: the
+rotation invariant biaxial compression and tension
+stresses conform to poles, and other special types,
+e.g., uniaxial and shear stresses form circles on
+the unit sphere surface (circle of latitude). The
+azimuthal angle (longitude) describes the rotation
+of the applied macroscopic stress ¯σ relative to the
+RVE. For an additional explanation please refer to
+the video in Online Resource 1.
+Common literature reduces the stress space
+even further. Under the assumption of isotropic
+buckling behavior, only biaxial loading without
+shearing component but varying the σxx
+σyy -ratio is
+investigated, or uniaxial loading with all possi-
+ble load orientations relative to the investigated
+microstructure is applied (Bluhm et al. 2020).
+In contrast, we compute the buckling yield sur-
+face for the whole unit stress surface S2. Thus,
+0◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦
+210◦
+240◦
+270◦
+300◦
+330◦
+10−3 10−2 10−1 100
+x
+biaxial compression
+uniaxial compression
+shear
+uniaxial tension
+Fig. 11 Homogenized buckling load factors for an RVE
+with 3x3 unit cell repetitions and a relative volume of 30%.
+Note the logarithmic scaling of the radial axis. The dis-
+played angle is the azimuthal angle from the spherical ref-
+erence coordinate system (see Fig. 10) and corresponds to
+the rotation of the stress around the RVE. The symmetry
+of the unit cell is reﬂected in the load factors.
+our method is applicable to arbitrary, parameter-
+ized microstructures with isotropic or anisotropic
+buckling properties.
+The homogenized load factors for uniaxial
+compression, biaxial compression and shear stress
+for an RVE with a relative volume of 30% and
+three cell repetitions are shown in Fig. 11. We can
+clearly see that the symmetry of the unit lattice
+cell is reﬂected in the load factors. The shape of
+the uniaxial loading case matches very well with
+results by Bluhm et al. (2020).
+Next, we coalesce all data in a worst-case
+model. Having evaluated homogenized load factors
+for diﬀerent cell repetitions κ ∈N and all stresses
+on the unit stress sphere ¯σ ∈S2, i.e., for all stress
+types and directions, we select the smallest buck-
+ling load factor with respect to all unit stresses
+and number of cell repetitions:
+λwc : (0, 1] →R,
+λwc(ρ) = min
+¯σ∈S2,
+κ∈N
+λκ(¯σ, ρ)
+(27)
+This worst-case model depends only on the local
+volume fraction and no longer on the local stress
+type or direction. We note that in practice the unit
+
+sphere is discretized and the number of cell repeti-
+tions bounded from above. The worst case is thus
+only a worst case with respect to the discretiza-
+tion resolution and maximal cell repetitions. We
+found, however, that the homogenized buckling
+load factors for our exemplary lattice cell have
+high regularity with respect to the stress variable.
+If homogenized load factors were obtained via
+Floquet-Bloch theory (Neves et al. 2002a) instead
+of using diﬀerent cell repetitions, (27) would con-
+tain a minimization over all possible wave vec-
+tors k in the Brillouin zone B in lieu of cell
+repetitions:
+λwc(ρ) = min
+¯σ∈S2,
+k∈B
+λk(¯σ, ρ)
+(28)
+4.2 Decoupling of micro- and
+macroscale
+The parameterization of the unit cell allows for
+eﬀective decoupling of the micro- and macroscopic
+scales (Bendsøe and Kikuchi 1988). That is, we
+discretize the parameter space (0, 1] for the rela-
+tive volume and precompute homogenized prop-
+erties (elasticity tensor from (15) and microscopic
+buckling load factor from (16)) for the resulting
+parameter set (see also Section 6). For optimiza-
+tion of structures on the macroscopic scale, we
+then apply an interpolation model to these pre-
+computed properties. In other words, we replace
+the maps EH (20) and λ (21) by
+EI : (0, 1] →S3,
+ρ 7→EI(ρ),
+(29)
+λI : R3 × (0, 1] →R,
+(¯σ, ρ) 7→λI(¯σ, ρ),
+(30)
+where EI and λI are approximations of EH and
+λ, respectively.
+To construct λI, we interpolate the worst-case
+load factors obtained from (27) with respect to the
+density variable:
+λI
+wc : (0, 1] →R,
+ρ 7→λI
+wc(ρ)
+(31)
+We obtain the worst-case microscopic buckling
+load factor associated with macroscopic stress ¯σ
+by dividing by the norm of this stress (see (25)):
+λI : R3 × (0, 1] →R,
+(¯σ, ρ) 7→
+1
+∥¯σ∥λI
+wc(ρ) (32)
+For gradient based optimization, we need
+a diﬀerentiable interpolation model. Following
+Bendsøe and Kikuchi (1988) we apply a piecewise
+interpolation strategy. More precisely, we employ
+piecewise cubic Hermite interpolation (Birkhoﬀ
+et al. 1968) for both, the homogenized elasticity
+tensor (29) as well as the buckling load factor
+(31). This scheme yields a continuously diﬀeren-
+tiable approximation that is composed of uniquely
+deﬁned cubic polynomials between the provided
+data points and is exact at these points. However,
+other interpolation schemes using, e.g., tangent
+or RAMP (Rational Approximation of Material
+Properties, Stolpe and Svanberg (2001)) func-
+tionals are possible with the downside of lower
+accuracy, especially for high porosity values.
+Under the piecewise Hermite approach, EI is
+constructed by individual interpolation of each
+coeﬃcient of the elasticity tensor. The ﬁrst order
+derivatives of the homogenized elasticity tensor
+and homogenized buckling load factor with respect
+to ρ are approximated by ﬁnite diﬀerences. For
+the homogenized load factors, we get numerical
+issues for high relative volumes. For these volumes,
+the unit cell is very resistant to buckling, but
+the iterative eigenvalue problem solver (ARPACK,
+version 3.7.0 (Lehoucq et al. 1998)) yields artiﬁ-
+cial modes, which are caused by the buckling of
+individual ﬁnite elements. Hence, we only inter-
+polate data points below 60% relative volume. At
+the boundary of this sample space, second-order
+central ﬁnite diﬀerences are not available, and
+thus only quadratic polynomials are used in the
+two outer subintervals, i.e., [0, 0.05] and [0.55, 0.6].
+For relative volumes above the chosen threshold
+of 60% we extrapolate using the quadratic func-
+tion obtained for the subinterval [0.55, 0.6]. It is
+noted, however, that in the optimized designs pre-
+sented in Section 6 microbuckling occurs only for
+signiﬁcantly lower densities of 60%. The inter-
+polated worst-case model λI
+wc for the homoge-
+nized microscopic buckling load factor is shown in
+Fig. 12. The presented interpolation scheme leads
+to suﬃciently diﬀerentiable functions to perform
+gradient-based optimization.
+The error of the approximated microscopic
+buckling load factor λI comprises several individ-
+ual errors: the error introduced by ﬁnite element
+discretization on the microscopic level to solve the
+homogenization problems, the error arising from
+
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+1
+2
+3
+relative volume / -
+buckling load factor / -
+interpolation ΛIwc
+extrapolation
+,
+homogenized BLF
+Fig. 12 Homogenized worst-case buckling load factors
+and the interpolating curve. For high relative volumes,
+numerical issues arise (marked by an o). Thus, only values
+up to 0.6 are interpolated, and quadratic extrapolation is
+applied above.
+restriction to the worst case, and the error result-
+ing from the interpolation. The discretization and
+interpolation errors can easily be controlled by
+using ﬁner ﬁnite element meshes on the micro-
+scopic scale and ﬁner interpolation grids. Thus,
+the worst-case error has the highest signiﬁcance.
+We will come back to this when we discuss numer-
+ical examples in Section 7.2.
+Remark 1 The worst-case error can be avoided if the
+worst-case model (27) and univariate interpolation
+(31) are replaced by a discretization and trivari-
+ate interpolation of (26) in the combined stress and
+density space S2 × (0, 1].
+In gradient-based optimization context, a contin-
+uously diﬀerentiable interpolation scheme is essential.
+Possible techniques to realize that for this worst-case
+free approach include piecewise cubic Hermite inter-
+polation (Birkhoﬀet al. 1968) or interpolation on
+sparse grids based on cubic B-splines (Valentin et al.
+2020). When applying the worst-case free approach
+in a three-dimensional setting, due to the curse of
+dimensionality, the diﬀerentiable sparse grid approach
+is preferable, as stress has six independent entries
+there, which result in ﬁve parameters to represent unit
+stress, requiring interpolation to be carried out in a
+six dimensional space.
+5 Sizing optimization
+In this section, we formulate two-scale sizing
+optimization problems, which will be solved in
+Section 6. In contrast to topology optimization,
+where usually a solid/void design is of interest,
+we vary the local lattice volume fraction between
+10% and 100%. This corresponds to a scaling of
+the width of the lattice struts.
+We want to achieve structures that are resis-
+tant to given loadings both with respect to their
+stiﬀness and their buckling strength. To maxi-
+mize buckling strength in our two-scale approach,
+we have to take into account buckling of the
+homogenized overall component as well as buck-
+ling of the microstructure. This leads to a multi-
+objective optimization problem. For a macroscopic
+domain, discretized by M ﬁnite elements, it can
+be stated that in terms of mechanical compliance
+c, macroscopic load factors Λℓ, ℓ= 1, . . . , L and
+microscopic buckling load factors λI
+e, e = 1, . . . , M:
+max
+ρ∈Uad g
+ −c, Λ1, . . . , ΛL, λI
+1, . . . , λI
+M
+
+(ρ).
+(33)
+The macroscopic load factors are given as solu-
+tions of (4) and a prediction for the micro-
+scopic buckling load factor λI
+e for each element
+e is obtained from the interpolated worst-case
+model (32). The design variable ρ represents the
+local volume fraction of the homogenized lat-
+tice. Via the homogenization formulas, this can
+be mapped to mechanical properties of a (peri-
+odic) microstructure, e.g., elasticity tensor (15)
+and buckling load factor (32), which uses (16). g is
+an aggregating function and Uad is the admissible
+set
+Uad =
+(
+ρ ∈RM : ρmin ≤ρe ≤1,
+M
+X
+e=1
+ρe ≤V
+)
+.
+(34)
+We include the ﬁrst few L ≪M macroscopic
+load factors in the objective to handle potential
+mode switching and multiple eigenvalues. Note
+that minimization of the compliance corresponds
+to maximization of its negative value. We treat the
+multi-objective problem (33) with the ϵ-constraint
+method (Mavrotas 2009). In this, a point on the
+Pareto front is obtained by solving the following
+problem:
+max
+ρ∈Uad ˜g
+ Λ1, . . . , ΛL, λI
+1, . . . , λI
+M
+
+(ρ),
+s. t. c(ρ) = c0,
+(35)
+
+with an imposed compliance value c0.
+We want to maximize the smallest load fac-
+tor to achieve a good buckling strength and thus
+choose ˜g to be the min function. To get rid of
+the non-smooth character of the latter, we apply
+a bound formulation of this problem, as suggested
+by Bendsøe and Sigmund (2003), and end up with
+the following optimization problem:
+max
+s∈R,ρ∈Uad s,
+(36)
+s. t. Λℓ(ρ) ≥s,
+ℓ= 1, . . . , L
+(37)
+λI
+e(ρ) ≥s,
+e = 1, . . . , M
+(38)
+c(ρ) = c0,
+(39)
+With the bound formulation we experienced no
+problems with multiple eigenvalues or cluster-
+ing of eigenvalues in our numerical experiments,
+if L was chosen suﬃciently large. Alternatively,
+other formulations like a smooth minimum via
+Kreisselmeier and Steinhauser (1980) could be
+considered.
+In Section 6.2, we look at three variations of
+this problem:
+A) We ignore (38), i.e., we maximize buckling
+on the macroscopic scale with a compliance
+constraint but do not take buckling on the
+microscopic scale into account during opti-
+mization.
+B) We drop (37), i.e., we only optimize micro-
+scopic buckling under a compliance con-
+straint but disregard macroscopic buckling.
+C) We investigate the problem as given, i.e.,
+we maximize buckling on both scales with
+respect to a given compliance.
+We compute a representation of the Pareto opti-
+mal set with 51 Pareto optimized solutions for
+each case. For this, we ﬁrst compute a solution to
+the pure compliance minimization problem
+c∗= arg min
+ρ∈Uad
+c(ρ).
+(40)
+Then we solve A) - C) without the compliance
+constraint (39) and evaluate the compliance values
+cA, cB and cC of the resulting designs to get the
+extreme points on the Pareto set. Afterwards, we
+discretize the intervals [c∗, cA], [c∗, cB] and [c∗, cC]
+equidistantly, e.g., for A)
+cj
+0 = c∗+ j (cA −c∗)/50,
+j = 0, . . . , 50.
+(41)
+The representation of the Pareto optimal set is
+then given by solutions to A) - C) with compliance
+constraint c(ρ) = cj
+0 in (39).
+6 Numerical examples
+In this section we present the results of numer-
+ical experiments for the two-scale sizing prob-
+lems stated in Section 5. We ﬁrst conduct a
+pre-study to develop a better understanding of
+later optimized designs. After that, solutions to
+the multi-objective optimization problems will be
+investigated.
+To construct the worst-case model, we have
+to conduct buckling homogenization with applied
+macroscopic stress. For this, we discretize the unit
+stress sphere in a spherical coordinate system (see
+Section 4.1). We discretize the azimuthal angle,
+which describes the rotation of the applied stress
+around the RVE, with 5◦steps. Exploiting the
+symmetry of our unit cell, it suﬃces to investi-
+gate the interval from 0◦to 30◦degrees. For the
+inclination, which describes the type of stress, we
+choose 11.25◦steps in the interval [0◦, 180◦). We
+discretize the relative volume with 0.05 steps and
+solve homogenization problems for four, ﬁve, six,
+and seven cell repetitions. Modes obtained with
+an RVE consisting of two and three unit cells can
+also be detected in an RVE with six unit cell rep-
+etitions. Likewise, the modes for an 1x1 RVE are
+covered by all other RVEs (see Section 4). This
+leads to 448 cell problems for each chosen relative
+volume and 9408 in total. Note that these simula-
+tions are independent of each other and can be run
+in parallel. We discretize the microscopic domain
+by approximately one million ﬁnite elements per
+RVE. As already mentioned in Section 4, the
+material properties are given by a Young’s modu-
+lus of 10 Pa and a Poisson’s ratio of 0.3. It is noted
+that the motivation for the choice of the Young’s
+modulus was an improved numerical behaviour, in
+particular when solving the associated eigenvalue
+problem on the microscopic scale. Conversely, the
+results are invariant with respect to this choice.
+The
+eigenvalue
+problems
+are
+solved
+by
+ARPACK, version 3.7.0 (Lehoucq et al. 1998). To
+solve optimization problems, we apply SNOPT,
+version 7.2.8 (Gill et al. 2005), which employs a
+sequential quadratic programming method.
+Now, consider the setting shown in Fig. 13,
+left. A rectangular design domain is subject to a
+
+0
+1
+relative local volume ρ
+Fig. 13 Left: macroscopic design setting with loadings
+and bearings. Right: the solution of a standard compliance
+problem (40) in the design domain (dashed).
+pressure load at the top. At the bottom rolling
+boundary conditions are applied, i.e., the degree
+of freedom in horizontal direction is ﬁxed for all
+nodes at the bottom edge. To prevent rigid body
+movement, the degree of freedom in vertical direc-
+tion is also ﬁxed for the central node at the bottom
+edge. This corresponds to Euler’s case of a slen-
+der column with ﬁxed/free boundary conditions,
+for which the buckling load is given by
+fcrit =
+π2
+4L2 EI,
+(42)
+where L is the length of the column, E is the elas-
+tic modulus and I is the planar second moment of
+area. The design domain has a ratio of 1 : 5.2 and
+we discretize it with 25 × 130 bi-linear quadrilat-
+eral elements (Q4), which is a suﬃcient resolution
+for this type of element (compare also (Ferrari
+and Sigmund 2019, Fig. 1)). Fig. 13 shows the
+optimized design of a mechanical compliance min-
+imization with a SIMP (Solid Isotropic Material
+with Penalization) material model and a lower
+physical design bound of 1e−9.
+Fig. 14 Left: buckling mode of a solid column. Center:
+column with weak (gray) material and a solid (black) rein-
+forcement in endoskeleton conﬁguration. Right: exoskele-
+ton conﬁguration. The force is applied via a stiﬀplate at
+the top (red).
+6.1 Pre-study: Endoskeleton versus
+exoskeleton
+Before we look into results of the optimization
+problems, we perform a study to develop a bet-
+ter understanding of later optimized designs. As a
+ﬁrst step, consider ρ = 1 on Ω, i.e., solid material
+everywhere (Fig. 14, left). Assuming plane stress
+conditions, a width and virtual depth of 1 m each,
+length 5.2 m and E = 10 Pa, we get fcrit = 0.076 N
+from (42). This ﬁts well to our numerical result
+of fcrit = 0.074 N. Next, we compare this solid
+column with two structures that have the same
+weight each as the solid column: weak material
+(ρ = 0.4) with either a solid reinforcement (ρ = 1)
+of width 0.5 m centered in the middle (endoskele-
+ton, Fig. 14, mid) or a solid reinforcement that
+ﬂanks the weak material at both sides with width
+0.25 m (exoskeleton, Fig. 14, right). The force is
+applied at the top boundary via a solid plate with
+an elastic modulus that is 100 times higher than
+the solid material. As the weight is kept con-
+stant, these two structures are wider than the ﬁrst
+one (their width is 1.75 m). The critical loads are
+0.065 N and 0.22 N, respectively. Due to a larger
+second moment of inertia, the exoskeleton shows
+superior macroscopic buckling stiﬀness compared
+to the endoskeleton. Thus, we expect designs
+that are optimized with respect to macroscopic
+buckling to exhibit an exoskeleton-like structure.
+6.2 Optimization
+Next, we investigate the three diﬀerent multi-
+objective
+optimization
+problems
+as
+given
+in
+Section 5. Let us brieﬂy note that we did not
+
+run into the problem of switching eigenvalues
+in any of the following examples. The material
+models are given by the interpolation functions
+from Section 4.1 and a density ﬁlter (Borrvall
+and Petersson 2001) is applied with a radius of
+1.6 times the edge length of a ﬁnite element for
+regularization purpose. We choose ρmin = 10%
+to obtain easily realizable lattice structures and
+apply a global volume constraint with V = 50%
+of the design domain’s area.
+A) Pure macroscopic load factor
+optimization
+Ignoring buckling on the microscopic scale, we
+maximize the macroscopic load factor (37). The
+load factors for diﬀerent values of the compliance
+constraint can be seen in Fig. 15. As reference,
+we include the value of a topology optimization
+with power law (ρ3) and ρmin = 0.001. Selected
+designs are shown in Fig. 16. Design A1 results
+from a compliance minimization without consider-
+ing buckling. Relaxing the compliance constraint
+while maximizing the buckling load factor, we only
+see a rather small improvement of up to 15% in the
+macroscopic load factor. This is due to design A1
+having already a rather good macroscopic buck-
+ling resistance, as it forms an exoskeleton. Only
+in the upper part of the design domain, where the
+loaded edge has to be supported, is this alleviated
+in favor of a typical branching structure. With
+a larger compliance, bound diagonal bars appear
+(A2-A4), which are known to increase macroscopic
+buckling stability (Bendsøe and Sigmund 2003).
+The lower design bound of ρmin = 10% is active
+for all designs, see Fig. 15. We conclude from this,
+that the load factor could potentially be larger,
+i.e., better structures could be obtained, if we
+chose a lower ρmin. On the other hand, for very
+low ρmin, the problem would no longer be a siz-
+ing but rather a topology optimization problem,
+which would require special handling (see, e.g.,
+Christensen et al. (2022)).
+B) Pure microscopic load factor
+optimization
+In the second optimization problem, we ignore
+macroscopic buckling and instead maximize the
+smallest microscopic load factor of all ﬁnite ele-
+ments (38) subject to a compliance constraint.
+1
+1.4
+1.6
+1.8
+0
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+c∗
+cA
+0
+0.05
+0.1
+0.15
+0.2
+TO A1
+A2
+A3
+A4
+compliance / Nm
+buckling load factor / -
+minimal local volume ρe / -
+macro. BLF
+min ρe
+Fig.
+15 Optimized
+function
+values
+considering
+only
+macroscopic buckling subject to a compliance and a global
+volume constraint. As reference, we include a topology
+optimization result (TO) for pure compliance minimiza-
+tion with ρmin = 0.001 with compliance 1.10 Nm and load
+factor 0.014. Selected designs are shown in Fig. 16.
+A1
+A2
+A3
+A4
+0
+1
+local volume / -
+Fig. 16 Optimized designs for the marked data in Fig. 15.
+From left to right the compliance constraint is relaxed and
+macroscopic buckling stiﬀness increases through appear-
+ance of reinforcing, diagonal structures.
+The microscopic buckling load factors are approx-
+imated by our worst-case model (32). In Fig. 17,
+a substantial improvement of the load factor can
+be seen when the compliance constraint is relaxed.
+The optimal solution for the problem without
+compliance constraint (design B5) is a fully homo-
+geneous design (see Fig. 18). Design B5 exhibits
+homogeneous stress under the given boundary
+conditions, which results in a homogeneous micro-
+scopic load factor. Thus, the further we relax the
+compliance constraint, the more homogeneous the
+
+1
+1.3
+1.6
+1.9
+0
+0.05
+0.1
+0.15
+0.2
+c∗
+cB
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+B1
+B2
+B3
+B4
+B5
+compliance / Nm
+buckling load factor / -
+minimal local volume ρe / -
+micro. BLF
+min ρe
+Fig.
+17 Optimized
+function
+values
+considering
+only
+microscopic buckling subject to a compliance and a global
+volume constraint. The optimized designs show increasing
+minimal local volume (see also Fig. 18), which yields better
+local buckling resistance.
+B2
+B3
+B4
+B5
+0
+1
+local volume / -
+Fig. 18 Optimized designs for the marked data in Fig. 17.
+Design B1 equals A1 in Fig. 16. B5 is pure maximization
+of microscopic buckling without compliance constraint and
+yields a homogeneous design.
+optimized design becomes. First, the branching
+structure at the top of design B1=A1 is replaced
+by lattice with high density (B2,B3), then the load
+carrying skeleton vanishes (B4,B5). The jumps in
+the minimal volume in Fig. 17 can be explained by
+design changes and the discretization of the design
+domain, e.g., between B3 and B4, the solid parts
+on the left and right edge each become one ﬁnite
+element thinner, which leads to a diﬀerent stress
+distribution in the whole structure.
+C) Simultaneous optimization of pure
+macro- and microscopic load factors
+The obtained values for the simultaneous opti-
+mization of both macroscopic and microscopic
+buckling load factors (36)-(39) can be seen in
+Fig. 19. As reference, the values of a topology
+optimization (TO) with ρ = 0.001 are given. To
+achieve a stiﬀ(small compliance) design, thick
+solid structures are needed. Little material is left
+for the lattice part, which results in low local
+volume and a small minimal microscopic buck-
+ling load factor. Hence, only (38) and (39) are
+active and (37) remains inactive. For less restric-
+tive (larger) compliance bounds, less solid material
+is necessary and material is redistributed to the
+lattice region (C2). Thus, the microscopic buck-
+ling load factor can be improved. When it reaches
+the value of the macroscopic one, (37) becomes
+active (C3). Therefore, raising only the micro-
+scopic buckling load factor further, i.e., steering
+towards homogeneous design as in B, yields no
+improvement in the objective, as the macroscopic
+load factor will deﬁne the value of the slack vari-
+able. For this reason, both micro- and macroscopic
+buckling load factors are raised simultaneously:
+the ﬁrst by increasing the lattice density especially
+in the upper region of the design domain and the
+second by stiﬀening the exoskeleton (C4,C5).
+The
+decreasing
+minimal
+local
+volume
+in
+Fig. 19 for more relaxed compliance appears non-
+intuitive. In Fig. 20, staircase structures on the
+solid parts can be seen due to discretization, see,
+e.g., C5. The resulting local stress ﬁeld allows
+a slightly lower volume for individual ﬁnite ele-
+ments, while preserving the microscopic buckling
+load factor.
+7 Dehomogenization and
+validation
+In this section, we want to give two distinct com-
+parisons: First, we compare the predicted buckling
+behavior with high-resolution numerical analyses
+of dehomogenized designs. Second, we validate the
+worst-case model against a precise microscopic
+load factor evaluation.
+
+1
+1.3
+1.4
+0
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+c∗
+cC
+0
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+TO C1
+C2 C3 C4
+C5
+compliance / Nm
+buckling load factor / -
+minimal local volume ρe / -
+macro. BLF
+micro. BLF
+min ρe
+Fig. 19 Optimized function values of concurrent load fac-
+tor maximization of pure macro- and pure microscopic
+buckling with compliance and volume constraint (36)-(39).
+Up to compliance 1.33, only the microscopic buckling load
+factor is active. For higher compliance values, the macro-
+scopic buckling load factor dominates. Selected designs are
+shown in Fig. 20.
+C2
+C3
+C4
+C5
+0
+1
+local volume / -
+Fig. 20 Optimized designs for the marked data in Fig. 19.
+Design C1 equals A1 in Fig. 16. To increase microscopic
+buckling resistance, the optimizer reduces lattice porosity.
+No diagonal bars appear as they do in the pure macroscopic
+buckling optimization, since the lattice already provides
+good macroscopic buckling resistance. Due to discretiza-
+tion, steps can be seen on the solid parts, as marked in C5
+by white ellipses.
+7.1 Performance of dehomogenized
+designs
+The number of lattice cells for dehomogenization
+of optimized results is chosen independently of
+the ﬁnite element resolution of the macroscopic
+model (cf. Fig. 13). To realize this, we proceed as
+6
+8
+10 12 14 16 18 20 22
+0.045
+0.055
+0.06
+C4
+6
+8
+10 12 14 16 18 20 22
+1.5
+1.6
+1.7
+1.8
+C4
+number of horizontal lattice cells
+load factor / -
+compliance / Nm
+macro. BLF
+micro. BLF
+interior LF
+compliance
+Fig. 21 Dehomogenization of design C4 with increasing
+number of lattice cells. For the interior microscopic load
+factor, we searched for the ﬁrst buckling mode that has
+no deﬂection at the boundary. The macroscopic buckling
+load factor matches our prediction well; the microscopic
+and the interior load factors are better than predicted by
+the worst-case model (cf. Fig. 19).
+follows: First, the optimized density ﬁeld ρ is inter-
+polated and the number of lattice cells is chosen.
+Then, an evaluation of this ﬁeld at each lattice
+cell’s center deﬁnes the width of the correspond-
+ing lattice struts. Note that our dehomogenization
+procedure is volume preserving, i.e., all dehomog-
+enized designs have a volume of V = 50% of the
+design domain’s area. Dehomogenized designs are
+shown in Figs. 22 and 23.
+Inﬂuence of cell size
+We compare dehomogenizations with diﬀerent cell
+sizes for design C4 from Fig. 20. We investigate
+diﬀerent buckling load factors: the one associated
+with a macroscopic buckling mode, i.e., deﬂec-
+tion of the structure as a whole (low-frequency),
+and the one associated with a microscopic mode,
+i.e., deﬂection of the lattice (high-frequency). As
+expected, the predicted macroscopic buckling load
+factor is met better with a higher number of lat-
+tice cells (see Fig. 21). The microscopic buckling
+load factor stems from modes at the boundary
+(Fig. 23). These modes cannot be approximated
+well by homogenization theory, which ignores
+boundary eﬀects. We therefore also search for the
+smallest load factor associated with an interior
+mode, i.e., a mode, that does not exhibit deﬂection
+at the structure’s boundary (cf. Fig. 23). In order
+to avoid buckling of the microstructure occurring
+at the structural boundary, a coating strategy as
+
+Fig. 22 Dehomogenization of design C4 with 6 (left) and
+12 (right) cells in horizontal direction with visualized pre-
+buckling displacement. The horizontal struts at the top face
+where the pressure load is applied exhibit sag, which is
+reduced for a higher number of cells.
+suggested by Christensen et al. (2022) may be
+pursued.
+In the considered example, the cell size has
+almost no inﬂuence on this interior load factor.
+This might diﬀer for other examples. Zooms for
+interior microscopic buckling modes are given in
+Fig. 24.
+As can be seen in Fig. 21, the compliance tends
+to decrease with smaller cell size. The observed
+increase for 22 lattice cells compared to 20 is pre-
+sumably caused by discretization eﬀects. Fig. 22
+shows that the displacement under the applied
+pressure load has a wave shape, where horizon-
+tal lattice struts at the top face sag between their
+diagonal supports. The more cells we have, the
+better these struts are supported, and thus the
+compliance is reduced.
+Comparison between homogenized and
+dehomogenized designs
+Next, we compare the homogenized design C4 with
+its dehomogenized counterpart with 20 cells in a
+horizontal direction. For this design, we have a
+clear separation of length scales and only a small
+homogenization error. The macroscopic load fac-
+tor is determined to be 0.0507 and diﬀers by less
+Fig. 23 Diﬀerent buckling modes for design C4 deho-
+mogenized with eight lattice cells (cf. Fig. 21). Left: ﬁrst
+macroscopic mode. Center: ﬁrst microscopic mode. Right:
+ﬁrst interior mode.
+Fig. 24 Zoom of ﬁrst interior buckling mode of design C4
+dehomogenized with 8 (left), 12 (middle) and 16 (right)
+lattice cells (cf. Fig. 21).
+than 1% from the predicted macroscopic load fac-
+tor of 0.0511 in the optimized homogenized design.
+A gap of 10% exists between the interior micro-
+scopic load factor of the dehomogenized design
+of 0.0563 and the predicted one of 0.0511. This
+is expected, as the predicted microscopic load
+factor is based on our worst-case model, which
+assumes the worst stress type and orientation
+(see Section 4.1). Note that the predicted micro-
+scopic buckling load factor is smaller than the
+microscopic buckling load factor, and hence our
+worst-case model acts as a safeguard against pure
+microscopic buckling in this example. Of course,
+such an observation is generally only valid up to
+
+Fig. 25 Left: microscopic buckling load factor predicted
+by the worst-case model. Right: visualization of a posteriori
+homogenized microscopic buckling load factor. Load factors
+are thresholded at 0.1. The marked ﬁnite element in the
+upper region corresponds roughly to the center of the mode
+from Fig. 24. The a posteriori homogenized buckling load
+factor of this element is 13% larger than predicted and
+diﬀers less than 3% from the dehomogenized design.
+remaining discretization and interpolation errors
+as well as the error introduced by homogenization.
+7.2 Impact of worst-case model
+Next, we investigate the gap between the load
+factor predicted by the worst-case model and
+the interior load factor obtained from the deho-
+mogenized design. For all ﬁnite elements in the
+lattice region of design C4, we perform a posteriori
+homogenization by evaluation of (26). We extract
+the local relative volume and create RVEs with
+κ ∈{4, 5, 6, 7} unit cell repetitions. Then, we con-
+duct homogenization (Section 3) of the buckling
+load factor for each κ with the ”real” macroscopic
+stress taken from the optimized design using (18)
+and (19) and use the minimal value with respect
+to κ. The resulting microscopic load factors are
+shown in Fig. 25. The mean relative diﬀerence
+between predicted and a posteriori load factor for
+all of the validated ﬁnite elements is 18%, with a
+standard deviation of 0.079.
+Fig. 26 Setting for shear stress example, consisting of
+homogenized lattice with 50% porosity. The color shows the
+norm of the resulting mechanical stress. Region C exhibits
+shear, region A uniaxial tension, and region B uniaxial
+compression stress.
+The marked element in Fig. 25 complies with
+the center of the interior microscopic mode in
+the dehomogenized design. For this element, the
+a posteriori homogenized buckling load factor is
+0.0578, which diﬀers less than 3% from the inte-
+rior microscopic load factor of the dehomogenized
+design. This rather small diﬀerence demonstrates
+that homogenization is a valid tool for predicting
+microscopic buckling behavior.
+The a posteriori homogenized buckling load
+factor for the mentioned element is 13% larger
+than predicted by the worst-case model. This can
+be explained by Fig. 11. The macroscopic stress for
+the chosen ﬁnite element, which is extracted from
+the macroscopic analysis, is uniaxial and acts in
+vertical direction. Thus, the a posteriori load fac-
+tor corresponds to the point on the uniaxial curve
+at 90◦, which is 15% larger than the biaxial value.
+Example with tension, compression,
+and shear stress
+In the previously considered example, we mostly
+observe uniaxial compression stress. Next, we
+want to examine an example with compression,
+tension, and shear stress. For this, consider the
+setting shown in Fig. 26: A bow-tie shaped domain
+is ﬁxed at the left edge in both degrees of free-
+dom. At the right edge, movement in a horizontal
+direction is prevented and a force is pulling down-
+wards. We simulate the behavior of a homogenized
+lattice with a constant relative local volume, i.e.,
+
+C
+A
+A
+B
+B
+Fig. 27 Microscopic buckling load factors obtained via
+our worst-case model.
+ρe = 0.5 for all e = 1, . . . , M. This leads to pure
+shear stress in the center of the domain, marked
+by C, uniaxial tension stress in the regions marked
+with A, and uniaxial compression stress in regions
+marked with B.
+In Fig. 27 we see, that the microscopic buckling
+load factor, which is obtained from our worst-
+case model, has its minimal value in regions A
+and B where the highest stress occurs. This high-
+lights a drawback of the worst-case approach: the
+model cannot distinguish between tension and
+compression stress. This is because it is based
+on a minimization over all unit stresses and only
+depends on the local volume fraction and local
+stress magnitude but not on stress type or direc-
+tion (cf. (27)). As for our exemplary lattice, the
+computed load factors for compression stress are
+consistently smaller than for tension stress (see
+also (Christensen et al. 2022, Fig. 3) for a con-
+ﬁrmation of this observation), and buckling load
+factors will always be underestimated by the
+model in regions of tension stress. This results
+in higher lattice volume fraction than actually
+necessary to prevent local buckling at these loca-
+tions. Due to this expendable lattice over-sizing,
+microscopic buckling is not observed at the corre-
+sponding locations for the dehomogenized design,
+although predicted by the worst-case model.
+As in the previous example, we conduct a
+posteriori homogenization with the ”real” macro-
+scopic stress taken from the simulated design in
+Fig. 26. Fig. 28 shows that in the region of com-
+pression stress (B), the error of the prediction is
+quite low, but in the region of tension stress (A),
+the worst-case model clearly underestimates the
+C
+A
+A
+B
+B
+a posteriori load factor / -
+relative error / -
+Fig. 28 Left: microscopic buckling load factors obtained
+by a posteriori homogenization with the “real” macroscopic
+stress. Right: relative diﬀerence of load factors predicted
+by the worst-case model compared with a posteriori load
+factors. The center region C is subject to pure shear stress
+and has a predicted load factor, which is 50% smaller than
+the one obtained by a posteriori homogenization.
+actual load factor. For an exemplary ﬁnite element
+in the marked region C, the predicted buckling
+load factor is 0.100, while the homogenized value is
+0.154. Thus, this element actually has 50% higher
+buckling strength than predicted by the worst-case
+model. This can be explained by Fig. 29. The load
+factor for shear stress at 45◦, which is the act-
+ing stress in the inspected element, is around 50%
+larger than the load factor for biaxial stress, on
+which our worst-case model is based. This expla-
+nation also leads to a simple a priori error estimate
+for the worst-case model: if we know the type
+of stress, the error is bounded by the diﬀerence
+between the maximal load factor on the curve for
+the speciﬁc stress type and the load factor for
+biaxial stress.
+For this last example, we showed a homoge-
+neous design with non-homogeneous microscopic
+buckling load factor. In a simultaneous optimiza-
+tion of both macro- and microscopic buckling
+(cf. problem C in Section 5), only the microscopic
+constraint is active as the structure exhibits a
+comparatively high macroscopic buckling load fac-
+tor. Optimization with respect to only microscopic
+buckling (problem B) leads to non-homogeneous
+lattice with homogeneous microscopic buckling
+load factor. For this optimized design, similar
+deviations in the predicted worst case versus the
+a posteriori buckling load factor have been found
+in regions that exhibit shear stress.
+
+0◦
+30◦
+60◦
+90◦
+120◦
+150◦
+180◦
+210◦
+240◦
+270◦
+300◦
+330◦
+0.00
+0.05
+x
+biaxial compression
+uniaxial compression
+shear
+Fig. 29 Homogenized buckling load factors for an RVE
+with 3x3 unit cell repetitions and a relative volume of 30%
+(cf. Fig. 11). In region C of our example (Fig. 26), we have
+shear stress acting at an angle of 45◦. The buckling load
+factor for this stress situation (marked by a circle) is around
+50% larger than the one for biaxial compression stress.
+We recall that our worst-case model acts as a
+safeguard against pure microscopic buckling. The
+possibly excessive underestimation of the micro-
+scopic buckling load factor can lead to oversized
+lattice struts. This can be overcome by replacing
+the worst-case approach with other interpolation
+models, e.g., a C1-Interpolation in the three-
+dimensional parameter space (ρ, ¯σ)|¯σ∈S2. How-
+ever, this comes with additional computational
+eﬀort for the worst-case model and, as mentioned
+in Remark 1 in Section 4.1, requires sophisticated
+interpolation schemes if the proposed method is
+applied for three-dimensional structures, as the
+parameter space will become higher dimensional.
+8 Conclusion
+We presented a method to perform two-scale opti-
+mization of lattice structures while accounting for
+buckling on both scales using asymptotic homog-
+enization. Based on a parameterization of our
+chosen lattice structure, we obtained homogenized
+elastic and buckling properties. We constructed
+a worst-case model for the homogenized buckling
+load factor (Section 4.1). Both elastic and buck-
+ling characteristics were upscaled by individual,
+continuously diﬀerentiable interpolation models.
+We provided numerical examples for optimization
+of only macroscopic or microscopic buckling and
+simultaneous optimization of both.
+We demonstrated that our method to obtain
+homogenized properties is equivalent to a special
+discretization of the Brillouin zone in Floquet-
+Bloch theory. We showed that rounding corners
+can have a considerable inﬂuence on the buck-
+ling strength of lattices, as it prevents stress
+concentrations.
+We compared the performance of optimized
+designs predicted by the worst-case model with
+their dehomogenized counterparts. Compliance
+and macroscopic buckling were predicted very
+well; the predicted microscopic buckling load fac-
+tor was conservative. We explained the reason
+for a possible underestimation and how this can
+be avoided by replacing the worst-case model by
+interpolation in the whole parameter space. A pos-
+teriori homogenization matched dehomogenized
+results quite well. This shows that homogenization
+is a viable tool to upscale the buckling behavior
+of lattice structures.
+Although
+we
+limit
+ourselves
+to
+a
+two-
+dimensional setting in this article, an extension
+to three dimensions is straight forward. Further
+research could include the combination of lattice,
+solid, and void design in optimization problems
+while accounting for manufacturing constraints.
+Acknowledgments.
+Funded by the Deutsche
+Forschungsgemeinschaft (DFG, German Research
+Foundation) – Project-ID 61375930 – SFB 814 -
+”Additive Manufacturing” TP C02.
+Declarations
+Competing interests On behalf of all authors, the
+corresponding author states that there is no
+conﬂict of interest.
+Replication of results The numerical implementa-
+tion of the presented approach is based on
+and extends the open-source ﬁnite element
+package openCFS (Verein zur F¨orderung der
+Software openCFS). The presented numeri-
+cal examples can be reproduced following the
+general openCFS instructions. Examples on
+how to conduct homogenization and buck-
+ling analysis are provided in its Testsuite.
+Finite element meshes have been generated
+by Coreform Cubit 2022.4 (Coreform LLC).
+Additional scripts for post-processing of the
+
+homogenized data are readily provided by the
+authors on request.
+References
+Allaire G, Francfort G (1993) A numerical algo-
+rithm for topology and shape optimization.
+In: Topology design of structures. Springer, p
+239–248
+Allaire G, Kohn RV (1993) Explicit optimal
+bounds on the elastic energy of a two-phase
+composite in two space dimensions. Quarterly
+of Applied Mathematics 51(4):675–699
+Allaire G, Bonnetier E, Francfort G, et al. (1997)
+Shape
+optimization
+by
+the
+homogenization
+method. Numerische Mathematik 76(1):27–68.
+https://doi.org/10.1007/s002110050253
+Andersen MN, Wang F, Sigmund O (2021) On
+the competition for ultimately stiﬀand strong
+architected
+materials.
+Materials
+&
+Design
+198:109,356. https://doi.org/10.1016/j.matdes.
+2020.109356
+Andersen MN, Wang Y, Wang F, et al. (2022)
+Buckling and yield strength estimation of archi-
+tected materials under arbitrary loads. Inter-
+national Journal of Solids and Structures p
+111842. https://doi.org/10.1016/j.ijsolstr.2022.
+111842
+Behrou R, LotﬁR, Carstensen JV, et al. (2021)
+Revisiting element removal for density-based
+structural topology optimization with rein-
+troduction by heaviside projection. Computer
+Methods in Applied Mechanics and Engineer-
+ing 380:113,799. https://doi.org/10.1016/j.cma.
+2021.113799
+Bendsøe
+MP,
+Kikuchi
+N
+(1988)
+Gener-
+ating
+optimal
+topologies
+in
+structural
+design
+using
+a
+homogenization
+method.
+Computer
+methods
+in
+applied
+mechan-
+ics
+and
+engineering
+71(2):197–224.
+https://doi.org/10.1016/0045-7825(88)90086-2
+Bendsøe MP, Sigmund O (2003) Topology opti-
+mization: theory, methods, and applications.
+Springer Science & Business Media, Berlin Hei-
+delberg New York
+BirkhoﬀG, Schultz MH, Varga RS (1968) Piece-
+wise hermite interpolation in one and two vari-
+ables with applications to partial diﬀerential
+equations. Numer Math 11(3):232–256
+Bluhm GL, Sigmund O, Wang F, et al. (2020)
+Nonlinear compressive stability of hyperelastic
+2d lattices at ﬁnite volume fractions. Journal of
+the Mechanics and Physics of Solids 137:103,851
+Borrvall T, Petersson J (2001) Topology optimiza-
+tion using regularized intermediate density con-
+trol. Computer Methods in Applied Mechanics
+and Engineering 190(37-38):4911–4928. https:
+//doi.org/10.1016/S0045-7825(00)00356-X
+Bruyneel M, Colson B, Remouchamps A (2008)
+Discussion on some convergence problems in
+buckling optimisation. Structural and Multidis-
+ciplinary Optimization 35(2):181–186. https://
+doi.org/10.1007/s00158-007-0129-z
+Christensen CF, Wang F, Sigmund O (2022) Mul-
+tiscale topology optimization considering local
+and global buckling response. arXiv preprint
+arXiv:221011477
+Clausen A, Aage N, Sigmund O (2016) Exploit-
+ing additive manufacturing inﬁll in topology
+optimization for improved buckling load. Engi-
+neering 2(2):250–257. https://doi.org/10.1016/
+J.ENG.2016.02.006
+Clausen T (1851) ¨Uber die form architektonis-
+cher s¨aulen. Bull cl, Physico Math Acad St
+P´etersbourg 9:369–380
+Coreform LLC, Orem, UT Coreform cubit. https:
+//coreform.com/products/coreform-cubit/
+Dalklint A, Wallin M, Tortorelli DA (2020)
+Eigenfrequency constrained topology optimiza-
+tion of ﬁnite strain hyperelastic structures.
+Structural
+and
+Multidisciplinary
+Optimiza-
+tion 61(6):2577–2594. https://doi.org/10.1007/
+s00158-020-02557-9
+Dunning PD, Ovtchinnikov E, Scott J, et al.
+(2016) Level-set topology optimization with
+many
+linear
+buckling
+constraints
+using
+an
+eﬃcient and robust eigensolver. International
+
+Journal
+for
+Numerical
+Methods
+in
+Engi-
+neering 107(12):1029–1053. https://doi.org/10.
+1002/nme.5203
+Ferrari F, Sigmund O (2019) Revisiting topol-
+ogy optimization with buckling constraints.
+Structural
+and
+Multidisciplinary
+Optimiza-
+tion 59(5):1401–1415. https://doi.org/10.1007/
+s00158-019-02253-3
+Ferrari F, Sigmund O (2020) Towards solving
+large-scale topology optimization problems with
+buckling constraints at the cost of linear anal-
+yses. Computer Methods in Applied Mechanics
+and Engineering 363:112,911. https://doi.org/
+10.1016/j.cma.2020.112911
+Ferrer A, Geoﬀroy-Donders P, Allaire G (2021)
+Stress
+minimization
+for
+lattice
+structures.
+part
+i:
+Micro-structure
+design.
+Philosophi-
+cal
+Transactions
+of
+the
+Royal
+Society
+A
+379(2201):20200,109. https://doi.org/10.1098/
+rsta.2020.0109
+Gao X, Ma H (2015) Topology optimization
+of continuum structures under buckling con-
+straints.
+Computers
+&
+Structures
+157:142–
+152. https://doi.org/10.1016/j.compstruc.2015.
+05.020
+Giele R, Groen J, Aage N, et al. (2021) On
+approaches for avoiding low-stiﬀness regions in
+variable thickness sheet and homogenization-
+based topology optimization. Structural and
+Multidisciplinary Optimization 64(1):39–52
+Gill PE, Murray W, Saunders MA (2005) Snopt:
+An sqp algorithm for large-scale constrained
+optimization. SIAM review 47(1):99–131. https:
+//doi.org/10.1137/S0036144504446096
+Huang N, Sheu CY (1968) Optimal design of an
+elastic column of thin-walled cross section. Jour-
+nal of Applied Mechanics 35(2):285–288. https:
+//doi.org/10.1115/1.3601193
+Keller JB (1960) The shape of the strongest
+column.
+Archive
+for
+Rational
+Mechan-
+ics
+and
+Analysis
+5(1):275–285.
+https:
+//doi.org/10.1007/BF00252909
+Khot N, Venkayya V, Berke L (1976) Optimum
+structural design with stability constraints.
+International Journal for Numerical Methods in
+Engineering 10(5):1097–1114. https://doi.org/
+10.1002/nme.1620100510
+Kreisselmeier G, Steinhauser R (1980) Systematic
+control design by optimizing a vector perfor-
+mance index. In: Computer aided design of
+control systems. Elsevier, p 113–117
+Larsen S, Sigmund O, Groen J (2018) Opti-
+mal truss and frame design from projected
+homogenization-based topology optimization.
+Structural and Multidisciplinary Optimization
+57(4):1461–1474
+Lehoucq
+RB,
+Sorensen
+DC,
+Yang
+C
+(1998)
+ARPACK users’ guide: solution of large-scale
+eigenvalue problems with implicitly restarted
+Arnoldi methods. SIAM, Philadelphia
+Mavrotas G (2009) Eﬀective implementation of
+the
+ε-constraint
+method
+in
+multi-objective
+mathematical programming problems. Applied
+mathematics and computation 213(2):455–465.
+https://doi.org/10.1016/j.amc.2009.03.037
+Nˇemec I, Trcala M, ˇSevˇc´ık I, et al. (2016) New
+formula for geometric stiﬀness matrix calcu-
+lation. Journal of Applied Mathematics and
+Physics 4(4):733–748. https://doi.org/10.4236/
+jamp.2016.44084
+Neves M, Rodrigues H, Guedes J (1995) Gen-
+eralized topology design of structures with
+a
+buckling
+load
+criterion.
+Structural
+opti-
+mization 10(2):71–78. https://doi.org/10.1007/
+BF01743533
+Neves MM (2019) Symbolic computation to derive
+a linear-elastic buckling theory for solids with
+periodic microstructure. International Journal
+for Computational Methods in Engineering Sci-
+ence and Mechanics 20(6):523–539
+Neves MM, Sigmund O, Bendsøe M (2002a)
+Topology optimization of periodic microstruc-
+tures with a buckling criteria. Vienna University
+of Technology
+
+Neves MM, Sigmund O, Bendsøe MP (2002b)
+Topology optimization of periodic microstruc-
+tures
+with
+a
+penalization
+of
+highly
+local-
+ized buckling modes. International Journal for
+Numerical Methods in Engineering 54(6):809–
+834. https://doi.org/10.1002/nme.449
+Pedersen NL (2000) Maximization of eigenval-
+ues using topology optimization. Structural
+and multidisciplinary optimization 20(1):2–11.
+https://doi.org/10.1007/s001580050130
+Rahman O, Uddin KZ, Muthulingam J, et al.
+(2022) Density-graded cellular solids: Mechan-
+ics, fabrication, and applications. Advanced
+Engineering Materials 24(1):2100,646. https://
+doi.org/10.1002/adem.202100646
+Rodrigues HC, Guedes J, Bendsøe MP (1995) Nec-
+essary conditions for optimal design of struc-
+tures with a nonsmooth eigenvalue based crite-
+rion. Structural optimization 9(1):52–56. https:
+//doi.org/10.1007/BF01742645
+Seyranian AP, Lund E, OlhoﬀN (1994) Multiple
+eigenvalues in structural optimization problems.
+Structural optimization 8(4):207–227. https://
+doi.org/10.1007/BF01742705
+Stolpe M, Svanberg K (2001) An alternative
+interpolation scheme for minimum compliance
+topology optimization. Structural and Multi-
+disciplinary Optimization 22(2):116–124. https:
+//doi.org/10.1007/s001580100129
+Tadjbakhsh I, Keller J (1962) Strongest columns
+and isoperimetric inequalities for eigenvalues.
+Journal of Applied Mechanics 29(1):159–164.
+https://doi.org/10.1115/1.3636448
+Thomsen CR, Wang F, Sigmund O (2018) Buck-
+ling strength topology optimization of 2d peri-
+odic materials based on linearized bifurca-
+tion analysis. Computer Methods in Applied
+Mechanics and Engineering 339:115–136. https:
+//doi.org/10.1016/j.cma.2018.04.031
+Valentin J, H¨ubner D, Stingl M, et al. (2020)
+Gradient-based two-scale topology optimization
+with b-splines on sparse grids. SIAM Journal
+on Scientiﬁc Computing 42(4):B1092–B1114.
+https://doi.org/10.1137/19M128822X
+Verein zur F¨orderung der Software openCFS
+opencfs. https://opencfs.org/
+Wang X, Zhu L, Sun L, et al. (2021) Optimiza-
+tion of graded ﬁlleted lattice structures subject
+to yield and buckling constraints. Materials &
+Design 206:109,746. https://doi.org/10.1016/j.
+matdes.2021.109746
+Wu J, Sigmund O, Groen JP (2021) Topology
+optimization of multi-scale structures: a review.
+Structural and Multidisciplinary Optimization
+63(3):1455–1480
+Zienkiewicz OC, Taylor RL, Zhu JZ (2005) The
+ﬁnite element method: its basis and fundamen-
+tals. Elsevier, Amsterdam i.a.

@@ -1,35 +1,41 @@
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "geoevolve"
-dynamic = ["version"]
+version = "0.2.2"
 description = 'A Geographical Knowledge Informed Code Evolver'
 readme = "README.md"
-requires-python = ">=3.8"
 license = "MIT"
-keywords = []
+keywords = ['Large Language Models', 'Geospatial Artificial Intelligence', 'Knowledge Discovery']
 authors = [
   { name = "Xiayin Lou", email = "xiayin.lou@tum.de" },
 ]
+requires-python = ">=3.10"
 dependencies = [
-    'langchain',
-    'langchain_core',
-    'langchain-text-splitters',
-    'langchain-openai',
-    'langgraph',
-    'openai',
-    'wikipedia-api',
-    'arxiv',
-    'pymupdf',
-    'gitpython',
-    'more-itertools',
-    'openevolve'
+    "arxiv>=2.3.1",
+    "gitpython>=3.1.45",
+    "langchain>=1.1.0",
+    "langchain-chroma>=1.0.0",
+    "langchain-community>=0.4.1",
+    "langchain-core>=1.1.0",
+    "langchain-openai>=1.1.0",
+    "langgraph>=1.0.4",
+    "more-itertools>=10.8.0",
+    "openevolve>=0.2.22",
+    "pymupdf>=1.26.6",
+    "requests>=2.32.5",
+    "ruamel-yaml>=0.18.16",
+    "tqdm>=4.67.1",
+    "wikipedia-api>=0.8.1",
 ]
 
-[tool.setuptools.packages.find]
-include = ["geoevolve*"]
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
-[tool.setuptools.dynamic]
-version = {attr = "geoevolve._version.__version__"}
+[tool.setuptools.packages.find]
+include = ["geoevolve"]
+exclude = [
+    "github_temp*",
+    "geo_knowledge*",
+    "geoevolve_logs*",
+    "geoevolve_storage*",
+    "outputs_*",]

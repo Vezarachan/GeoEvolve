@@ -1,0 +1,292 @@
+arXiv:gr-qc/9907090v1  27 Jul 1999
+Entanglement/Brick-wall entropies correspondence
+Shinji Mukohyama
+Department of Physics and Astronomy, University of Victoria, Victoria, BC, Canada V8W 3P6
+Yukawa Institute for Theoretical Physics, Kyoto University, Kyoto 606-8502, Japan
+Abstract.
+There have been many attempts to understand the statistical origin of black-hole entropy.
+Among them, entanglement entropy and the brick wall model are strong candidates. In this paper we show
+a relation between entanglement entropy and the brick wall model: the brick wall model seeks the maximal
+value of the entanglement entropy. In other words, the entanglement approach reduces to the brick wall
+model when we seek the maximal entanglement entropy .
+I
+INTRODUCTION
+Black hole entropy is given by a mysterious formula called the Bekenstein-Hawking formula [1,2]:
+SBH = A
+4l2
+pl
+,
+(1)
+where A is area of the horizon. There have been many attempts to understand the statistical origin of the
+black-hole entropy.
+Entanglement entropy [3,4] is one of the strongest candidates of the origin of black hole entropy.
+It is
+originated from a direct-sum structure of a Hilbert space of a quantum system: for an element |ψ⟩of the
+Hilbert space F of the form
+F = FI ¯⊗FII,
+(2)
+the entanglement entropy Sent is deﬁned by
+Sent = −TrI[ρI ln ρI],
+ρI = TrII|ψ⟩⟨ψ|.
+(3)
+Here ¯⊗denotes a tensor product followed by a suitable completion and TrI,II denotes a partial trace over
+FI,II, respectively.
+On the other hand, there is another strong candidate for the origin of black hole entropy: the brick wall model
+introduced by ’tHooft [5]. In this model, thermal atmosphere in equilibrium with a black hole is considered.
+In this situation, we encounter with two kinds of divergences in physical quantities. The ﬁrst is due to inﬁnite
+volume of the system and the second is due to inﬁnite blue shift near the horizon. We are not interested in the
+ﬁrst since it represents contribution from matter in the far distance. Hence we introduce an outer boundary
+in order to make our system ﬁnite. It is the second divergence that we would like to associate with black hole
+entropy. Namely, it can be shown by introducing a Planck scale cutoﬀthat entropy of the thermal atmosphere
+near the horizon is proportional to the area of the horizon in Planck units.
+In this paper, we show that the brick wall model seeks the maximal value of the entanglement entropy.
+II
+MODEL DESCRIPTION
+For simplicity, we consider a minimally coupled, real scalar ﬁeld described by the action
+
+ 
+I
+II
+1
+1
+r = r
+r = r
+t = const.
+FIGURE 1. The Kruskal-like extension of the static, spherically symmetric black-hole spacetime. We consider only
+the regions satisfying r > r1 (the shaded regions I and II ).
+S = −1
+2
+Z
+d4x√−g
+
+gµν∂µφ∂νφ + m2
+φφ2
+,
+(4)
+in the spherically symmetric, static black-hole spacetime
+ds2 = −f(r)dt2 + dr2
+f(r) + r2dΩ2.
+(5)
+We denote the area radius of the horizon by r0 and the surface gravity by κ0 (̸= 0):
+f(r0) = 0,
+κ0 = 1
+2f ′(r0).
+(6)
+We quantize the system of the scalar ﬁeld with respect to the Killing time t in a Kruskal-like extension of the
+black hole spacetime. The corresponding ground state is called the Boulware state and its energy density is
+known to diverge near the horizon. Although we shall only consider states with bounded energy density, it
+is convenient to express these states as excited states above the Boulware ground state for technical reasons.
+Hence, we would like to introduce an ultraviolet cutoﬀα with dimension of length to control the divergence.
+The cutoﬀparameter α is implemented so that we only consider two regions satisfying r > r1 (shaded regions
+I and II in Figure 1), where r1 (> r0) is determined by
+α =
+Z r1
+r0
+dr
+p
+f(r)
+.
+(7)
+[Evidently, the limit α →0 corresponds to the limit r1 →r0. Thus, in this limit, the whole region in which
+∂/∂t is timelike is considered.] Strictly speaking, we also have to introduce outer boundaries, say at r = L
+(≫r0), to control the inﬁnite volume of the constant-t surface. However, even if there are outer boundaries,
+the following arguments still hold.
+In this situation, there is a natural choice for division of the system of the scalar ﬁeld: let HI be the space
+of mode functions with supports in the region I and HII be the space of mode functions with supports in the
+region II. Thence, the space F of all states are of the form (2), where FI and FII are deﬁned as symmetric
+Fock spaces constructed from HI and HII, respectively:
+FI ≡C ⊕HI ⊕(HI ¯⊗HI)sym ⊕· · · ,
+FII ≡C ⊕HII ⊕(HII ¯⊗HII)sym ⊕· · · .
+(8)
+Here (· · ·)sym denotes the symmetrization.
+III
+SMALL BACKREACTION CONDITION
+Let us investigate what kind of condition should be imposed for our arguments to be self-consistent. A clear
+condition is that the backreaction of the scalar ﬁeld to the background geometry should be ﬁnite. For the brick
+
+wall model this condition is satisﬁed. Namely, in Ref. [6], it was shown that the total mass of the thermal
+atmosphere of quantum ﬁelds is actually bounded. Thus, also for our system, we would like to impose the
+condition that the contribution ∆M of the subsystem FI to the mass of the background geometry should be
+bounded in the limit α →0.
+It is easily shown that ∆M is given by
+∆M ≡−
+Z
+x∈I
+T t
+t 4πr2dr = HI,
+(9)
+where HI is the Hamiltonian of the subsystem FI with respect to the Killing time t. Hence, the expectation
+value of ∆M with respect to a state |ψ⟩of the scalar ﬁeld is decomposed into the contribution of excitations
+and the contribution from the zero-point energy:
+⟨ψ|∆M|ψ⟩= Eent + ∆MB,
+(10)
+where Eent is entanglement energy deﬁned by
+Eent ≡⟨ψ| : HI : |ψ⟩,
+(11)
+and ∆MB is the zero-point energy of the Boulware state. Here, the colons denote the usual normal ordering.
+[This deﬁnition of entanglement energy corresponds to E(I′)
+ent in Ref. [7] and ⟨: H2 :⟩in Ref. [8].]
+Since the Boulware energy ∆MB diverges as ∆MB ∼−ATHα−2 in the limit α →0 [6], we should impose
+the condition
+Eent ≃|∆MB|,
+(12)
+where A = 4πr2
+0 is the area of the horizon, TH = κ0/2π is the Hawking temperature. We would like to call this
+condition the small backreaction condition (SBC). Note that the right hand side of SBC (12) is independent of
+the state |ψ⟩.
+IV
+MAXIMAL ENTANGLEMENT ENTROPY
+Now, we shall show that the Hartle-Hawking state is a maximum of the entanglement entropy in the space
+of quantum states satisfying SBC. For this purpose, we prove a more general statement for a quantum system
+with a state-space of the form (2): a state of the form
+|ψ⟩= N
+X
+n
+e−En/2T |n⟩I ⊗|n⟩II
+(13)
+is a maximum of the entanglement entropy in the space of states with ﬁxed expectation value of the operator
+EI deﬁned by
+EI =
+ X
+n
+En|n⟩I · I⟨n|
+!
+⊗
+ X
+m
+|m⟩II · II⟨m|
+!
+,
+(14)
+provided that the real constant T is determined so that the expectation value of EI is actually the ﬁxed value.
+Here, {|n⟩I} and {|n⟩II} (n = 1, 2, · · ·) are bases of the subspaces FI and FII, respectively, and En are
+assumed to be real and non-negative. Note that this statement is almost the same as the following statement
+in statistical mechanics: a canonical state is a maximum of statistical entropy in the space of states with ﬁxed
+energy, provided that the temperature of the canonical state is determined so that the energy is actually the
+ﬁxed value.
+Note that the expectation value of EI is equal to the entanglement energy (11), providing that |n⟩I and En
+are an eigenstate and an eigenvalue of the normal-ordered Hamiltonian : HI : of the subsystem FI. Hence,
+for the system of the scalar ﬁeld, the above general statement insists that the state (13) is a maximum of
+the entanglement entropy in the space of states satisfying SBC, which corresponds to ﬁxing the entanglement
+entropy. Oﬀcourse, in this case, the constant T should be determined so that SBC (12) is satisﬁed.
+
+Returning to the subject, let us prove the general statement. (The following proof is the almost same as
+that given in the Appendix of Ref. [9] for a slightly diﬀerent statement. However, for completeness, we shall
+give the proof. )
+First, we decompose an element |ψ⟩of F as
+|ψ⟩=
+X
+n,m
+Cnm|n⟩I ⊗|m⟩II,
+(15)
+where the coeﬃcients Cnm (n, m = 1, 2, · · ·) are complex numbers satisfying P
+n,m |Cnm|2 = 1 and can be
+considered as matrix elements of a matrix C.
+Since C†C is a non-negative Hermitian matrix, it can be
+diagonalized as
+C†C = V †PV,
+(16)
+where P is a diagonal matrix with diagonal elements pn (≥0) and V is a unitary matrix. For this decomposition
+and diagonalization, the entanglement entropy and the expectation value of the operator EI are written as
+follows.
+Sent = −
+X
+n
+pn ln pn,
+(17)
+Eent =
+X
+n,m
+Enpm|Vnm|2,
+(18)
+where Vnm is matrix elements of V . The constraints P
+n,m |Cnm|2 = 1 and V †V = 1 are equivalent to
+X
+n
+pn = 1,
+X
+l
+V ∗
+lnVlm = δnm.
+(19)
+Next, we shall show that these expressions are equivalent to those appearing in statistical mechanics in FI.
+Let us consider a density operator ¯ρ on FI:
+¯ρ =
+X
+n,m
+˜Pnm|n⟩I · I⟨m|,
+(20)
+where ( ˜Pnm) is a non-negative Hermitian matrix with unit trace. By diagonalizing the matrix ˜P as
+˜P = ¯V † ¯P ¯V ,
+(21)
+we obtain the following expressions for entropy S and an expectation value E of the operator ¯EI ≡P
+n En|n⟩I ·
+I⟨n|.
+S = −
+X
+n
+¯pn ln ¯pn,
+E =
+X
+n
+X
+n,m
+En¯pm|Vnm|2,
+(22)
+where ¯pn is the diagonal elements of ¯P. The constraints Tr¯ρ = 1 and ¯V † ¯V = 1 are restated as
+X
+n
+¯pn = 1,
+X
+l
+¯V ∗
+ln ¯Vlm = δnm.
+(23)
+From these and those expressions, the following correspondence is easily seen:
+
+Sent ↔S,
+Eent ↔E,
+C†C ↔˜P.
+(24)
+Hence, a maximum of S in the space of statistical states with a ﬁxed value of E gives a set of maxima of Sent
+in the space of quantum states with a ﬁxed value of Eent. (All of them are related by unitary transformations
+in the subspace FII.) Thus, since the thermal state ˜Pnm = e−En/T δnm is a maximum of S in the space of
+statistical states with a ﬁxed value of E, Cnm = e−En/2T δnm is a maximum of Sent in the space of quantum
+states with a ﬁxed value of Eent. Here the temperature (or the constant) T should be determined so that E
+(or Eent) has the ﬁxed value. This completes the proof of the general statement.
+Therefore, for the system of the scalar ﬁeld, a state of the form (13) is a maximum of the entanglement
+entropy in the space of quantum states satisfying SBC, provided that the constant T is determined so that
+SBC is satisﬁed. The value of T is easily determined as T = TH by using the well-known fact that the negative
+divergence in the Boulware energy density can be canceled by thermal excitations if and only if temperature
+with respect to the time t is equal to the Hawking temperature.
+Finally, we obtain the statement that the Hartle-Hawking state [10] is a maximum of entanglement entropy
+in the space of quantum states satisfying SBC since the Hartle-Hawking state is actually of the form (13) with
+T = TH [11]. [Strictly speaking, in order to obtain the Hartle-Hawking state, we have to take the limit α →0
+(and L →∞). However, the following arguments still hold for a ﬁnite value of α (and L).] The corresponding
+reduced density matrix is the thermal state with temperature equal to the Hawking temperature. Therefore,
+the maximal entanglement entropy is equal to the thermal entropy with the Hawking temperature, which is
+sought in the brick wall model.
+V
+CONCLUSION
+In summary the brick wall model seeks the maximal value of entanglement entropy. In other words, the
+entanglement approach reduces to the brick wall model when we seek the maximal entanglement entropy .
+Our arguments suggests strong connection among three kinds of thermodynamics: black hole thermodynam-
+ics, statistical mechanics, and entanglement thermodynamics [9,7,8,12]. It will be interesting to investigate
+close relations among them in detail.
+ACKNOWLEDGMENTS
+The author would like to thank Professors W. Israel and H. Kodama for their continuing encouragement.
+This work was supported partially by the Grant-in-Aid for Scientiﬁc Research Fund (No. 9809228).
+REFERENCES
+1. J. D. Bekenstein, Phys. Rev. D7, 949 (19973).
+2. S. W. Hawking, Commun. Math. Phys. 43, 199 (1975).
+3. L. Bombelli, R. K. Koul, J. Lee and R. D. Sorkin, Phys. Rev. D34, 373 (1986).
+4. M. Srednicki, Phys. Rev. Lett. 71, 666 (1993).
+5. G. ’tHooft, Nucl. Phys. B256, 727 (1985).
+6. S. Mukohyama and W. Israel, Phys. Rev. D58, 104005 (1998).
+7. S. Mukohyama, M. Seriu and H. Kodama, Phys. Rev. D58, 064001 (1998).
+8. S. Mukohyama, “The origin of black hole entropy”, Doctoral thesis, gr-qc/9812079.
+9. S. Mukohyama, Phys. Rev. D58, 104023 (1998).
+10. J. B. Hartle and S. W. Hawking, Phys. Rev. D13, 2188 (1976).
+11. W. Israel, Phys. Lett. 57A, 107 (1976).
+12. S. Mukohyama, M. Seriu and H. Kodama, Phys. Rev. D55, 7666 (1997).
+13. S. Mukohyama, “Hartle-Hawking state is a maximum of entanglement entropy“, gr-qc/9904005.

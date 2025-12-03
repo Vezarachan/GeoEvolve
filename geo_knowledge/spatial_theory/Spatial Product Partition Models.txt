@@ -1,0 +1,2560 @@
+Spatial Product Partition Models
+Garritt L. Page
+Departamento de Estadística
+Pontiﬁcia Universidad Católica de Chile
+page@mat.puc.cl
+Fernando A. Quintana
+Departamento de Estadística
+Pontiﬁcia Universidad Católica de Chile
+quintana@mat.uc.cl
+November 8, 2021
+Abstract
+When modeling geostatistical or areal data, spatial structure is commonly accom-
+modated via a covariance function for the former and a neighborhood structure for the
+latter. In both cases the resulting spatial structure is a consequence of implicit spatial
+grouping in that observations near in space are assumed to behave similarly. It would
+be desirable to develop spatial methods that explicitly model the partitioning of spa-
+tial locations providing more control over resulting spatial structures and being able
+to better balance global vs local spatial dependence. To this end, we extend product
+partition models to a spatial setting so that the partitioning of locations into spatially
+dependent clusters is explicitly modeled. We explore the spatial structures that result
+from employing a spatial product partition model and demonstrate its ﬂexibility in
+accommodating many types of spatial dependencies. We illustrate the method’s utility
+through simulation studies and an education application. Computational techniques
+with additional simulations and examples are provided in a Supplementary Material
+ﬁle available online.
+Key Words: prediction; product partition models, spatial smoothing, spatial clustering.
+1
+arXiv:1504.04489v1  [stat.ME]  17 Apr 2015
+
+1
+Introduction
+Research dedicated to developing statistical methodologies that in some way incorporate
+information relating to location has grown exponentially in the last decade. In fact, spatial
+methods are now available in essentially all areas of statistics and have been developed
+to accommodate both areal (lattice) and geo-referenced data. The principal motivation in
+developing these methods is to produce inference and predictions that take into account the
+spatial dependence that is believed to exist among observations. The end result is typically
+a smoothed map for areal data or a predictive map for geo-referenced data. These maps
+are frequently produced by implicitly performing a type of spatial grouping that carries out
+the intuitively appealing notion that responses measured at locations near in space have
+similar values. Since the grouping is implicit, the spatial partition is not directly modeled
+but is a consequence of model choices (e.g., neighborhood structure or covariance function).
+For areal data this can lead to spatial correlation structures that are counter-intuitive (Wall
+2004). Additionally, it is common that the smoothed or predictive maps are global in nature
+in that methods are not ﬂexible enough to capture local deviations from an overall spatial
+structure.
+0.2
+0.4
+0.6
+0.8
+1.0
+0.2
+0.4
+0.6
+0.8
+1.0
+−2
+0
+2
+4
+0.2
+0.4
+0.6
+0.8
+1.0
+0.2
+0.4
+0.6
+0.8
+1.0
+−2
+0
+2
+4
+0.2
+0.4
+0.6
+0.8
+1.0
+0.2
+0.4
+0.6
+0.8
+1.0
+−4
+−2
+0
+2
+4
+Figure 1: Synthetic spatial ﬁelds. From left to right, the graphs display random ﬁelds that
+become progressively more local.
+Figure 1 provides a synthetic example of local vs. global spatial dependence. The three
+plots were generated using a Gaussian process featuring an exponential covariance function.
+2
+
+From left to right the random ﬁelds become increasingly more local. The left plot displays
+one spatial process over the entire domain that has expectation 0, nugget 0.1, partial sill
+2, and eﬀective range 6 (see Banerjee et al. 2014, Chapter 2 for more details). The second
+plot is generated with the same covariance function, but the ﬁeld is partitioned into four
+rectangular clusters and each is assigned a speciﬁc constant mean (1, −0.5, 0.25, −1), thus
+inducing a small amount of local structure. The right plot is the most local of the three
+as each cluster is a realization from a unique spatial process that has expectation 0 and
+a cluster speciﬁc partial sill (1, 2, 3, 4) and eﬀective range (0.5, 10, 5, 20). Methods able to
+ﬂexibly capture these three structures would certainly be appealing. Developing these types
+of methods is the primary focus of this paper.
+Our approach is to develop a class of priors based on product partition models (PPM,
+Hartigan 1990) that directly model the partitioning of locations into spatially dependent
+clusters. Making the PPM location dependent is necessary in a spatial setting because if
+not, then locations that are very far apart could possibly be assigned to the same cluster
+with high probability. As a consequence, the marginal correlation between observations far
+apart could be stronger than that of observations near each other, which runs counter to
+correlation structures often desired in spatial modeling. As will be seen, PPM’s are a very
+attractive way to partition spatial units as they are extremely ﬂexible in accommodating
+diﬀerent types of spatial clusters.
+The method we develop is able to adapt to the three scenarios described in Figure 1 by
+incorporating spatial information in two ways. The ﬁrst is via a prior on the partitioning of
+locations using PPM ideas. The second is through the likelihood either directly or hierar-
+chically. If spatial structure is not built in the likelihood, the spatial PPM will marginally
+induce local spatial dependence among observations. As an aside, apart from more accurately
+modeling spatial phenomena, considering local spatial dependance potentially provides large
+computational gains as covariance matrices are considerably smaller.
+Spatial methods now have a large presence in the statistical literature. We focus on
+methods that incorporate spatial dependence ﬂexibly.
+For a general overview of spatial
+methods see Gelfand et al. (2010), Banerjee et al. (2014), or Schabenberger and Gotway
+(2005).
+Locating spatial clusters is commonly considered in spatial point processes (Diggle 2014).
+That said, from a modeling standpoint, the analysis goals are completely diﬀerent from those
+we consider. Image segmentation is an extensively studied area that we do not attempt to
+fully survey here. We do mention the spatial distance dependent Chinese restaurant process
+3
+
+of Ghosh et al. (2011) (a spatial extension of the distance dependent Chinese restaurant
+process of Blei and Frazier 2011) as they develop a process that produces a non-exchangeable
+distribution on location dependent partitions through a distance dependent decay function.
+Though there are similarities, our approach is model based and therefore provides measures
+of uncertainty regarding inferences and predictions.
+Gelfand et al. (2005) developed a spatial Dirichlet process (DP) by modeling atoms asso-
+ciated with Sethuraman (1994)’s stick-breaking random measure construction with a random
+ﬁeld. Duan et al. (2007) generalized the spatial DP through a type of multivariate stick-
+breaking in which individual sites could possibly arise from unique surfaces introducing a type
+of local spatial modeling. Both spatial DP processes require replication. Griﬃn and Steel
+(2006) developed the ordered dependent DP where stick breaking weights are randomly per-
+muted according to a latent spatial point process thus inducing spatial dependence. Petrone
+et al. (2009) developed a DP that pieces together functions and applied it to a spatial ﬁeld.
+Reich and Bondell (2011) use a DP to model locations directly resulting in spatially refer-
+enced clusters. All of these methods induce a marginal distribution on partitions through
+the introduction of latent cluster labels.
+Somewhat related to the spatial DP and operationally similar to what we introduce
+are the spatial stick-breaking process of Reich and Fuentes (2007) and the logistic stick-
+breaking process of Ren et al. (2011) (both of which are in some sense special cases of kernel-
+stick breaking process of Dunson and Park 2008).
+Both stick-breaking processes induce
+spatial dependence via kernel functions that allow stick-breaking weights to change with
+space. A related probit-stick breaking prior for spatial dependence was recently proposed in
+Papageorgiou et al. (2014).
+Other authors have employed DP type methods to areal data resulting in a more ﬂexible
+(local) neighborhood structure (Li et al. 2014, Lee et al. 2014). Kang et al. (2014) created
+local conditional autoregressive (CAR) models to accommodate local spatial residual.
+Even though all the previously mentioned nonparametric Bayes based methods may have
+some inferential similarities or are at least operationally similar to what we are proposing,
+they are fundamentally diﬀerent. We do not introduce any notion of a random probability
+measure. Therefore, we are not bound to an induced marginal model on partitions available
+from the DP (though this particular model is certainly available as a special case). Instead
+we directly model the spatially dependent partition using a PPM. Doing so provides much
+more control over the partitioning of spatial units into clusters.
+From a disease mapping perspective, Denison and Holmes (2001) consider spatial clus-
+4
+
+tering by ﬁrst selecting cluster centroids and using tessellation ideas of Lawson and Denison
+(2002) to determine cluster memberships. This requires employing Reversible Jump MCMC
+and produces spatial clusters that are necessarily convex. Knorr-Held and Raßer (2000)
+cluster areal units via a distance measure that is based on shared boundaries. Hegarty and
+Barry (2008) employ a PPM to model partitions of areal units, though they do not explore
+the spatial properties of their model and are restricted to a very speciﬁc setting. We aim to
+propose a very general methodology that is ﬂexible in accommodating many types of spatial
+dependencies. In fact, we will show that once a model for the partition has been speciﬁed,
+the sky is limit in terms of how spatial dependence can be incorporated in other parts of the
+model.
+The remainder of the article is organized as follows.
+In Section 2 we provide some
+preliminaries on PPM’s and a bit of discussion on spatial clustering.
+Section 3 details
+spatial extensions of the PPM and investigates spatial properties.
+Section 4 contains a
+small simulation study and a Chilean education data application. We make some concluding
+remarks in Section 5.
+Lastly, the Supplementary Material ﬁle available online contains
+computational details along with additional simulations and applications.
+2
+Preliminaries
+We provide background to PPM’s and a bit of discussion motivating our view of spatial
+clusters.
+2.1
+Preliminaries of Product Partition Model
+PPM’s were ﬁrst introduced by Hartigan (1990) and have since been extended to include
+covariates (Müller et al. 2011 and Park and Dunson 2010) and correlated parameters (Mon-
+teiro et al. 2011). They’ve been employed in applications ranging from change point analysis
+(Barry and Hartigan 1992) to functional clustering (Page and Quintana 2014) among oth-
+ers. Since PPMs are central to our approach of carrying out spatial clustering, we brieﬂy
+introduce them here. Consider n distinct locations denoted by s1, . . . , sn. The si are quite
+general in that they can be latitude and longitude values or in the case of areal data they
+could deﬁne a neighborhood structure. The goal is to directly model the partitioning of the
+si, i = 1, . . . , n into kn groups. With this in mind, let ρn = {S1, . . . , Skn} denote a partition-
+ing (or clustering) of the n locations into kn subsets such that i ∈Sh implies that location i
+belongs to cluster h. Alternatively, we will denote cluster membership using c1, . . . , cn where
+5
+
+ci = h implies i ∈Sh. Then the PPM prior for ρ is simply
+Pr(ρ) ∝
+kn
+Y
+h=1
+C(Sh),
+(2.1)
+where C(Sh) ≥0 for Sh ⊂{1, . . . , n} is a cohesion function that measures how likely elements
+of Sh are clustered a priori. The normalizing constant of (2.1) is simply the sum of (2.1)
+over all possible partitions. A popular cohesion function that connects (2.1) to the marginal
+prior distribution on partitions induced by a Dirichlet process (DP) is C(S) = M × Γ(|S|).
+This cohesion produces a PPM that encourages partitions with a small number of large
+clusters and also a few smaller clusters (the rich get richer property). This property will be
+useful to avoid creating many singleton clusters when extending PPM’s to a spatial setting
+and therefore the form M × Γ(|S|) will be used regularly. Eventually we will consider a
+response and covariate vector measured at each location which will be denoted by y(si) and
+x(si) respectively. Finally, it will be necessary to make reference to partitioned location and
+response vectors which we denote by s⋆
+h = {si : i ∈Sh} and y⋆
+h = {y(si) : i ∈Sh}.
+2.2
+Spatial Clustering
+Before proceeding, we expound on the term “spatial cluster” and make its deﬁnition used in
+this paper concrete (for more discussion on the subject of spatial clusters see Lawson 2013,
+Chapter 6). Typically, clustering attempts to group or partition individuals or experimental
+units based on some measured response variable. Therefore, the resulting partition consists
+of clusters whose members are fairly homogenous with respect to the measured response.
+How cluster boundaries are deﬁned (e.g., elliptical, convex) is crucial to the resulting parti-
+tion and to our knowledge no universally agreed upon deﬁnition exists. When in addition
+to a measured response, the proximity of individuals or experimental units inﬂuences the
+partitioning of individuals, then we refer to these clusters as “spatial”.
+If spatial structure exists among the realizations of some response variable measured at
+various locations, then the values measured at locations near each other should be more
+similar than those that are far apart. However, this doesn’t exclude the possibility of two
+individuals far apart producing similar responses. Clustering in the absence of spatial infor-
+mation would group these two individuals together (as would be the case in a non-spatial
+PPM). From a spatial perspective it seems more natural that locations far from each other
+would not belong to the same cluster. That is, spatial clusters should be in some sense “lo-
+6
+
+cal” in that locations that belong to the same cluster should share a boundary for areal data
+(or comply with some other neighborhood structure) or attain a pre-determined minimum
+distance with other members of the cluster for geo-referenced data. We make this concrete
+with the following deﬁnition.
+Deﬁnition 2.1. Consider s⋆
+h corresponding to cluster Sh ⊂{1, . . . , n} and let d(·, ·) be a
+metric in the space of spatial coordinates. We say that cluster Sh is spatially connected if
+there does not exist si′ /∈s⋆
+h such that for all si, sj ∈s⋆
+h where sj ̸= si, d(si′, si) < d(sj, si).
+A partition will be called spatially connected if all of its clusters are spatially connected.
+Figure 2 provides four spatial plots of regular grids that assist in visualizing spatially
+connected clusters. The top left plot is an example of convex clusters that are connected
+while the top right plot contains connected clusters one of which is concave. The bottom left
+plot is an example of a partition that is not connected as the cluster of triangle points has
+been split by the cluster of square points. The bottom right plot is an example of clusters
+that are connected even though there exists a singleton island cluster.
+Our vision of spatial clusters does not necessarily partition the spatial domain into disjoint
+sets. Because clusters possibly depend on variables other than location, it is possible that
+two clusters exist in the same geographical region. The presence of these “stacked” clusters
+seems common and a perk of the methodology we develop.
+3
+Methodological Development
+We now detail spatial extensions to the basic PPM (here after referred to as sPPM) and
+investigate cluster membership probabilities.
+Also, we show that combining sPPM with
+likelihoods (that potentially include spatial information) produce marginal spatial structures
+with appealing properties (e.g., non-stationary) and balance local vs. global structure. As
+both cluster membership probabilities and correlations depend on the cohesion function we
+propose a few reasonable candidates.
+7
+
+Figure 2: Regular grids that provide an illustration of spatial connectedness. The top two
+ﬁgures display partitions that are spatially connected with the left demonstrating concave
+clusters and the right convex.
+The bottom left graph illustrates a partition that is not
+spatially connected as the green cluster is not spatially connected since it has been completely
+separated by the red. The partition in the bottom right ﬁgure is spatially connected even
+though there exists an island (singleton) cluster.
+8
+
+3.1
+Cohesion Functions
+Extending the PPM to incorporate spatial information requires making the cohesion of (2.1)
+a function of location. With this in mind, consider
+Pr(ρ) ∝
+kn
+Y
+h=1
+C(Sh, s⋆
+h),
+(3.1)
+which makes the clustering process location dependent. (This is structurally similar to Park
+and Dunson 2010’s approach to extending the PPM to incorporate covariates.) Deﬁning a
+cohesion function that only admits spatially connected partitions is conceptually straight-
+forward. For example, one could employ
+C(S, s⋆
+h) =
+(
+M × Γ(|S|)
+if S is spatially connected
+0
+otherwise,
+where M ×Γ(|S|) is used to favor a small number of large clusters with the number of clusters
+being regulated by M. A cohesion function deﬁned in this way places zero prior mass on
+partitions that are not spatially connected. Although this deﬁnition is intuitively appealing,
+it is particularly challenging to implement from a computational stand point and can only
+realistically be considered for a small number of locations. Therefore, we suggest considering
+cohesion functions that assign small probabilities to partitions with clusters that are not
+spatially connected. A nice feature of the sPPM is that there are many ways in which this
+can be carried out and we introduce four reasonable candidates. Subsequently, we study the
+spatial properties of each one.
+As we introduce the ﬁrst cohesion function keep in mind that our overarching goal is
+to develop a prior that favors spatially connected partitions without creating a bunch of
+singleton clusters. One way to carry this out is by employing tessellation ideas found in
+Denison and Holmes (2001) in that distances to a cluster centroid are considered. To this
+end, let ¯sh denote the centroid of cluster Sh and Dh = P
+i∈Sh d(si, ¯sh) the sum of all distances
+from the centroid (unless otherwise stated we use Euclidean norm ∥·∥). Deﬁning the cohesion
+as a decreasing function of Dh would certainly produce small local clusters. Unfortunately,
+cohesions that favor clusters with small Dh would also produce partitions with many singleton
+clusters. To counteract this, we make the cohesion a function of M × Γ(|Sh|) in addition
+to Dh. Now since Γ(|Sh|) would overwhelm Dh as cluster membership grows, we consider
+Γ(Dh)I[Dh ≥1] + DhI[Dh < 1]. (The partitioning of Dh’s domain was motivated by the fact
+9
+
+that the gamma function is not monotone on [0, 1] and does not tend to zero as Dh tends to
+zero). Finally, to provide a bit more control over the penalization of distances, we introduce
+a user supplied tuning parameter, α, resulting in the following cohesion function
+C1(Sh, s⋆
+h) =
+
+
+
+
+
+M × Γ(|Sh|)
+Γ(αDh)I[Dh ≥1] + (Dh)I[Dh < 1]
+if |Sh| > 1
+M
+if |Sh| = 1.
+(3.2)
+We set C1(Sh, s⋆
+h) = M for |Sh| = 1 to avoid issues associated with Dh = 0. Notice that since
+all s1, . . . , sn are distinct Dh = 0 ⇐⇒|Sh| = 1. Further, when |Sh| = 1, M × Γ(|Sh|) = M
+justifying in a sense setting the cohesion to M when |Sh| = 1.
+The second cohesion function we consider provides a hard cluster boundary and for some
+pre-speciﬁed a > 0 has the following form
+C2(Sh, s⋆
+h) = M × Γ(|Sh|) ×
+Y
+i,j∈Sh
+I[∥si −sj∥≤a].
+(3.3)
+Once again, M ×Γ(|Sh|) is included to inherit the “rich get richer” property of DP partition-
+ing. This cohesion is amenable to neighborhood structures of areal data modeling. Instead
+of I[d(si, sj) ≤a], one could use I[i ∼j] where i ∼j indicates that si and sj are neighbors
+according to some neighborhood structure. If a data dependent neighborhood structure is
+desired, one could introduce auxiliary variables in the cohesion and employ ideas similar to
+those found in Kang et al. (2014).
+sPPM under C1 and C2 produces a completely valid joint distribution over partitions
+that is quite general. In fact, since the cohesions are functions of not only |Sh| but also of
+s⋆
+h, sPPM relaxes exchangeability assumptions. However, for this same reason sPPM under
+C1 and C2 does not inherit the PPM (2.1)’s property of being coherent across sample sizes.
+That is, P(ρn) ̸= Pkn+1
+h=1 P(ρn, cn+1 = h). This is easily seen as the location of sn+1 inﬂuences
+P(ρn, cn+1 = j). Although this does not change the fact that the sPPM produces a valid
+joint distribution over partitions, for computational purposes it is sometimes desirable to
+have coherence across sample sizes. To retain this property one would need to “marginalize”
+over all possible locations. This was considered in detail in Müller et al. (2011) (and also
+mentioned in Park and Dunson 2010) when making a PPM covariate dependent. We employ
+ideas developed in Müller et al. (2011) in a spatial setting which produces the following
+10
+
+cohesion
+C3(Sh, s⋆
+h) = M × Γ(|Sh|) ×
+Z Y
+i∈Sh
+q(si|ξh)q(ξh)dξh.
+(3.4)
+In Bayesian modeling
+R Q
+i∈Sh q(si|ξh)q(ξh)dξh is often called the marginal likelihood or prior
+predictive distribution and is used to measure the similarity among the locations belonging to
+cluster h. Therefore, C3 favors partitioned location vectors (s⋆) that produce large marginal
+likelihood values. To simplify evaluating C3 and retain coherence across sample sizes, q(s|ξ)
+and q(ξ) are speciﬁed to form a conjugate probability model. We emphasize however that
+we are not assuming the si’s to be random, we are simply employing the conjugate model as
+a means to measure spatial proximity and encourage co-clustering of locations that are near
+each other. Both areal and point referenced data can be considered when C3 is employed, all
+that is required is specifying appropriate q(s|ξ) and q(ξ). For example, if point referenced
+data are available, a conjugate Gaussian/Gaussian-Inverse-Wishart model would be appro-
+priate. In this case ξ = (m, V ) would denote a mean and covariance, q(s|ξ) = N(s|m, V )
+a bivariate Gaussian density and q(ξ) = NIW(m, V |µ0, κ0, ν0, Λ0) a bivariate Normal-
+Inverse-Wishart density. For areal data a conjugate multinomial/Dirichlet model could be
+utilized. In what follows we focus on point reference case and will occasionally refer to C3
+as the auxiliary cohesion. Finally, as in the previous two cohesions, M × Γ(|Sh|) is included
+to avoid creating many singleton clusters.
+The fourth and ﬁnal cohesion that we consider is similar to what Quintana et al. (In
+press) call a “double dipper” cohesion. It has the same form as C3, but instead of employing
+a prior predictive conjugate model, a posterior predictive conjugate model is used. Therefore
+C4 has the following form
+C4(Sh, s⋆
+h) = M × Γ(|Sh|) ×
+Z Y
+i∈Sh
+q(si|ξh)q(ξh|s⋆
+h)dξh.
+(3.5)
+Since the posterior predictive is typically more peaked than the prior predictive, C4 puts
+more weight on partitions that are local. Once again both areal and point referenced data
+are possible, but in what follows we focus on point-referenced and use the following conjugate
+model: N2(si|mh, Vh)NIW(mh, Vh|s⋆
+h).
+Before proceeding we provide more detail regarding the role of the scale parameter (M) in
+sPPM. In Dirichlet process (DP) modeling M regulates the number of clusters and it is fairly
+well known that the expected number of clusters a priori under the DP induced probability
+11
+
+distribution on partitions is approximately M log[(M + n)/M]. Thus the number of clusters
+grows slowly as n increases which favors partitions with a small number of large clusters
+(rich get richer). This motivated its inclusion in the four cohesions (without it each cohesion
+would favor partitions with a large number of singletons). However, when M × Γ(|Sh|) is
+coupled with distance penalties, it is not clear how the number of expected clusters a priori
+grows as a function of M. We explore this using a small simulation study in the next section.
+3.2
+Cluster assignment probabilities
+To investigate how distance inﬂuences partition (cluster membership) probabilities we con-
+sider the very simple case of n = 2. In this context only two possible partitions exist: ({1, 2})
+and ({1}, {2}). Table 1 provides Pr(ρ = {1, 2}) for each of the cohesion functions along with
+the limiting probabilities as d(s1, s2) →0 and d(s1, s2) →∞. To simplify calculations, for
+the auxiliary and double dipping similarity functions we use µ0 = ¯sh, κ0 = 1, ν0 = 2, and
+Λ0 a diagonal matrix of dimension 2 and we will use S = P
+i∈Sh(si −¯sh)(si −¯sh)′.
+Table 1: Prior Partition Probabilities
+d(s1, s2) →0
+d(s1, s2) →∞
+Cohesion
+Pr({1, 2})
+Pr({1, 2})
+Pr({1, 2})
+C1(Sh, s⋆
+h)
+1
+1 + M{Γ(αDh)I[Dh ≥1] + DhI[Dh < 1]}
+1
+0
+C2(Sh, s⋆
+h)
+I[d(s1, s2) ≤a]
+I[d(s1, s2) ≤a] + M
+1
+1 + M
+0
+C3(Sh, s⋆
+h)
+1
+1 + 2M|Λ0 + S|3/2
+1
+1 + 2M
+0
+C4(Sh, s⋆
+h)
+81|Λ0 + S|2
+81|Λ0 + S|2 + 10M|Λ0 + 2S|3
+81
+81 + 10M
+0
+From Table 1 it can be seen that for all four cohesions the probability that both locations
+are members of the same cluster approaches zero as distance between the two locations
+increases (a quality that is desirable). However, only C1 displays the property that as distance
+between two locations decreases the probability of clustering the two locations approaches
+1. This limiting probability for the other three cohesion functions depends on M and other
+12
+
+tuning parameter choices. Of the three, for a ﬁxed M, Pr({1, 2}) increases as d(s1, s2) →0
+quickest for C4 and slowest for C2. To see this let M = 1 (common in DP modeling), then
+as d(s1, s2) →0, Pr({1, 2}) approaches 0.5 for C2, 0.72 for C3, and 0.89 for C4. A slightly
+more sophisticated example that further explores partition probabilities is provided in the
+Supplementary Material.
+Figure 3 displays pairwise probabilities of locations belonging to the same cluster for a
+10 × 10 regular grid. Since sPPM under cohesions 1 and 2 are not coherent across sample
+sizes, care must be taken when generating samples from the prior and we use self-normalized
+importance sampling (Robert and Casella 2009, chap 3) to appropriately reweight partitions
+drawn from the predictive distribution based on C1 and C2. M is set to 0.1 for C1 and C2
+and M = 1 for C3 and C4. For C2 we set a = 1.77 which is the median distance among all
+pairwise distances, and the tuning parameters associated with C1, C3 and C4 are those used
+previously. From Figure 3 it appears that C1 and C4 are similar in how distance penalizes
+cluster membership. C3 allows locations fairly far apart to have positive probability of being
+members of the same cluster. The cut-oﬀboundary for cluster membership associated with
+C2 is clearly shown.
+To better understand M’s inﬂuence on ρ’s cluster conﬁguration a priori, we ran a small
+simulation study by drawing 5000 partitions from the sPPM for each of the four cohesions.
+The spatial conﬁgurations are regular 10 × 10, 15 × 15 and 20 × 20 grids resulting in 100,
+225, and 400 spatial locations. (We also considered the spatial conﬁguration found in the
+application of Section 4.2 but results were similar and so are not provided.) The tuning
+parameters are set to the same values as used previously except that both α = 1, 2 are
+considered for C1. The results are provided in Table 2. Under the header E(kn) are listed
+the number of clusters in ρ averaged over the 5,000 prior draws, #sing denotes the number
+of singletons clusters and max |Sj| denotes the number of members in the largest cluster.
+Notice that setting a = 1.77 for C2 forces the sPPM to have at least 10 clusters. Also,
+as expected setting α = 2 results in C1 producing more clusters. The number of clusters
+associated with C1, C2, and C4 grow at a faster rate than M log((M +n)/M) while C3 grows
+at a slower rate. The number of singleton clusters is also very reasonable for M ≤1.
+3.3
+Modeling Spatial Structure via the Likelihood and Prior
+Given ρ, the sky’s the limit on how spatial dependence might be modeled via the likelihood.
+A completely valid modeling strategy would be to assume independent observations given ρ.
+In this case, all spatial dependence would originate from the spatial clustering produced by
+13
+
+C1
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+C2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+C3
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+C4
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Figure 3: Pairwise probability matrix of two locations belong to the same cluster for a 10×10
+regular grid. M = 0.1 for each cohesion
+14
+
+Table 2: Results from simulation study which drew 5,000 partitions from sPPM for each of
+the four cohesions.
+n = 100
+n = 225
+n = 400
+M
+Method
+E(kn)
+#sing
+max |Sj|
+E(kn)
+#sing
+max |Sj|
+E(kn)
+#sing
+max |Sj|
+10−5
+C1α=1
+1.00
+0.00
+100.00
+1.00
+0.00
+224.99
+1.01
+0.00
+399.99
+C1α=2
+3.91
+0.03
+37.06
+4.61
+0.01
+66.85
+4.98
+0.00
+106.92
+C2
+10.08
+0.82
+18.18
+11.63
+0.68
+39.11
+13.06
+0.64
+67.59
+C3
+1.00
+0.00
+100.00
+1.00
+0.00
+225.00
+1.00
+0.00
+400.00
+C4
+1.00
+0.00
+99.98
+1.00
+0.00
+224.99
+1.00
+0.00
+399.96
+10−4
+C1α=1
+1.01
+0.01
+99.96
+1.03
+0.02
+224.93
+3.00
+0.00
+345.00
+C1α=2
+4.58
+0.04
+31.04
+5.40
+0.00
+57.28
+7.00
+0.00
+80.02
+C2
+10.11
+0.81
+18.20
+11.65
+0.68
+39.13
+13.08
+0.64
+67.53
+C3
+1.00
+0.00
+99.99
+1.00
+0.00
+224.98
+1.00
+0.00
+399.92
+C4
+1.00
+0.00
+99.97
+1.00
+0.00
+224.90
+1.00
+0.00
+399.86
+10−3
+C1α=1
+1.16
+0.03
+99.37
+2.17
+0.00
+141.19
+2.77
+0.00
+227.96
+C1α=2
+5.50
+0.00
+25.76
+6.76
+0.00
+49.19
+8.08
+0.00
+68.10
+C2
+10.10
+0.82
+18.15
+11.65
+0.68
+39.15
+13.05
+0.64
+67.49
+C3
+1.00
+0.00
+99.93
+1.00
+0.00
+224.85
+1.01
+0.00
+399.52
+C4
+1.02
+0.00
+99.62
+1.02
+0.00
+224.00
+1.02
+0.00
+398.27
+10−2
+C1α=1
+3.00
+0.01
+55.99
+3.18
+0.00
+95.76
+3.00
+0.00
+151.00
+C1α=2
+8.43
+0.03
+20.62
+9.51
+0.02
+39.33
+12.93
+0.00
+53.83
+C2
+10.17
+0.84
+18.13
+11.72
+0.70
+39.10
+13.20
+0.65
+67.30
+C3
+1.04
+0.01
+99.22
+1.05
+0.01
+223.42
+1.05
+0.01
+396.73
+C4
+1.16
+0.01
+96.33
+1.17
+0.01
+217.12
+1.19
+0.01
+385.04
+10−1
+C1α=1
+5.91
+0.22
+30.66
+8.87
+0.00
+46.20
+8.50
+0.02
+83.57
+C1α=2
+14.12
+0.73
+13.78
+18.98
+0.63
+22.30
+25.03
+0.31
+32.20
+C2
+10.89
+1.00
+17.77
+12.69
+0.89
+38.15
+14.34
+0.85
+65.57
+C3
+1.42
+0.07
+92.84
+1.46
+0.07
+209.11
+1.51
+0.07
+370.28
+C4
+2.22
+0.10
+76.89
+2.40
+0.09
+171.75
+2.52
+0.10
+304.25
+100
+C1α=1
+14.96
+1.11
+14.24
+21.66
+0.63
+22.48
+31.03
+1.21
+31.20
+C1α=2
+26.50
+2.57
+7.85
+43.98
+3.27
+11.70
+54.80
+1.74
+16.78
+C2
+17.84
+3.19
+14.54
+22.31
+2.96
+30.38
+26.23
+3.00
+51.37
+C3
+4.27
+0.72
+62.99
+4.64
+0.70
+141.88
+5.01
+0.71
+249.55
+C4
+7.70
+0.97
+35.91
+9.17
+0.94
+76.42
+10.22
+0.96
+132.32
+101
+C1α=1
+36.51
+9.28
+7.06
+60.10
+9.61
+10.12
+85.77
+10.31
+13.30
+C1α=2
+52.34
+19.55
+4.46
+92.38
+19.91
+6.68
+137.61
+19.82
+7.87
+C2
+46.78
+21.86
+7.21
+70.16
+23.34
+13.27
+92.31
+24.77
+20.80
+C3
+18.83
+6.59
+25.10
+23.02
+6.80
+56.47
+25.86
+6.89
+99.96
+C4
+27.72
+8.93
+12.88
+37.99
+9.19
+25.10
+46.30
+9.33
+41.22
+15
+
+the sPPM. Alternatively, global spatial structure or cluster speciﬁc spatial structure may be
+included in the likelihood producing much richer marginal spatial structure.
+To explore spatial dependence further, we consider correlations among two observations
+as distance between them either increases to ∞or decreases to 0. This is done under a few
+likelihood models for each of the cohesions. Letting y = (y(s1), . . . , y(sn)), in the absence
+of spatial dependence in the likelihood, the basic model employed is
+f(y|ρ) =
+kn
+Y
+h=1
+fh(y⋆
+h)
+(3.6)
+Pr(ρ) ∝
+kn
+Y
+h=1
+C(Sh, s⋆
+h)
+With fh(y⋆
+h) =
+R Q
+i∈Sh f(y(si)|θ)dG0(θ) and f(·|θ) denoting the likelihood and G0 a prior
+on θ. Alternatively, the model can be written hierarchically using cluster labels c1, . . . , cn in
+the following way
+y(si) | θ, ci
+ind
+∼f(θ∗
+ci), for i = 1, . . . , n
+θ∗
+ℓ
+iid
+∼G0, for ℓ= 1, . . . , kn
+(3.7)
+with θ∗
+1, . . . , θ∗
+kn denoting cluster speciﬁc parameters so that θi = θ∗
+ci. In the spatial setting
+c1, . . . , cn are dependent multinomial latent variables with component probabilities derived
+from the sPPM.
+When spatial structure is included in the likelihood it is done hierarchically by way of
+introducing spatial random eﬀects, and models (3.6) and (3.7) will need to be adjusted
+accordingly. The spatial random eﬀects can be cluster speciﬁc or global. If covariates are
+available, their relationship to the response can also be modeled as being cluster speciﬁc
+(local) or not (global).
+To simplify calculations in what follows we consider a Gaussian
+likelihood by setting f(·|θ) = N(·|µ, σ2). Proofs to all Propositions are provided in the
+Appendix.
+3.3.1
+Covariances Under Local Regression
+Proposition 3.1 furnishes the correlation between two observations available from a model
+that incorporates spatial information in the prior only. Therefore, all spatial structure is
+completely produced by the sPPM.
+16
+
+Proposition 3.1. Let x(si) = xi and y(si) = yi denote a p-dimensional covariate vector
+and response at location si. Further, let β∗
+1, . . . , β∗
+kn denote cluster speciﬁc parameters such
+that β∗
+h
+iid
+∼N(µ, T ) and assume that ρ and {β∗
+h}kn
+h=1 are mutually independent. Then under
+likelihood
+yi|xi, ci, β∗, σ2 ∼N(x′
+iβ∗
+ci, σ2)
+(3.8)
+and a sPPM prior for ρ, the marginal correlation between two observations is
+corr(yi, yj) =
+x′
+iT xj
+px′
+jT xi + σ2px′
+jT xj + σ2Pr(ci = cj).
+(3.9)
+When x(si) = 1 for all i (i.e., no covariates are available) and β∗
+h
+iid
+∼N(µ, τ 2), (3.9) simpliﬁes
+to
+corr(yi, yj) =
+τ 2
+τ 2 + σ2Pr(ci = cj).
+(3.10)
+Remark 3.1. Recall that as d(si, sj) →∞, Pr(ci = cj) →0 and therefore corr(yi, yj) →
+0. However, corr(yi, yj) ̸→1 as d(si, sj) →0. Although this result does not agree with
+many spatial covariance functions, it does agree with models that include a nugget eﬀect.
+Additionally, from a clustering perspective it makes sense that locations allocated to same
+cluster are assigned the same parameter value, but not necessarily the same response value.
+To visualize (3.10) as a function of distance (d(s1, s2) = ∥s1 −s2∥), consider again the
+case of two locations.
+In Figure 4 we present correlations that are calculated by ﬁxing
+s1 = (0, 0) and moving s2 around in space. We set σ2 = 0.1 and τ 2 = 1 which produces
+1/1.1 ≈0.9 as the maximum correlation. For each cohesion we set M = 1 and use the same
+values for the tuning parameters that were used in Section 3.2. The hard boundary of C2 is
+evident as correlations produced by C2 are either zero or 0.5(1/1.1) ≈0.45. The correlations
+associated with the other three cohesions decrease more smoothly as distances between s1
+and s2 increase. It appears that correlations associated with C1 decay quicker as distance
+increases relative to C3 and C4. The correlations associated with C3 seem to be the most
+global in the sense that they decay slowly as a function of distance.
+In order to consider simultaneous movement between two observations, in Figure 5 s1, s2 ∈
+R (rather than s1, s2 ∈R2). Thus what is seen in Figure 5 are correlations associated with
+d(s1, s2) = |s1 −s2|. Once again the maximum correlation is 1/1.1. Just as in the previous
+17
+
+Figure 4: Correlations produced using (3.10) when two locations are considered. s1 is set to
+(0, 0) and s2 varies. The maximum correlation available is τ 2/(τ 2 +σ2) ≈0.91 with τ 2 = 1.0
+and σ2 = 0.1
+18
+
+−3
+−2
+−1
+0
+1
+2
+3
+C1
+0.0
+0.2
+0.4
+0.6
+0.8
+s2
+C2
+0.0
+0.2
+0.4
+0.6
+0.8
+−3
+−2
+−1
+0
+1
+2
+3
+−3
+−2
+−1
+0
+1
+2
+3
+C3
+0.0
+0.2
+0.4
+0.6
+0.8
+s2
+s1
+−3
+−2
+−1
+0
+1
+2
+3
+C4
+0.0
+0.2
+0.4
+0.6
+0.8
+s1
+Figure 5: Pairwise correlations calculated using (3.10) and distances |s1−s2|. The maximum
+correlation available is τ 2/(τ 2 + σ2) ≈0.91 with τ 2 = 1.0 and σ2 = 0.1
+19
+
+ﬁgure, C2’s hard boundary is evident and C1 displays the most extreme correlation values.
+However, perhaps more interesting is the fact that the spatial structures produced by C3
+and C4 appear to be non stationary and anisotropic as they are not constant in distance nor
+direction.
+3.3.2
+Correlations Under Local Regression and Global Spatial Structure
+Proposition 3.2 provides the correlation between two observations from a model containing
+local regression and global spatial structure.
+Proposition 3.2. Let xi, yi, and β∗
+1, . . . , β∗
+kn be as described in Proposition 3.1. Further, Let
+θ = [θ(s1), . . . , θ(sn)] ∼GP(0, λ2H(φ)) denote an n-dimensional vector of a spatial process
+where GP(0, λ2H(φ)) denotes a Gaussian process with covariance function H(φ) : R2×R2 →
+R parametrized by φ and assume that ρ, {β∗
+h}kn
+h=1, and θ are mutually independent. Then
+for likelihood
+yi | xi, θi, β∗, ci, σ2 ∼N(x′
+iβ∗
+ci + θi, σ2)
+(3.11)
+and sPPM for ρ, the marginal correlation between two observations is
+corr(yi, yj) =
+λ2(H(φ))i,j + x′
+jT xiPr(ci = cj)
+p
+x′
+iT xi + λ2 + σ2px′
+jT xj + λ2 + σ2.
+(3.12)
+When x(si) = 1 for all i (i.e., no covariates are available) and β∗
+h
+iid
+∼N(µ, τ 2), (3.12)
+simpliﬁes to
+corr(yi, yj) =
+λ2
+τ 2 + λ2 + σ2(H(φ))i,j +
+τ 2
+τ 2 + λ2 + σ2Pr(ci = cj).
+(3.13)
+Correlations are now a function of covariances from the GP and from spatial clustering.
+Notice that if the variability among cluster means (τ 2) is large relative to σ2 and λ2, then
+cluster probabilities will be extremely inﬂuential in marginal correlations. Consider once
+again the simple case of two spatial locations.
+In this scenario if d(s1, s2) →∞, then
+corr(y1, y2) →0. While as d(s1, s2) →0, then corr(y1, y2) →(λ2 + τ 2Pr(c1 = c2))/(λ2 +
+τ 2 + σ2). Thus modeling spatial partitions with the sPPM results in decreased correlation
+for locations that have small probability of being co-clustered and an increase for those that
+have high probability relative to GP type spatial structures.
+20
+
+3.3.3
+Covariances Under Global Regression and Local Spatial Structure
+Proposition 3.3 provides the correlation between two observations for a model with local
+covariance structure and global regression.
+Proposition 3.3. Let xi, yi be as described in Proposition 3.1. Further let β ∼N(µ, T )
+and θh = {θi : i ∈Sh} such that θh|λ2∗
+h , φ∗
+h ∼GP(0, λ2∗
+h H(φ∗
+h)). With out loss of generality
+order θ = (θ1, . . . , θkn) such that
+
+
+
+
+θ1
+...
+θkn
+
+
+
+∼Nn
+
+
+
+0,
+
+
+λ2∗
+1 H(φ∗
+1)
+· · ·
+0
+...
+...
+...
+0
+· · ·
+λ2∗
+knH(φ∗
+kn)
+
+
+
+
+
+.
+(3.14)
+If spatial random eﬀects (3.14) are combined with likelihood (3.11) and sPPM is employed to
+model ρ with ρ, β, and θ being mutually independent, then the marginal correlation between
+two observations is
+corr(yi, yj) =
+x′
+jT xi + cov∗(θi, θj)
+p
+σ2 + x′
+iT xi + var∗(θi)
+q
+σ2 + x′
+jT xj + var∗(θj)
+,
+(3.15)
+where cov∗(θi, θj) = Pkn
+h=1 λ2∗
+h (H(φ∗
+h))i,jPr(ci = cj = h) and var∗(θi) = Pkn
+h=1 τ 2∗
+h Pr(ci = h).
+When x(si) = 1 for all i (i.e., no covariates are available) and β ∼N(µ, τ 2), then (3.15)
+simpliﬁes to
+corr(yi, yj) =
+τ 2 + cov∗(θi, θj)
+p
+σ2 + τ 2 + var∗(θi)
+p
+σ2 + τ 2 + var∗(θj)
+.
+(3.16)
+It is interesting to note that covariances are weighted averages of all cluster speciﬁc
+covariances with weights depending on distance. This type of spatial correlation structure
+is clearly nonstationary and nonisotropic.
+4
+Simulation Study and Examples
+Except for very speciﬁc examples, the discussion to this point has been fairly generic with the
+idea of explaining diﬀerent modeling approaches under a general framework. Now we pro-
+vide more concrete illustrations by way of a small simulation study and a Chilean education
+application (with additional simulations and applications are provided in the Supplementary
+21
+
+Material). The simulation studies and applications will require making some speciﬁc mod-
+eling assumptions but still within the general class of models thus far presented. To make
+methods invariant to scale of location, in the simulations and applications that follow we
+standardize s1, . . . , sn to have mean zero and unit variance. Fitting the models that will be
+described is a straightforward MCMC exercise. The algorithm we employ is based on Neal
+(2000)’s algorithm number 8 and details are provided in the Supplementary Material.
+4.1
+Simulation Study
+We conduct a small simulation study to explore sPPM’s ability to recover partitions, make
+predictions and assess its goodness-of-ﬁt performance. This is done by specifying the follow-
+ing model
+y(si)|x(si), ci, µ∗
+ci(si), σ2 ind
+∼N(µ∗
+ci(si) + x(si)β, σ2), σ ∼UN(0, 10), β ∼N(0, 102)
+(4.1)
+µ∗
+h(si)
+iid
+∼N(µ0, σ2
+0) for h = 1, . . . , kn and µ0 ∼N(0, 102), σ0 ∼UN(0, 10)
+{ci}n
+i=1 ∼sPPM.
+Here after this procedure will be referred to as the Conditional Model with Prior Spatial
+Structure (CPS). To the CPS we compare the spatial stick breaking (SSB) process found in
+Reich and Fuentes (2007) and a common spatial regression model (SR). More precisely,
+1. The SR model refers to y(si)|x(si), β, θ(si) ∼N(x′(si)β + θ(si), σ2) with x′(si) =
+(1, x(si)), β = (β0, β1) ∼N2(0, 102I),
+[θ(s1), . . . , θ(sn)] ∼GP(0, λ2H(φ)), and σ2 ∼
+IG(a, b).
+2. Given cluster labels {ci}n
+i=1, SSB can be expressed as y(si)|x(si), ci, µ∗
+ci(si), σ2 ∼N(µ∗
+ci(si)+
+x(si)β, σ2) where ci ∼Categorical(p1(si), . . . , pm(si)) with pj(s) = wj(s)Vj
+Q
+k<j[1 −
+wk(s)Vk] for Vj
+iid
+∼beta(1, M). The wj(s) are location weighted kernels that intro-
+duce spatial dependence in the model (we always use a Gaussian kernel).
+Lastly,
+µ∗
+h(si)
+iid
+∼N(µ0, σ2
+0) for h = 1, . . . , kn and µ0 ∼N(0, 102), σ0 ∼UN(0, 10).
+For the CPS we consider the four cohesions. For C1 we set α = 1 and α = 2 and use the
+same tuning parameter values as in Section 3.2 for the other three cohesions functions.
+The SSB is included because it is operationally very similar to the sPPM and was ﬁt
+using the R function provided by Reich and Fuentes (2007). Since the function only admits
+models that don’t include likelihood spatial structure, to make comparisons valid, we do not
+22
+
+incorporate spatial structure in (4.1). The spBayes package in R (Finley and Banerjee 2013)
+was used to ﬁt the SR model.
+We considered the following four factors.
+1. number of clusters (1, 4)
+2. distribution of ϵi (N(0, σ2) and 0.5N(0, σ2) + 0.5N(1, σ2) with σ2 = 0.1)
+3. value of M
+4. shapes of clusters (square, random)
+The ﬁrst factor was considered to assess clustering accuracy. Note the the sPPM and SSB will
+by deﬁnition create spatially referenced clusters, so we don’t expect high clustering accuracy
+when the number of clusters is 1. But including this level will allow us to assess the CPS
+when the true data generating mechanism is much simpler. Factors 2 and 3 are included to
+assess robustness of predictions and of goodness-of-ﬁt against possible model perturbations.
+Factor 3 will only inﬂuence CPS and is included to investigate how calibrating sPPM is
+cohesion dependent.
+To create synthetic data we employed the following as a data generating mechanism
+y(si) = µ∗
+ci(si) + x(si)β + θ(si) + ϵ(si)
+θ = [θ(s1), . . . , θ(sn)] ∼GP(0, τ 2H(φ)).
+An exponential covariance function with τ 2 = 2 and φ = 6 was used to create H(φ).
+Locations (s1, . . . , sn) were generated in two ways. The ﬁrst method set si
+iid
+∼UN(0, 1) ×
+UN(0, 1) with clusters being created by partitioning the R2 simplex into four equal area
+squares and assigning si accordingly. For the second method we set si
+iid
+∼P4
+k=1 0.25N(m, s2).
+The MixSim R function (see Melnykov et al. 2012) was employed to generate locations from
+the mixture. For data containing four clusters, values of the cluster speciﬁc intercepts were
+µ∗= (0, 1, −1, −2). We set β = 1 for all data sets and used UN(0, 10) to generate x values.
+To obtain of point estimates for ρ we employed the least squares procedure proposed in Dahl
+(2006).
+For each combination of factor levels D = 100 data sets containing 100 training and 100
+testing observations were generated. For each data set, the SSB, SR and sPPM procedures
+were ﬁt to data by collecting 1000 MCMC iterates after discarding the ﬁrst 1000. Results
+for M = 0.01, M = 0.1, and M = 1.0 are presented in tabular form and can be found in
+Tables 3 and 4 (results for other values of M are provided in the Supplementary Materials
+ﬁle). The columns of both tables correspond to the following
+23
+
+• RAND: represents the adjusted Rand index which measures proximity of estimated
+partition to the true partition. An adjusted Rand index close to 1 indicates a good
+match between estimated and true partition. The values found in the Table 3 are the
+adjusted Rand index averaged over the D = 100 data sets.
+• MSPE: represents the mean squared prediction error deﬁned as
+1
+100
+P100
+i=1(Yp(sdi) −
+ˆYp(sdi))2 where i indexes the 100 testing observations (Yp(s)) and ˆYp(sid) = E(Yp(sdi)|Y (s)).
+This quantity measures the predictive performance of the models. The values found in
+Tables 3 and 4 are the MSPE averaged over the 100 data sets.
+• LPML: represents the log pseudo marginal likelihood which is a goodness-of-ﬁt metric
+(see Christensen et al. 2011) that takes into account model complexity. The values in
+the two tables are average LPML over the 100 data sets.
+Table 3 provides results for data that contain four clusters. First notice that for C1 the
+model ﬁt associated with CPS declines as M decreases, but prediction accuracy and Rand
+index values improve. This indicates that M must be small for C1 or CPS tends to overﬁt
+by creating many clusters. For C3 it appears that the opposite is true. Setting α = 2 for C1
+seems to reduce overﬁtting as model ﬁt is slightly worse but out of sample prediction greatly
+improves. It seems like C4 is the best at making accurate predictions regardless of the value
+of M, but selecting an appropriate M is clearly cohesion dependent (something we explore
+more in the Supplementary Material). Interestingly CPS (and SSB) predict slightly better
+when error is a mixture and clusters are not regular. All that said, perhaps the main take
+home message is that CPS produces more accurate predictions and better data ﬁt relative
+to SSB and SR for almost all data generating scenarios and cohesions.
+Table 4 provides results for data with no clusters. Notice that we do not report the
+Rand index in this scenario as the CPS and SSB by construction create clusters. Because
+of this, as expected, the one cluster partition is not recovered well. That said, this scenario
+allows us to assess over-ﬁt properties as the data structure is much simpler. It turns out that
+the model ﬁts associated with data that contain no clusters are similar to those produced
+with data contained four clusters. However, the MSPE values are slightly better (which was
+expected). Generally speaking, it appears that CPS continues to perform well relative to
+SSB for each of the cohesions and SR (it is a bit surprising that SR does not perform much
+better).
+24
+
+Table 3:
+Simulation study results when data are generated with four clusters.
+M = 1.0
+M = 0.1
+M = 0.01
+Error
+Cluster
+Method
+RAND
+LPML
+MSPE
+RAND
+LPML
+MSPE
+RAND
+LPML
+MSPE
+Gaussian
+Square
+CPS C1α=1
+0.05
+-169.73
+2.75
+0.09
+-172.61
+2.45
+0.16
+-178.07
+2.43
+CPS C1α=2
+0.06
+-183.36
+2.47
+0.12
+-179.09
+2.40
+0.18
+-180.24
+2.26
+CPS C2
+0.16
+-183.49
+2.34
+0.37
+-182.49
+2.24
+0.49
+-182.78
+2.32
+CPS C3
+0.52
+-183.21
+2.37
+0.50
+-184.24
+2.28
+0.43
+-184.09
+2.41
+CPS C4
+0.29
+-179.39
+2.29
+0.51
+-180.74
+2.18
+0.59
+-181.58
+2.27
+SSB
+0.15
+-189.46
+3.50
+0.16
+-190.22
+3.37
+0.13
+-189.45
+3.39
+SR
+-
+-2669.12
+22.27
+-
+-2501.09
+21.93
+-
+-2804.15
+22.02
+Irregular
+CPS C1α=1
+0.07
+-166.78
+2.55
+0.14
+-173.83
+2.39
+0.27
+-176.76
+2.28
+CPS C1α=2
+0.09
+-176.04
+2.42
+0.17
+-175.51
+2.16
+0.28
+-177.87
+2.11
+CPS C2
+0.25
+-183.70
+2.35
+0.46
+-183.52
+2.30
+0.52
+-183.28
+2.32
+CPS C3
+0.64
+-181.00
+2.24
+0.58
+-183.06
+2.33
+0.57
+-182.55
+2.30
+CPS C4
+0.63
+-176.68
+2.07
+0.73
+-178.89
+2.13
+0.74
+-178.99
+2.09
+SSB
+0.20
+-183.92
+2.91
+0.17
+-183.73
+2.86
+0.19
+-184.44
+2.87
+SR
+-
+-2460.53
+21.04
+-
+-2267.52
+21.62
+-
+-2632.71
+21.36
+Mixture
+Square
+CPS C1α=1
+0.05
+-169.89
+2.62
+0.09
+-172.04
+2.43
+0.16
+-176.90
+2.36
+CPS C1α=2
+0.06
+-179.92
+2.54
+0.11
+-179.26
+2.36
+0.19
+-178.36
+2.18
+CPS C2
+0.16
+-183.50
+2.27
+0.36
+-181.42
+2.24
+0.47
+-182.74
+2.28
+CPS C3
+0.52
+-183.27
+2.25
+0.47
+-183.02
+2.29
+0.43
+-184.64
+2.35
+CPS C4
+0.29
+-179.05
+2.18
+0.50
+-179.88
+2.18
+0.57
+-181.92
+2.21
+SSB
+0.16
+-189.17
+3.36
+0.16
+-189.33
+3.40
+0.15
+-188.22
+3.35
+SR
+-
+-2320.54
+22.40
+-
+-2383.69
+22.17
+-
+-2400.44
+21.91
+Irregular
+CPS C1α=1
+0.07
+-170.99
+2.61
+0.17
+-176.83
+2.46
+0.27
+-176.37
+2.27
+CPS C1α=2
+0.10
+-179.31
+2.40
+0.18
+-176.41
+2.29
+0.29
+-176.05
+2.20
+CPS C2
+0.22
+-185.50
+2.48
+0.46
+-184.50
+2.41
+0.54
+-182.95
+2.30
+CPS C3
+0.60
+-183.57
+2.33
+0.56
+-184.98
+2.36
+0.58
+-182.77
+2.27
+CPS C4
+0.61
+-178.93
+2.14
+0.72
+-180.52
+2.13
+0.77
+-178.58
+2.07
+SSB
+0.18
+-184.78
+3.01
+0.19
+-185.32
+2.98
+0.19
+-184.24
+2.96
+SR
+-
+-2445.62
+21.61
+-
+-2412.06
+21.67
+-
+-2420.39
+21.71
+25
+
+Table 4:
+Simulation study results when data are generated with one cluster.
+M = 1.0
+M = 0.1
+M = 0.01
+Error
+Cluster
+Method
+LPML
+MSPE
+LPML
+MSPE
+LPML
+MSPE
+Gaussian
+Square
+CPS C1α=1
+-168.99
+2.06
+-172.97
+2.09
+-174.82
+2.08
+CPS C1α=2
+-171.94
+2.01
+-173.14
+1.96
+-172.66
+1.92
+CPS C2
+-176.97
+2.02
+-177.12
+2.07
+-177.98
+2.06
+CPS C3
+-178.06
+2.07
+-178.77
+2.12
+-179.18
+2.15
+CPS C4
+-175.33
+2.01
+-176.70
+2.05
+-178.15
+2.07
+SSB
+-175.18
+2.10
+-176.30
+2.13
+-176.49
+2.14
+SR
+-2275.31
+19.99
+-2803.85
+19.59
+-2504.16
+20.11
+Irregular
+CPS C1α=1
+-165.90
+1.98
+-170.31
+1.96
+-174.71
+1.95
+CPS C1α=2
+-168.86
+1.88
+-169.64
+1.85
+-170.12
+1.76
+CPS C2
+-175.76
+1.96
+-174.65
+1.95
+-176.82
+1.95
+CPS C3
+-176.33
+1.98
+-175.54
+1.99
+-177.61
+2.01
+CPS C4
+-173.47
+1.89
+-173.52
+1.94
+-176.12
+1.95
+SSB
+-175.12
+2.06
+-174.91
+2.07
+-175.11
+2.07
+SR
+-1913.70
+19.58
+-1902.62
+20.13
+-2115.85
+19.77
+Mixture
+Square
+CPS C1α=1
+-172.31
+2.14
+-172.95
+2.08
+-176.83
+2.01
+CPS C1α=2
+-179.92
+2.00
+-179.26
+2.04
+-178.36
+1.97
+CPS C2
+-178.38
+2.11
+-177.22
+2.04
+-178.46
+1.99
+CPS C3
+-179.00
+2.15
+-178.31
+2.12
+-179.95
+2.06
+CPS C4
+-177.00
+2.07
+-176.30
+2.02
+-178.80
+1.99
+SSB
+-177.51
+2.21
+-176.22
+2.17
+-177.21
+2.10
+SR
+-2470.62
+19.47
+-2776.41
+19.97
+-2532.80
+19.16
+Irregular
+CPS C1α=1
+-168.59
+2.00
+-167.94
+1.90
+-172.75
+1.96
+CPS C1α=2
+-168.61
+1.84
+-168.21
+1.84
+-170.23
+1.81
+CPS C2
+-175.51
+1.98
+-173.57
+1.90
+-175.64
+1.98
+CPS C3
+-176.13
+2.00
+-174.25
+1.94
+-176.14
+2.01
+CPS C4
+-173.75
+1.93
+-172.53
+1.88
+-175.09
+1.97
+SSB
+-175.18
+2.12
+-173.83
+2.02
+-175.20
+2.08
+SR
+-2040.83
+19.94
+-2291.49
+19.47
+-1847.70
+20.25
+26
+
+4.2
+Application: Chilean Standardized Testing
+Over the past 25 years Chile’s Ministry of Education has established a national large-scale
+standardized test called SIMCE (Sistema de Medición de la Calidad de la Educación, System
+Measurement of Quality of Education). It was introduced during the later part of the 80’s
+and since then has continually grown in scope and scale and is now a key component of
+Chilean educational policies (Meckes and Carrasco 2010; Manzi and Preiss 2013). During
+the early part of the 80’s education was privatized in Chile aﬀording parents a great deal of
+ﬂexibility when deciding to which school to send their children. One of the purported roles
+of SIMCE is to aid parents in making this decision. In addition to administrating the exam
+other socio-economic variables are recorded. Among them is mother’s education level which
+is known to inﬂuence individual SIMCE scores. Therefore, we include mother’s education as
+a covariate in modeling.
+We brieﬂy note that accommodating spatial dependence in education studies has only
+very recently been considered. In fact, the one article we found is Neelon et al. (2014).
+They explore regional diﬀerences in end of grade test scores in North Carolina using county
+level data. This was done by modeling reading and math scores jointly through a fairly
+sophisticated joint conditional autoregressive model.
+Figure 6: Spatial plots of SIMCE math scores and mother education level. The left ﬁgure
+corresponds with average SIMCE math scores, while the right average mothers education
+level.
+27
+
+We were given access to individual 2011 SIMCE 4th grade math scores. To simplify
+the analysis, instead of analyzing individual test scores and mother’s education level, we
+compute school-wide averages for both variables. The longitude and latitude of each school
+was recorded and we focus only on those schools that are located in the greater Santiago
+area (which produced 1215 schools). Figure 6 provides a spatial plot for both SIMCE and
+mother’s education values. Notice that schools in the north east part of the city tend to
+have higher SIMCE scores than those in the south and west. Mother’s education level also
+varies spatially with lower levels generally appearing in the west and south of Santiago.
+An exploratory analysis was performed to investigate spatial structures in the SIMCE data
+results of which are provided in the Supplementary Material.
+To demonstrate the ﬂexibility of pairing the sPPM with a variety of likelihoods, in what
+follows we detail and compare three reasonable models that could be proposed for the SIMCE
+data. In each case, SIMCE scores and mother’s education are standardized to have mean
+zero and unit standard deviation and the proposed model was ﬁt to data by collecting 1000
+MCMC iterates after discarding the ﬁrst 10,000 as burn-in and thinning by 20. Convergence
+was monitored graphically. The MCMC chains mixed reasonably well and converged quickly.
+To assess out of sample prediction, we divided the 1215 schools into 600 training obser-
+vations and 615 testing observations. This partitioning of the data also facilitated a cross-
+validations study (see Supplementary Material) that in addition to information gleaned from
+the simulation study resulted in setting M equal to 5 × 10−5, 0.1, 1.0, and 0.5 for cohesions
+1-4 respectively. For C1 both α = 1 and α = 2 were considered, but only results from α = 1
+are reported as α = 2 produced very similar ﬁts. The tuning parameters associated with
+other cohesions are those employed previously.
+4.2.1
+Conditional Model
+In order to compare ﬁts and predictions associated with sPPM to those of SSB, our ﬁrst
+modeling approach is to model SIMCE scores conditional on mother education level with
+spatial structure in the prior only. This model corresponds to the CPS model of Section 4.1.
+To compare model ﬁt we once again employ LPML (see Christensen et al. 2011), but now
+also include MSE = 1
+n
+P
+i=1(y(si) −ˆy(si))2 and the Watanabe-Akaike information criterion
+(WAIC) which is a fairly new hierarchical model selection metric advocated in Gelman et al.
+(2014).
+The MSPE associated with the 615 testing observations is also provided under
+the “MSPE” column of Table 5. Excluding C3, it appears that CPS ﬁts the data better
+than SSB. Additionally, CPS appears to make more accurate predictions compared to SSB
+28
+
+with C4 producing the most accurate. CPS with C1 clearly ﬁts the data best and produces
+competitive predictions.
+Table 5: Model ﬁt comparisons associated with SIMCE test score data for sPPM and SSB
+Procedure
+WAIC
+LPML
+MSE
+MSPE
+CPS C1
+2113.64
+-1314.21
+0.12
+0.533
+CPS C2
+2420.56
+-1358.97
+0.21
+0.535
+CPS C3
+2739.73
+-1364.31
+0.48
+0.538
+CPS C4
+2706.71
+-1361.58
+0.40
+0.516
+SSB
+2733.40
+-1387.91
+0.48
+0.536
+For the CPS procedure predicting an average SIMCE score for a completely new school
+requires knowing the new school’s location and mother’s education level. One approach would
+be to discretize mother’s education into, say, three levels and create a predictive map for
+each one. An alternative approach would be to ﬁrst predict mother’s education level for the
+new school, then use the predicted mother’s education level as covariate to predict SIMCE.
+Using the later approach, the 600 training observations, and a regular grid of locations that
+belonged to the convex hull created by the observed school locations, we predict SIMCE
+scores by ﬁrst predicting mother’s education level using a model similar to CPS but free of
+covariates. (i.e., z(si)|ρ, µ∗, σ2 ∼N(µ∗
+ci(si), σ2) where z(si) denotes mother’s education level
+at the ith new school.) The predictive map of mother’s education values and SIMCE scores
+is provided in Figure 7 (we only report predictions from C1 as the others were similar). The
+predicted values of mother’s education level and SIMCE math scores are completely plausible
+and the resulting spatial structure follows the general social-economic spatial distribution
+that is known to exist in Santiago.
+4.2.2
+Joint Model
+Making predictions with the previous model is somewhat awkward as mother’s education
+needs to be either ﬁxed or predicted using a completely diﬀerent model. A more natural
+and coherent modeling approach for this application would be to model SIMCE scores and
+mother’s eduction jointly as both could be thought of as random quantities. To demonstrate
+ﬂexibility in which sPPM can be incorporated in modeling and because comparisons to the
+SSB are not available for the joint model, we include spatial structure in the likelihood which
+amounts to using a simple coregionalization model (Banerjee et al. 2014, Chapter 9). Now let
+29
+
+−33.6
+−33.5
+−33.4
+−33.3
+−70.8
+−70.7
+−70.6
+−70.5
+Longitude
+Latitude
+10.5
+11.0
+11.5
+12.0
+12.5
+Mother's Education Predictions
+−33.6
+−33.5
+−33.4
+−33.3
+−70.8
+−70.7
+−70.6
+−70.5
+Longitude
+Latitude
+330
+340
+350
+360
+SIMCE prediction
+Figure 7: Predictive maps for mother’s education and SIMCE scores. The predicted mother’s
+education levels were used to predict SIMCE
+y(si) = [y1(si), y2(si)]′ denote the ith school’s average SIMCE score and mother’s education
+level and consider the following data model
+y(si) = µ∗
+ci(si) + θ(si) + ϵ(si),
+i = 1, . . . , n,
+(4.2)
+where µ∗
+ci(si) = [µ∗
+1ci(si), µ∗
+2ci(si)]′ is a cluster speciﬁc 2-dimensional intercept vector whose
+spatial structure is guided through a sPPM prior, θ(si) = (θ1(si), θ2(si))′ is a two-dimensional
+intercept whose spatial structure is directly incorporated into the likelihood in a manner that
+will be described shortly, and ϵ(si) ∼N2(0, Σ) is an error term. Σ contains dependence
+structure between SIMCE and mother’s education with variances denoted by σ2
+1 and σ2
+2 and
+covariance σ12 = ησ1σ2. For h = 1, . . . , kn we assume µ∗
+h(si)
+iid
+∼N2(µ0, T ). To address
+spatial structure for each variable and the dependence that may exist between these two
+spatial processes, instead of modeling θ(si) and θ2(si) directly with a Gaussian process we
+instead introduce (˜θj(s1), ˜θj(s2), . . . , ˜θj(sn)) ∼GP(0, Cj) independently for j = 1, 2 and set
+ 
+θ1(si)
+θ2(si)
+!
+= A
+ ˜θ1(si)
+˜θ2(si)
+!
+where A =
+ 
+1
+γ
+γ
+1
+!
+,
+30
+
+for γ ∈(0, 1). Cj of the Gaussian process denotes a valid covariance matrix constructed
+using an exponential covariance function.
+Thus, the (ℓ, ℓ′)th entry of (Cj) is (Cj)ℓ,ℓ′ =
+τ 2
+j exp{−φj∥sℓ−sℓ′∥}. Prior distributions employed are τ 2
+j ∼Gamma(1, 1), φj ∼UN(0.5, 30)
+(this implies a UN(0.1, 6) for eﬀective range), µ0 ∼N2(0, 102I), T ∼IW(2, I), and
+Σ ∼IW(2, I).
+We use IW(ν, Λ) to denote an inverse Wishart distribution with scale
+and matrix parameters ν and Λ.
+Under this model prediction of the SIMCE math score for a new school located at s0 is
+easily made via y1(s0)|y2(s0) which has the following form
+y1(s0)|y2(s0) ∼N
+ β∗
+0c0(s0) + β∗
+1y2(s0), σ2
+1(1 −η2)
+
+,
+with β∗
+1 = η σ1
+σ2 and β∗
+0c0(si) = µ∗
+1c0 + θ1(s0) −β∗
+1[µ∗
+2c0 + θ2(s0)].
+For this procedure to be useful, predictions of µ∗
+1c0, µ∗
+2c0, θ1(s0), θ2(s0), and y2(s0) are
+needed. Values for µ∗
+1 and µ∗
+2 are readily available once c0 is classiﬁed by way of the predic-
+tive distribution found Section 2 of the Supplementary Material (equation S.1). Values for
+[θ1(s0), θ2(s0)] are obtained by ﬁrst predicting [˜θ1(s0), ˜θ2(s0)] from ˜θ1(s0)|˜θ1(s1), . . . , ˜θ1(sn)
+and ˜θ2(s0)|˜θ2(s1), . . . , ˜θ2(sn) independently and then setting [θ1(s0), θ2(s0)]′ = A[˜θ1(s0), ˜θ2(s0)]′.
+Finally, using the fact that y2(s0) ∼N(µ∗
+2c0 + θ2(s0), σ2
+2) a prediction for y2(s0) is easily ob-
+tained. We will refer to the procedure just described as the Joint model with Likelihood
+Spatial Structure (JLS) model.
+JLS can become computationally expensive as the number of schools grows. Incorpo-
+rating spatial information solely in the prior would radically reduce computation time, but
+potentially at the cost of model ﬁt. To investigate this trade oﬀ, we also consider
+y(si)|µ∗, ci
+ind
+∼N2(µ∗
+ci(si), Σ) for i = 1, . . . , n and Σ ∼IW(2, I)
+µ∗
+h|µ0, T
+iid
+∼N2(µ0, T ) with T ∼IW(2, I)
+µ0 ∼N2(0, 102I)
+{ci}n
+i=1 ∼sPPM.
+As in the JLS, predictions at location s0 are also easily made via E[y1(s0)|y2(s0)] = µ∗
+1c0(s0)+
+η σ1
+σ2[y2(s0) −µ∗
+2c0(s0)]. Values for µ∗
+1c0(s0), µ∗
+2c0(s0), and y2(s0) are gathered using the pro-
+cedure described for JLS. We will refer to this model as the Joint model with Prior Spatial
+Structure (JPS).
+Using the same M values as in Section 4.2.1 we ﬁt JLS and JPS to the training data and
+31
+
+Table 6: Model ﬁt comparisons for the JPS and JLS models ﬁt to the SIMCE education
+data set.
+Procedure
+WAIC
+LPML
+MSE
+MSPE
+Clusters
+Time
+JPS C1
+2312.503
+-1383.301
+0.380
+0.586
+35.767
+2154
+JPS C2
+2569.589
+-1438.750
+0.415
+0.590
+34.746
+4621
+JPS C3
+2778.803
+-1447.872
+0.482
+0.591
+8.921
+598
+JPS C4
+2552.333
+-1399.899
+0.433
+0.600
+26.750
+1090
+JLS C1
+2047.319
+-1291.011
+0.244
+0.574
+34.992
+38017
+JLS C2
+2266.945
+-1342.172
+0.258
+0.569
+34.249
+41022
+JLS C3
+2553.984
+-1376.176
+0.365
+0.573
+6.789
+38538
+JLS C4
+2273.479
+-1331.949
+0.334
+0.606
+26.952
+37565
+carried out prediction using the same grid of points and the testing data. Comparisons of
+the two joint models regarding model ﬁt and computation time are provided in Table 6. The
+column “Clusters” is the expected number of clusters a posteriori and “Time” is the amount
+of computing time required to ﬁt models (measured in seconds). MSPE is associated with
+the 600 testing observations. As expected ﬁts using JLS are much better for all cohesion
+functions but at a substantial computational cost. However, JPS out of sample predictions
+are fairly competitive to those from JLS and may be considered if a timely answer is needed.
+Maps associated with predictions made using JPS and JLS are provided in Figures 8
+and 9.
+For JPS the four cohesions produce fairly diﬀerent predictive surfaces, while for
+JLS the surfaces are very similar among the four cohesions. This illustrates that including
+spatial structure in the likelihood greatly impacts the predictive maps. For both procedures,
+the predictive maps identify the same general areas that contain higher SIMCE scores, but
+changes in SIMCE scores as a function of space are far more pronounced for JLS. This may
+be indicating that predictions are more local for JLS relative to JPS.
+5
+Conclusions
+We have proposed a general procedure that extends PPMs to a spatial setting providing a
+mechanism to directly model the partitioning of locations into spatially dependent clusters.
+This mechanism in turn provides a means to introducing sophisticated spatial structures
+in modeling in a straightforward fashion.
+The cohesion function of the sPPM aﬀords a
+32
+
+Figure 8: Predictive maps associated with JPS for each of the four cohesion functions
+33
+
+Figure 9: Predictive maps associated with JLS for each of the four cohesion functions
+34
+
+great deal of ﬂexibility regarding the type of spatial clusters available and the four that
+we have proposed are certainly not exhaustive.
+Other functions can be developed that
+produce diﬀerent types of spatial structures. The simulation study and application showed
+that the methodology is particularly well suited for predictions and the fact that spatial
+information can be incorporated in the prior and likelihood allows for added ﬂexibility in
+how spatial structure is modeled, providing the added beneﬁt of capturing local structure.
+Exactly how to join local spatial structure so that global maps are smooth and continuous
+(if so desired) is a topic of ongoing research. Although not explicitly considered, including
+covariate information in the clustering mechanism in addition to spatial information should
+be a natural extension of work developed in Müller et al. (2011).
+Acknowledgements
+The ﬁrst author was partially funded by grant FONDECYT 11121131 and the second author
+was partially funded by grant FONDECYT 1141057. The authors thank Carolina Flores for
+granting access to the Chilean education data whose collection was partially funded by
+the ANILLO Project SOC 1107 Statistics for Public Policy in Education from the Chilean
+Government.
+Appendices
+A
+Marginal Correlation Proof
+We provide a detailed proof of Proposition 3.2 and 3.3. The proof of Proposition 3.1 follows
+very similar arguments.
+35
+
+A.1
+Proof of Proposition 2
+Proof. From the law of total covariance
+cov(yi, yj) = covρ,β,θ[E(yi|ρ, β, θ), E(yj|ρ, β, θ)] + Eρ,β,θ[cov(yi, yj, |ρ, β, θ)]
+= Eρ,β,θ[(x′
+iβ∗
+ci + θi)(x′
+iβ∗
+ci + θi)] −Eρ,β,θ[x′
+iβ∗
+ci + θi]Eρ,β,θ[x′
+iβ∗
+ci + θi] + 0
+= Eρ,β,θ[(x′
+iβ∗
+ci)(x′
+jβ∗
+cj) + (x′
+iβ∗
+ci)θj + θi(x′
+jβ∗
+cj) + θiθi] −Eρ,β[x′
+iβ∗
+ci]Eρ,β[x′
+iβ∗
+ci]
+= Eρ,β[(x′
+iβ∗
+ci)(x′
+jβ∗
+cj)] + Eθ[θiθi] −Eρ,β[x′
+iβ∗
+ci]Eρ,β[x′
+iβ∗
+ci]
+=
+X
+ρ
+Eβ[tr{β∗
+cixix′
+jβ∗
+cj}]Pr(ρ) −
+ X
+ρ
+Eβ[x′
+iβ∗
+ci]Pr(ρ)
+!  X
+ρ
+Eβ[x′
+jβ∗
+cj]Pr(ρ)
+!
++ cov(θi, θj)
+=
+X
+ρ
+Eβ[tr{xix′
+jβ∗
+cjβ∗′
+ci}]Pr(ρ) −
+ X
+ρ
+x′
+iµPr(ρ)
+!  X
+ρ
+x′
+jµPr(ρ)
+!
++ cov(θi, θj)
+=
+X
+ρ:ci=cj
+tr{xix′
+j(T + µµ′)}Pr(ρ) +
+X
+ρ:ci̸=cj
+tr{xix′
+j(µµ′)}Pr(ρ) −µ′xix′
+jµ + cov(θi, θj)
+= x′
+jT xi
+X
+ρ:ci=cj
+Pr(ρ) + cov(θi, θj)
+= x′
+jT xiPr(ci = cj) + λ2(H(φ))i,j
+Now using the law of total variance
+var(yi) = Eρ,β,θ[var(yi|ρ, β, θ)] + varρ,β,θ[E(yi|ρ, β, θ)]
+= Eρ,β,θ[σ2] + varρ,β,θ[x′
+iβ∗
+ci + θi]
+= σ2 + λ2 + x′
+iT xi.
+Using corr(yi, yj) =
+cov(yi, yj)
+p
+var(yi)
+p
+var(yj)
+completes the proof.
+36
+
+A.2
+Proof of Proposition 3
+Proof. Following similar arguments from the previous proof,
+cov(yi, yj) = covρ,β,θ[E(yi|ρ, β, θ), E(yj|ρ, β, θ)] + Eρ,β,θ[cov(yi, yj, |ρ, β, θ)]
+= x′
+iT xj +
+X
+ρ:ci=cj
+cov(θi, θj)Pr(ρ) +
+X
+ρ:ci̸=cj
+cov(θi, θj)Pr(ρ)
+= x′
+iT xj +
+X
+ρ:ci=cj
+cov(θi, θj)Pr(ρ)
+= x′
+iT xj +
+kn
+X
+h=1
+X
+ρ:ci=cj=h
+λ2
+h(H(φh))i,jPr(ρ)
+= x′
+iT xj +
+kn
+X
+h=1
+λ2
+h(H(φh))i,j
+X
+ρ:ci=cj=h
+Pr(ρ)
+= x′
+iT xj +
+kn
+X
+h=1
+λ2
+h(H(φh))i,jPr(ci = cj = h)
+And now using the law of total variance
+var(yi) = Eρ,β,θ[var(yi|ρ, β, θ)] + varρ,β,θ[E(yi|ρ, β, θ)]
+= σ2 + x′
+iT xi +
+X
+ρ
+varθ(θi)Pr(ρ)
+= σ2 + x′
+iT xi +
+kn
+X
+h=1
+var(θi)
+X
+ρ:ci=h
+Pr(ρ)
+= σ2 + x′
+iT xi +
+kn
+X
+h=1
+τ 2∗
+h Pr(ci = h)
+Using corr(yi, yj) =
+cov(yi, yj)
+p
+var(yi)
+p
+var(yj)
+completes the proof.
+References
+Banerjee, S., Carlin, B. P., and Gelfand, A. E. (2014), Hierarchical modeling and analysis
+for spatial data, Boca Raton, Florida: Chapman & Hall/CRC, 2nd ed.
+37
+
+Barry, D. and Hartigan, J. A. (1992), “Product Partition Models for Change Point Problems,”
+The Annals of Statistics, 20, 260–279.
+Blei, D. M. and Frazier, P. I. (2011), “Distant dependent chinese restaurant processes,”
+Journal of Machine Learning Research, 12, 2461–2488.
+Christensen, R., Johnson, W., Branscum, A. J., and Hanson, T. (2011), Bayesian Ideas and
+Data Analysis: An Introduction for Scientists and Statisticians, CRC Press.
+Dahl, D. B. (2006), “Model-Based Clustering for Expression Data via a Dirichlet Process
+Mixture Model,” in Bayesian Inference for Gene Expression and Proteomics, eds. Van-
+nucci, M., Do, K. A., and Müller, P., Cambridge University Press, pp. 201–218.
+Denison, D. G. T. and Holmes, C. C. (2001), “Bayesian Partitioning for Estimating Disease
+Risk,” Biometrics, 57, 143–149.
+Diggle, P. (2014), Statistical Analysis of Spatial and Spatio-Temporal Point Patterns, Chap-
+man & Hall/CRC.
+Duan, J. A., Guindani, M., and Gelfand, A. E. (2007), “Generalized Spatial Dirichlet Process
+Models,” Biometrika, 94, 809–825.
+Dunson, D. B. and Park, J.-H. (2008), “Kernel Stick-Breaking Processes,” Biometrika, 95,
+307–323.
+Finley, A. O. and Banerjee, S. (2013), spBayes: Univariate and Multivariate Spatial-temporal
+Modeling, r package version 0.3-8.
+Gelfand, A., Diggle, P., Guttorp, P., and Fuentes, M. (2010), Handbook of Spatial Statistics,
+Chapman & Hall/CRC Handbooks of Modern Statistical Methods, Taylor & Francis.
+Gelfand, A. E., Kottas, A., and MacEachern, S. N. (2005), “Bayesian Nonparametric Spatial
+Modeling With Dirichlet Process Mixing,” Journal of the American Statistical Association,
+100, 1021–1035.
+Gelman, A., Hwang, J., and Vehtari, A. (2014), “Understanding predictive information cri-
+teria for Bayesian models,” Statistics and Computing, 24, 997–1016.
+Ghosh, S., Ungureanu, A. B., Sudderth, E. B., and Blei, D. (2011), “Spatial distance depen-
+dent Chinese restaurant processes for image segmentation,” in Advances in Neural Infor-
+mation Processing Systems 24, eds. Shawe-Taylor, J., Zemel, R., Bartlett, P., Pereira, F.,
+and Weinberger, K., pp. 1476–1484.
+Griﬃn, J. E. and Steel, M. F. J. (2006), “Order-Based Dependent Dirichlet Processes,”
+Journal of the American Statistical Association, 101, 179–194.
+Hartigan, J. A. (1990), “Partition Models,” Communications in Statistics, Part A - Theory
+and Methods, 19, 2745–2756.
+38
+
+Hegarty, A. and Barry, D. (2008), “Bayesian Disease Mapping Using Product Partition Mod-
+els,” Statistics in Medicine, 27, 3868–3893.
+Kang, J., Zhang, N., and Shi, R. (2014), “A Bayesian Nonparametric Model for Spatially Dis-
+tributed Multivariate Binary Data with Application to a Multidrug-Resistant Tuberculosis
+(MDR-TB) Study,” Biometrics, 0, 1–12.
+Knorr-Held, L. and Raßer, G. (2000), “Bayesian Detection of Clusters and Discontinuities in
+Disease Maps,” Biometrics, 56, 13–21.
+Lawson, A. B. (2013), Bayesian Disease Mapping: Hierarchical Modeling in Spatial Epiemi-
+ology, Chapman and Hall/ CRC, 2nd ed.
+Lawson, A. B. and Denison, D. G. T. (2002), Spatial Cluster Modeling, Chapman and Hall/
+CRC.
+Lee, D., Rushworth, A., and Sahu, S. K. (2014), “A Bayesian Localized Conditional Au-
+toregressive Model for Estimating the Health Eﬀects of Air Pollution,” Biometrics, 70,
+419–429.
+Li, P., Banerjee, S., Hanson, T. A., and McBean, A. M. (2014), “Bayesian Hierarchical Models
+for Detecting Boundaries in Areally Referenced Spatial Datasets,” Statistica Sinica, 0, 737–
+761.
+Manzi, J. and Preiss, D. (2013), “Educational Assessment and Educational Achievement
+in South America,” in International Guide to Student Achievement, eds. Hattie, J. and
+Anderman, E. M., Taylor and Friends, p. chapter 9.
+Meckes, L. and Carrasco, R. (2010), “Two decades of Simce: An overview of the National
+Assessment System in Chile,” Assessment in Education: Principles, Policy and Practice,
+17, 233–248.
+Melnykov, V., Chen, W.-C., and Maitra, R. (2012), “MixSim: An R Package for Simulating
+Data to Study Performance of Clustering Algorithms,” Journal of Statistical Software, 51,
+1–25.
+Monteiro, J. V. D., Assunção, R. M., and Loschi, R. H. (2011), “Product partition models
+with correlated parameters,” Bayesian Analysis, 6, 691–726.
+Müller, P., Quintana, F., and Rosner, G. L. (2011), “A Product Partition Model With
+Regression on Covariates,” Journal of Computational and Graphical Statistics, 20, 260–
+277.
+Neal, R. M. (2000), “Markov Chain Sampling Methods for Dirichlet Process Mixture Models,”
+Journal of Computational and Graphical Statistics, 9, 249–265.
+39
+
+Neelon, B., Gelfand, A. E., and Miranda, M. L. (2014), “A Multivariate Spatial Mixture
+Model for Areal Data: Examining Regional Diﬀerences in Standardized Test Scores,”
+Journal of the Royal Statistical Society C, 63, 737–761.
+Page, G. L. and Quintana, F. A. (2014), “Predictions Based on the Clustering of Heteroge-
+neous Functions via Shape and Subject-Speciﬁc Covariates,” Bayesian Analysis, to appear.
+Papageorgiou, G., Richardson, S., and Best, N. (2014), “Bayesian non-parametric models for
+spatially indexed data of mixed type,” Journal of the Royal Statistical Society: Series B
+(Statistical Methodology), n/a–n/a.
+Park, J.-H. and Dunson, D. B. (2010), “Bayesian Generalized Product Partition Model,”
+Statistica Sinica, 20, 1203–1226.
+Petrone, S., Guindani, M., and Gelfand, A. E. (2009), “Hybrid Dirichlet Mixture Models for
+Functional Data,” Journal of the Royal Statistical Society Series B, 94, 755–782.
+Quintana, F. A., Müller, P., and Papoila, A. L. (In press), “Cluster-Speciﬁc Variable Selection
+for Product Partition Models,” Scandinavian Journal of Statistics.
+Reich, B. J. and Bondell, H. D. (2011), “A Spatial Dirichlet Process Mixture Model for
+Clustering Population Genetics Data,” Biometrics, 67, 381–390.
+Reich, B. J. and Fuentes, M. (2007), “A Multivariate Semiparametric Bayesian Spatial Mod-
+eling Framework for Hurricane Surface Wind Fields,” The Annals of Applied Statistics, 1,
+249–264.
+Ren, L., Du, L., Carin, L., and Dunson, D. B. (2011), “Logistic Stick-Breaking Processes,”
+Journal of Machine Learning Research, 12, 203–239.
+Robert, C. P. and Casella, G. (2009), Introducing Monte Carlo Methods with R (Use R),
+Berlin, Heidelberg: Springer-Verlag, 1st ed.
+Schabenberger, O. and Gotway, C. A. (2005), Statistical Methods for Spatial Data Analysis,
+Chapman & Hall/CRC.
+Sethuraman, J. (1994), “A constructive deﬁnition of Dirichlet priors,” Statistica Sinica, 4,
+639–650.
+Wall, M. M. (2004), “A Close Look at the Spatial Structure Implied by the CAR and SAR
+Models,” Journal of Statistical Planning and Inference, 121, 311–324.
+40

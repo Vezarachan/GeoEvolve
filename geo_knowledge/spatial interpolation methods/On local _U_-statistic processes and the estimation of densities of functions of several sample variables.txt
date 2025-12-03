@@ -1,0 +1,2964 @@
+arXiv:0708.2227v1  [math.ST]  16 Aug 2007
+The Annals of Statistics
+2007, Vol. 35, No. 3, 1105–1145
+DOI: 10.1214/009053607000000154
+c
+⃝Institute of Mathematical Statistics, 2007
+ON LOCAL U-STATISTIC PROCESSES AND THE ESTIMATION
+OF DENSITIES OF FUNCTIONS OF SEVERAL
+SAMPLE VARIABLES
+By Evarist Gin´e1 and David M. Mason2
+University of Connecticut and University of Delaware
+A notion of local U-statistic process is introduced and central
+limit theorems in various norms are obtained for it. This involves
+the development of several inequalities for U-processes that may be
+useful in other contexts. This local U-statistic process is based on
+an estimator of the density of a function of several sample variables
+proposed by Frees [J. Amer. Statist. Assoc. 89 (1994) 517–525] and,
+as a consequence, uniform in bandwidth central limit theorems in the
+sup and in the Lp norms are obtained for these estimators.
+1. Introduction.
+Let X,X1,X2,... be i.i.d. random variables taking val-
+ues in R, with common density function f and consider the kernel density
+estimator of f deﬁned for t ∈R,
+fn(t,hn) = (nhn)−1
+n
+X
+i=1
+K(h−1
+n (t −Xi)) =: n−1
+n
+X
+i=1
+Khn(t −Xi),
+(1.1)
+where {hn}n≥1 is a sequence of positive constants converging to zero at the
+rate nhn →∞and the kernel K is an integrable (real) function of bounded
+variation satisfying
+R
+R K(x)dx = 1 (Parzen [27]). It is easy to prove that,
+subject to smoothness conditions on f, for each t ∈R,
+p
+hnun(t) :=
+p
+nhn{fn(t,hn) −Efn(t,hn)} →d N(0,∥K∥2
+2f(t)),
+whereas for any choice of t1 ̸= t2 the random variables √hnun(t1) and √hnun(t2)
+are asymptotically independent. This means that √hnun cannot converge
+weakly to a continuous bounded process on any nontrivial subinterval of R.
+Received March 2005; revised May 2006.
+1Supported in part by NSA Grant H98230-04-1-0075.
+2Supported in part by NSA Grant MDA904-02-1-0034 and NSF Grant DMS-02-03865.
+AMS 2000 subject classiﬁcations. 60F05, 60F15, 62E20, 62G30.
+Key words and phrases. U-statistics, central limit theorems, empirical process, kernel
+density estimation.
+This is an electronic reprint of the original article published by the
+Institute of Mathematical Statistics in The Annals of Statistics,
+2007, Vol. 35, No. 3, 1105–1145. This reprint diﬀers from the original in
+pagination and typographic detail.
+1
+
+2
+E. GIN´E AND D. M. MASON
+Since the bias Efn(t,hn) −f(t) can always be dealt with under the usual
+conditions on K and f, this tells us that fn(t,hn) estimates the density f
+at a much slower rate than n−1/2. On the other hand, Frees [15] discovered
+the perhaps surprising fact that the densities fg(t) of some symmetric real
+functions g(X1,...,Xm) of m > 1 i.i.d. random variables can be estimated
+at each ﬁxed t at the rate n−1/2, using the U-statistic estimator
+(n −m)!
+n!
+X
+i∈Im
+n
+Khn(t −g(Xi1,...,Xim)),
+where i = (i1,...,im) and Im
+n = {(i1,...,im):1 ≤ij ≤n,ij ̸= ik if j ̸= k}.
+Schick and Wefelmeyer [32] consider the special case
+g(X1,...,Xm) =
+m
+X
+i=1
+ui(Xi),
+which however is not necessarily a symmetric function. Using convolution
+kernels, they also obtain the (in probability) rate of n−1/2 for the sup norm
+and the L1 norm measure of the discrepancy between the estimator and
+the density (actually, they obtain limit theorems in distribution). These
+results require smoothness conditions on the kernel, the density and certain
+conditional densities.
+Our aim is to extend the Schick and Wefelmeyer results to the Frees
+framework and with g not necessarily symmetric. Moreover, we frame our
+results uniform in bandwidth in the sup norm and the Lp norm with p ≥1 so
+that they can be used with adaptive bandwidth estimators. Also, we do this
+not necessarily in one dimension, but in Rd. These extensions substantially
+increase the scope of applicability of the results and, as a consequence, we
+can show how our results recover, extend and/or improve upon, previous
+work by several authors. We shall not discuss removing the bias in general
+but only in some examples and very brieﬂy. The bias is not probabilistic and
+can always be treated by adding enough smoothness to the kernel and the
+density (see, e.g., the two references just cited and Ahmad and Fan [1]).
+We shall begin by generalizing the setup in Gin´e, Mason and Zaitsev
+[21] (concretely, that of Examples 1.2 and 1.3 there) and Mason [25] to
+U-statistics. Throughout this paper, we let X,Xi, i ∈N, be i.i.d. random
+variables taking values in a measurable space (S,S); let g :Sm 7→Rd, 1 ≤d <
+∞, be a measurable function; let K :Rd 7→R be an integrable measurable
+function that integrates to 1 (a “kernel”); and let 0 < a ≤b < ∞. Then, for
+t ∈Rd and λ ∈[a,b], we introduce the local U-statistic
+Un(t,λ) := (n −m)!
+n!
+X
+i∈Im
+n
+Kλhn(t −g(Xi1,...,Xim)),
+(1.2)
+
+LOCAL U-STATISTIC PROCESS
+3
+where, here and elsewhere in this paper, for functions H :Rd 7→R and h > 0,
+the notation
+Hh(t) := h−1H(t/h1/d),
+t ∈Rd,
+(1.3)
+is in force. The term “local” just reﬂects the fact that the U-process (1.2)
+is of a special kind, namely a convolution of an approximate identity Kλhn
+with an “empirical measure,” in this case ((n −m)!/n!) P
+Im
+n δg(Xi1,...,Xim),
+and therefore, for each value of t, the largest contributions to the statistic
+come from the values g(Xi1,...,Xim) closest to t.
+Special cases of Un(t,λ), when X1,...,Xn are i.i.d. Rd valued, include
+the interpoint distance studied by Jammalamadaka and Janson [23], with
+g(x,y) = |x −y|,
+hnUn(0,1) =
+1
+n(n −1)
+X
+i∈I2n
+I{|Xi1 −Xi2| ≤hn}
+and the related short distance process studied by Eastwood and Horv´ath
+[12],
+1
+n(n −1)
+X
+i∈I2n
+I{d(Xi1,Xi2) ≤λhn},
+0 ≤λ ≤1,
+where d is a distance on Rd, as well as the U-statistic estimator of the
+density of the sum X1 + ··· + Xm,
+(n −m)!
+n!
+X
+i∈Im
+n
+Khn(t −Xi1 −··· −Xim).
+Our goal is to obtain central limit theorems for the following local U -statistic
+process formed from Un(t,λ):
+un,λ(t) := √n{Un(t,λ) −EKλhn(t −g(X1,...,Xm))},
+(1.4)
+t ∈Rd,λ ∈[a,b].
+The case when m = 1 is a special case of the local empirical process studied
+in Mason [25]. We shall conﬁne our attention to the case m ≥2, which we
+shall soon see has a radically diﬀerent asymptotic behavior than the case
+m = 1. Occasionally, we may restrict the process to t ∈D ⊂Rd, where D
+may even consist of a single point.
+The limit theorems to be obtained for these processes will be in the sup
+and in the Lp norms, 1 ≤p < ∞, uniformly in λ ∈[a,b] (precise deﬁnitions in
+the next section). The reason these results will be true will be essentially the
+same as in Frees [15], namely: (1) the process (1.4) is equivalent to its linear
+part, that is, all the terms in its Hoeﬀding decomposition of order higher
+
+4
+E. GIN´E AND D. M. MASON
+than one tend to zero in the appropriate way; (2) that this linearization,
+which is a smoothed empirical process, is equivalent to the empirical process
+without smoothing, hence independent of λ and hn; (3) that this empirical
+process, under appropriate and quite weak conditions, satisﬁes the central
+limit theorem in the sup norm or in the Lp norms.
+The devil is in the details, and extending the Frees result from one point
+t ∈R, to uniformity in t ∈Rd and in λ ∈[a,b], makes for very diﬀerent
+proofs and requires a substantial amount of technique, some of it new.
+The statements of the central limit theorems, along with examples, are
+collected in Section 2 and all the proofs are postponed to Section 3. In the
+process of establishing our results we shall develop some tools that should
+be of separate interest. Among them include tight bounds for the absolute
+moment of the supremum of the U-statistic process under a uniform cover-
+ing number bound generalizing a similar bound obtained by Einmahl and
+Mason [13] and Gin´e and Koltchinskii [17] (see also Gin´e and Guillou [16])
+for the usual empirical process. All of these results were motivated by Propo-
+sition 6.2 of Talagrand [35], which is an expectation bound for VC classes of
+sets, where VC stands for Vapnik and ˇCervonenkis. We also obtain moment
+and exponential inequalities for Banach space valued U-statistics which, al-
+though not necessarily optimal, are very easy to apply and are well adapted
+to the problems treated in this article. In a sequel to this paper (Gin´e and
+Mason [20]), we derive the corresponding functional laws of the logarithm
+for un,λ.
+2. Main results and examples.
+As is usual when dealing with empirical
+processes, we take ((S × T)N,(S ⊗T )N,Pr) as the underlying probability
+space, where (S,S) is a measurable space, T = {−1,1}, T is the family of
+all subsets of T, and Pr = P N × (P ′)N, P a probability measure on (S,S)
+and P ′ the uniform distribution on T. Then the random variables Xi are
+the projections (S × T)N 7→S, Xi(s1,t1,s2,t2,...) = si, which are i.i.d. with
+law P. We will occasionally use the random variables εi(s1,t1,s2,t2,...) =
+ti, which obviously satisfy Pr{εi = 1} = Pr{εi = −1} = 1/2. Note that the
+random variables {Xi,εj :i,j ∈N} are independent. The variables εi are
+often called Rademacher variables. Sometimes we will write X for X1.
+All the asymptotic results on the process un,λ in this article require the
+following key assumption.
+For each i = 1,...,m, the random variable g(X1,...,Xm), con-
+ditionally on Xi = x, x ∈S, has a density fi(t,x), t ∈Rd, which
+is jointly measurable in t and x.
+(CD)
+Note that, setting
+f =
+m
+X
+i=1
+f i,
+(2.1)
+
+LOCAL U-STATISTIC PROCESS
+5
+the function
+fg(t) := E[f(t,X)]/m,
+t ∈Rd,
+(2.2)
+deﬁnes a density for the random variable g(X1,...,Xm). Another condition
+that we will require for diﬀerent values of p ∈[1,∞] is
+∥f(·,x)∥p < ∞
+for all x ∈S and ∥fg∥p < ∞.
+(CDp)
+Here and elsewhere, ∥· ∥p denotes the Lp(Rd) norm for 1 ≤p < ∞and
+the sup norm on Rd for p = ∞.
+The asymptotics of the processes un,λ will turn out to be equivalent to
+that of the processes
+νn(t) = 1
+√n
+n
+X
+i=1
+(f(t,Xi) −E[f(t,Xi)]),
+t ∈Rd,
+(2.3)
+which are empirical processes. With some abuse of notation, we say that
+νn converges in law in L∞(Rd)
+(2.4)
+if condition (CD∞) holds and the class of functions {f(t,·):t∈Rd} is P-Donsker.
+We refer to Dudley [10] or van der Vaart and Wellner [37] for the deﬁnition of
+Donsker classes of functions. The condition (CD∞) is equivalent to the maps
+t 7→f(t,x) and t 7→Ef(t,X) being in ℓ∞(Rd), the abuse of notation consists
+in replacing this last space by L∞(Rd), which usually means something else,
+and the precise meaning of (2.4) is that limn→∞EH(νn)∗= EH(G) for ev-
+ery H :ℓ∞(Rd) 7→R bounded and continuous, where G = {G(t):t ∈Rd} is
+the centered Gaussian process with the covariance of f(·,X), more precisely
+a sample continuous version, and H(νn)∗is the (a.s.) smallest measurable
+function larger than or equal to H(νn). Likewise, for 1 ≤p < ∞, we say that
+νn converges in law in Lp(Rd)
+(2.5)
+if the condition (CDp) holds and the Lp(Rd)-valued random variable f(·,X)
+satisﬁes the central limit theorem in this space, that is, there is a centered
+Gaussian process G with the same covariance as f(·,X) and with sample
+paths in Lp(Rd), such that for every H :Lp(Rd) 7→R bounded and contin-
+uous,
+lim
+n→∞EH(νn) = EH(G).
+Note that in each case, νn(·) is a random variable that takes values in
+Lp(Rd), 1 ≤p ≤∞, although in the case p = ∞, with abuse of notation:
+νn(·) is really in ℓ∞(Rd), the space of bounded functions on Rd, and νn is
+not necessarily measurable.
+The following deﬁnition describes the type of central limit theorem we
+will prove for the process un,λ.
+
+6
+E. GIN´E AND D. M. MASON
+Definition 1.
+Let 1 ≤p ≤∞and assume (CD) and (CDp). The pro-
+cesses un,λ converge weakly in Lp(Rd), uniformly in a ≤λ ≤b, to the cen-
+tered Gaussian process G with the same covariance as f(·,X) if
+sup
+λ∈[a,b]
+∥un,λ −νn∥p →0
+in pr∗
+and νn converges weakly in Lp(Rd) in the sense of (2.4) for p = ∞and (2.5)
+for p < ∞.
+Convergence in pr∗means convergence in probability of the measurable
+envelopes (the smallest dominating measurable functions).
+Note that in the case p = ∞, convergence of un,λ to G in the sense of
+this deﬁnition implies that the processes (t,λ) 7→un,λ(t) converge in law
+in ℓ∞(Rd × [a,b]) to the Gaussian process G (de la Pe˜na and Gin´e [7],
+Dudley [10], or van der Vaart and Wellner [37] for this type of convergence).
+However, our notion gives more. In fact if, for l = 1,...,N, we have functions
+gl :Sml 7→Rdl such that the processes u(l)
+n,λ corresponding to g = gl converge
+weakly in L∞(Rdl), uniformly in al ≤λ ≤bl, to a centered Gaussian process
+Gl with the same covariance as Fl(·,X), where Fl is the f corresponding to
+g = gl, then it is easy to conclude, using the obvious multivariate extension
+of Deﬁnition 1, that the vector-valued processes −→un,λ1,...,λN deﬁned by
+−→un,λ1,...,λN (t1,...,tN) = (u(1)
+n,λ1(t1),...,u(N)
+n,λN(tN)),
+(2.6)
+t1 ∈Rd1,...,tN ∈RdN ,
+converge weakly in L∞(Rd1) × ··· × L∞(RdN ) uniformly in al ≤λl ≤bl,
+l = 1,...,N, to the centered vector-valued Gaussian process deﬁned on Rd1 ×
+··· × RdN ,
+G(t1,...,tN) = (G1(t1),...,GN(tN)),
+(2.7)
+with the same covariance/cross covariance matrix as F(·,X), where
+F(t1,...,tN,X) = (F1(t1,X),...,FN(tN,X)),
+(2.8)
+t1 ∈Rd1,...,tN ∈RdN .
+2.1. Central limit theorems.
+We still require another deﬁnition. We say
+that a class of measurable functions F deﬁned on a measurable space (S,S)
+is VC-type (VC for Vapnik and ˇCervonenkis) with respect to an envelope
+F (meaning a measurable function F such that |f| ≤F for all f ∈F) if the
+covering number N(F,L2(Q),ε), deﬁned as the smallest number of L2(Q)
+open balls of radius ε required to cover F, satisﬁes
+N(F,L2(Q),ε) ≤
+A∥F∥L2(Q)
+ε
+v
+,
+0 < ε ≤2∥F∥L2(Q),
+(2.9)
+
+LOCAL U-STATISTIC PROCESS
+7
+for some A ≥3 and v ≥1, for every probability measure Q on S for which
+Q(F 2) < ∞. If (2.9) holds for F, then we say that the VC class F admits
+the characteristics A and v.
+Theorem 1.
+Let p = ∞, let (CD) and (CD∞) hold, and let K be
+bounded. Assume:
+(a) each of the classes
+Kn := {K(h−1/d(y −·)):y ∈Rd,ahn ≤h ≤bhn}
+(2.10)
+is VC-type for a bounded envelope Fn and all the classes Kn admit the same
+characteristics A and v;
+(b) the density fg of g(X1,...,Xm) is bounded and the class of functions
+F := {f(t,·):t ∈Rd} is P-Donsker and the identity map
+(Rd,| · |) 7→(Rd,ρ)
+is uniformly continuous, where ρ2(u,v) = Var(f(u,X) −f(v,X));
+(c) hn →0 and nhn/(1 ∨log(A∥Fn∥L2(fg)/√hn))2 →∞. The processes
+un,λ then converge weakly in L∞(Rd), uniformly in a ≤λ ≤b, to the centered
+Gaussian process with the same covariance as f(·,X).
+Remark 1.
+Theorem 1 has obvious applications to the construction
+of conﬁdence bands for fg. It is formulated uniformly in a ≤λ ≤b so as
+to allow the possibility for λ to be replaced by an estimator bλn. Suppose
+that bλn = λn(X1,...,Xn) is an adaptive bandwidth selector such that for
+all 0 < ε < 1 there exist 0 < c < d < ∞for which for all large enough n
+Pr{c < bλn < d} ≥1 −ε.
+(2.11)
+Then if assumption (a) of Theorem 1 holds for any choice of 0 < a < b < ∞
+we can immediately conclude from (2.11) that the processes un,bλn converge
+weakly in L∞(Rd) to the centered Gaussian process with the same covari-
+ance as f(·,X). The analogous remark holds for Theorems 2 and 3 below.
+For a thorough discussion of bandwidth estimators that satisfy (2.11) refer
+to Deheuvels and Mason [5].
+Remark 2.
+We note that if the classes of functions Fi = {fi(t,·):t ∈
+Rd}, i = 1,...,m, are P-Donsker, then so is F given in (b) (e.g., The-
+orem 2.10.6 in van der Vaart and Wellner [37] applied to the function
+φ(t1,...,tm) = Pm
+i=1 ti/√m). A suﬃcient condition for the class of functions
+F being P-Donsker is that it be of VC-type, since the function f being
+jointly measurable already ensures that this class of functions is measurable
+(e.g., Deﬁnition 2.3.3, Example 2.3.5 and Theorem 2.5.2 (Pollard’s CLT)
+
+8
+E. GIN´E AND D. M. MASON
+in van der Vaart and Wellner [37], or Dudley [10], Theorem 6.3.1). These
+two references contain many examples of classes of functions which are of
+VC-type. We single out one of them which is particularly convenient for
+condition (a) above. Let Ψ:R 7→R be a function of bounded variation on
+R (Ψ is the diﬀerence of two bounded nondecreasing functions). The proof
+of Lemma 22 in Nolan and Pollard [26] shows that if
+K(x) = Ψ(p(x)),
+x ∈Rd,
+(2.12)
+where p is either a real polynomial on Rd or the αth power of the absolute
+value of a real polynomial on Rd, α > 0, then the class of functions
+K = {K(γ−1(t −·)):t ∈Rd,γ > 0}
+is VC-type. Moreover, since the function K(γ−1(t−x)) is jointly measurable,
+this class is also measurable. Most kernels of interest satisfy condition (2.12),
+and therefore, condition (a) in Theorem 1.
+Sometimes one is interested only in weak convergence in L∞(D) uniformly
+in a ≤λ ≤b, where D is a subset of Rd that may even consist of a single
+point. For instance, this is the case for the interpoint distance process, where
+K(x) = I{|x| ≤1}, S = Rd and g(x,y) = x −y. The following, which is
+related to a result of Eastwood and Horv´ath (year?), will be a corollary
+to the proof of the above theorem. We say that a subset D of Rd is star-
+shaped about 0 if x ∈D implies λx ∈D for all 0 ≤λ ≤1.
+Corollary 1.
+Let D be a measurable bounded subset of Rd star-shaped
+about 0 and with Vol(D) ̸= 0, and set K = ID/Vol(D). Assume that g(X1,...,
+Xm) has a bounded density fg, that E[f(0,X)]2 < ∞and that for all ε > 0,
+lim
+δ→0limsup
+n→∞Pr∗
+
+sup
+|u|≤δ
+|νn(u) −νn(0)| > ε
+
+= 0.
+(2.13)
+Let hn →0 be such that nhn →∞. Then, the processes λun,λ(0) converge
+weakly in ℓ∞((0,1]) to the process λσZ, 0 ≤λ ≤1, where Z is standard
+normal and σ2 = Var(f(0,X)).
+It makes sense to deﬁne λun,λ(0) as zero for λ = 0. With this convention,
+in force from here on, we have weak convergence in ℓ∞([0,1]) in this corollary.
+Condition (2.13) is satisﬁed, for instance, if the class Fδ := {f(t,·):|t| ≤δ}
+is P-Donsker for some δ > 0, a condition weaker than the class F being P-
+Donsker.
+Next we state the central limit theorems in the Lp norm, uniform on
+a ≤λ ≤b. We need to recall the deﬁnition of Young moduli of exponential
+type. As in de la Pe˜na and Gin´e [7], page 188, Ψ1(x) := ex −1, but if α < 1,
+
+LOCAL U-STATISTIC PROCESS
+9
+since exα is only convex for x ≥xα := ((1 −α)/α)1/α, we take as a function
+Ψα that is 0 at 0, convex and increasing, and of the order of exα for x large
+the following:
+Ψα(x) := τα(x) −αexp((1 −α)/α),
+(2.14)
+where τα(x) equals exp(xα) if x ≥xα, and equals the tangent line to the
+function y = exp(xα) at x = xα for 0 ≤x ≤xα. We also recall that then, for
+any nonnegative random variable ξ for which Ee(ξ/a)α < ∞for some a > 0,
+∥ξ∥Ψα := inf{c:EΨα(ξ/c) ≤1}.
+(2.15)
+This is a (pseudo)norm and it dominates, up to constants that depend only
+on α and p, all the Lp (pseudo)norms. Simple standard computations show
+that
+Pr{ξ > x} ≤bexp{−(x/a)α}
+for all x > 0
+=⇒
+∥ξ∥Ψα ≤Ca
+(2.16)
+for a constant C that depends only on α and b. Note also that Ψ−1
+α (u) is
+a constant times u for 0 ≤u ≤Ψα(xα) and it is the 1/α-th power of the
+logarithm of u + αexp((1 −α)/α) for u ≥Ψα(xα).
+Given a kernel K and 0 < a ≤b < ∞, deﬁne
+K[a,b] := {Kh :h ∈[a,b]} ∪{0}.
+(2.17)
+For any two functions f and g in Lp, set
+dp
+p(f,g) =
+Z
+Rd |f(t) −g(t)|p dt.
+(2.18)
+Theorem 2.
+Let 2 ≤p < ∞and let (CD) and (CDp) hold. Assume:
+(a) the kernel K is in Lp(Rd) and
+Z 1
+0
+Ψ−1
+2/m(N(K[a,b],dp,ε))dε < ∞;
+(2.19)
+(b) the sum of conditional densities f deﬁned in (2.1) satisﬁes
+lim
+t→∞t2 Pr{∥f(·,X) −Ef(·,X)∥p > t} = 0
+(2.20)
+and
+Z
+Rd[E(f(u,X) −Ef(u,X))2]p/2 du < ∞;
+(c) hn →0 and nh2(p−1)/p
+n
+→∞.
+Then, the processes un,λ converge weakly in Lp(Rd), uniformly in a ≤λ ≤b,
+to the centered Gaussian process with the same covariance as f(·,X).
+
+10
+E. GIN´E AND D. M. MASON
+The two conditions in (2.20) are implied by the stronger but sometimes
+more convenient conditions E∥f i(·,X) −Efi(·,X)∥2
+p < ∞for i = 1,...,m.
+This follows immediately from Minkowski’s inequality for integrals (e.g.,
+Folland [14], page 194). Also, note that for p = 2 the ﬁrst condition in (2.20)
+is superﬂuous.
+We should remark here that the conditions (2.20) are precisely the neces-
+sary and suﬃcient conditions for the Lp(Rd)-valued random variable f(·,X)
+to satisfy the central limit theorem, that is, for the processes νn to converge
+in law to G in Lp(Rd), p ≥2 (Pisier and Zinn [29]; see also Araujo and Gin´e
+[2], pages 206–207).
+For 1 ≤p < 2 we need K2 and fg to satisfy certain moment assumptions,
+and for this it will be convenient to have the following notation: for s > 0,
+p ≥1, we deﬁne the Borel measure µs on Rd, Lp(µs) and ˜dp,s as
+dµs(t) = (1 + |t|)s dt,
+Lp(µs) = Lp(Rd,B,µs),
+(2.21)
+˜dp,s(f,g) = ∥f −g∥Lp(µs),
+the latter for functions f,g ∈Lp(µs).
+Theorem 3.
+Let 1 ≤p < 2 and let (CD) and (CDp) hold. Assume K2
+and fg are in L1(µs) for some s > d(2 −p)/p. Assume also:
+(a) K is in Lp(Rd) and
+Z 1
+0
+Ψ−1
+1/m(N(K[a,b],dp ∨˜d2,s,ε))dε < ∞;
+(2.22)
+(b) the sum f of conditional densities satisﬁes
+Z
+Rd[E(f(t,X) −Ef(t,X))2]p/2 dt < ∞;
+(2.23)
+(c) hn →0 and nhn →∞.
+Then, the processes un,λ converge weakly in Lp(Rd), uniformly in a ≤λ ≤b,
+to the centered Gaussian process with the same covariance as f(·,X).
+For p = 1, condition (2.23) is equivalent to
+R [Ef
+2(t,X)]1/2 dt < ∞.
+As above, we should also mention that condition (2.23) is precisely the
+necessary and suﬃcient condition for the Lp(Rd)-valued random variable
+f(·,X) to satisfy the central limit theorem, that is, for the processes νn to
+converge in law to G in Lp(Rd), 1 ≤p ≤2 (Vakhania [36] and Jain [22]; see
+also Araujo and Gin´e [2], pages 206–207).
+Remark 3.
+All garden variety kernels satisfy the entropy assumptions of
+Theorems 2 and 3. In fact, many such kernels are of the form K(x) = Ψ(|x|),
+
+LOCAL U-STATISTIC PROCESS
+11
+where Ψ is a function of bounded variation deﬁned on [0,∞). To see this,
+assume that for bounded nondecreasing functions M and N we can write
+Ψ = P −N. Further, assume that
+Z ∞
+0
+rd−1|M(r)|dr = M0 < ∞
+and
+Z ∞
+0
+rd−1|N(r)|dr = N0 < ∞.
+Deﬁne the class of functions P = {r 7→rd−1Ψ(rλ1/d):λ ≥1}. We claim that
+this class satisﬁes for some A1 > 0,
+N(P,d1,ε) ≤A1ε−1,
+0 < ε ≤1.
+(2.24)
+To verify this choose 1 ≤λ ≤µ. We see that
+Z ∞
+0
+|rd−1Ψ(rλ1/d) −rd−1Ψ(rµ1/d)|dr
+≤
+Z ∞
+0
+rd−1[M(rµ1/d) −M(rλ1/d)]dr
++
+Z ∞
+0
+rd−1[N(rµ1/d) −N(rλ1/d)]dr
+= (M0 + N0)(λ−1 −µ−1) =: C(λ−1 −µ−1).
+Now as in the proof in Example 1.2 of Gin´e, Mason and Zaitsev [21] choose
+open balls with centers at λk = C/(C −kε) for k = 0,...,k0 where k0 is the
+largest integer strictly less than C/ε. This shows (2.24).
+Now consider the class of functions on Rd given by K = {x 7→K(λ1/dx):
+λ ≥1}, where K(λ1/dx) = Ψ(λ1/d|x|). Since by changing to polar coordinates
+Z
+Rd |K(λ1/dx) −K(µ1/dx)|dx = Cd
+Z ∞
+0
+rd−1|Ψ(rλ1/d) −Ψ(rµ1/d)|dr,
+where Cd = dπd/2/Γ(1 + d/2), we see from (2.24) that for some B1 > 0
+N(Kλ,d1,ε) ≤B1ε−1,
+0 < ε ≤1.
+(2.25)
+From this result along with boundedness of K we readily get that for all
+p ≥1 there is a Bp > 0 such that
+N(Kλ,dp,ε) ≤Bpε−p,
+0 < ε ≤1.
+(2.26)
+It then follows easily that the class of functions K[a,b] formed from a kernel
+of the form K(x) = Ψ(|x|) obeying the above conditions satisﬁes the en-
+tropy condition of Theorems 2 and, if K has bounded support or decreases
+exponentially in a positive power of |x|, that of Theorem 3 as well. Some
+commonly used kernels deﬁned on R of this form are (1) K(u) = 1{u ∈
+[−1/2,1/2]}, (2) K(u) = 1
+2 exp(−|u|), (3) K(u) =
+1
+√
+2π exp(−u2/2), and (4)
+K(u) = 3
+4(1 −x2)+. See, for instance, Devroye [8].
+
+12
+E. GIN´E AND D. M. MASON
+2.2. Examples.
+In this subsection we show how the previous theorems
+apply to a few instances of estimation of the density of a function of several
+variables considered in the literature, as well as to the interpoint distance.
+Example 1 (Linear combinations). (Frees [15], Schick and Wefelmeyer [32])
+Suppose that
+g(x1,...,xm) =
+m
+X
+i=1
+ui(xi),
+xi ∈S,
+(2.27)
+for measurable functions u1,...,um from S to Rd such that the random
+variable ui(X) has a density fi for each i = 1,...,m. Then (CD) holds with
+f i(t,x) = ˜fi(t −ui(x)) and ˜fi = f1 ∗··· ∗fi−1 ∗fi+1 ∗··· ∗fm. Thus,
+f(t,x) =
+m
+X
+i=1
+˜fi(t −ui(x)),
+t ∈Rd,x ∈S.
+The process un,λ is then given by
+un,λ(t) = √n(n −m)!
+n!
+X
+i∈Im
+n
+"
+Kλhn
+ 
+t −
+m
+X
+r−1
+ur(Xir)
+!
+(2.28)
+−EKλhn
+ 
+t −
+m
+X
+r−1
+ur(Xr)
+!#
+.
+We will discuss some conditions under which the central limit theorems in
+Lp(Rd), p ∈[1,∞], uniform in λ, given above apply in this situation.
+Let d = 1. If f is of bounded variation on R then so is the convolution of
+f with any density, as is easy to check (in fact, more is true; see, e.g., Schick
+and Wefelemeyer [33], Lemma 1). Hence ˜fj is of bounded variation for each
+j if at least two of the densities fi are. So, assuming the densities fi are of
+bounded variation, then the classes Fi = { ˜fi(t−·):t ∈Rd} are of VC type by
+Lemma 22 of Nolan and Pollard [26], as mentioned in connection with (2.12).
+Also, since the map (t,x) 7→˜fi(t −x) is jointly measurable, these classes
+are Q-Donsker for every Q (e.g., Dudley [10], Theorem 6.3.1, page 208).
+Hence, Fi is P-Donsker for each i = 1,...,m. As observed, for example, in
+the proof of Lemma 8, Schick and Wefelmeyer [34], if f is a function of
+bounded variation on R, with f(−∞+) = 0 and Tf is the total variation of
+its right continuous modiﬁcation f(·+), then by Fubini’s theorem applied
+to the product of Lebesgue measure with the measure whose cumulative
+
+LOCAL U-STATISTIC PROCESS
+13
+distribution function is f(·+),
+R |f(x + s) −f(x)|dx ≤C|s| for all s ∈R.
+With f = ˜fi this gives
+E(f i(t,X) −fi(s,X))2 =
+Z
+( ˜fi(t −u) −˜fi(s −u))2fi(u)du
+≤2Tfi∥˜fi∥∞∥˜fi∥1|t −s|.
+Hence, since this holds for every i = 1,...,m, the identity map (R,| · |) 7→
+(R,ρ) is uniformly continuous. So, if the densities fi are of bounded variation
+on R, then condition (b) in Theorem 1 is satisﬁed (note that fg is of bounded
+variation, hence bounded).
+Let d > 1. Finding interesting conditions on the densities fi in order for
+condition (b) in Theorem 1 in the CLT to be satisﬁed is a little more cum-
+bersome in this case. Here are some conditions:
+(1) fi is α-H¨older continuous for some 0 < α ≤1 and of bounded support,
+for each 1 ≤i ≤m. In this case one can easily check the VC property.
+(2) fi is of bounded variation on Rd in the sense that it is the diﬀerence
+of the (d-dimensional) distribution functions of two positive measures (nec-
+essarily of the same mass). In this case the Donsker property follows from
+Dudley [10], Corollary 10.2.8, page 327.
+(3) The functions ˜fi satisfy condition (2.12). This condition is directly
+imposed on convolutions because (2.12) may not be inherited by convolu-
+tion, except in particular cases. Some important examples, like full d-variate
+normal densities, satisfy it.
+As a consequence of the above discussion, we have proved the following
+theorem that improves on Theorem 1 in Schick and Wefelmeyer [32] in that
+the convergence is uniform in λ ∈[a,b], the kernel is not necessarily a con-
+volution and the window sizes hn are allowed to decrease at a smaller rate.
+Their result includes the bias part whereas ours does not, and we discuss
+this immediately below.
+Theorem 4.
+Let g be deﬁned by (2.27) and let K satisfy condition
+(2.12). If d = 1 assume that the densities fi of ui(X) are of bounded variation
+and if d > 1 assume that fi satisfy (1) or (2) or that ˜fi satisfy (3) in the
+previous paragraph. Let hn →0 and nhn/(log h−1
+n )2 →∞. Then the processes
+un,λ deﬁned by (2.28) converge weakly in L∞(Rd) uniformly in a ≤λ ≤
+b to the centered Gaussian process with the same covariance as f(·,x) =
+Pm
+i=1 ˜fi(· −ui(x)).
+Next we comment on the bias part in this theorem. What we do is stan-
+dard and can also be done for the rest of the results in this article, but we
+will refrain from doing so. Suppose that the densities fi are in Ck(Rd) and
+
+14
+E. GIN´E AND D. M. MASON
+that their partial derivatives of order k or smaller are all bounded. Then the
+same is true for fg = f1 ∗··· ∗fm (this follows, e.g., from Proposition 8.10
+in Folland [14] and Young’s inequalities) and therefore fg admits a Taylor
+development of the form
+fg(t + δ) −fg(t)
+=
+k
+X
+r=1
+1
+r!
+X
+s1+···+sd=r
+0≤si≤r
+∂rfg
+∂s1x1 ···∂sdxd
+(t)δs1
+1 ···δsd
+d + H(t,k,δ)|δ|k,
+where H is uniformly bounded by a constant times the common bound for
+the kth partial derivatives of fg (actually, by continuity, H →0 as δ →0).
+Suppose moreover that the kernel K satisﬁes the conditions
+Z
+|t|k|K(t)|dt < ∞
+and
+Z
+ts1
+1 ···tsd
+d K(t)dt = 0
+for si ≥0,
+d
+X
+i=1
+si ≤k.
+Then, integration after change of variables and use of Taylor’s formula for
+fg(t + (λhn)1/du) −fg(t) give
+sup
+λ∈[a,b]
+√n|EKλhn(t −g(X1,...,Xm)) −fg(t)| = O(√nhk/d
+n ).
+Therefore, under these extra conditions on fi and K, if nh2k/d
+n
+→0, the
+conclusion of the previous theorem can be modiﬁed to convergence in law
+in ℓ∞(Rd × [a,b]) of
+√n
+(
+1
+|Im
+n |
+X
+Im
+n
+Kλhn
+ 
+t −
+m
+X
+r=1
+ur(Xir)
+!
+−fg(t)
+)
+to the same centered Gaussian process. If the partial derivatives up to order
+k of fi are bounded and in L1, then fg ∈Cmk(Rd) (e.g., by iteration in
+Proposition 8.10, Folland [14]), and the previous discussion applies with k
+replaced by mk.
+Simultaneous estimation of convolutions. Here is an immediate applica-
+tion of Theorem 4 to the simultaneous estimation of the densities of convolu-
+tions. Let f be a density of bounded variation on R. We are interested in es-
+timating the convolutions f ∗2 = f ∗f,...,f ∗N, for N ≥2. For m = 2,...,N,
+tm ∈R and am ≤λm ≤bm introduce the estimators
+d
+f ∗m
+n (tm,λm) =
+1
+|Im
+n |λmhn
+X
+Im
+n
+K
+tm −Pm
+r=1 Xir
+λmhn
+
+and set
+u(m)
+n,λm(tm) = √n{ d
+f ∗m
+n (tm,λm) −E d
+f ∗m
+n (tm,λm)}
+
+LOCAL U-STATISTIC PROCESS
+15
+or, under extra conditions as in the previous remark, replace E d
+f ∗m
+n (tm,λm)
+by f ∗m(tm,λm). [These estimators correspond to the functions g = gm de-
+ﬁned by gm(x1,...,xm) = x1 + ··· + xm.] A direct application of Theorem 4
+in combination with the observations (2.6)–(2.8) gives that the vector-valued
+processes (u(2)
+n,λ2(t2),...,u(N)
+n,λN(tN)) converge weakly in L∞(R)×···×L∞(R)
+uniformly in am ≤λm ≤bm, m = 2,...,N, to the centered vector-valued
+Gaussian process deﬁned on R × ··· × R, with the same covariance/cross
+covariance matrix as
+(2f(t2 −X),...,Nf ∗(N−1)(tN −X)).
+We note here that Schick and Wefelmeyer [32] use a variation of the Frees
+[15] local U-statistic estimator of convolutions of densities. Their estimator
+is based on convolving kernel density estimators. Here is how their approach
+works in the case of estimating the density of X1 + X2, where X1 and X2
+are i.i.d. real valued with density f. Consider the kernel density estimator
+bfn(x) = (nhn)−1
+n
+X
+i=1
+k(h−1
+n (x −Xi)),
+where k is of bounded variation on R. Their estimator is bfn ∗bfn and can be
+expressed, with K = k ∗k, as
+bfn ∗bfn(x) =
+1
+n2hn
+n
+X
+i=1
+n
+X
+j=1
+K
+x −Xi −Xj
+hn
+
+= n −1
+n
+U n,hn(x) +
+1
+n2hn
+n
+X
+i=1
+K
+x −2Xi
+hn
+
+,
+where U n,hn(x) is the Frees type local U-statistic estimator of f ∗f(x) de-
+ﬁned by
+U n,hn(x) = (hnn(n −1))−1
+X
+1≤i̸=j≤n
+K(h−1
+n (x −Xi −Xj)).
+The second term in the above expression for bfn ∗bfn(x) is asymptotically
+negligible and Theorem 4 applies to U nhn. This remark applies as well to
+simultaneous estimation of convolutions of densities.
+We can complement the above results for L∞(Rd) with limit theorems
+for the Lp distance. We now do this for the cases p = 1 and p = 2.
+Theorem 5.
+Assume K satisﬁes condition (a) in Theorem 2 and let
+g(x1,...,xm) = Pm
+i=1 ui(xi), ui :S 7→Rd be measurable, where ui(X) has
+
+16
+E. GIN´E AND D. M. MASON
+density fi. Assume fi is in L2(Rd). Assume also hn →0 and nhn →∞.
+Then
+√n
+|Im
+n |
+X
+Im
+n
+(
+Kλhn
+ 
+t −
+m
+X
+r=1
+ur(Xir)
+!
+−EKλhn
+ 
+t −
+m
+X
+r=1
+ur(Xr)
+!)
+converges in law in L2(Rd) uniformly in λ ∈[a,b] to the centered Gaussian
+process with the same covariance as Pm
+i=1 ˜fi(· −ui(Xi)).
+This theorem follows because by Young’s inequality (e.g., Folland [14],
+page 240), fi ∈L2 for i = 1,...,m implies E
+R f(t,X)2 dt < ∞. As in the
+previous theorem, a little more smoothness on fi and higher-order kernels
+allow for elimination of the bias.
+We can also recover the Schick and Wefelmeyer [32], Theorem 2 on the
+CLT for the L1 norm, with weaker assumptions (note that condition (2.22)
+is vacuous if [a,b] reduces to a single point).
+If two densities belong to L1(µs) for some s > 0, then so does their con-
+volution as can be seen by direct computation using the trivial observation
+that (1 + |u + v|) ≤(1 + |u|)(1 + |v|), and it is also routine to check that if
+any ﬁnite number of densities and their squares belong to L1(µs), so does
+the square of their convolution. Moreover, by Lemma 1 to be proved below,
+if f and k are two nonnegative functions in L1(µs) for some s > d, then
+R (f ∗k)1/2(t)dt < ∞. Hence Theorem 3 gives:
+Theorem 6.
+Let g(x1,...,xm) = Pm
+i=1 ui(xi), ui :S 7→Rd be measur-
+able, with ui(X) having density fi, for i = 1,...,m, and let K be a kernel on
+Rd. Assume that for some s > d, K2, fi and f 2
+i are in L1(µs), i = 1,...,m,
+and that K satisﬁes condition (a) in Theorem 3 for this s. Assume also
+hn →0 and nhn →∞. Then
+√n
+|Im
+n |
+X
+Im
+n
+(
+Kλhn
+ 
+t −
+m
+X
+r=1
+ur(Xir)
+!
+−EKλhn
+ 
+t −
+m
+X
+r=1
+ur(Xr)
+!)
+converges in law in L1(Rd) uniformly in λ ∈[a,b]) to the centered Gaussian
+process with the same covariance as Pm
+i=1 ˜fi(· −ui(Xi)).
+In R, if the densities fi are bounded (they do not need to be) then the
+condition imposed on fi is simply that
+R |x|1+δf(x)dx < ∞for some δ > 0.
+Example 2 (Distribution of sample distances).
+Frees [15] considers es-
+timating the density of the interpoint functional g(X1,X2) = |X1 −X2| in
+two dimensions, where Xi are i.i.d. with a density f which is bounded and
+of bounded support. We further assume that f is α-H¨older continuous for
+
+LOCAL U-STATISTIC PROCESS
+17
+some 0 < α ≤1, that is, |f(u) −f(v)| ≤C|u −v|α for all u,v ∈R2. Then, it
+is easy to see that fg, the density of g,
+fg(t) =
+Z 2π
+0
+Z
+R2 f(x1 + tcosθ,x2 + tsinθ)f(x1,x2)tdx1 dx2 dθ,
+is bounded and has bounded support. Moreover, for x = (x1,x2) and with
+R the radius of a ball around zero containing the support of f, we have, for
+the conditional densities fi of |X1 −X2|,
+f 1(t,x) = f2(t,x) =
+Z 2π
+0
+f(x1 + tcosθ,x2 + tsinθ)tdθ,
+0 ≤t ≤2R,
+and fi(t,x) = 0 for larger values of t. Then f = f1 + f 2 satisﬁes
+|f(t,·) −fi(s,·)| ≤8πRC|t −s|α + 4π∥f∥∞|t −s|,
+and therefore, with F = {f(t,·):|t| ≤2R} and any probability measure Q,
+N(F,L2(Q),ε) ≤C/ε1/α which, since the class F is image admissible Suslin
+by joint measurability of f, implies that the class F is P-Donsker. So, if we
+take a kernel K satisfying (2.12), and hn →0 with nhn/(log h−1
+n )2 →∞, we
+get that the processes deﬁned for |t| ≤R, λ ∈[a,b],
+n1/2
+n(n −1)
+X
+1≤i̸=j≤n
+{Kλhn(t −|Xi −Xj|) −EKλhn(t −|Xi −Xj|)},
+converge in law uniformly in t and λ to the centered Gaussian process with
+the same covariance as 2f1(t,X). Moreover, the comments following Theo-
+rem 4 regarding replacement of (λhn)−1EK((λhn)−1(t−|Xi −Xj|)) by fg(t)
+apply here as well.
+In dimension 1,
+f1(t,x) = f2(t,x) = f(t + x) + f(−t + x),
+t ≥0,
+and a suﬃcient condition for F to be P-Donsker is that f be of bounded
+variation on R. Then, K of bounded variation on R and nhn/(log h−1
+n )2 →∞
+ensure the same CLT as above. Since
+fg(x) =
+Z
+f(y + x)f(y)dy +
+Z
+f(y −x)f(y)dy
+and
+fg(0) = 2
+Z
+f 2(y)dy,
+as observed by Frees [15], we get a √n consistent estimator of
+R f 2(x)dx
+when the extra smoothness conditions to make the bias tend to zero hold.
+See also Bickel and Ritov [4] or Gin´e and Mason [19] and references therein
+for other √n consistent estimators of
+R f 2(x)dx.
+
+18
+E. GIN´E AND D. M. MASON
+Example 3 (Local interpoint distance processes).
+(Jammalamadaka and
+Janson [23], Eastwood and Horv´ath [12].) In Corollary 1 we consider the
+processes
+√n
+hn Vol(D)
+X
+Im
+n
+[I{g(Xi1,...,Xim) ∈(λhn)1/dD}
+−Pr{g(X1,...,Xm) ∈(λhn)1/dD}]
+for D star shaped about 0. Of particular interest in the literature is the case
+corresponding to m = 2, S = Rd, g(X1,X2) = X2 −X1 and D the (open or
+closed) unit ball about zero for some norm in Rd. In this case the densities
+f i(t,x), i = 1,2, are, respectively, f(x−t) and f(x+t), where f is the density
+of X. So, for the local asymptotic equicontinuity condition (2.13) to hold
+we only need that the class F = {f(· + t):|t| < δ} be P-Donsker for some
+δ > 0. If f is H¨older continuous of order α ∈(0,1], and Q is any probability
+measure on Rd, then
+Z
+(f(x + t) −f(x + s))2 dQ(x) ≤C|t −s|2α,
+s,t ∈Rd.
+It follows as in the previous example that F is VC and measurable, hence
+Q-Donsker for every probability measure Q. Thus, Corollary 1 implies the
+following slight strengthening and generalization of Theorem 1.1 in East-
+wood and Horv´ath [12].
+Theorem 7.
+If D is a bounded measurable subset of Rd star-shaped
+about zero and with Vol(D) ̸= 0, Xi are i.i.d. random vectors in Rd with
+a density f which is α-H¨older continuous for some α ∈(0,1], and hn →0,
+nhn →∞, then the processes
+1
+n3/2hn Vol(D)
+X
+(i1,i2)∈I2n
+
+I
+Xi1 −Xi2
+(λhn)1/d ∈D
+
+−Pr
+X1 −X2
+(λhn)1/d ∈D
+
+,
+0 ≤λ ≤1,
+converge in law in ℓ∞[0,1] to the process λσZ, 0 ≤λ ≤1, where Z is N(0,1)
+and σ2 = 4[
+R f 3(x)dx −(
+R f 2(x)dx)2].
+3. Proofs.
+In the sequel it will be helpful to introduce the following no-
+tation and facts. For a kernel L of k ≥1 variables we set
+U (k)
+n (L) = (n −k)!
+n!
+X
+i∈Ikn
+L(Xi1,...,Xik)
+(3.1)
+[so, Un(t,λ) = U (m)
+n
+(Kλhn(t −g(·,...,·))) even if g is not symmetric in its
+entries]. [When L is a constant function we deﬁne U (0)
+n (L) = L.] Assume now
+
+LOCAL U-STATISTIC PROCESS
+19
+that L is a function of m ≥1 variables, symmetric in its entries. Then, for
+1 ≤k ≤m, the Hoeﬀding projections with respect to P are deﬁned as
+πkL(x1,...,xk) = (δx1 −P) × ··· × (δxk −P) × P m−k(L)
+(3.2)
+and π0L = EL(X1,...,Xm). Then, the Hoeﬀding decomposition states the
+following, which is easy to check:
+U (m)
+n
+(L) −EL =
+m
+X
+k=1
+m
+k
+
+U (k)
+n (πkL).
+(3.3)
+For L ∈L2(P m) this is an orthogonal decomposition and E(πkL|X2,...,Xk.) =
+0 for k ≥1; that is, the kernels πkL are canonical for P (or completely de-
+generate, or completely centered). Also, πk, k ≥1, are nested projections,
+that is, πk ◦πℓ= πk if k ≤ℓ, and E(πkL)2 ≤E(L −EL)2 ≤EL2.
+The function Kh(t −g(X1,...,Xm)) is not necessarily symmetric in its
+entries, but we can symmetrize it as
+Kh(t,x1,...,xm) := 1
+m!
+X
+σ∈Im
+m
+Kh(t −g(xσ1,...,xσm)).
+(3.4)
+Then, clearly, for each t ∈Rd,
+Un(t,λ) −EKλhn(t −g(X1,...,Xm))
+= U (m)
+n
+(Kλhn(t,·,...,·)) −EKλhn(t,X1,...,Xm).
+Moreover, by applying (3.3) to un,λ(t) we get
+un,λ(t) = √n
+m
+X
+k=1
+m
+k
+
+U (k)
+n (πkKλhn(t,·,...,·)).
+(3.5)
+3.1. A general proposition for the CLT.
+Let us consider the ﬁrst term in
+the expansion (3.5). Note that, by deﬁnition of f and fg,
+mπ1Kλhn(t,x) =
+m
+X
+i=1
+EKλhn(t −g(X1,...,Xi−1,x,Xi+1,...,Xm))
+−mEKλhn(t −g(X1,...,Xm))
+=
+Z
+Kλhn(t −u)(f(u,x) −Ef(u,X)) du
+=
+Z
+(f(t −u,x) −Ef(t −u,X))Kλhn(u)du.
+Hence,
+√nmU (1)
+n (π1Kλhn(t,·))
+
+20
+E. GIN´E AND D. M. MASON
+= 1
+√n
+n
+X
+i=1
+Z
+(f(t −u,Xi) −Ef(t −u,X))Kλhn(u)du
+(3.6)
+=
+Z
+νn(t −u)Kλhn(u)du = (νn ∗Kλhn)(t),
+which is a generalized version of the smoothed empirical process that has
+been recently investigated by several authors (e.g., Rost [31] and references
+therein). We shall see that it controls the asymptotic behavior of the process
+un,λ. In the next proposition we show it has the same asymptotic behavior
+as the empirical process over the class of functions {f(t,·),t ∈Rd}.
+Proposition 1.
+Let 1 ≤p ≤∞. Assume:
+(i) condition (CDp) holds;
+(ii) limδ→0 limsupn→∞Pr∗{sup|u|≤δ ∥νn(· −u) −νn(·)∥p > ε} = 0 for all
+ε > 0;
+(iii) the sequence ∥νn∥∗
+p, n ∈N, is stochastically bounded.
+Then, whenever hn →0 we have
+lim
+n→∞sup
+a≤λ≤b
+∥√nmU (1)
+n (π1Kλhn(·,·)) −νn(·)∥p = 0
+in pr∗.
+(3.7)
+Proof.
+Let wδ(νn) = sup|u|<δ ∥νn(·−u)−ν(·)∥p, δ > 0, denote the Lp(Rd)
+modulus of “continuity” of νn, which is deﬁned because of (i). Then it fol-
+lows by Fubini in the case p = ∞and by Minkowski’s inequality for integrals
+(e.g., Folland [14], page 194) in the case 1 ≤p < ∞that
+∥νn ∗Kλhn −νn∥p ≤wδ(νn)∥Kλhn∥1 + 2∥νn∥p
+Z
+|u|>δ
+|Kλhn(u)|du
+≤wδ(νn)∥K∥1 + 2∥νn∥p
+Z
+|u|>δ/(λhn)1/d |K(u)|du.
+Now, the result follows from this, K ∈L1(Rd) and (ii) and (iii), in view of
+(3.6).
+□
+Corollary 2.
+Let 1 ≤p ≤∞. Assume (CDp) and hypothesis (b) in
+Theorem 1 for p = ∞, in Theorem 2 for 2 ≤p < ∞and in Theorem 3 for
+1 ≤p < 2. Then the processes νn converge weakly in Lp(Rd) to the centered
+Gaussian process G with the covariance of f(·,X). If moreover hn →0, then
+the limit (3.7) holds.
+Proof.
+(a) Case p = ∞. In this case, the hypothesis of the class F being
+P-Donsker is just another way of saying that νn converges in law to G in
+L∞(Rd), and this obviously implies (iii); ﬁnally, (ii) holds by the uniform
+
+LOCAL U-STATISTIC PROCESS
+21
+continuity of the identity map (Rd,| · |) 7→(Rd,ρ) together with the usual
+asymptotic equicontinuity condition (e.g., Dudley [10], pages 117–118).
+(b) Case 1 ≤p < ∞. As mentioned in Section 2, the hypotheses (b) in
+Theorems 2 and 3 are precisely the necessary and suﬃcient conditions for the
+process f(·,X) to satisfy the CLT in Lp, that is, for νn to converge in law to
+G in Lp. Moreover, (iii) is a direct consequence of this convergence. Finally,
+condition (ii) holds by the uniform tightness implied by weak convergence
+together with the Fr´echet–Kolmogorov characterization of compact sets of
+Lp(Rd) (see, e.g., Dunford and Schwartz [11], Theorem IV.8.21, page 301).
+□
+In view of (3.5) and Corollary 2, to complete our CLT program for un,λ,
+that is, the proofs of Theorems 1, 2 and 3, it only remains to show that the
+hypotheses in the statements of these theorems also imply
+sup
+a≤λ≤b
+∥√nU (k)
+n (πkKλhn)∥p →0
+in pr,
+k = 2,...,m.
+(3.8)
+Proving this constitutes the main part of our proofs, and requires new in-
+equalities for U-processes that we develop in the next subsections.
+3.2. Inequalities for U-processes.
+In the next two subsections we collect
+the inequalities we need to prove the limits (3.8). First we consider the case
+of U-processes indexed by VC classes of functions and obtain a moment
+inequality that generalizes the scope of that of Einmahl and Mason [13]
+and Gin´e and Koltchinskii [17] for empirical processes. Next, we consider U-
+statistics taking values on separable type 2 Banach spaces such as Lp, p ≥2,
+and derive exponential inequalities for them. The inequality that we get in
+this situation is particularly neat. Then, based on the method recently used
+by Gin´e, Lata la and Zinn [18] to prove inequalities for U-statistics, we derive
+both moment and exponential inequalities for other Banach spaces, such as
+Lp, 1 ≤p < 2. These are less clean than in the type 2 case, but are still
+usable. Neither of our exponential inequalities captures the Gaussian tail
+behavior that the statistic should have for small values of x; nevertheless,
+their application yields very strong results in the situations encountered in
+this article.
+3.3. U-processes indexed by VC classes.
+In this subsection we consider
+classes of measurable functions F deﬁned on (Sm,Sm) taking values in
+[−1,1], and we assume that 0 ∈F. The object is to obtain a bound for
+E∥U (k)
+n (πkf)∥F where F is of VC-type, and where we use the notation
+∥Ψ(f)∥F = supf∈F|Ψ(f)| for any functional Ψ deﬁned on the class F. This
+bound will require measurability on the class F described in de la Pe˜na
+and Gin´e [7], page 138: the class F should be measurable in the sense that
+
+22
+E. GIN´E AND D. M. MASON
+for every k = 1,...,m and every choice of ai1,...,ik ∈{−1,1}, the mapping
+f 7→P
+Ikn ai1,...,ikP m−kf(Xi1,...,Xik) is measurable for the completion of
+Sn. This holds, for instance, if (a) if there exists F0 countable such that this
+sup equals the sup over F0, or (b) if the σ-algebra S is countably gener-
+ated and contains the singletons, and the class F is image admissible Suslin,
+for instance, if it is parametrized by a complete separable metric space T in
+such a way that the evaluation map (t,x1,...,xm) 7→ft(x1,...,xm) is jointly
+measurable (Dudley [10], Section 5.3; van der Vaart and Wellner [37], Sec-
+tion 2.3.1; Pollard [30], page 196). These conditions allow us to randomize by
+independent random signs and use Fubini. If either of these two conditions
+is satisﬁed, we say that the class F is measurable.
+The following moment inequality will be instrumental in ﬁnishing the
+proof of Theorem 1. The proof of this inequality has several points in com-
+mon with the proofs of similar inequalities for m = 1 in Einmahl and Mason
+[13] and in Gin´e and Koltchinskii [17]; however the present proof does not
+rely on the square root trick or on the contraction principle for Rademacher
+processes.
+Theorem 8.
+Let F be a measurable collection of functions Sm 7→R
+symmetric in their entries with an envelope function F and let P be any
+probability measure on (S,S) (with Xi i.i.d. P). Assume F is bounded by
+M > 0 and F is VC with respect to F with characteristics A and v, as in
+(2.9). Then for every m ∈N, A ≥em, v ≥1, there exist constants C1 :=
+C1(m,A,v,M) and C2 = C2(m,A,v,M) such that
+nk/2E∥U (k)
+n (πkf)∥F ≤C1σ
+
+log A∥F∥L2(P m)
+σ
+k/2
+,
+(3.9)
+k = 0,1,...,m,
+assuming
+nσ2 ≥C2 log
+2∥F∥L2(P m)
+σ
+
+,
+(3.10)
+where σ2 is any number satisfying
+∥P mf 2∥F ≤σ2 ≤P mF 2.
+(3.11)
+Proof.
+Without loss of generality we assume F ≤M = 1. The theorem
+is true for all m and k = 0 by H¨older’s inequality, since U (0)
+n (π0f) = Pf, so
+we assume the statement to be true for all m ∈N and k −1, for some k ≥1,
+and prove it for k (and for all m ∈N ). We shall omit symbols when no
+confusion is possible, so, for instance, we write ∥· ∥for ∥· ∥F. We shall not
+keep track of constants; in particular, constants that depend on a subset of
+
+LOCAL U-STATISTIC PROCESS
+23
+m,A,v,M, will generically be denoted by C (so, the value of C may change
+from line to line). By Theorem 3.5.3 in de la Pe˜na and Gin´e [7], the deﬁnition
+of πk and Jensen’s inequality,
+E
+
+X
+Ikn
+(πkf)(Xi1,...,Xik)
+ ≤CE
+
+X
+Ikn
+εi1 ···εik(πkf)(Xi1,...,Xik)
+
+≤CE
+
+X
+Ikn
+εi1 ···εik(P m−kf)(Xi1,...,Xik)
+.
+Here Xi,εj are all independent, the X’s have law P and the ε’s are random
+signs (Rademacher variables). Since for any probability measure Q on Sk,
+Q(P m−k(f −g))2 ≤Q × P m−k(f −g)2,
+it follows from the VC property of F that
+N(P m−kF,L2(Q),τ) ≤
+A∥
+√
+P m−kF 2∥L2(Q)
+τ
+v
+,
+0 < τ ≤2∥
+√
+P m−kF 2∥L2(Q),
+that is, P m−kF is VC-type with characteristics A and v and envelope
+√
+P m−kF 2. This gives, by the entropy integral for Rademacher chaos of or-
+der k (de la Pe˜na and Gin´e [7], Corollary 5.1.8, upon noting that exponential
+Orlicz norms dominate Lp norms up to constants),
+|Ik
+n|−1/2Eε
+
+X
+Ikn
+εi1 ···εik(P m−kf)(Xi1,...,Xik)
+
+≤C
+Z p
+∥U(k)
+n
+((P m−kf)2)∥
+0
+
+log A
+q
+U (k)
+n (P m−kF 2)
+τ
+k/2
+dτ,
+where Eε denotes expectation with respect to the Rademacher variables only.
+[To apply Corollary 5.1.8 exactly to our process we need that, for X1,...,Xn
+ﬁxed, the Rademacher chaos process
+f 7→
+X
+Ikn
+εi1 ···εik(P m−kf)(Xi1,...,Xik),
+f ∈F,
+be separable, and this follows by separability of the unit cube of R|Ik
+n| for
+the Euclidean norm.] Then, by Fubini,
+|Ik
+n|1/2E∥U (k)
+n (πkf)∥≤CB,
+(3.12)
+where
+B = E
+Z p
+∥U(k)
+n
+((P m−kf)2)∥
+0
+
+log A
+q
+U (k)
+n (P m−kF 2)
+τ
+k/2
+dτ.
+(3.13)
+
+24
+E. GIN´E AND D. M. MASON
+Decompose the integral B into two parts,
+(I) := E
+Z p
+∥U(k)
+n
+((P m−kf)2)∥
+0
+
+log A
+q
+U (k)
+n (P m−kF 2)
+τ
+k/2
+dτ In
+
+,
+where
+In = I{U (k)
+n (P m−kF 2) > 4P mF 2}
+and
+(II ) := E
+Z p
+∥U(k)
+n
+((P m−kf)2)∥
+0
+
+log A
+q
+U (k)
+n (P m−kF 2)
+τ
+k/2
+dτ Ic
+n
+
+,
+so that B = (I)+(II ). The (I) term is handled by the Arcones [3] exponential
+inequality (de la Pe˜na and Gin´e [7], Theorem 4.1.13), which gives
+Pr{U (k)
+n (P m−kF 2) > 4P mF 2}
+(3.14)
+≤4exp
+
+−
+9n(P mF 2)2
+2k2P mF 4 + cP mF 2
+
+≤4exp
+
+−9nP mF 2
+2k2 + c
+
+for a constant c that depends only on k. In the last inequality we have used
+F ≤1. Since, by change of variables,
+Z p
+∥U(k)
+n
+((P m−kf)2)∥
+0
+
+log A
+q
+U (k)
+n (P m−kF 2)
+τ
+k/2
+dτ
+≤A
+Z 1
+0
+(log u−1)k/2 du
+q
+U (k)
+n (P m−kF 2),
+and P k(U (k)
+n (P m−kF 2)) ≤P mF 2, it follows by H¨older’s inequality and (3.14)
+that
+(I) ≤C∥F∥L2(P m) exp
+
+−
+9n∥F∥2
+L2(P m)
+2(2k2 + c1)
+
+≤D
+√n.
+(3.15)
+As for (II ), we note
+(II ) ≤E
+Z p
+∥U(k)
+n
+((P m−kf)2)∥
+0
+
+log 2A∥F∥L2(P m)
+τ
+k/2
+dτ Ic
+n
+
+.
+(3.16)
+Now by integration we see that for any 0 < c < C
+Z c
+0
+(log(C/x))k/2
+
+1 −k
+2(log(C/x))−1
+
+dx = c(log(C/c))k/2,
+which when (log(C/c))−1 ≤k−1 gives the inequality
+Z c
+0
+(log(C/x))k/2 dx ≤2c(log(C/c))k/2.
+(3.17)
+
+LOCAL U-STATISTIC PROCESS
+25
+Thus since on Ic
+n
+2A∥F∥L2(P m)/
+q
+∥U (k)
+n ((P m−kf)2)∥≥A ≥em > ek,
+(3.18)
+we get from (3.17), (3.18) and (3.16) that
+(II ) ≤2E
+q
+∥U (k)
+n ((P m−kf)2)∥
+
+log
+2A∥F∥L2(P m)
+q
+∥U (k)
+n ((P m−kf)2)∥
+k/2
+.
+Since the function √x(−logx)k/2, 0 < x < 1, is concave on (0,e−k] and
+A ≥em > ek, this last bound is by Jensen’s inequality
+≤2
+q
+E∥U (k)
+n ((P m−kf)2)∥
+
+log
+2A∥F∥L2(P m)
+q
+E∥U (k)
+n ((P m−kf)2)∥
+k/2
+.
+(3.19)
+We are going to show that there exists a C > 0 such that
+B ≤C
+ 1
+√n +
+s
+B
+nk/2 + σ2
+
+log A∥F∥L2(P m)
+σ
+k/2
+.
+(3.20)
+We shall consider two cases. In case 1, E∥U (k)
+n ((P m−kf)2)∥≤σ2. In this
+case, since the function √x(−log x)k/2, 0 < x < 1, is increasing on (0,e−k],
+we get the trivial bound from (3.15) and (3.19) that
+B ≤D
+√n + 2σ
+
+log 2A∥F∥L2(P m)
+σ
+k/2
+,
+which of course implies the bound (3.20) (note that A∥F∥L2(P m)/σ ≥em).
+Next consider case 2, E∥U (k)
+n ((P m−kf)2)∥> σ2. To handle this case we
+must bound E∥U (k)
+n ((P m−kf)2)∥. It is here that we will use the induction
+hypothesis. By Hoeﬀding’s decomposition (3.3) we have
+E∥U (k)
+n ((P m−kf)2)∥≤
+k
+X
+r=0
+k
+r
+
+E∥U (r)
+n (πr(P m−kf)2)∥.
+(3.21)
+The term corresponding to r = 0 is simply ∥P k(P m−kf)2∥≤σ2. Consider
+now the new class
+G := {(P m−kf)2 :f ∈F}
+of functions of k variables. For any probability measure Q on Sk,
+Q((P m−kf)2 −(P m−kg)2)2 ≤4Q × P m−k(f −g)2,
+and thus the class G is VC-type with constants A and v and envelope
+2
+√
+P m−kF 2 as in (2.9). Also observe that since
+∥P k(P m−kf)4∥≤∥P mf 2∥≤4σ2 ≤4∥
+√
+P m−kF 2∥2
+L2(P k) = 4∥F∥2
+L2(P m),
+
+26
+E. GIN´E AND D. M. MASON
+we verify that (3.11) holds. Also we trivially see that (3.10) is satisﬁed, that
+is,
+4nσ2 > nσ2 ≥C2 log
+2∥F∥L2(P m)
+σ
+
+= C2 log
+4∥F∥L2(P m)
+2σ
+
+.
+Finally noting that A ≥em > ek and 2
+√
+P m−kF 2 ≤2, we are permitted to
+apply the induction hypothesis for 1 ≤r < k (r = 0 has already been dealt
+with) to get with M = 2,
+E∥U (r)
+n (πr(P m−kf)2)∥≤C1(k,A,v,2)n−r/22σ
+
+log A∥F∥L2(P m)
+σ
+r/2
+.
+(3.22)
+Since by the hypotheses (3.10) and (3.11) on σ [note (3.11) and F ≤1 imply
+σ2 ≤1] we have
+1
+nr/2 σ
+
+log A∥F∥L2(P m)
+σ
+r/2
+≤Cr/2σ1+r ≤Cr/2σ2,
+(3.23)
+it follows from the bounds (3.22) and (3.23) that
+k
+r
+
+E∥U (r)
+n (πr(P m−kf)2)∥≤Cσ2,
+1 ≤r < k.
+(3.24)
+As for r = k, we randomize and use the entropy bound for Rademacher
+chaos, just as we did at the beginning of the proof, using the fact that G is
+VC-type. This gives
+E∥U (k)
+n (πk(P m−kf)2)∥
+≤C|Ik
+n|−1/2E
+|Ik
+n|−1/2 X
+Ikn
+εi1 ···εik(P m−kf)2
+
+(3.25)
+≤
+C
+|Ikn|1/2 E
+Z p
+∥U(k)
+n
+((P m−kf)4)∥
+0
+
+log A
+q
+U (k)
+n (P m−kF 2)
+τ
+k/2
+dτ
+≤C B
+nk/2 ,
+where B is as deﬁned in (3.13) and we use
+∥U (k)
+n ((P m−kf)4)∥≤∥U (k)
+n ((P m−kf)2)∥.
+From (3.15), (3.19), (3.21)–(3.25) and E∥U (k)
+n ((P m−kf)2)∥> σ2 we get (3.20).
+Since log[A∥F∥L2(P m)/σ] > 1, hypothesis (3.10) on σ gives
+1
+√n ≤C
+σ
+(log A∥F∥L2(P m)/σ)1/2 ≤Cσ
+
+log A∥F∥L2(P m)
+σ
+k/2
+,
+
+LOCAL U-STATISTIC PROCESS
+27
+and therefore it follows from inequality (3.20) that with perhaps a diﬀerent
+value of C,
+B ≤C
+s
+B
+nk/2 + σ2
+
+log A∥F∥L2(P m)
+σ
+k/2
+.
+Taking squares and solving this inequality, we get that there exists a constant
+C (easy to evaluate) such that
+B ≤C
+(log A∥F∥L2(P m)/σ)k
+nk/2
++ σ
+
+log A∥F∥L2(P m)
+σ
+k/2
+.
+But, again by condition (3.10) on σ as in (3.23),
+(log A∥F∥L2(P m)/σ)k/2
+nk/2
+≤Cσk ≤σ,
+and therefore
+B ≤Cσ
+
+log A∥F∥L2(P m)
+σ
+k/2
+,
+which, by inequality (3.12), proves the theorem.
+□
+Remark 4.
+An analogue of the previous theorem holds if we replace the
+function (log(A∥F∥L2(Q)/τ) by H(∥F∥L2(Q)/τ) with H an increasing regu-
+larly varying function of exponent 0 ≤α < 2/m, very much as in Theorem
+3.1 in Gin´e and Koltchinskii [17].
+3.4. U-statistics taking values in separable Banach spaces.
+3.4.1. The Lp case, 2 ≤p < ∞.
+We shall begin by establishing an ex-
+ponential bound for the tail of the norm of a U-statistic taking values in
+a separable type 2 Banach space B. Let us recall that a separable Ba-
+nach space B is of type 2 if for any ﬁnite number of points xi ∈B and
+independent Rademacher variables εi (independent random signs), we have
+E∥Pn
+i=1 εixi∥2 ≤C Pn
+i=1 ∥xi∥2, and the smallest such constant C is the type
+2 constant of B. It is well known that the Lp spaces are of type 2 if (and
+only if) p ≥2. If Zi are independent, centered B-valued random vectors with
+a square integrable norm and B is of type 2, then
+E
+
+n
+X
+i=1
+Zi
+
+2
+≤C
+n
+X
+i=1
+E∥Zi∥2
+(3.26)
+(Araujo and Gin´e [2] or Ledoux and Talagrand [24]).
+
+28
+E. GIN´E AND D. M. MASON
+Theorem 9.
+Let H be a function of k variables, P-canonical, symmet-
+ric, with values in a type 2 Banach space. We have, for all x ≥0,
+Pr
+(
+X
+i∈Ikn
+H(Xi1,...,Xik)
+ ≥x
+)
+≤D exp
+
+−
+
+x
+λ0nk/2κ
+2/k
+,
+(3.27)
+where κ is a number satisfying
+κ ≥
+sup
+x1,...,xk∈S
+∥H(x1,...,xk)∥
+(3.28)
+and λ0 and D are constants that depend only on k and the type 2 constant
+C of B.
+Proof.
+(This inequality was mentioned on page 252 of de la Pe˜na and
+Gin´e [7] and its precise statement and proof were left to the reader.) Here
+is the proof.
+Let
+Sn =
+1
+κ
+ n
+k
+1/2
+X
+1≤i1<···<ik≤n
+H(Xi1,...,Xik),
+and let
+S′
+n =
+1
+κ
+ n
+k
+1/2
+X
+1≤i1<···<ik≤n
+ε1
+i1 ···εk
+ikH(X(1)
+i1 ,...,X(k)
+ik ),
+where κ is as in (3.28), X(j)
+i
+are i.i.d. with law P, and εj
+i are i.i.d. Rademacher
+variables independent of the collection of variables {X(j)
+i
+}.
+By decoupling (Theorem 3.1.1 of de la Pe˜na and Gin´e [7]) and convexity
+(e.g., Theorem 3.5.3 on page 140 of de la Pe˜na and Gin´e [7], as it applies
+to a nonnegative, nondecreasing convex function Ψ), there is a constant Ck
+such that
+∥∥Sn∥∥Ψ2/k ≤Ck∥∥S′
+n∥∥Ψ2/k.
+(3.29)
+By hypercontractivity of Rademacher chaos (Khinchin’s inequality for Rade-
+macher chaos), for example, Theorem 3.2.2 on page 113 of de la Pe˜na and
+Gin´e (year?), for all r ≥2,
+Eε∥S′
+n∥r ≤rkr/2(Eε∥S′
+n∥2)r/2,
+and by the type 2 inequality applied one sequence {εj
+i }, j = 1,...,k, at a
+time, we get
+(Eε∥S′
+n∥2)r/2 ≤Ckr/2,
+where C is the type 2 constant of the Banach space, and therefore,
+Eε∥S′
+n∥r ≤Ckr/2rkr/2.
+
+LOCAL U-STATISTIC PROCESS
+29
+This inequality yields, by Taylor expansion of the exponential, that for some
+c > 0,
+EεΨ2/k(c∥S′
+n∥) < ∞
+and therefore that there exists a constant λ1 = λ1(C,k) depending only on
+C and k, such that
+EεΨ2/k(∥S′
+n∥/λ1) ≤1.
+Integrating with respect to the X’s,
+EΨ2/k(∥S′
+n∥/λ1) ≤1,
+that is, ∥∥S′
+n∥∥Ψ2/k ≤λ1,
+which, combined with (3.29), gives
+∥∥Sn∥∥Ψ2/k ≤Ckλ1 := λ0,
+a constant. Of course this implies, by the deﬁnition of the Orlicz norm Ψ2/k,
+that there is a constant D(k,C) such that
+Pr{∥Sn∥> x} ≤De−(x/λ0)2/k.
+□
+3.4.2. The Lp case, 1 ≤p < 2.
+Our aim now is to obtain a useful expo-
+nential inequality for B-valued U-statistics, when B is not necessarily a type
+2 Banach space. We will generalize to B-valued U-statistics (via decoupling
+followed by iteration) the following sharp inequality for sums of independent
+random vectors: there is a constant L < ∞such that if B is a separable Ba-
+nach space, Zi, i ∈N, are independent mean zero random vectors taking
+values in B and r ≥2, then, setting Sn = Pn
+i=1 Zi,
+E∥Sn∥r ≤Lr
+
+rr/2(E∥Sn∥2)r/2 + rrE max
+1≤i≤n∥Zi∥r
+
+.
+(3.30)
+This inequality was obtained by Pinelis [28], and it also follows easily from
+the sharper inequality in Gin´e, Lata la and Zinn [18], Proposition 3.1. Next
+we extend inequality (3.30) to B-valued U-statistics.
+Theorem 10.
+Let B be a separable Banach space, let H :Sk 7→B be a
+bounded P-canonical random vector symmetric in its entries and let Xi,X(j)
+i
+be i.i.d. S-valued random variables, 1 ≤i ≤n and j = 1,...,k. Deﬁne κ and
+χn to be any pair of numbers such that
+κ ≥
+sup
+x1,...,xk∈S
+∥H(x1,...,xk)∥
+(3.31)
+and
+χn ≥
+ 
+E
+
+X
+i∈Ikn
+H(X(1)
+i1 ,...,X(k)
+ik )
+
+2!1/2
+.
+
+30
+E. GIN´E AND D. M. MASON
+Then there exists a constant C depending only on k such that, for all n ∈N
+and r ≥2,
+E
+
+X
+i∈Ikn
+H(X(1)
+i1 ,...,X(k)
+ik )
+
+r
+(3.32)
+≤Cr[rkr/2χr
+n + r(k+1)r/2n(k−1)rκr + rkrκr].
+Moreover, there exists a constant D0 depending only on k such that, for all
+n ∈N and r ≥2,
+E
+
+X
+i∈Ikn
+H(Xi1,...,Xik)
+
+r
+≤Dr
+0[rkr/2χr
+n + r(k+1)r/2n(k−1)rκr + rkrκr],
+(3.33)
+where κ and χn are deﬁned as in (3.31).
+Proof.
+Inequality (3.30) gives the result for k = 1. Assume the re-
+sult is true for k and for every Banach space, and let H be a function
+of k + 1 variables satisfying the conditions in the statement of the the-
+orem. Before starting the induction, we describe some simplifying nota-
+tion. We will denote by ≤′ inequality up to a multiplicative constant Cr
+with C depending only on k. Also, we will write Hi = H if the coordi-
+nates of the multi-index i ∈{1,...,k + 1}n are all diﬀerent, and Hi = 0
+otherwise, and we will drop the arguments of H or Hi, so P
+i Hi will mean
+P
+i∈{1,...,k+1}n Hi(X(1)
+i1 ,...,X(k+1)
+ik+1 ). Finally, for A ⊂{1,...,k + 1}, EA will
+mean integration with respect to the variables X(r)
+i
+only, for r ∈A and i ≤n.
+Applying (3.30) conditionally on the variables X(j)
+i
+, j = 1,...,k, we obtain
+E
+
+X
+i
+Hi
+ ≤′ E1,...,k
+"
+rr/2
+ 
+Ek+1
+
+X
+ik+1
+ X
+i1,...,ik
+Hi
+!
+2!r/2#
+(3.34)
++ E1,...,k
+"
+rrEk+1 max
+ik+1
+
+X
+i1,...,ik
+Hi
+
+r#
+.
+In order to deal with the ﬁrst term in (3.34), for each x1,...,xk ∈S ﬁxed
+we consider the random variable P
+ik+1 Hi(x1,...,xk,X(k+1)
+ik+1 ) as a function
+from Sk into the Banach space L2(Ω,Σ,P;B) of B-valued random variables
+whose B norms are square integrable, with norm
+|F(x1,...,xk,X(k+1)
+ik+1 )|∗:= (Ek+1∥F(x1,...,xk,X(k+1)
+ik+1 )∥2)1/2.
+To apply the induction hypothesis to the statistic P
+i1,...,ik(P
+ik+1 Hi) in this
+Banach space with the norm | · |∗, we ﬁrst note that, if we denote by ˜κ and
+
+LOCAL U-STATISTIC PROCESS
+31
+˜χ the corresponding quantities associated with this statistic, then
+˜κ =
+max
+x1,...,xk∈S
+
+X
+ik+1
+H(x1,...,xk,X(k+1)
+ik+1 )
+
+∗
+≤nκ
+and
+˜χn =
+ 
+E1,...,k
+
+X
+i1,...,ik
+ X
+ik+1
+Hi
+!
+2
+∗
+!1/2
+=
+ 
+E
+
+X
+i
+Hi
+
+2!1/2
+= χn.
+Hence, the induction hypothesis gives
+rr/2E1,...,k
+ 
+Ek+1
+
+X
+ik+1
+ X
+i1,...,ik
+Hi
+!
+2!r/2
+= rr/2E1,...,k
+
+X
+i1,...,ik
+ X
+ik+1
+Hi
+!
+r
+≤′ rr/2[rkr/2 ˜χr
+n + r(k+1)r/2n(k−1)r˜κr + rkr˜κr]
+≤r(k+1)r/2χr
+n + r(k+2)r/2nkrκr + r(k+1/2)rnrκr.
+Now, if n ≤r1/2, then r(k+1/2)rnr ≤r(k+1)r and if n > r1/2, then r(k+1/2)rnr ≤
+r(k+2)r/2nkr, so that
+rr/2E1,...,k
+ 
+Ek+1
+
+X
+ik+1
+ X
+i1,...,ik
+Hi
+!2
+!r/2
+(3.35)
+≤′ r(k+1)r/2χr
+n + r(k+2)r/2nkrκr + r(k+1)rκr.
+Finally, we apply the induction hypothesis conditionally on the variables
+X(k+1)
+i
+to the second term of (3.34) by considering that term to be a U-
+statistic with values in the Banach space ℓ∞
+n (B) := {(v1,...,vn):vi ∈B},
+with norm |(v1,...,vn)| := max1≤i≤n ∥vi∥. In fact, with this deﬁnition,
+max
+ik+1
+
+X
+i1,...,ik
+Hi
+
+=
+
+X
+i1,...,ik
+(Hi(X(1)
+i1 ,...,X(k)
+ik ,X(k+1)
+1
+),...,Hi(X(1)
+i1 ,...,X(k)
+ik ,X(k+1)
+n
+))
+,
+and if we denote by κ and χn the corresponding parameters, we have, for
+each value of X(k+1)
+i
+, j = 1,...,n,
+κ =
+max
+x1,...,xk∈S∥(H(x1,...,xk,X(k+1)
+1
+),...,H(x1,...,xk,X(k+1)
+n
+))∥≤κ
+
+32
+E. GIN´E AND D. M. MASON
+and
+χn =
+ 
+E1,...,k max
+ik+1
+
+X
+i1,...,ik
+Hi
+
+2!1/2
+≤nkκ.
+So, induction gives
+rrE1,...,k max
+ik+1
+
+X
+i1,...,ik
+Hi
+
+r
+≤′ rr[rkr/2χr
+n + r(k+1)r/2n(k−1)rκr + rkrκr]
+≤κr[r(k+2)r/2nkr + r(k+3)r/2n(k−1)r + r(k+1)r].
+By considering the cases n ≤r1/2 and n > r1/2 we see that
+r(k+3)r/2n(k−1)r ≤max(r(k+2)r/2nkr,r(k+1)r),
+from which it follows that
+rrE1,...,k max
+ik+1
+
+X
+i1,...,ik
+Hi
+
+r
+≤′ κr[r(k+2)r/2nkr + r(k+1)r].
+(3.36)
+Now, the ﬁrst part of the theorem follows by substituting the estimates (3.35)
+and (3.36) into inequality (3.34). The proof of the theorem is completed
+by noting that (3.33) follows from (3.32) via de la Pe˜na’s [6] decoupling
+inequality (see Theorem 3.1.1 in de la Pe˜na and Gin´e [7]).
+□
+We note that this theorem could have been proved, with only formal
+changes, for Hi depending on the subindices i. Gin´e, Lata la and Zinn, un-
+published, have a moment inequality for B-valued canonical U-statistics of
+order 2 without boundedness assumptions that contains (3.32) for k = 2.
+Our proof is inspired by theirs.
+We shall apply (3.33) to the special case when B = Lp(Rd), 1 ≤p < 2,
+and H(x1,...,xk) = πkKh(·,x1,...,xk), to obtain the following. Recall the
+deﬁnition (2.21) of µs.
+Corollary 3.
+Let K, fg and s > 0 satisfy the conditions of Theorem
+3 for 1 ≤p < 2. Then there exist γ > 0 and D > 0 such for all n ≥1 and
+x > 0,
+Pr
+∥P
+Ikn πkKh(·,Xi1,...,Xik)∥p
+Dnk−1/
+√
+h
+> x
+
+≤γ exp
+
+−
+
+x
+∥K∥p,2,s
+1/k
+,
+(3.37)
+where ∥K∥p,2,s = ∥K∥p ∨∥K∥L2(µs).
+For the proof, ﬁrst, note the following easy bound for ∥∥πkKh∥p∥∞,
+namely, we can choose some A1 > 0, so that
+κ := A1∥K∥p/h1−1/p ≥
+sup
+x1,...,xk∈S
+∥πkKh(·,x1,...,xk)∥p.
+(3.38)
+
+LOCAL U-STATISTIC PROCESS
+33
+To see this, just observe that πkKh(t,x1,...,xk) is a linear combination of
+terms of the form hℓ(t,xi1,...,xiℓ) with (i1,...,iℓ) ∈Iℓ
+n and 0 ≤ℓ≤k, where
+h0(t) = P mKh and, for ℓ≥1,
+hℓ(t,xi1,...,xiℓ) = P m−ℓKh(t,x1,...,xℓ,Xℓ+1,...,Xm)
+= P m−ℓ1
+m!
+X
+σ∈Im
+m
+Kh(t −gσ(x1,...,xℓ,Xℓ+1,...,Xm))
+and gσ(y1,...,ym) = g(yσ1,...,yσm). Then Jensen’s inequality for expecta-
+tions and averages and a substitution yield
+Z
+|hℓ(t,x1,...,xl)|p dt ≤
+Z
+|Kh(t)|p dt = h1−p
+Z
+|K(t)|p dt.
+We shall also need a good bound for E∥P
+Ikn πkKh(·,Xi1,...,Xik)∥p in
+order to estimate χn in (3.31). Such a bound will be based on the following
+lemma, which is an extension of ideas and results in Chapter 7 in Devroye
+[8] and Section 3 of Devroye [9].
+Lemma 1.
+Let 1 ≤p < 2. If f and k are two nonnegative functions on
+Rd such that f,k ∈L1(µs) for some s > d(2−p)/p, then, for any 0 < b < ∞,
+sup
+h∈(0,b]
+Z
+(kh ∗f)p/2(y)dy ≤C(∥f∥L1(µs)∥k∥L1(µs))p/2
+for some constant C that depends only on d, p and s.
+Proof.
+Let q = sp/(2−p) and note that v(y) := (1+|y|)−q is integrable.
+Then, by Jensen with respect to the probability measure v(y)dy/∥v∥1, we
+have
+Z
+(kh ∗f)p/2(y)dy =
+Z
+v(y)−1(kh ∗f)p/2(y)v(y)dy
+≤∥v∥1−p/2
+1
+Z
+(1 + |y|)s(kh ∗f)(y)dy
+p/2
+.
+Since (1+|u+v|) ≤(1+|u|)(1+|v|) and 1+|hu| ≤(1∨h)(1+|u|) for h > 0,
+we also haveZ
+(1 + |y|)s(kh ∗f)(y)dy
+≤
+Z Z
+(1 + |y −x|)s(1 + |x|)skh(y −x)f(x)dxdy
+≤(1 ∨bs/d)∥f∥L1(µs)∥k∥L1(µs).
+The lemma follows from these inequalities.
+□
+
+34
+E. GIN´E AND D. M. MASON
+Lemma 2.
+If K ∈L2(Rd) and h > 0, then, for 1 ≤k ≤m and t ∈Rd,
+E(πkKh(t,X1,...,Xk))2 ≤((K2)h ∗fg)(t)
+h
+.
+(3.39)
+Let now K, fg and s > 0 satisfy the conditions of Theorem 3 for 1 ≤p < 2,
+and let 0 < b < ∞. Then there exists C < ∞, such that, for 1 ≤k ≤m and
+all 0 < h ≤b,
+ 
+E
+
+X
+Ikn
+πkKh(·,Xi1,...,Xik)
+
+2
+p
+!1/2
+≤C∥K∥L2(µs)nk/2
+h1/2
+.
+(3.40)
+Proof.
+Using the fact that πk is a projection in L2(Pr), and applying
+convexity of the square function to the symmetrization of Kh, we have
+E(πkKh(t,X1,...,Xk))2 ≤1
+h2 EK2
+t −g(X1,...,Xm)
+h1/d
+
+= 1
+h((K2)h ∗fg)(t),
+that is, (3.39). Next, by orthogonality,
+E
+ X
+Ikn
+πkKh(·,Xi1,...,Xik)
+!2
+=
+k!n!
+(n −k)!E(πkKh(t,X1,...,Xk))2.
+Then the Minkowski inequality for integrals (e.g., Folland [14], page 194)
+and the above results yield
+ 
+E
+
+X
+Ikn
+πkKh(·,Xi1,...,Xik)
+
+2
+p
+!1/2
+≤
+
+ 
+E
+ X
+Ikn
+πkKh(·,Xi1,...,Xik)
+!2!1/2
+p
+≤
+m!nk
+h
+1/2Z
+((K2)h ∗fg)p/2(t)dt
+1/p
+.
+The result (3.40) follows now from Lemma 1.
+□
+Proof of Corollary 3.
+It follows from Lemma 2 and from (3.38)
+that we can take, for some A2 > 0,
+χn := A2nk/2∥K∥p,2,s/
+√
+h
+and
+κ := A1∥K∥p,2,s/h1−1/p.
+
+LOCAL U-STATISTIC PROCESS
+35
+Assume that 0 < h ≤1 and r ≥2. Then we have the bounds
+rk/2χn = A2∥K∥p,2,srk/2nk/2/
+√
+h ≤A2∥K∥p,2,srknk−1/
+√
+h,
+r(k+1)/2nk−1κ = A1∥K∥p,2,sr(k+1)/2nk−1/h1−1/p ≤A1∥K∥p,2,srknk−1/
+√
+h
+and
+rkκ = rkA1∥K∥p,2,s/h1−1/p ≤A1∥K∥p,2,srknk−1/
+√
+h.
+By (3.33), this says that for some D > 0, for all r ≥2,
+E
+
+X
+Ikn
+πkKh(·,Xi1,...,Xik)
+
+r
+p
+≤(D∥K∥p,2,srknk−1/
+√
+h)r
+and thus
+E
+
+X
+Ikn
+πkKh(·,Xi1,...,Xik)
+
+r/k
+p
+≤
+ 
+E
+
+X
+Ikn
+πkKh(·,Xi1,...,Xik)
+
+r
+p
+!1/k
+≤(D∥K∥p,2,srknk−1/
+√
+h)r/k
+= (3kD∥K∥p,2,snk−1/
+√
+h)r/krr/3r.
+The same bound holds for r = 1. From this moment bound we easily get
+that for all k ≥2,
+E exp
+∥P
+Ikn πkKh(·,Xi1,...,Xik)∥p
+3kD∥K∥p,2,snk−1/
+√
+h
+1/k
+<
+∞
+X
+r=0
+rr
+3rr! =: γ < ∞.
+The desired result (3.37) follows now from Markov’s inequality and a re-
+naming of D.
+□
+Notice for future use that by (3.37) we get via (2.16) that for some C > 0,
+
+√n∥P
+Ikn πkKh(·,Xi1,...,Xik)∥p
+nk
+
+Ψ1/k
+≤CD∥K∥p,2,s
+√
+nh
+.
+(3.41)
+3.5. Completion of the proofs of the CLT.
+We are now ready to prove
+(3.8) for 1 ≤p ≤∞, which will complete the proofs of Theorems 1, 2 and 3
+(Section 3.1). We begin with the case p = ∞.
+Proof of Theorem 1.
+Let
+Kg,n := {K((y −g(·))/h1/d):y ∈Rd,ahn ≤h ≤bhn}.
+Since N(Kg,n,L2( ˜Q),ε) = N(Kn,L2( ˜Q ◦g−1),ε) for every probability mea-
+sure ˜Q on Rm, it follows from condition (a) in Theorem 1 that the classes
+
+36
+E. GIN´E AND D. M. MASON
+Kg,n are VC-type with the same A and v and with envelopes Fn(g). More-
+over, since the map
+(y,h,x1,...,xm) 7→K((y −g(x1,...,xm))/h1/d)
+is jointly measurable, these classes are image admissible Suslin, hence mea-
+surable. So, we can apply Theorem 8 to them. Since by Minkowski’s inequal-
+ity
+(λhn)2EK2
+λhn(y,X1,...,Xm) ≤EK2
+y −g(X1,...,Xm)
+(λhn)1/d
+
+=
+Z
+K2
+ y −w
+(λhn)1/d
+
+fg(w)dw ≤∥fg∥∞∥K∥2
+2bhn,
+we can take σ2 = Chn with C = b∥fg∥∞∥K∥2
+2/∥πkK∥2
+∞. Hence, Theorem 8
+gives that there is a constant Ck such that, for all n and k,
+E
+(
+sup
+
+1
+nk/2 λhn
+X
+Ikn
+πkKλhn(t,Xi1,...,Xik)
+:t ∈Rd,a ≤λ ≤b
+)
+≤Ck
+p
+hn[1 ∨log(A∥Fn∥L2(fg)/
+p
+hn )].
+Hence, if nhn/[1 ∨log(A∥Fn∥L2(fg)/√hn )]2 →∞, then for all k = 2,...,m,
+E sup
+a≤λ≤b
+∥√nU (k)
+n (πkKλhn)∥∞≤C[1 ∨log(A∥Fn∥L2(fg)/√hn )]
+n(k−1)/2h1/2
+n
+→0,
+(3.42)
+proving (3.8) in the L∞case.
+□
+Proof of Corollary 1.
+By the Hoeﬀding decomposition (3.5), it
+suﬃces to show [in analogy with Proposition 1 and (3.8)] that
+sup
+0<λ≤1
+|λ(√nmU (1)
+n (π1Kλhn(0,·,...,·)) −νn(0))| →0
+in pr
+(3.43)
+and
+sup
+0<λ≤1
+λ√n|U (k)
+n (πkKλhn(0,·,...,·))| →0,
+k = 2,...,m.
+(3.44)
+As in the proof of Proposition 1, (3.43) reduces to proving
+sup
+0<λ≤1
+λ
+Z
+|νn(−u) −νn(0)||Kλhn(u)|du →0
+for i = 1,...,m. Let M be such that D is contained in the ball of radius M
+about the origin in Rd. Since Kλhn(u) = I{u ∈(λhn)1/dD/(λhn Vol(D))} is
+zero for |u| > (λhn)1/dM, we have
+sup
+0<λ≤1
+λ
+Z
+|νn(−u) −νn(0)||Kλhn(u)|du ≤
+sup
+|u|≤h1/d
+n
+M
+|νn(−u) −νn(0)|,
+
+LOCAL U-STATISTIC PROCESS
+37
+which tends to zero in probability by condition (2.13), proving (3.43).
+For each n, the class of functions {IλhnD :0 ≤λ ≤1} is VC because it is
+linearly ordered (these are the simplest VC classes), and its envelope is
+contained in the class. The same is true for the class {λhnKλhn(0,·,...,·)/
+∥πkK(0,·,...,·)∥∞:0 < λ ≤1}. Then the logarithm in the bound (3.9) in
+Theorem 8 is simply a constant, and that theorem gives
+nk/2
+hn
+∥πkK(0,·,... ,·)∥∞
+E sup
+0<λ≤1
+|λU (k)
+n (πkKλhn(0,·,...,·))| ≤Cσ
+as long as nσ2 > C′, for ﬁxed constants C and C′ and for k = 2,...,m, where
+we can take
+σ2 =
+hn∥fg∥∞
+Vol(D)∥πkK(0,·,...,·)∥2∞
+because, by change of variables,
+sup
+0<λ≤1
+E[λ2h2
+nK2
+λhn(−g(X1,...,Xm)/(λhn)1/d)] ≤hn∥fg∥∞/Vol(D).
+Since nhn →∞by hypothesis, the condition nσ2 > C′ is satisﬁed, and there-
+fore, we can apply Theorem 8 and obtain
+sup
+0<λ≤1
+λ√n|U (k)
+n (πkKλhn(0,·,...,·))| ≤
+Ck
+n(k−1)/2h1/2
+n
+→0
+for all 2 ≤k ≤m, proving (3.44).
+□
+To ﬁnish the proof of Theorems 2 and 3 is more complicated because we
+must deal with a mixed norm, the sup over λ of an Lp norm. The proof
+will consist in showing that the exponential inequalities from the above
+subsections lead to an entropy bound of the random variables in (3.8).
+Given a kernel L in Lp(Rd), 1 ≤p < ∞, and h > 0, let Lh(t,x1,...,xm)
+be the symmetrization of Lh(t−g(x1,...,xm)), as in (3.4). We observe that,
+just as in (3.38), there is a constant c < ∞that depends only on k such that
+∥∥πkLh∥p∥∞≤c∥L∥p
+h(p−1)/p ,
+k = 1,...,m.
+(3.45)
+Because of (3.45), it makes sense to deﬁne
+XL,n :=
+
+h(p−1)/p
+n
+nk/2
+X
+i∈Ikn
+πkLhn(·,Xi1,...,Xim)
+
+p
+.
+(3.46)
+Proof of (3.8) for 2 ≤p < ∞.
+For p ≥2, Lp is of type 2 and Theorem
+9 then gives that, for a constant C that depends only on k and p, for all
+x ≥0,
+Pr{XL,n ≥x} ≤D exp
+
+−
+
+x
+C∥L∥p
+2/k
+,
+(3.47)
+
+38
+E. GIN´E AND D. M. MASON
+and then, by (2.16), we have for another constant C that depends on k and
+p,
+∥XL,n∥Ψ2/k ≤C∥L∥p,
+(3.48)
+where Ψ2/k is the Young modulus of exponential type deﬁned in (2.14) [but
+with Ψ1(x) = ex −1] and ∥· ∥Ψ2/k is the associated (pseudo)norm (2.15).
+Applying (3.48) to L = Kλ −Kλ′, we obtain
+∥XKλ,n −XKλ′,n∥Ψ2/k ≤∥XKλ−Kλ′,n∥Ψ2/k ≤C∥Kλ −Kλ′∥p.
+(3.49)
+Then this bound and (3.45) allow us to apply the usual entropy integral
+bound, for example, in the version given in de la Pe˜na and Gin´e [7], Corollary
+5.1.5, and conclude that for some constant D, keeping in mind that 0 ∈K[a,b],
+ sup
+a≤λ≤b
+XKλ,n
+
+Ψ2/k
+≤D
+Z C∥K∥p
+0
+Ψ−1
+2/k(N(K[a,b],dp,ε))dε,
+(3.50)
+where K[a,b] is deﬁned by (2.17) and dp is the Lp(Rd) distance deﬁned in
+(2.18) (technically, this only holds for any separable version of the process
+XKλ,n, but we see in a remark below that this process itself is separable).
+Now, since up to constants Ψα is increasing in α, hypothesis (a) in Theorem
+2 implies that this integral is ﬁnite for all 2 ≤k ≤m. Taking into account
+that the Orlicz distances of exponential type dominate (up to constants) the
+Lr(Pr) distances, inequality (3.50) implies that for all 2 ≤k ≤m,
+E sup
+a≤λ≤b
+∥√nU (k)
+n (πkKλhn)∥p ≤
+C
+n(k−1)/2h(p−1)/p
+n
+,
+for some constant C that depends on k,p,a and b. The condition nh2(p−1)/p
+n
+→
+∞implies that this expectation tends to zero for 2 ≤k ≤m, proving (3.8)
+for p ≥2.
+□
+Proof of (3.8) for 1 ≤p < 2.
+Since fg and K2 are in L1(µs) for some
+s > d(2 −p)/p, Lemma 1 applies and therefore Corollary 3 and inequality
+(3.41) hold. Now, the proof of (3.8) and subsequently Theorem 3 follow
+exactly as the proof of Theorem 2, but using Corollary 3 and its consequence
+(3.41) instead of Theorem 9 and its consequence for XL,n. These give
+∥XL,n∥Ψ1/k ≤Cnk/2−1h1/2−1/p
+n
+∥L∥p,2,s
+instead of (3.48), which yields, as in the previous proof, for some constant
+D,
+ sup
+a≤λ≤b
+XKλ,n
+
+Ψ1/k
+≤Dnk/2−1h1/2−1/p
+n
+Z C∥K∥p,2,s
+0
+Ψ−1
+1/k(N(K[a,b],dp ∨˜d2,s,ε))dε
+
+LOCAL U-STATISTIC PROCESS
+39
+instead of (3.50). Hence, for some constant C,
+E sup
+a≤λ≤b
+∥√nU (k)
+n (πkKλhn)∥Lp ≤′
+1
+nk/2−1/2h1−1/p
+n
+E sup
+a≤λ≤b
+XKλ,n
+≤C∥K∥p,2,s
+(nhn)1/2 →0
+if nhn →∞.
+□
+Remark 5 (Separability of the process XKλ,n).
+In the previous subsec-
+tion technically we must make sure that
+ sup
+λ∈[a,b]
+XKλ,n
+
+Ψα
+= sup
+max
+λ∈C XKλ,n
+
+Ψα
+:C ﬁnite, C ⊂[a,b]
+
+in order to ensure that the entropy bound applies exactly to the process
+XKλ,n and not to a modiﬁcation thereof. For this, by standard arguments
+(basically the monotone convergence theorem), it suﬃces that there exist
+D ⊂[a,b] countable such that
+sup
+λ∈[a,b]
+XKλ,n = sup
+λ∈D
+XKλ,n
+a.s.
+(3.51)
+Let D denote the rationals in [a,b]. To show (3.51) it suﬃces to prove that,
+with probability 1, for each λ ∈[a,b] and any sequence λm in D such that
+λm →λ we have limm→∞XKλm−Kλ,n = 0. In turn to verify this it is enough
+to check that
+lim
+m→∞
+ Z
+Rd
+
+X
+Ikn
+πkKλmhn −Kλhn(t,Xi1,...,Xik)
+
+p
+dt
+!1/p
+= 0.
+(3.52)
+Now, each of these Lp norms is bounded by a ﬁnite number of terms of the
+form
+Z
+Rd |E(Kλmhn −Kλhn)(t −V )|p dt
+1/p
+,
+where V is a random variable. Observe that
+Z
+Rd |E(Kλmhn −Kλhn)(t −V )|p dt
+1/p
+≤
+
+E
+Z
+Rd |(Kλmhn −Kλhn)(t −V )|p dt
+1/p
+=
+
+E
+Z
+Rd
+
+1
+λmhn
+K
+
+t −V
+(λmhn)1/d
+
+−
+1
+λhn
+K
+ t −V
+(λhn)1/d
+
+p
+dt
+1/p
+,
+
+40
+E. GIN´E AND D. M. MASON
+which by the change of variables inside the integral u = (t −V )/(λmhn)1/d
+is equal to
+
+λmhn
+Z
+Rd
+
+1
+λmhn
+K(u) −
+1
+λhn
+K
+λm
+λ
+1/d
+u
+
+p
+du
+1/p
+=
+Z
+Rd
+K(u) −λm
+λ K
+λm
+λ
+1/d
+u
+
+p
+du
+1/p
+(λmhn)1/p−1.
+Now since K ∈Lp(Rd) we have limγ→1
+R
+Rd |K(u)−K(γu)|p du = 0, and this,
+in turn, implies that
+lim
+m→∞
+Z
+Rd
+K(u) −λm
+λ K
+λm
+λ
+1/d
+u
+
+p
+du = 0,
+which gives (3.51).
+Acknowledgments.
+We would like to thank Anton Schick and Wolfgang
+Wefelmeyer for introducing us to this area via the second named author.
+We are also grateful to an anonymous referee whose excellent detailed com-
+ments were very helpful for improving and streamlining the presentation; in
+particular the present proof of Lemma 1 belongs to him. Finally we thank
+Julia Dony for pointing out a number of misprints as well as for a helpful
+suggestion.
+REFERENCES
+[1] Ahmad, I. A. and Fan, Y. (2001). Optimal bandwidths for kernel density estimators
+of functions of observations. Statist. Probab. Lett. 51 245–251. MR1822731
+[2] Araujo, A. and Gin´e, E. (1980). The Central Limit Theorem for Real and Banach
+Valued Random Variables. Wiley, New York. MR0576407
+[3] Arcones, M. A. (1995). A Bernstein-type inequality for U-statistics and U-
+processes. Statist. Probab. Lett. 22 239–247. MR1323145
+[4] Bickel, P. and Ritov, Y. (1988). Estimating integrated squared density deriva-
+tives: Sharp best order of convergence estimates. Sankhy¯a Ser. A 50 381–393.
+MR1065550
+[5] Deheuvels, P. and Mason, D. M. (2004). General asymptotic conﬁdence bands
+based on kernel-type function estimators. Stat. Inference Stoch. Process. 7 225–
+277. MR2111291
+[6] de la Pe˜na, V. H. (1992). Decoupling and Khintchine’s inequalities for U-statistics.
+Ann. Probab. 20 1877–1892. MR1188046
+[7] de la Pe˜na, V. H. and Gin´e, E. (1999). Decoupling. From Dependence to Indepen-
+dence. Springer, New York. MR1666908
+[8] Devroye,
+L. (1987). A Course in Density Estimation. Birkh¨auser, Boston.
+MR0891874
+[9] Devroye, L. (1992). A note on the usefulness of superkernels in density estimation.
+Ann. Statist. 20 2037–2056. MR1193324
+[10] Dudley, R. M. (1999). Uniform Central Limit Theorems. Cambridge Univ. Press.
+MR1720712
+
+LOCAL U-STATISTIC PROCESS
+41
+[11] Dunford, N. and Schwartz, J. T. (1988). Linear Operators. Part I. General The-
+ory. Wiley, New York. MR1009162
+[12] Eastwood, V. R. and Horv´ath, L. (1999). Limit theorems for short distances in
+Rm. Statist. Probab. Lett. 45 261–268. MR1718038
+[13] Einmahl, U. and Mason, D. M. (2000). An empirical process approach to the
+uniform consistency of kernel-type function estimators. J. Theoret. Probab. 13
+1–37. MR1744994
+[14] Folland, G. B. (1999). Real Analysis: Modern Techniques and Their Applications,
+2nd ed. Wiley, New York. MR1681462
+[15] Frees, E. W. (1994). Estimating densities of functions of observations. J. Amer.
+Statist. Assoc. 89 517–525. MR1294078
+[16] Gin´e, E. and Guillou, A. (2001). On consistency of kernel density estimators for
+randomly censored data: Rates holding uniformly over adaptive intervals. Ann.
+Inst. H. Poincar´e Probab. Statist. 37 503–522. MR1876841
+[17] Gin´e, E. and Koltchinskii, V. (2006). Concentration inequalities and asymp-
+totic results for ratio type empirical processes. Ann. Probab. 34 1143–1216.
+MR2243881
+[18] Gin´e, E., Lata la, R. and Zinn, J. (2000). Exponential and moment inequalities for
+U-statistics. In High Dimensional Probability, II (E. Gin´e, D. M. Mason and J.
+A. Wellner, eds.) 13–38. Birkh¨auser, Boston. MR1857312
+[19] Gin´e, E. and Mason, D. M. (2006). Uniform in bandwidth estimation of integral
+functionals of the density function. Preprint.
+[20] Gin´e, E. and Mason, D. M. (2007). Laws of the iterated logarithm for the local
+U-statistic process. J. Theoret. Probab. To appear.
+[21] Gin´e, E., Mason, D. M. and Zaitsev, A. Yu. (2003). The L1-norm density esti-
+mator process. Ann. Probab. 31 719–768. MR1964947
+[22] Jain, N. (1977). Central limit theorem and related questions in Banach space.
+In Probability (J. L. Doob, ed.) 55–65. Amer. Math. Soc., Providence, RI.
+MR0451328
+[23] Jammalamadaka, S. R. and Janson, S. (1986). Limit theorems for a triangular
+scheme of U-statistics with applications to inter-point distances. Ann. Probab.
+14 1347–1358. MR0866355
+[24] Ledoux, M. and Talagrand, M. (1991). Probability in Banach Spaces. Springer,
+Berlin. MR1102015
+[25] Mason, D. M. (2004). A uniform functional law of the logarithm for the local em-
+pirical process. Ann. Probab. 32 1391–1418. MR2060302
+[26] Nolan, D. and Pollard, D. (1987). U-processes: Rates of convergence. Ann.
+Statist. 15 780–799. MR0888439
+[27] Parzen, E. (1962). On estimation of a probability density function and mode. Ann.
+Math. Statist. 33 1065–1076. MR0143282
+[28] Pinelis, I. F. (1995). Optimum bounds on moments of sums of independent random
+vectors. Siberian Adv. Math. 5 141–150. MR1387858
+[29] Pisier, G. and Zinn, J. (1978). On the limit theorems for random variables with
+values in the spaces Lp, 2 ≤p < ∞. Z. Wahrsch. Verw. Gebiete 41 289–304.
+MR0471010
+[30] Pollard, D. (1984). Convergence of Stochastic Processes. Springer, New York.
+MR0762984
+[31] Rost, D. (2000). Limit theorems for smoothed empirical processes. In High Dimen-
+sional Probability, II (E. Gin´e, D. M. Mason and J. A. Wellner, eds.) 107–113.
+Birkh¨auser, Boston. MR1857318
+
+42
+E. GIN´E AND D. M. MASON
+[32] Schick, A. and Wefelmeyer, W. (2004). Root n consistent density estimators
+for sums of independent random variables. J. Nonparametr. Stat. 16 925–935.
+MR2094747
+[33] Schick, A. and Wefelmeyer, W. (2006). Pointwise convergence rates and central
+limit theorems for kernel density estimators in linear processes. Statist. Probab.
+Lett. 76 1756–1760. MR2274137
+[34] Schick, A. and Wefelmeyer, W. (2007). Root-n consistent density estimators of
+convolutions in weighted L1-norms. J. Statist. Plann. Inference 137 1765–1774.
+[35] Talagrand, M. (1994). Sharper bounds for Gaussian and empirical processes. Ann.
+Probab. 22 28–76. MR1258865
+[36] Vakhania, N. (1981). Probability Distributions on Linear Spaces. North-Holland,
+Amsterdam. MR0626346
+[37] van der Vaart, A. W. and Wellner, J. A. (1996). Weak Convergence and Empir-
+ical Processes. With Applications to Statistics. Springer, New York. MR1385671
+Department of Mathematics
+University of Connecticut
+196 Auditorium Road
+Storrs, Connecticut 06269-3009
+USA
+E-mail: gine@math.uconn.edu
+Department of Food and Resource Economics
+University of Delaware
+206 Townsend Hall
+Newark, Delaware 19717
+USA
+E-mail: davidm@udel.edu

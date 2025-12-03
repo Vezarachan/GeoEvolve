@@ -1,0 +1,1270 @@
+Randomized Experimental Design via Geographic Clustering
+David Rolnick∗, Kevin Aydin†, Jean Pouget-Abadie†,
+Shahab Kamali†, Vahab Mirrokni†, Amir Najmi†
+Abstract
+Web-based services often run randomized experiments to improve
+their products. A popular way to run these experiments is to use
+geographical regions as units of experimentation, since this does
+not require tracking of individual users or browser cookies. Since
+users may issue queries from multiple geographical locations, geo-
+regions cannot be considered independent and interference may be
+present in the experiment. In this paper, we study this problem, and
+ﬁrst present GeoCUTS, a novel algorithm that forms geographi-
+cal clusters to minimize interference while preserving balance in
+cluster size. We use a random sample of anonymized trafﬁc from
+Google Search to form a graph representing user movements, then
+construct a geographically coherent clustering of the graph. Our
+main technical contribution is a statistical framework to measure
+the effectiveness of clusterings. Furthermore, we perform empiri-
+cal evaluations showing that the performance of GeoCUTS is com-
+parable to hand-crafted geo-regions with respect to both novel and
+existing metrics.
+1
+Introduction
+Large-scale online services routinely conduct live experiments to
+improve their products. As described in [27], browser cookies are
+the standard unit of analysis for experiments run by many web ser-
+vices. Typically, cookies are randomly selected into disjoint treat-
+ment and control groups and then subjected to different treatments
+(e.g. background color). The statistical and practical signiﬁcance
+of metric differences between the two groups of cookies are im-
+portant factors in the decision whether or not to launch the exper-
+imental treatment to all users. While this cookie-based approach
+has been used extensively in the industry, it has some important
+limitations when measuring long-term effects on users. As detailed
+in [14], the fundamental problem is that “[cookies]...are a poor
+proxy for users...Users can clear their cookies whenever they want,
+and they frequently use multiple devices and multiple browsers.”
+The authors further observe that “Using a signed-in id may seem to
+mitigate this issue, but users can have multiple sign-ins and many
+queries are made while signed-out.” Thus the effect measured by
+a cookie experiment is diluted by the fact that a user may be in the
+treatment group on one device or browser and in the control group
+in another.
+To ﬁx this problem, experiments are often run on geographical
+regions [31]. This is a form of cluster-based randomization [15].
+∗University of Pennsylvania, drolnick@seas.upenn.edu
+†Google, {kaydin, jeanpa, kamali, mirrokni, amir}@google.com
+Assuming a user remains within one such region, the user will re-
+ceive consistent experimental treatment regardless of which device
+or browser she uses. Geo-partitions are also somewhat well-suited
+to mitigate secondary effects from interactions between the treat-
+ment and control groups. When experiments are run with large,
+noticeable changes (e.g. a new feature or signiﬁcant redesign of an
+existing feature), it is often the case that users inﬂuence each other
+by word of mouth. Such inﬂuence tends to be biased towards ge-
+ographically local interaction [6]. Geo-regions have typically been
+hand-designed with great effort. Moreover their design has typ-
+ically ignored the actual movements of web users, which means
+an increased number of users move between regions, causing in-
+terference between the treatment and control arms of the experi-
+ment, which violates the Stable Unit Treatment Value Assumption
+(SUTVA) [15] on which standard causal inference analyses rely.
+In this paper, we aim to design a framework for running ran-
+domized experiments using geographic clustering.
+To this end,
+we ﬁrst present a distributed algorithm, Geographic Clustering Us-
+ing Travel Statistics (GeoCUTS) designed to mitigate interference
+whilst ensuring experimental power. We perform a comprehensive
+evaluation on massive quantities of Google Search data to study the
+impact of different design choices on GeoCUTS and compare its
+performance against alternatives, for both novel and existing met-
+rics. To do so, we describe a statistical framework for evaluating
+the quality of the clusters, and a new metric—the Q-metric—for
+this purpose. This statistical framework and the new metric are of
+independent interest as they present a novel way to measure effec-
+tiveness of clustering for such experimental design problems. In
+particular, we formally show the relationship between minimizing
+the cut via a balanced partitioning and optimizing the Q-metric,
+which, in turn, we show represents the quality of experimental de-
+sign. Finally, the results of our empirical study suggest that the
+performance of GeoCUTS is equal to or surpasses that of hand-
+designed regions.
+2
+Prior results
+Many authors [2, 19, 25] have considered the problem of causal
+inference in a network-structured domain.
+Experimental treat-
+ment is imposed upon some nodes and interference occurs between
+nodes that are sufﬁciently close in the network. For example, in
+a social network, an individual’s response may be inﬂuenced both
+by their own treatment and by that of their friends or friends of
+friends [3, 7, 32, 20]. Ugander et al. [30] and Gui et al. [13] de-
+sign low-variance estimators for these cases, relying upon clusters
+within the network. Eckles et al. [11] demonstrate the effectiveness
+1
+arXiv:1611.03780v2  [cs.SI]  15 Feb 2019
+
+of network bucket testing, randomly assigning treatments to dif-
+ferent clusters, which gives a natural low-variance estimator. This
+approach is analyzed further by Backstrom and Kleinberg [5] and
+by Katzir et al. [17], who consider making clusters using weighted
+random walks on the network. Few of these prior works however
+consider the bipartite setting that we study here. Our main contri-
+bution to this literature is the introduction of the Q-metric and its
+justiﬁcation as a suitable quality metric for causal experiments on
+bipartite graphs.
+Furthermore, our paper builds upon existing literature for ﬁnd-
+ing balanced clusters efﬁciently within a large network and evalu-
+ating the resulting clustering. In balanced partitioning, our goal is
+to ﬁnd a set of clusters of almost equal size and to minimize the
+total weight of edges that cross clusters (i.e., minimize the cut).
+This is an NP-hard problem that is computationally hard even for
+medium-sized graphs [1] as it captures the problem of graph bisec-
+tion [12]. No constant approximation algorithm is known. Loga-
+rithmic time approximation algorithms are based on solving linear
+programming and semi-deﬁnite programming relaxations for these
+problems. Such relaxations are hard for graphs with thousands of
+nodes, yet we must consider still larger graphs, which require ef-
+fective heuristics that can be implemented in a distributed manner.
+While the topic of large-scale balanced graph partitioning has
+attracted signiﬁcant attention in the literature [16, 9, 8, 28, 29,
+26, 23, 22], many prior authors have studied large-scale but non-
+distributed solutions to this problem. The need for distributed al-
+gorithms has been observed by several practical and theoretical re-
+search papers [4, 28, 29]. Zhu and Ghahramani [33] introduced
+the approach of label propagation, which was generalized to bal-
+anced clusters in the work of Ugander and Backstrom [29]. More
+recently, Aydin et al. [4] achieve a scalable clustering in large net-
+works by embedding the nodes along a line and use this embedding
+in future optimization steps. This approach has been proved to be
+effective for highly connected networks and expander graphs such
+as social networks [4]. Our work in this paper focuses on cluster-
+ing with a geographically deﬁned network, in contrast to the focus
+upon social networks. Our contribution to this literature is the par-
+allelization of the “natural cuts” algorithm [9, 8], which has been
+shown to be effective in solving the balanced partitioning problem,
+particularly for geographical graphs.
+3
+Algorithm
+We now present the GeoCUTS algorithm. The input is a set of lo-
+cations and individual users who have issued queries there. The
+algorithm proceeds in two phases. In Phase 1, we build a graph
+from the given data by setting nodes to discretized locations and as-
+signing edges between pairs of nodes that frequently share users. In
+Phase 2, we ﬁnd a clustering of this graph by applying a geographic
+clustering algorithm that combines recently developed techniques.
+Both the graph-building and the graph-clustering algorithm are de-
+signed to be run massively in parallel.
+3.1
+Phase 1: Graph building
+3.1.1
+Discrete locations.
+The ﬁrst step in building our graph is location discretization: we
+round each location to the nearest gridpoint in a lattice, where the
+width of the lattice may be speciﬁed; a coarser lattice yields a faster
+but less precise algorithm. We have chosen to discretize to a grid,
+rather than for instance to the nearest city, as described in Ugan-
+der and Backstrom [29], because a grid has a natural geometrical
+structure that we exploit in our algorithm. As a result, our method is
+applicable to location data which might include users in very rural
+areas or along transit corridors.
+3.1.2
+Node weights.
+We deﬁne a graph for which the nodes are the gridpoints above;
+in the following discussion, we shall identify each node with the
+corresponding range of user locations. The weight of a node is a
+measure of the number of user visits to that location; speciﬁcally,
+if a user visits node A a total of a times, then the user’s inﬂuence
+upon A is √a:
+weight(A) =
+X
+user u
+√
+# visits u to A.
+We use √a as a slight normalization. Alternatively, it would be
+possible to increment the node’s inﬂuence by any other normal-
+ization or a itself. We explored normalization because some in-
+dividual users may have much more location data available than
+others, which would bias the graph strongly towards these users to
+the exclusion of others. We compared the efﬁcacy of the square
+root normalization against other possible heuristics in §5.4.
+3.1.3
+Edge weights.
+The edges in this graph correspond to the intensity of transit be-
+tween nodes. Speciﬁcally, if a user visits node A a total of a times,
+and node B a total of b times, then the user’s inﬂuence upon edge
+AB is
+√
+ab:
+weight(AB) =
+X
+user u
+p
+(# visits u to A) · (# visits u to B).
+We use the geometric mean to increment edge weights since it is
+minimized when either endpoint is visited seldom, and is maxi-
+mized when the endpoints are visited equally.
+3.1.4
+Sparsity.
+We retain only certain edges within the graph, speciﬁcally those
+for which the geographical distance between the two nodes is less
+than a given parameter. The reason for this trimming of edges is
+twofold: ﬁrstly, it greatly reduces the size of the graph, allowing the
+number of edges to be linear, instead of at worst quadratic, in the
+number of nodes, which greatly speeds up the algorithm. Secondly,
+edges between nodes at great geographical distance interfere with
+our goal of geographically local clusters.
+2
+
+3.1.5
+Coverage
+In some instances, the data may not cover the entire geographical
+region of interest. For example, in clustering users within the USA,
+it may be uncommon to receive user locations from within Death
+Valley. This means that certain possible nodes do not have any
+weight in the graph. In the interest of complete geographic cover-
+age, GeoCUTS ﬁlls these gaps by creating new nodes with small
+weight. In addition, for every two nodes that are geographically
+close, the algorithm creates an edge of low weight. This enforces
+the geographic plausibility of output clusters even in areas of low
+data density.
+3.1.6
+Normalization.
+As a ﬁnal and critical step, we re-normalize the weights in the
+graph. We consider the cases of re-normalizing the weight x to
+√x and to log(x). As we discuss further in §5, we observed best
+results, both visually and according to the metrics introduced in
+§4, after log-normalizing both node and edge weights, though the
+normalization of nodes was most critical. This is due to the long
+tail distribution of our data, with small geographical regions con-
+centrating a (very) large amount of trafﬁc. Without normalization,
+our algorithm would attempt to aggressively split large cities, for
+example, to achieve exact balance between clusters.
+3.2
+Phase 2: Graph clustering
+As a crucial step in many graph mining problems, graph cluster-
+ing is an active research area and numerous algorithms have been
+developed for this problem. Since our objective is to minimize in-
+terference (that is, the interaction between clusters) while main-
+taining clusters with roughly similar size, we have chosen an al-
+gorithm that solves the balanced partitioning problem. While this
+problem is computationally hard even for small instances, a seek a
+distributed solution for large-scale graphs. We ﬁrst formally deﬁne
+balanced partitioning and then present our distributed algorithm for
+this problem on geographic graphs.
+Our algorithm improves on the the natural cuts heuristic [9, 8]
+by parallelizing two steps of the algorithm: the seed selection can
+be done in parallel using a Hilbert curve embedding (see §3.2.3);
+the contraction around seed nodes can be done in parallel by using
+a distributed hash-table service [4, 18].
+3.2.1
+The balanced partitioning problem.
+Consider a graph G(V, E) of N vertices with edge weights ℓ: E →
+R, node weights w : V →R. Let w(S) for any subset S of nodes
+be the total weight of nodes in S, i.e., w(S) = P
+j∈S w(j). A
+partition of nodes of G into M parts {Vk : k ∈[M]} is said to be
+α-balanced if and only if
+∀k ∈[M], (1 −α)w(V )
+M
+≤w(Vk) ≤(1 + α)w(V )
+M
+In particular, a zero-balanced (or fully balanced) partition is one
+where all partitions have the same weight. The weight of the cut
+for this partitioning is the total sum of all edges whose endpoints
+fall in different regions Vk and Vl:
+X
+k<l
+X
+(u,v)∈(Vk×Vl)∩E(G)
+ℓ(u, v).
+In the balanced partitioning problem, the goal is to ﬁnd an α-
+balanced partitioning for which the cut size is minimized. In most
+cases, we are not given a speciﬁc α as input and must ﬁnd a parti-
+tioning that is as balanced as possible, i.e., with minimum α. For
+more statistical context on balanced partitioning, see §4.
+Following the structure of algorithms based on natural cuts [9, 8],
+our distributed algorithm iterates on a contraction stage and gener-
+ates the output by applying a post-processing contraction stage, in
+which we merge parts of the contracted graph to compute the ﬁnal
+partitioning.
+Input: Undirected graph G(V, E) with node and edge weights
+and desired cluster size U
+Output: A partition of G into clusters of size near U
+Graph Contraction:
+S ←IdentifySeedSetMapRed (G, U);
+Em ←GetHilbertEmbedding (G, U);
+Parts ←SplitEqualParts (U, Em);
+return GetMiddleNodeOfEachParts (Parts);
+C ←NaturalCutsMapRed (G, S, U); // Cut edges
+Q ←w(V )
+M ;
+C(v) ←ExpandNeighborhood (v, Q/10);
+s ←ContractSubGraph (C(v));
+G′(v) ←ExpandNeighborhood (s, Q);
+t ←ContractSubGraph (G −G′(v));
+return ComputeSourceTargetCut (G′(v), s, t) ;
+CC ←ConnectedComponentsMapRed
+(G(V, E −C));
+H ←GraphContractionMapRed (G, CC);
+In Memory Merge:
+P ←GraphAssembly (H);
+H′ ←H, repeat :
+(u, v) ←MatchBestPair (H′) //
+w(u) + w(v) ≤U
+H′ ←ContractPair (H′, u, v);
+return ClustersOf (H′) // H′ nodes are clusters
+OutputClusters (P);
+Algorithm 1: Phase 2 of the GeoCUTS algorithm.
+3.2.2
+Our algorithm.
+In this section we go into the details of the main stages of our dis-
+tributed algorithm: 1) Contraction stage to reduce the graph size
+into a smaller one and 2) Merging stage that applies expensive
+heuristics to a small contracted in-memory graph.
+Contraction stage. This stage consists of a sequence of four main
+steps: (i) identifying a seed set, (ii) ﬁnding a natural cut around
+each seed node, (iii) computing connected components of the graph
+after removing edges of the natural cuts, and (iv) ﬁnally contracting
+3
+
+nodes in each connected component to one node and computing an
+updated smaller graph with new node weights and edge weights.
+The main contribution of our distributed implementation is that all
+of the natural cuts are computed in parallel, and the graph contrac-
+tion based on these cuts also happens in a distributed manner.
+1. Identify a seed set. Here, the goal is to identify a set of M
+seed nodes S from which we compute natural cuts. We follow
+the following strategy for computing this set S: embed nodes
+of the graph into a line using the Hilbert curve (see §3.2.3),
+and divide the line into M pieces, each with almost the same
+number of nodes. Then, output a node close to the center of
+each piece of the Hilbert curve embedding. This method en-
+sures that the set of seed nodes are spread uniformly across
+different parts, and thus natural cuts cover different parts of
+the graph.
+2. Natural cuts around seed nodes. After selecting the seed set,
+we compute a “natural cut” around each seed node in parallel.
+Consider a seed node v, and let Q = (1 + α) w(V )
+M , i.e., Q
+is the maximum weight of a cluster in an α-balanced parti-
+tioning. The idea is ﬁrst to compute a core C(v) around node
+v by performing a BFS around node v until we cover Q/10
+nodes (wher the constant 10 is heuristic). We contract C(v) to
+a node s. Then, we continue the BFS until the total size of the
+neighborhood reaches Q and form a graph G′(v) around node
+v. We take the rest of the graph G\G′(v) and contract it to one
+node, denoted by t. Finally, we compute a minimum (s, t)-cut
+in this graph G′(v). We call this (s, t)-cut a natural cut around
+seed node v. A desirable property of this cut is that it has less
+than Q total weight on its nodes, and can be used as a build-
+ing block for computing parts of a balanced partitioning. We
+can compute all these natural cuts in parallel in a distributed
+manner by applying a MapReduce framework, uploading the
+graph in a distributed hash-table service, and accessing the
+neighborhood of nodes via a read-only service [4, 18].
+3. Distributed connected components. As the next part of the
+contraction stage, we remove all edges of the graph that ap-
+pear in at least one of the natural cuts computed around the
+seed nodes, and then compute connected components in the
+remaining graph (after removing those edges). We apply a
+distributed implementation of connected components that em-
+ploys a distributed hash-table service that has been shown to
+be effective and scalable in practice [18, 24].
+4. Contraction of each connected component. After comput-
+ing connected components, we can easily construct a con-
+tracted graph as follows: we put a node ui for each connected
+component Ti with node weight w(Ti), i.e., the sum of the
+weight of nodes in Ti. We also set the weight of the edge
+between two nodes ui and uj to the sum of edge weights be-
+tween components Ti and Tj.
+Merging stage. If the size of the contracted graph is large, we it-
+erate on the contraction stage until the size of the graph is small
+enough to ﬁt in memory.1 When the contracted graph ﬁts in mem-
+1For our data sets, we never needed to iterate on this stage, since after the ﬁrst
+stage, the graph ﬁts in memory.
+ory, we can produce an output by applying any in-memory heuristic
+for balanced partitioning of graphs with node weights. The algo-
+rithm that we employ at this stage is similar to the greedy assembly
+algorithm proposed in [9, 8].
+3.2.3
+Hilbert curve embedding
+A Hilbert curve is a space-ﬁlling curve that has a fractal-like
+structure ﬁrst described by German mathematician David Hilbert
+in [21]. Figure 1 shows the ﬁrst three steps of its construction. It
+can be recursively constructed up to any desired level to approx-
+imate a space by dividing it into cells. One of its most desirable
+properties is that close distances in 2D space also stay (mostly)
+close on the 1D line. This property can be used to ﬁnd dense re-
+gions on a geographic graph by simply inspecting dense segments
+on the line. We use this property in our parallelization of the natural
+cuts seed selection (cf. §3.2.2).
+Figure 1: Hilbert space-ﬁlling curves are constructed recursively
+up to any desired resolution.
+4
+Statistical evaluation
+In this section, we deﬁne a set of metrics to measure how well
+a given partitioning supports the purpose of experimentation. In
+particular, we introduce the Q-metric as an improvement over the
+oft-used graph-cut metric in the literature on experimentation with
+interference [11, 13].
+4.1
+Quantifying interference: the Q-metric
+In many A/B tests, the units of experimentation can be considered
+independent: the outcome of one unit is affected only by whether
+it is assigned to treatment or control. In the potential outcomes
+framework [15], we say that the Stable Unit Treatment Value As-
+sumption (SUTVA) holds, in which case the difference-in-means
+estimator (and other common estimators) is provably unbiased for
+the treatment effect estimand.
+However, in certain A/B tests, the outcome of one unit may be
+affected by the treatment status of units around them. In this case,
+we say there is interference: the Standard Unit Treatment Value As-
+sumption (SUTVA) does not hold and our estimators are no longer
+guaranteed to be unbiased. In the geo-experiments case, the units
+of randomization are geographical regions; their outcomes are the
+aggregation of the user activity within each region. Because users
+travel from region to region, the outcome of one region does not de-
+pend only on whether that region is assigned to treatment or control,
+but also on the treatment status of all neighboring regions between
+which its users might travel.
+The causal inference literature often represents interference by a
+graph on the experimental units, where an edge is drawn between
+4
+
+two units likely to interfere with one another [11, 3, 34]. In this
+representation, two disconnected components of the graph (groups
+of regions with no users travelling from one to the other) do not
+affect each other’s outcome. The edge weights of the graph are
+chosen to be representative of the interference structure and often
+the result of a domain-informed heuristic.
+In our case, there is a clear underlying bipartite graph between
+users and regions (see Figure 2), from which we can build the in-
+terference graph between regions. Let aik be the number of queries
+performed by user i in region k. A natural weight to consider for a
+pair of geo-clusters k and k′ is the folded edge Ekk′:
+qkk′ =
+X
+i
+aikaik′
+(1)
+Much like in the graph building step of the GeoCUTS algorithm
+(cf. §3), we seek to normalize these edge weights to account for the
+large variance of information available across users and regions.
+Letting a:k = P
+i aik and ai: = P
+k aik be the region-aggregated
+and user-aggregated outcomes respectively, we consider the nor-
+malized folded edge:
+Qkk′ =
+X
+i
+aikaik′
+√a:ka:k′√ai:ai:
+.
+Figure 2: Diagram of the bipartite user-region graph and the result-
+ing “folded” interference graph between regions. The edge weights
+of the folded graph correspond to the unnormalized weights qkk (cf.
+Equation 1).
+To measure the “quality” of each individual cluster or region, we
+can simply set k = k′, as is done in the following deﬁnition:
+Deﬁnition 1. We deﬁne the quality of region k by:
+Qk =
+X
+i
+a2
+ik
+a:kai:
+,
+where ai: is the total number of queries issued by user i across all
+clusters and a:k is the number of queries in region k issued by all
+users. Let M be the number of regions. We deﬁne the quality or
+Q-metric of the overall geo-clustering as the mean quality of each
+region:
+¯Q = 1
+M
+X
+k
+Qk
+The Q-metric is a natural extension of the graph-cut metric [13,
+11] to the bipartite setting of users and regions. Much like a cut
+metric for interference, ¯Q = 1 when regions are perfectly isolated
+and no user travels between two regions, and ¯Q ∼
+1
+M when each
+user participates equally in each region.
+In constructing the Q-metric, we have considered regions to be
+units both of analysis and of randomization. Since our setting is
+bipartite, we could consider users to be units of analysis (but not
+randomization) as explored in [10, 34]. We would then face the
+problem of modeling user response to varying levels of treatment
+over time. As a user travels from region to region, he or she will be
+exposed to various values of treatment.
+For example, assume that a user’s response is proportional to
+their “treatment dose”, i.e. the ratio of queries made within treated
+regions over the total queries made. Let Zk ∈{0, 1} be the treat-
+ment status of region k; Zk = 1 if treated and Zk = 0 otherwise.
+Then, the treatment dose di received by user i and user i’s response
+Y t
+i at time t are given by:
+di =
+P
+k Zkaik
+ai:
+and
+Y t
+i = Y 0
+i (1 + βdi) ,
+(2)
+where Y 0
+i is the response of user i prior to the start of the experi-
+ment and β ∈R is an arbitrary coefﬁcient.
+In this dosed-response setting, we ﬁnd evidence that the Q-
+metric is an appropriate measure of clustering quality for the pur-
+pose of experimentation with interference. Let TE be the treatment
+effect estimand, deﬁned as the difference between responses when
+every region is treated (Z = ⃗1) and when none is treated (Z = ⃗0):
+TE = 1
+M
+X
+i
+Y t
+i (Z = ⃗1) −1
+M
+X
+i
+Y t
+i (Z = ⃗0)
+Though Y t
+i could be modeled as a linear function of the number of
+queries at
+i: made by user i at time t, we let Y t
+i = at
+i: to simplify the
+exposition of the following proposition, which serves to illustrate
+the relevance of the Q-metric.
+Proposition 1. Under the linear-outcomes model for users given
+in Equation 2, the expectation of the difference-in-means estimator
+ˆτ for the treatment effect with respect to the assignment of regions
+to treatment and control is:
+EZ [ˆτ] = TE + β
+  ¯Q −1
+
+Proof. Let Mt be the number of regions assigned to treatment and
+Mc the number of regions assigned to control, such that M = Mt+
+Mc. The difference-in-means estimator considers the difference of
+relative responses of treated and control geo-regions:
+ˆτ =
+1
+Mt
+X
+k
+Zk
+P
+i at
+ik
+a0
+:k
+−1
+Mc
+X
+k
+(1 −Zk)
+P
+i at
+ik
+a0
+:k
+Considering the user responses, linear in the treatment dose, and
+cancelling out the constant term, from Equation 2, the left-hand
+side (LHS) of the estimator becomes:
+ˆτLHS =
+1
+Mt
+X
+k
+Zk
+a0
+:k
+X
+i
+a0
+ik
+
+1 + β
+P
+k′ a0
+ik′Zk′
+a0
+i:
+
+5
+
+Taking the expectation with respect to the treatment assignment
+vector Z of the LHS estimator,
+EZ [ˆτLHS] = 1
+M
+X
+k
+1
+a0
+:k
+X
+i
+a0
+ik
+ 
+1 + β a0
+ik
+a0
+i:
++ Mt
+M
+P
+k′̸=k a0
+ik′
+a0
+i:
+!
+Computing the difference with the expectation of the right-hand
+side (RHS) of the estimator,
+EZ [ˆτ] = 1
+M
+X
+k
+1
+a0
+:k
+X
+i
+a0
+ikβ a0
+ik
+a0
+i:
+= 1
+M
+X
+k
+Qkk = β ¯Q
+Since the treatment effect is given by TE = β, we recover the
+formula in Proposition 1:
+EZ [ˆτ] = TE + β
+  ¯Q −1
+
+The Q-metric of the clustering is an appropriate measure for
+quantifying the quality of the geo-partitions in terms of interfer-
+ence: the higher ¯Q, the lower the bias of the difference-in-means
+estimator. In fact, when ¯Q is at its maximum ( ¯Q = 1), the estimator
+is unbiased for the treatment effect. It is, to the best of our knowl-
+edge, the ﬁrst heuristic of its kind for measuring cluster quality in
+a bipartite interference-graph setting.
+4.2
+Quantifying balance: the B-metric
+While the Q-metric is a good metric for measuring the interference
+present in an experiment, it cannot be the only yardstick by which
+we measure the overall quality of our experimental set-up. If it
+were, we could place the majority of users in one very large clus-
+ter, letting other clusters be sparsely populated (e.g. the contiguous
+United States vs. Hawaii and Alaska). While this would achieve a
+high Q-metric score, the variance of our estimator would be very
+large since our estimate would be strongly dependent on the treat-
+ment status of the large cluster.
+As an illustrative example, suppose the response rate of individ-
+ual users is given by Eq. 2 and that a single cluster k concentrates
+far more queries than any other clusters:
+X
+i
+aik >>
+X
+i
+X
+k′̸=k
+aik′
+If cluster k is placed in treatment, the treatment effect estimate will
+be approximately β · P
+i aik, otherwise it will be approximately
+β P
+i
+P
+k′̸=k aik′. As a result, the variance of our estimator is:
+varZ[ˆτ] ≈β2
+8 (2a:k −a::)2 + β2
+8 (a:: −2a:k)2 ≈β2
+4 a2
+:k
+where a:k = P
+i aik and a:: = P
+i
+P
+k aik. We have assumed
+that a:k ≈a:: in the above comparisons, i.e. there exists one large
+cluster that concentrates the vast majority of user queries.
+Despite the constant treatment effect parameter β on each in-
+dividual user, the variance of our estimator is large because one
+cluster is responsible for determining the treatment dose received
+by an overwhelming majority of users. To avoid such a scenario,
+we introduce the following balance metric.
+Deﬁnition 2. Let wk be the f-normalized weight of geo-region k:
+wk =
+P
+i f(aik)
+P
+i
+P
+k′̸=k f(aik′)
+where f is a normalization function of our choosing. We deﬁne the
+B-metric of the clustering as the quantity
+
+∥w∥2 −1
+M
+
+where M is the total number of geo-regions.
+As in the graph-building phase described in §3, we explored both
+√· and log(·) and the identify function as normalizations (cf. Ta-
+ble 5). As expected, the B-metric is equal to 0 if the clustering is
+perfectly balanced and is otherwise positive, with greater size indi-
+cating greater imbalance.
+4.3
+Effective number of clusters
+Our proposed balanced partitioning algorithm (cf.
+§3) optimizes
+both Q- and B-metrics in an effort to mitigate interference while
+enforcing balance. In achieving this trade-off, the number of clus-
+ters must be speciﬁed. As a rule of thumb, the larger the number
+of clusters, the more difﬁcult it will be to attain a high Q-metric.
+In the case of a complete interference graph for example, the high-
+est achievable Q-metric is
+1
+M , the inverse of the number of clusters
+speciﬁed by the user.
+While having few clusters may achieve a high Q-metric score
+without necessarily impacting the B-metric, having few experi-
+mental units has other undesirable statistical properties: high vari-
+ance of estimators, low coverage of conﬁdence intervals, covari-
+ate imbalance, etc. Ultimately, the ideal number of clusters will
+be experiment-dependent. We suggest, in practice, evaluating co-
+variate imbalance, running AA tests, and simulating possible user
+responses in order to determine experimental power under various
+numbers of clusters. In our experiments (cf. Table 1), we have
+used, as a baseline, a ﬁxed number of clusters based on that for
+established hand-designed geo-regions.
+5
+Empirical Results
+In this section we evaluate our algorithm and compare it against
+alternative algorithms and baselines.
+5.1
+Dataset
+We seek in our clustering to minimize the interference introduced
+by movement of users; hence, identifying movement trends is cru-
+cial. A natural choice for reconstructing movement of users is the
+(approximate) location of Google Search queries. We use a mas-
+sive dataset consisting of 1 percent of all Google Search data over
+a period of 28 days. Our data from Search queries consists of an
+anonymized set of browser cookies, each associated with a num-
+ber of locations at which that cookie has issued search queries.
+The locations are approximate (both of necessity and to preserve
+6
+
+Figure 3: The graph built by the GeoCUTS algorithm, with nodes
+shown on corresponding locations of the US. White represents
+large edge weights (high trafﬁc areas), while black represents low
+edge weights. Larger edge weights often do not match larger ver-
+tex weights, showing the difference between GeoCUTS and an al-
+gorithm simply measuring population density. Gaps in the colored
+regions represent locations for which no search data is available.
+For example, in regions such as deserts, Search queries come dis-
+proportionately from narrow strips corresponding to major roads.
+anonymity) and speciﬁed as a bounding box that covers the loca-
+tion at which a query was issued. The size of the bounding boxes is
+not uniform but all of them are large enough to contain locations of
+queries issued by a large number of distinct cookies. Larger boxes
+tend to occur in rural areas, where geo-location is less accurate and
+where the smaller number of queries also makes it necessary for
+bounding boxes to be larger in order to ensure anonymization. Due
+to the scale of our datasets, while we have only a rough position
+for each individual query, and potentially only a few queries per
+cookie, the aggregate movement patterns are quite accurate.
+Figure 4: The GeoCUTS algorithm applied to user queries from the
+United States. The algorithm automatically identiﬁes metropolitan
+areas, correctly predicting, for example, that the Bay Area includes
+San Francisco, Berkeley, and Palo Alto, but not Sacramento.
+To build a graph, we form a grid on the geographical area we
+wish to partition. Each grid cell is a node in our graph, with the
+edge between two nodes weighted based on the number of cook-
+ies that issue queries in both corresponding grid cells. Thus, for
+each query we need only identify the cell it is issued from; for this
+purpose, we assume that each query is issued at the center of its
+bounding box. To ensure that inaccuracies in estimating positions
+do not negatively impact our algorithm, grid cells must be large
+relative to the typical sizes of bounding boxes. We will take this
+assumption into account when we discuss the granularity of grid
+cells.
+In the rest of this section, we evaluate the performance of the
+GeoCUTS algorithm on different geographic regions, for each of
+which a separate graph was built and clustered. Figures 4 and 5
+show the clusters generated for data from the United States and
+France, respectively, and Figure 3 shows the GeoCUTS graph be-
+fore clustering. Note that prior hand-designed geo-regions have
+largely focused on the United States and, unlike GeoCUTS, cannot
+be generalized to other regions without extensive additional labor.
+5.2
+Mobility
+Stationary cookies (cookies that do not move) are not interesting
+for our problem. In an extreme scenario where all cookies are sta-
+tionary and issue queries from one location only, any arbitrary clus-
+tering algorithm performs perfectly well in terms of interference.
+Hence for our ﬁrst dataset we consider only highly mobile cookies:
+cookies that issue queries in at least two different cells of the grid.
+Figure 5: The GeoCUTS algorithm applied to user queries from
+France. It correctly identiﬁes metropolitan areas such as Paris, Bor-
+deaux, and Lyon, and regions such as Alsace and Normandy.
+The typical time-scale of experiments ranges from a few weeks
+to a few months, just long enough for a response equilibrium to be
+reached and for metrics to stabilize. While migrations may not af-
+fect the result of a one-day experiment, interference effects become
+more pronounced as time passes. Furthermore, some cookies are
+churned rather shortly after they are created; thus, multiple cook-
+ies may represent the same user over the period of our analysis.
+Hence, cookies with low query frequency under-represent the true
+movement. Query bounding boxes are in fact samples from the ac-
+tual movement path, and a small number of samples is not enough
+to reconstruct the path. Hence, for our second dataset we consider
+highly active cookies only: cookies which issue a query in more
+than 10 out of the 28 days. Some highly active users may still have
+a limited movement and issue queries from the same geographical
+area. On the other hand, while some highly mobile users may issue
+fewer queries, they tend to move over a wider range. Therefore we
+expect interference to be higher for highly mobile users, which is
+validated in our experiments.
+7
+
+(a)
+GeoCUTS
+DMA
+Grid
+Avg
+Query-w. avg
+Avg
+Query-w. ag
+Avg
+Query-w. avg
+US
+Highly Active
+87%
+92%
+88%
+92%
+84%
+91%
+Highly Mobile
+79%
+85%
+80%
+85%
+76%
+81%
+France
+Highly Active
+84%
+89%
+-
+-
+83%
+86%
+Highly Mobile
+74%
+79%
+-
+-
+75%
+77%
+(b)
+GeoCUTS
+DMA
+Grid
+≥0.75
+≥0.8
+≥0.85
+≥0.75
+≥0.8
+≥0.85
+≥0.75
+≥0.8
+≥0.85
+US
+Highly Active
+100%
+100%
+97%
+100%
+100%
+98%
+100%
+99%
+94%
+Highly Mobile
+96%
+86%
+52%
+95%
+81%
+49%
+94%
+60%
+11%
+France
+Highly Active
+100%
+97%
+80%
+-
+-
+-
+100%
+89%
+64%
+Highly Mobile
+78%
+42%
+11%
+-
+-
+-
+74%
+24%
+5%
+Table 1: (a) Average and query-weighted average (Query-w. avg) of Q-metric, (b) Percentage of queries from clusters with a Q-metric
+of at least x%. ∼200 clusters were used for the US and ∼50 for France. For both highly active and highly mobile graphs, GeoCUTS
+performs comparably to DMAs and outperforms the baseline grid clustering.
+For each of the United States and France, we collect two datasets
+- one for highly mobile and one for highly active cookies - and
+form a graph for each dataset. Both graphs have the same num-
+ber of nodes (e.g. about 11,000 for the US at grid size 0.25 de-
+grees). Unless otherwise speciﬁed, node and edge weights are log-
+normalized. In §5.4, we compare various normalization methods.
+5.3
+Comparison against other clusterings
+In this section, we show that GeoCUTS regions are comparable to
+hand-designed geo-regions, while requiring no manual effort and
+extending naturally to different regions of the world and granulari-
+ties. We compare GeoCUTS against the most popular set of hand-
+designed geo-regions in the US, Nielsen’s DMAs (Designated Mar-
+ket Areas)
+R⃝, which were created by Nielsen to correspond to
+television audiences. DMAs have the advantage of being well-
+established as a means of subdividing a user population. However,
+they are restricted to the US without a direct international equiva-
+lent, and their granularity is ﬁxed, with approximately 200 regions.
+We previously deﬁned the Q-metric to quantify the interference
+within a clustering.
+In Table 1, we compare the Q-metrics of
+the output of GeoCUTS against DMAs (within the US) and also
+against a baseline automatic clustering consisting of a simple grid
+subdivision (within both the US and France).
+The average and query-weighted average of the Q-metric for
+each clustering algorithm are shown in Table 1(a). For each metric,
+GeoCUTS beats the baseline grid clustering. Where applicable,
+GeoCUTS and DMAs perform similarly well. It is important to
+note that in every evaluation, we compared only clusterings with
+similar numbers of clusters. Thus, in constructing the grid base-
+line, we picked the coarseness of the grid so that the number of
+regions in the grid approximated the number of clusters formed by
+GeoCUTS. We also used ∼200 clusters for GeoCUTS in the US,
+in order to provide an effective comparison with DMAs.
+The fraction of clusters and queries for different lower bounds
+of Q-metric are shown in Table 1(b). For example 80% of queries
+in the highly active set are issued from minimum-cut clusters with
+a Q-metric of at least 0.8. For the grid, 62% of queries are issued
+from clusters with a Q-metric of at least 0.8. As already noted,
+highly mobile graphs are more challenging to partition compared
+to highly active graphs. The data indicates that the gap between
+our algorithm and baseline is larger for highly mobile graphs.
+While the Q-metric quantiﬁes the interference, we must also
+compare the clustering algorithms in terms of balance. An algo-
+rithm that produces highly unbalanced clusters may outperform
+other alternatives if only the Q-metric is considered. For exam-
+ple, if we partitioned the US into 200 clusters where 199 of them
+were in Alaska and one cluster covered the rest of the country, we
+would obtain an almost perfect Q-metric as relatively few users
+would cross between clusters. However, such a clustering would
+not be useful for our applications. We compare B-metrics in Ta-
+ble 2. The results indicate that, in terms of balance, GeoCUTS
+performs equally to the alternatives for highly active graphs, and
+slightly better for the highly mobile graph. In summary, while we
+perform better in terms of interference, we do not compromise bal-
+ance.
+GeoCUTS
+DMA
+Grid
+US Highly Active
+1.5
+1.5
+1.5
+US Highly Mobile
+1.8
+1.7
+1.3
+France Highly Active
+11.1
+-
+11.5
+Table 2: B-metrics across clusterings, reported with a multiplica-
+tive constant of 100. We see that GeoCUTS performs comparably
+to other clusterings for highly active users, and somewhat better for
+highly mobile users.
+GeoCUTS
+DMA
+Grid
+LE
+Hilbert
+HA
+4%
+7%
+15%
+4%
+7%
+HM
+4%
+7%
+14%
+4%
+7%
+Table 3: Cut size comparison against different clustering algo-
+rithms for highly active (HA) and highly mobile (HM) users within
+the US. “Grid” denotes the grid partition, “LE” denotes the Linear
+Embedding algorithm [4], and “Hilbert” denotes partitions along a
+Hilbert curve [21]. We see that GeoCUTS and Linear Embedding
+give the best cut size.
+Finally, we compare GeoCUTS to other clusterings with respect
+8
+
+GeoCUTS
+Grid
+≥0.75
+≥0.8
+≥0.85
+≥0.75
+≥0.8
+≥0.85
+∼25 clusters
+Highly Active
+100%
+100%
+94%
+100%
+99%
+69%
+Highly Mobile
+94%
+56%
+10%
+83%
+30%
+0%
+∼50 clusters
+Highly Active
+100%
+97%
+80%
+100%
+89%
+64%
+Highly Mobile
+78%
+42%
+11%
+74%
+24%
+5%
+Table 4: Percentage of queries from clusters with a Q-metric ≥x% for different numbers of clusters in France.
+to cut size (see Table 3) on the US log-normalized graph with grid
+size 0.25. It is clear that the GeoCUTS algorithm produces better
+cut sizes compared to DMA and grid partitioning. We also com-
+pare against Linear Embedding [4] and against partitions generated
+along a Hilbert curve [21], which the GeoCUTS algorithm simi-
+larly outperforms.
+5.4
+Tuning the algorithm
+In this set of experiments, we consider how various design choices
+in the GeoCUTS algorithm affect performance. First, we consider
+different types of normalization during the graph-building phase
+(see Table 5(a)). Speciﬁcally, we build graphs over US queries us-
+ing logarithmic normalization of both vertices and edges, square
+root normalization, and also no normalization step at all. As ex-
+pected, a stronger normalization is associated with better Q-metrics
+but worse B-metrics, demonstrating that normalization may be seen
+as mediating the trade-off between diminished interference and in-
+creased balance.
+Normalization
+log(·)
+√·
+None
+Q-metric, Highly Active
+0.921
+0.881
+0.840
+Q-metric, Highly Mobile
+0.854
+0.807
+0.765
+B-metric, Highly Active
+1.65
+0.47
+0.06
+B-metric, Highly Mobile
+1.82
+0.53
+0.11
+Coarseness
+0.1
+0.25
+0.5
+Q-metric, Highly Active
+0.916
+0.921
+0.858
+Q-metric, Highly Mobile
+0.847
+0.854
+0.781
+B-metric, Highly Active
+1.57
+1.65
+1.15
+B-metric, Highly Mobile
+1.75
+1.82
+1.32
+Table 5: Comparison of weighted average Q-metrics and B-metrics
+for GeoCUTS applied to US query data across (a) varying normal-
+izations, (b) varying coarsenesses of location discretization. The
+B-metrics are reported with a multiplicative factor of 100.
+Next, we compare the performance of GeoCUTS across vary-
+ing coarsenesses of grid cells, considering log-normalized graphs
+in which locations (latitude and longitude) are discretized to 0.1,
+0.25, and 0.5 degrees (see Table 5(b)). It is worth noting that all
+of these sizes are considerably larger than the side length of a typ-
+ical bounding box for location data. The coarsest discretization of
+0.5 performs the worst in Q-metric and best in B-metric, as coarser
+discretization enforces balance but reduces the ability to decrease
+interference. In all other experiments, we have made a trade-off
+between the two metrics by rounding to the nearest 0.25 degree.
+Finally, we consider the effect of varying the number of clusters
+(see Table 4). As we noted in §4, decreasing the number of clus-
+ters increases the Q-metric. We see that GeoCUTS signiﬁcantly
+outperforms the baseline grid regardless of the number of clusters.
+6
+Conclusion
+We have presented an algorithm, GeoCUTS, for clustering user
+queries into geographical regions. These regions can be used to
+run cluster-based randomized experiments for measuring users’
+response under treatment. Clustering users geographically offers
+two major advantages: 1) assigning identical treatments to differ-
+ent browser cookies of the same user, and 2) mitigating the inter-
+ference effects of interactions between users assigned to different
+treatments. Unlike existing systems, GeoCUTS can be run in any
+region of the world and for any number of clusters. Alongside
+our clustering algorithm, we have introduced quality metrics for
+interference and balance of a given clustering for the purpose of
+running cluster-based randomized experiments. We evaluate Geo-
+CUTS on these metrics, showing that it outperforms balanced par-
+titioning baselines, and performs comparably to the state-of-the-art
+in hand-designed clustering.
+Acknowledgments
+The authors would like to thank Kay Brodersen and Hal Varian for
+helpful advice. We also thank the Google New York graph min-
+ing team and especially Aaron Archer, Hossein Bateni, and Silvio
+Lattanzi. The research was carried out at Google, Inc. D.R. was
+additionally supported by NSF Grant No. 1122374.
+References
+[1] K. Andreev and H. Räcke. Balanced graph partitioning. The-
+ory Comp. Sys., 39(6):929–939, 2006.
+[2] P. M. Aronow and C. Samii. Estimating average causal effects
+under interference between units. Preprint arXiv:1305.6156,
+2013.
+[3] S. Athey, D. Eckles, and G. W. Imbens. Exact p-values for
+network interference. Journal of the American Statistical As-
+sociation, 113(521):230–240, 2018.
+9
+
+[4] K. Aydin, M. Bateni, and V. Mirrokni. Distributed balanced
+partitioning via linear embedding. In WSDM, 2016.
+[5] L. Backstrom and J. Kleinberg. Network bucket testing. In
+WWW, 2011.
+[6] L. Backstrom and C. Sun, E.and Marlow.
+Find me if you
+can: improving geographical prediction with social and spa-
+tial proximity. In WWW, 2010.
+[7] G. W. Basse and E. M. Airoldi.
+Optimal design of ex-
+periments in the presence of network-correlated outcomes.
+Preprint arXiv:1507.00803, 2015.
+[8] D. Delling, A. V. Goldberg, I. Razenshteyn, and R. F. Wer-
+neck. Graph partitioning with natural cuts. In IPDPS, 2011.
+[9] D. Delling, A. V. Goldberg, I. Razenshteyn, and R. F. Wer-
+neck. Exact combinatorial branch-and-bound for graph bi-
+section. In ALENEX, 2012.
+[10] A. Donner and N. Klar. Pitfalls of and controversies in clus-
+ter randomization trials. American Journal of Public Health,
+94(3):416–422, 2004.
+[11] D. Eckles, B. Karrer, and J. Ugander. Design and analysis
+of experiments in networks: Reducing bias from interference.
+Preprint arXiv:1404.7530, 2014.
+[12] M. R. Garey and D. S. Johnson. Computers and Intractability:
+A Guide to the Theory of NP-Completeness. W.H. Freeman
+and Company, 1979.
+[13] H. Gui, Y. Xu, A. Bhasin, and J. Han. Network A/B testing:
+From sampling to estimation. In WWW, 2015.
+[14] H. Hohnhold, D. O’Brien, and D. Tang. Focusing on the long-
+term: It’s good for users and business. In KDD, 2015.
+[15] G. W. Imbens and D. B. Rubin. Causal Inference in Statis-
+tics, Social, and Biomedical Sciences. Cambridge University
+Press, 2015.
+[16] G. Karypis and V. Kumar.
+Multilevel k-way partitioning
+scheme for irregular graphs.
+Journal of Parallel and Dis-
+tributed computing, 48(1):96–129, 1998.
+[17] L. Katzir, E. Liberty, and O. Somekh. Framework and algo-
+rithms for network bucket testing. In WWW, 2012.
+[18] R. Kiveris, S. Lattanzi, V. Mirrokni, V. Rastogi, and S. Vas-
+silvitskii. Connected components in MapReduce and beyond.
+In SOCC, 2014.
+[19] C. F. Manski. Identiﬁcation of treatment response with social
+interactions. The Econometrics Journal, 16(1):S1–S23, 2013.
+[20] J. A. Middleton and P. M. Aronow. Unbiased estimation of the
+average treatment effect in cluster-randomized experiments.
+Preprint SSRN, 2011.
+[21] B. Moon, H. V. Jagadish, C. Faloutsos, and J. H. Saltz. Anal-
+ysis of the clustering properties of the Hilbert space-ﬁlling
+curve. IEEE Trans. on Knowledge & Data Eng., 13, 2001.
+[22] G. D. Nelson and A. Rae. An economic geography of the
+United States: From commutes to megaregions. PloS one,
+11(11):e0166083, 2016.
+[23] J. Nishimura and J. Ugander. Restreaming graph partitioning:
+simple versatile algorithms for advanced balancing. In KDD,
+2013.
+[24] V. Rastogi, A. Machanavajjhala, L. Chitnis, and A. D. Sarma.
+Finding connected components in map-reduce in logarithmic
+rounds. In ICDE, 2013.
+[25] M. Saveski, J. Pouget-Abadie, G. Saint-Jacques, W. Duan,
+S. Ghosh, Y. Xu, and E. Airoldi. Detecting network effects:
+Randomizing over randomized experiments. In KDD, 2017.
+[26] I. Stanton and G. Kliot. Streaming graph partitioning for large
+distributed graphs. In KDD, 2012.
+[27] D. Tang, A. Agarwal, D. O’Brien, and M. Meyer. Overlap-
+ping experiment infrastructure: More, better, faster experi-
+mentation. In KDD, 2010.
+[28] C. Tsourakakis, C. Gkantsidis, B. Radunovic, and M. Vo-
+jnovic.
+Fennel: Streaming graph partitioning for massive
+scale graphs. In WSDM, 2014.
+[29] J. Ugander and L. Backstrom. Balanced label propagation for
+partitioning massive graphs. In WSDM, 2013.
+[30] J. Ugander, B. Karrer, L. Backstrom, and J. Kleinberg. Graph
+cluster randomization: Network exposure to multiple uni-
+verses. In KDD, 2013.
+[31] J. Vaver and J. Koehler. Periodic measurement of advertis-
+ing effectiveness using multiple-test-period geo experiments.
+Technical report, Google Inc., 2012.
+[32] D. Walker and L. Muchnik. Design of randomized experi-
+ments in networks. Proceedings of the IEEE, 102(12):1940–
+1951, 2014.
+[33] X. Zhu and Z. Ghahramani. Learning from labeled and unla-
+beled data with label propagation. Technical report, Citeseer,
+2002.
+[34] C. M. Zigler and G. Papadogeorgou. Bipartite causal infer-
+ence with interference. Preprint arXiv:1807.08660, 2018.
+10

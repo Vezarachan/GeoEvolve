@@ -1,0 +1,2161 @@
+The Discrepancy Principle for Choosing Bandwidths in
+Kernel Density Estimation
+Thoralf Mildenberger∗
+Department of Mathematics, Physics, and Computer Science
+University of Bayreuth
+thoralf.mildenberger@uni-bayreuth.de
+October 22, 2021
+Abstract
+We investigate the discrepancy principle for choosing smoothing parameters for kernel
+density estimation. The method is based on the distance between the empirical and estimated
+distribution functions. We prove some new positive and negative results on L1-consistency
+of kernel estimators with bandwidths chosen using the discrepancy principle. Consistency
+crucially depends on a rather weak H¨older condition on the distribution function. We also
+unify and extend previous results on the behavior of the chosen bandwidth under more strict
+smoothness assumptions. Furthermore, we compare the discrepancy principle to standard
+methods in a simulation study. Surprisingly, some of the proposals work reasonably well over
+a large set of diﬀerent densities and sample sizes, and the performance of the methods at least
+up to n = 2500 can be quite diﬀerent from their asymptotic behavior.
+1
+Introduction
+We investigate the discrepancy principle, a simple method for choosing the bandwidth in kernel
+density estimation which – unlike most other methods like cross-validation or plug-in estimates –
+does not directly aim at minimizing the risk.
+In the following, let X1, . . . , Xn denote iid random variables having a distribution with Lebesgue
+density f and distribution function F. We denote the empirical distribution function by Fn.
+A function K : R −→R is called a kernel of order ℓfor ℓ∈N, if ujK(u) ∈L1(R) for j = 0, . . . , ℓ
+and
+Z
+ujK(u)du =
+
+
+
+
+
+1
+(j = 0)
+0
+(j = 1, . . . , ℓ−1)
+kℓ∈R \ {0}
+(j = ℓ)
+.
+For a kernel K and h > 0 we deﬁne Kh(u) := h−1K(h−1u).
+We denote the distribution
+function associated with K (which is not necessarily monotone if K is not a probability density)
+by K. For iid random variables X1, . . . , Xn, a kernel K of order ℓ∈N and a bandwidth h > 0 the
+function x −→ˆfh(x) given by
+ˆfh(x) := 1
+nh
+n
+X
+i=1
+K
+x −Xi
+h
+
+= 1
+n
+n
+X
+i=1
+Kh(x −Xi)
+∗This work has been supported by the Collaborative Research Center Statistical modelling of nonlinear dynamic
+processes (SFB 823, Project C1) of the German Research Foundation (DFG).
+1
+arXiv:1104.2190v4  [math.ST]  18 Dec 2012
+
+is called the kernel density estimator. A corresponding kernel estimator of the distribution function
+is given by
+ˆF h
+n (x) :=
+Z x
+−∞
+ˆfh(t)dt = 1
+n
+n
+X
+i=1
+K
+x −Xi
+h
+
+= (Fn ∗Kh)(x).
+(1)
+More important than the choice of the kernel is the choice of the bandwidth h. Depending
+on the risk function and on additional assumptions on f, often an explicit expression for the
+(at least asymptotically) optimal value can be derived. However, it necessarily depends on some
+functionals of the unknown true density f. Most parameter choice strategies used in practice
+aim at minimizing the risk. In contrast, the strategies considered here are based on a measure of
+distance between the empirical and estimated distribution functions, i.e. a direct comparison of
+the estimate with the data.
+In the following, by the discrepancy principle for choosing the bandwidth for kernel density
+estimators we mean that h is chosen such that
+d(Fn, ˆF h
+n ) = s(n).
+(2)
+The threshold function s : N −→R+ depends on n only and fulﬁlls s(n) = o(1) for n →∞. For
+the distance d between distribution functions we will always take the Kolmogorov or (generalized)
+Kuiper distances although, in principle, other metrics could be used. The diﬀerent suggestions in
+the previous literature diﬀer in their choices of s(n) and d and possibly in their prescriptions for
+the selection of a solution of (2) in case there are multiple solutions.
+The discrepancy principle was ﬁrst introduced by Morozov (1966) in the context of (determin-
+istic) inverse problem theory, where it is one of the most widely known methods for choosing a
+regularization parameter. In Statistical Learning Theory, the connection between nonparametric
+statistics and ill-posed problems is strongly emphasized, and already in the seventies density esti-
+mation was recognized as being closely related to the problem of numerical diﬀerentiation, which
+is an ill-posed problem. Methods adapted from deterministic inverse problem theory as well as
+using the discrepancy principle for choosing their smoothing parameters have been suggested by
+Vapnik and Stefanyuk (1978) and Aidu and Vapnik (1989), see also Chapter 7 in Vapnik (1998)
+and Chapter 7 in Vapnik (2000) for detailed accounts.
+Variants of the discrepancy principle (but under diﬀerent names) have also independently
+been proposed in the context of the so-called Data Features or Data Approximation approach
+(Davies, 1995, 2008) which has its roots in robust statistics and exploratory data analysis. The
+main idea is to choose the simplest estimate (with simplicity e.g. measured by smoothness) that
+is suﬃciently close to the data. Several procedures for density estimation based on these ideas
+have been proposed, including methods based on kernel density estimators (Davies, 1995), regular
+histograms (Davies et al., 2009) and the taut-string estimator (Davies and Kovac, 2004).
+The discrepancy principle has also been used in a few other approaches to density estimation.
+Eggermont and LaRiccia (1996) suggest a version for kernel density estimation that chooses a
+bandwidth of the optimal order under standard assumptions; see also Eggermont and LaRiccia
+(2001, Ch.
+7.6).
+The same authors also use their method for choosing a penalty parameter
+in a penalized-likelihood approach (Eggermont and LaRiccia, 2001, Ch. 7.7) and in a density
+deconvolution method (Eggermont and LaRiccia, 1997).
+The diﬀerent variants of the discrepancy principle for density estimation mentioned above have
+largely been suggested independently of each other, and to our knowledge, there has never been a
+systematic investigation of this approach.
+In Section 2, we show that a solution of (2) exists under very weak conditions, and we show
+that the almost sure L1-consistency of the resulting kernel density estimate mainly depends on
+a rather mild H¨older condition on the distribution function F. This condition is, for example,
+fulﬁlled for all square-integrable densities provided that the threshold function s decays slowly
+enough.
+We also give suﬃcient conditions for the resulting estimator to be inconsistent.
+In
+Section 3 we extend and unify some known results on the exact order of the chosen bandwidth.
+2
+
+Furthermore, we compare diﬀerent versions of the discrepancy principle with standard methods
+of smoothing parameter selection in a simulation study (Section 4). The methods can behave
+quite diﬀerently to what is predicted by the asymptotic results even for sample sizes up to at
+least n = 2500. This is not so much of a surprise as the asymptotics are mostly based on the
+law of the iterated logarithm for the empirical distribution function. Indeed, some versions of
+the discrepancy principle that were previously suggested in the literature perform reasonably well
+over a wide range of diﬀerent densities, while others suﬀer from oversmoothing for these sample
+sizes, although they are guaranteed to undersmooth asymptotically. The last section contains
+some concluding remarks.
+2
+Existence and consistency
+First, we investigate the existence of a solution of (2). We measure the distance between two
+distribution functions F and G either by the Kolmogorov distance
+d∞(F, G) := ∥F −G∥∞
+or by the k-th order Kuiper distance (for k ∈N) ﬁrst introduced in Davies and Kovac (2004) and
+deﬁned by
+dkuip,k(F, G) :=
+sup
+a1≤b1≤a2≤b2≤···≤ak≤bk
+k
+X
+i=1
+|(F(bi) −F(ai)) −(G(bi) −G(ai))|.
+For a continuous probability distribution function F and the empirical distribution Fn of a sample
+of size n drawn from F, the distributions of d∞(Fn, F) and dkuip,k(Fn, F) do not depend on F.
+For k = 1 we obtain the usual Kuiper distance. All these distances are topologically equivalent
+and it is easy to see that
+d∞(F, G) ≤dkuip,k(F, G) ≤2kd∞(F, G).
+In the following, we always have d = d∞or d = dkuip,k for some k ∈N, and we deﬁne
+cd =
+(
+1,
+d = d∞
+2k,
+d = dkuip,k
+.
+It should be noted that, since we allow for higher order kernels, some distribution functions do
+not correspond to probability measures but to signed measures.
+For a kernel K with associated distribution function K, we deﬁne
+κ0 := sup
+x∈R
+|K(x) −F0(x)|,
+where F0(x) := I(x ≥0) is the distribution function of the Dirac measure in 0. In case K is a
+probability density, we have κ0 = max{K(0), 1 −K(0)}. If K is also symmetric around zero, he
+have κ0 = K(0) = 1/2.
+The following lemma shows that, almost surely, for ﬁxed n, the function h −→d(Fn, ˆF h
+n ) is
+continuous and must – under weak conditions on s – take the value s(n) for at least one h if n is
+large enough. An analogous statement has been proved by Eggermont and LaRiccia (1996, 2001)
+for the special case of a symmetric, nonnegative kernel of of order 2 and d = d∞. The proof can
+be found in Mildenberger (2011), pp. 27-28.
+Lemma 2.1. For Fn an empirical distribution function of an iid sample from a distribution with
+continuous distribution function and ˆF h
+n as in (1) we have almost surely:
+1. d(Fn, ˆF h
+n ) is continuous in h.
+3
+
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.00
+0.05
+0.10
+0.15
+0.20
+h
+d
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.00
+0.05
+0.10
+0.15
+0.20
+h
+d
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.00
+0.05
+0.10
+0.15
+0.20
+h
+d
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.00
+0.05
+0.10
+0.15
+0.20
+h
+d
+Figure 1: Solutions of d∞( ˆF h
+n , Fn) = s(n) using a standard Gaussian kernel for X1, . . . , Xn ∼
+N(0, 1). Top row: n = 10, bottom row: n = 100. Straight lines: s(n) = 0.6n−1/2, broken lines:
+s(n) = 0.35n−2/5.
+2. lim infh→0 d(Fn, ˆF h
+n ) ≤cd
+κ0
+n .
+3. lim suph→∞d(Fn, ˆF h
+n ) ≥κ0.
+Lemma 2.1 shows that if s(n) = o(1) and n−1 = o(s(n)) the equation d(Fn, ˆF h
+n ) = s(n) almost
+surely has at least one solution hs,n for suﬃciently large n. These conditions are fulﬁlled by the
+threshold functions previously proposed in the literature. Moreover, the minimum sample size
+that guarantees existence of at least one solution can be calculated explicitly since it depends on
+s(n) and κ0 only, and not on the sample or on the underlying true distribution (assuming there are
+no ties, which holds true almost surely). For example, if s(n) = 0.6n−1/2 as proposed by Vapnik
+(1998, Ch. 7.9) or s(n) = 0.35n−2/5 as proposed in Eggermont and LaRiccia (1996), d = d∞
+and K is any symmetric probability density, we have that s(n) ∈[ 1
+2n, 1
+2] for n ≥2, so existence
+of the bandwidth can be guaranteed if there are at least two data points. As already noted by
+Eggermont and LaRiccia (1996), the function h −→d(Fn, ˆF h
+n ) is not necessarily monotone, so that
+the bandwidth chosen according to the discrepancy principle is not necessarily unique; Eggermont
+and LaRiccia (1996) suggest using the smallest solution while the Data Approximation approach
+would suggest using the largest one. However, none of the results given subsequently depends on
+the particular choice of the solution, and multiple solutions seem to occur only rarely in larger
+samples.
+Figure 1 shows shows two realizations each for n = 10 and n = 100. The samples were drawn
+from a standard normal distribution and the Gaussian kernel was used.
+The horizontal lines
+correspond to the two diﬀerent choices of the threshold functions mentioned above. The solution
+d(Fn, ˆF h
+n ) = s(n) can be computed numerically since the function h →d(Fn, ˆF h
+n ) is continuous.
+In Eggermont and LaRiccia (1996), a secant method is proposed for solving this equation, but
+we use the related regula falsi which we found to be more stable. The possibility of using an
+iterative method makes selection of the bandwidth using the discrepancy quite fast in comparison
+to other methods (like cross-validation) where one usually has to evaluate some criterion on a grid
+4
+
+of possible bandwidths. In addition, well-known formulas exist for calculating Kolmogorov- and
+Kuiper-distances (for k = 1) for two distribution functions and these can be applied if K is a
+probability density.
+In the following, we frequently need the function
+Fh := F ∗Kh.
+In case Kh is a probability density, Fh is a probability distribution function, otherwise it is the
+distribution function of a signed measure.
+The proof of the following Lemma is based on basic properties of convolutions and the Law of
+the Iterated Logarithm, see Mildenberger (2011), p. 29, for details.
+Lemma 2.2. With probability 1,
+1. d(Fn, F) = O
+ (log log n/n)1/2
+and
+2. d( ˆF h
+n , Fh) = O
+ (log log n/n)1/2
+uniformly in h.
+The next theorem shows that bandwidths chosen using the discrepancy principle converge to
+0 almost surely. This result will be needed later on for obtaining more precise statements about
+the behavior of the selected bandwidths. At this point, F must be continuous but does not need
+to have a density. As a by-product, the theorem also shows that the resulting estimator for the
+distribution function is always consistent w.r.t. d, although our aim is to estimate the density
+rather than the distribution function. The proof of the second assertion is based on similar Fourier
+arguments as the proof of Theorem 3 in Yamamoto (1973).
+Theorem 2.1. Let F be a continuous distribution function, Fn and ˆF h
+n as above and s(n) = o(1).
+For the bandwidth hs,n chosen as a solution of
+d(Fn, ˆF h
+n ) = s(n).
+we have almost surely
+1. d(F, ˆF hs,n
+n
+) −→0 and
+2. hs,n −→0.
+Proof. 1. With probability 1, we have:
+d(F, Fhs,n) ≤d(F, Fn) + d(Fn, ˆF hs,n
+n
+) + d( ˆF hs,n
+n
+, Fhs,n)
+= O
+
+(log log n/n)1/2
++ s(n) + O
+
+(log log n/n)1/2
+= o(1),
+and hence
+d(F, ˆF hs,n
+n
+) ≤d(F, Fhs,n) + d(Fhs,n, ˆF hs,n
+n
+) = o(1).
+2. According to the ﬁrst part, d∞(F, Fhs,n) ≤d(F, Fhs,n) −→0 with probability 1; it remains to
+show that this implies hs,n
+a.s.
+−→0. In the following hn := hs,n denotes the sequence of bandwidths
+chosen, P denotes the probability measure associated with F and µhn the (signed) measure with
+Lebesgue density Khn.
+Denote by ˆP, ˆK and ˆKhn the Fourier transforms of P, K and Khn,
+respectively. Observing that the sequence (|P ∗µhn|)n∈N is tight (Mildenberger, 2011, pp. 30-31)
+and combining Proposition 8.1.8 in Bogachev (2007) with a result on page 173/174 in Katznelson
+(2004), it follows that ˆP ˆKhn(t) −→ˆP(t) for all t ∈R. Because of the continuity of the Fourier
+transform, we must have ˆP > 0 on an interval [−ε, ε] for some ε > 0, which implies that ˆKhn(t) =
+ˆK(hnt) −→1 for all t ∈[−ε, ε]. Since
+R
+uℓK(u)du ̸= 0, ˆK cannot be identically 1 on any interval
+around zero. But this implies that hn −→0.
+5
+
+While the previous results hold for any continuous distribution function F, for the remainder
+of the paper we suppose that a Lebesgue density f exists.
+For consistency of the kernel density estimate with bandwidth chosen by the discrepancy
+principle, we also need that the chosen bandwidth does not go to 0 too quickly. This can be
+guaranteed under rather mild conditions. For 0 < α ≤1, let
+C0,α :=
+
+F
+F : R −→R and ∃C > 0 with
+sup
+x,y∈R
+|F(x) −F(y)|/|x −y|α ≤C
+
+denote the set of all H¨older continuous functions with exponent α. Smoothness of the distribution
+function follows from integrability assumptions on the density. We deﬁne for p ∈[1, ∞)
+Lp(R) :=
+(
+f
+f : R −→R and ∥f∥p :=
+Z
+|f|pdλ
+1/p
+< ∞
+)
+where λ denotes the Lebesgue-Measure on (the Borel sets of) R. Then we have:
+Lemma 2.3. Let f denote a probability density and F the corresponding distribution function.
+For p ∈(1, ∞) we have
+f ∈Lp(R) =⇒F ∈C0,(p−1)/p.
+Proof. For any x < y ∈R and q =
+p
+p−1 we obtain using the H¨older inequality
+|F(y) −F(x)| ≤∥f∥p(y −x)1/q
+and hence F ∈C0,(p−1)/p.
+This implies for example that for any square-integrable density (i.e., f ∈L2(R)) F is H¨older-
+continuous with exponent α = 1
+2. We also observe that, using a similar argument, for any bounded
+f the corresponding distribution function F is H¨older-continuous with exponent α = 1.
+The next theorem shows that L1 consistency of a kernel density estimator with bandwidth cho-
+sen by the discrepancy principle can be guaranteed if the distribution function is H¨older continuous
+with an suﬃciently large exponent and the threshold function goes to 0 slowly enough.
+Theorem 2.2. Let K be a kernel of order ℓ, ℓ≥1, and f a density with associated distribution
+function F such that F ∈C0,α for some 0 < α ≤1. If the threshold function s(n) is such that
+q
+log log n
+n
+= o(s(n)) and nαs(n) →∞for n →∞, then with probability 1 we have that
+nhs,n →∞.
+Proof. The H¨older condition F ∈C0,α implies that there is a constant A > 0 such that d∞(F, Fh) ≤
+Ahα, cf. Shapiro (1969), Theorem 20. With probability 1, we have that
+nαs(n) = nαd(Fn, ˆF hs,n
+n
+)
+≤cdnα 
+d∞(Fn, F) + d∞(F, Fhs,n) + d∞(Fhs,n, ˆF hs,n
+n
+)
+
+≤Acdnαhα
+s,n + nαO((log log n/n)1/2)
+which implies that
+Acdnαhα
+s,n ≥nαs(n)(1 + o(1)),
+and hence, since nαs(n) →∞, that nhs,n →∞.
+Corollary 2.1. If K is a probability density and f and s are such that the conditions of Theorem
+2.2 are fulﬁlled, we have
+lim
+n→∞
+Z
+| ˆfhs,n(x) −f(x)|dx = 0
+with probability 1.
+6
+
+Proof. Under the stated conditions, part two of Theorem 2.1 and Theorem 2.2 yield that almost
+surely hs,n −→0 and nhs,n −→∞, which by Theorem 1 in Chapter 6 of Devroye and Gy¨orﬁ
+(1985) implies limn→∞
+R
+| ˆfhs,n(x) −f(x)|dx = 0 almost surely.
+From Corollary 2.1, we have that almost sure L1-consistency can be guaranteed for the thresh-
+old function s(n) = 0.35n−2/5 suggested in Eggermont and LaRiccia (1996), K a probability
+density and f ∈L2.
+Although the conditions for consistency are rather weak, the resulting density estimate may
+be inconsistent if the distribution function is too rough or the threshold function vanishes too
+quickly:
+Theorem 2.3. Let K be a kernel and 0 < ε < 1/2 such that nεs(n) = o(1). Let Fn denote
+the empirical distribution function of an iid sample drawn from a distribution with density f and
+distribution function F. Suppose there exist constants c, h0 > 0 such
+d∞(F, Fh) ≥chε
+for all 0 < h < h0. Then, if hs,n is a solution of d(Fn, ˆF h
+n ) = s(n), we have:
+1. nhs,n −→0 with probability 1 and
+2. if K is compactly supported and there exist a, b > 0 such that λ{x : f(x) ≥b} ≥a, where λ
+denotes Lebesgue measure on R, then lim infn→∞∥ˆfhs,n −f∥1 ≥ab > 0 with probability 1.
+Proof. 1. It follows that, with probability 1,
+cnεhε
+s,n ≤nεd∞(F, Fhs,n)
+≤nε 
+d∞(F, Fn) + d(Fn, ˆF hs,n
+n
+) + d∞(Fhs,n, ˆF hs,n
+n
+)
+
+= nεO((log log n/n)1/2) + nεs(n)
+= o(1),
+and hence nhs,n = o(1).
+2. If the support of K is contained within a compact interval I, then, since λ{Khs,n ̸= 0} ≤λ(I),
+we have almost surely
+λ{ ˆfhs,n ̸= 0} ≤2nhs,nλ(I) = o(1)
+because of the ﬁrst assertion. It then follows almost surely that
+lim inf
+n→∞
+Z
+| ˆfhs,n(x) −f(x)|dx ≥lim inf
+n→∞
+Z
+{f≥b}∩{ ˆ
+fhs,n=0}
+f(x)dx ≥ab.
+In the following example, we consider a family of densities with an inﬁnite peak and see that
+the using the discrepancy principle can lead to consistent or inconsistent estimates depending on
+the sharpness of the peak:
+Example 2.1. Let
+K(x) = (3/4)(1 −x2)I(|x| ≤1)
+(3)
+denote the Epanechnikov kernel and choose s(n).
+Consider the distribution of X := U β for
+β ∈[1, ∞), where U is uniformly distributed on [0, 1]. With ε = β−1 the density of X is given by
+f(x) :=
+(
+εx−(1−ε)
+0 < x ≤1
+0
+otherwise .
+(4)
+7
+
+The distribution function of X is given by
+F(x) :=
+
+
+
+
+
+0
+x ≤0
+xε
+0 < x ≤1
+1
+x > 1
+.
+(5)
+It is easy to see that F ∈C0,α iﬀα ≤ε.
+First consider the case that
+q
+log log n
+n
+= o(s(n)) and nεs(n) →∞. Then the conditions of
+Theorem 2.2 are fulﬁlled and the estimator will be consistent w.r.t L1-distance.
+Note that if
+q
+log log n
+n
+= o(s(n)) then we trivially have nεs(n) →∞for all ε > 1/2.
+Now consider the case that 0 < ε < 1/2 and nεs(n) = o(1).
+By elementary integration, we obtain
+|F(h) −(F ∗Kh)(h)| =
+
+1 −
+3 · 2(ε+1)
+ε2 + 5ε + 6
+
+|
+{z
+}
+=:c>0
+hε.
+for h < 1 and hence
+d∞(F, Fh) ≥chε
+for h < 1 =: h0. Since K is compactly supported, inconsistency w.r.t. the L1 distance directly
+follows from the second assertion of Theorem 2.3.
+3
+Rates for the bandwidths
+In the following, we consider threshold functions s(n) that go to 0 at diﬀerent speeds:
+• s(n) = o
+ (log log n/n)1/2
+(Theorem 3.1),
+• s(n) ≍(log log n/n)1/2 (Theorem 3.2),
+• (log log n/n)1/2 = o(s(n)) (Theorem 3.3).
+The versions of the discrepancy principle for kernel estimators previously proposed in the
+literature can be obtained by choosing a threshold function that belongs to one of these classes.
+To obtain more precise statements about the order of the chosen bandwidth, we need some
+additional assumptions of f and K. In this section, we suppose that f is in a Sobolev space deﬁned
+by
+W ℓ,1 := {f : f, f (1), . . . , f (ℓ) ∈L1(R)}.
+where ℓ≥2 is the order of the Kernel K.
+The following Lemma is a slight generalization of a similar result by Eggermont and LaRiccia
+(1996, 2001), who only considered nonnegative symmetric kernels of order ℓ= 2 and d = d∞. The
+proof is left out since the ﬁrst part is completely analogous to Eggermont and LaRiccia (2001,
+Lemma 6.15 a) and the second part is easy.
+Lemma 3.1. Suppose that f ∈W ℓ,1(R) and K is a kernel of order ℓ≥2. Then we have:
+1. Fh(x) −F(x) = (−1)ℓ
+ℓ!
+kℓf (ℓ−1)(x)hℓ(1 + o(1)) uniformly in x ∈R.
+2. d(Fh, F) = 1
+ℓ!kℓd(f (ℓ−1), 0)hℓ(1 + o(1)).
+The approximations given in Lemma 3.1 are only valid for suﬃciently small h.
+Since by
+Theorem 2.1 for n →∞we have that hs,n →0 almost surely with hs,n chosen by the discrepancy
+principle, terms of order o(1) for h →0 are also of order o(1) for n →∞.
+8
+
+The most simple and intuitive implementation of the discrepancy principle is based on a
+goodness-of-ﬁt test for a ﬁxed level independent of n: the Data Approximation approach pre-
+scribes that for a given data set, one should choose the simplest model that could have generated
+the data (Davies, 2008). For kernel density estimation, this results in the discrepancy principle
+(2) with d = d∞or d = dkuip,k and s(n) = cn−1/2 with c chosen as an appropriate quantile
+of √nd(Fn, F).
+Generally, the Data Approximation approach seems to suggest using extreme
+quantiles (95%, 99%).
+In Example 10 of Davies (1995), a discrepancy principle based on the
+98%-quantile of the Kuiper distance is used, which is then combined with a further criterion, the
+so-called extreme value feature. In contrast, (for the Kolmogorov distance) Vapnik (2000, Ch.
+7.5.1) suggests to use the median or even the mode, which is approximately located at 0.74. Using
+c = 0.6 is suggested in Vapnik (1998), Markovich (1989) suggests c = 0.7 or c = 0.5. With c = 0.6
+, the estimated distribution function is required to lie in a 14% conﬁdence band. However, c has
+no eﬀect on the rate with which hs,n converges to 0:
+Theorem 3.1. For f ∈W ℓ,1, K Kernel of order ℓand s(n) = O
+q
+log log n
+n
+
+,
+hs,n = O(n−1
+2ℓ(log log n)
+1
+2ℓ)
+almost surely.
+Proof. According to Lemma 3.1, we have a.s.
+1
+ℓ!kℓ∥f (ℓ−1)∥∞hs,n
+ℓ(1 + o(1)) = d∞(Fhs,n, F)
+≤d∞(F, Fn) + d(Fn, ˆF hs,n
+n
+) + d∞( ˆF hs,n
+n
+, Fhs,n)
+= O
+
+(log log n/n)1/2
++ s(n)
+= O
+
+(log log n/n)1/2
+.
+The second term in parentheses on the left-hand side is not only of order o(1) for hs,n →0, but
+also o(1) for n →∞since, by Theorem 2.1, n →∞almost surely implies hs,n →0. Solving for
+hs,n then proves the claim.
+Theorem 3.1 shows that for f ∈W ℓ,1 and K kernel of order ℓ, an upper bound for the
+bandwidth (and hence the bandwidth itself) converges to 0 at a faster rate than the optimal
+bandwidths according to most criteria, which behave like h ≍n−
+1
+2ℓ+1 (although this problem
+becomes less severe as ℓincreases). The reason is that density estimation is an ill-posed problem
+that requires regularization.
+For suﬃciently large n, the Kolmogorov-Smirnov-test with ﬁxed
+level will detect the diﬀerence between F and Fh, even if h is chosen optimally.
+This leads
+to a bandwidth that is too small. The incompatibility of optimal bandwidths with conﬁdence
+sets based on the Kolmogorov-Smirnov or Kuiper tests has also been observed in Davies (1995),
+Eggermont and LaRiccia (1996) and Hjort and Walker (2001).
+Asymptotically, the estimated
+distribution function is too close to the empirical distribution function, leading to undersmoothing.
+However, the simulations in Section 4 show that discrepancy principles based on extreme quantiles
+of goodness-of-ﬁt tests still oversmooth even for sample sizes as large as n = 2500, while the version
+proposed by Vapnik (c = 0.6) works quite well for the sample sizes considered.
+Theorem 3.1 is applicable to threshold functions of the form s(n) = c
+q
+log log n
+2n
+, but more
+precise results are possible when c is large enough. A threshold of this form is motivated by the
+law of the iterated logarithm for d(Fn, F), and is in a sense the closest analogue to the upper
+bound on the error in deterministic inverse problems. Aidu and Vapnik (1989) considered the case
+where c = (1 + ˜k + ε) for kernels K of order ℓ, ˜k = ∥K∥1 and d = d∞. The next theorem is a
+slight extension of their theorem (Aidu and Vapnik, 1989, Sec. 3) that now additionally includes
+the case of d = dkuip,k and has essentially the same proof, see pp. 38 in Mildenberger (2011) for
+details.
+9
+
+Theorem 3.2. For f ∈W ℓ,1, K kernel of order ℓ≥2, ˜k = ∥K∥1 and s(n) = cd(˜k + 1 +
+ε) (log log n/2n)1/2, we have with probability 1:
+lim inf
+n→∞
+h
+(log log n/2n)1/2ℓ≥
+
+cdεℓ!
+kℓd(f (ℓ−1), 0)
+ 1
+ℓ
+lim sup
+n→∞
+h
+(log log n/2n)1/2ℓ≤
+ 
+cd(2˜k + 2 + ε)ℓ!
+kℓd(f (ℓ−1), 0)
+! 1
+ℓ
+The theorem gives an upper and a lower bound on the selected bandwidth which are of the
+same order, and which again go to 0 faster than the optimal bandwidths according to most criteria.
+Exact results on the limiting behavior of the bandwidth chosen by the discrepancy principle
+can be obtained in the case where s(n) converges to 0 at a slower rate than d(Fn, F). Noting
+that discrepancy principles based on ﬁxed quantiles or the law of the iterated logarithm lead to
+undersmoothing, Eggermont and LaRiccia (1996, 2001) introduce a rate-corrected version. For a
+symmetric, nonnegative kernel, they propose to choose h as a solution of
+d∞(Fn, ˆF h
+n ) = 0.35n−2/5.
+The choice of the exponent implies that the smoothing parameter goes to 0 at the optimal rate.
+The next theorem is a generalization of the main result in Eggermont and LaRiccia (1996) and
+Chapter 7.6 of Eggermont and LaRiccia (2001).
+Our version is also applicable in the case of
+d = dkuip,k and allows for higher order kernels.
+Theorem 3.3. For f ∈W ℓ,1, K kernel of order ℓand s(n) = cn−γ for c > 0 and 0 < γ < 1/2
+we have almost surely:
+hs,n =
+
+cℓ!
+kℓd(f (ℓ−1), 0)
+ 1
+ℓ
+n−γ
+ℓ(1 + o(1)) .
+(6)
+Proof. Using the triangle inequality, we have with probability 1 that
+|d(Fn, ˆF hs,n
+n
+) −d(F, Fhs,n)| ≤d(Fhs,n, ˆF hs,n
+n
+) + d(F, Fn) = O
+ r
+log log n
+n
+!
+.
+Combining this with Lemma 3.1 and again observing that, by Theorem 2.1, the o(1) term for
+hs,n →0 is also of order o(1) for n →∞, we have
+1
+ℓ!kℓd(f (ℓ−1), 0)hs,n
+ℓ(1 + o(1)) = cn−γ + O
+
+(log log n/n)1/2
+which implies that
+hs,n =
+
+cℓ!
+kℓd(f (ℓ−1), 0)
+ 1
+ℓ
+n−γ
+ℓ(1 + o(1)) .
+The theorem implies that for a kernel of order ℓand a threshold function of the form s(n) =
+cn−γ with γ = ℓ/(2ℓ+ 1) the chosen bandwidth is – for suﬃciently smooth f – of the optimal
+order h = αn−1/(2ℓ+1) with respect to the L1 or L2 risks. The constant α depends on c and the
+unknown true density f and is not equal to the optimal one according to any of the standard
+criteria. Eggermont and LaRiccia choose c = 0.35 based on simulations. Noting that s(n) =
+cn−2/5 = (cn1/10)n−1/2 we can interpret the threshold function in terms of conﬁdence levels that
+depend on n. For c = 0.35, the conﬁdence level is below 0.5 up to n = 5624.
+In principle, constants suitable for other classes of densities, other distances or higher order
+kernels can also be chosen using simulations. But Theorem 3.3 also allows for a diﬀerent approach:
+Discrepancy principles that can be guaranteed to asymptotically choose the optimal bandwidths
+for a reference density. In the following example, we will sketch this approach for the normal
+distribution and the L2-optimal bandwidth.
+10
+
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+uniform (1)
+−4
+−2
+0
+2
+4
+0.05
+0.15
+0.25
+Cauchy (6)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0
+1
+2
+3
+4
+5
+infinite peak (8)
+−3
+−2
+−1
+0
+1
+2
+3
+0.0
+0.1
+0.2
+0.3
+0.4
+normal (11)
+0
+2
+4
+6
+8
+10
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+lognormal (12)
+−6
+−4
+−2
+0
+2
+4
+6
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+uniform scale mixture (13)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0
+1
+2
+3
+4
+5
+6
+logarithmic peak (15)
+−4
+−2
+0
+2
+4
+0.0
+0.5
+1.0
+1.5
+2.0
+normal cubed (19)
+−4
+−2
+0
+2
+4
+0.0
+0.1
+0.2
+0.3
+0.4
+skewed bimodal (22)
+−4
+−2
+0
+2
+4
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+claw (23)
+−4
+−2
+0
+2
+4
+0.0
+0.1
+0.2
+0.3
+0.4
+smooth comb (24)
+−10
+−5
+0
+5
+10
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+sawtooth (27)
+Figure 2: The densities used.
+Example 3.1. The asymptotically L2-optimal bandwidth for a kernel of order ℓis given by
+hopt =
+
+ℓ!2∥K∥2
+2
+2ℓk2
+ℓ∥f (ℓ)∥2
+2
+
+1
+2ℓ+1
+n−
+1
+2ℓ+1 ,
+(7)
+(Wand and Jones, 1995, p.33). Equating (6) and (7) yields γ =
+ℓ
+2ℓ+1 and
+c =
+∥K∥2ℓ
+2 kℓ
+(2ℓ)ℓℓ!
+
+1
+2ℓ+1
+d(f (ℓ−1), 0)
+∥f (ℓ)∥2ℓ/(2ℓ+1)
+2
+.
+(8)
+The ﬁrst factor only depends on the kernel and is invariant w.r.t. rescaling of the kernel. The
+second factor only depends on the shape of f and does not change when f is translated or rescaled.
+For f the standard normal density, we obtain c = 0.1357 for the Gaussian and c = 0.1331 for the
+Epanechnikov kernel (3) when using d = d∞. Both values are much smaller than c = 0.35 as
+suggested by Eggermont and LaRiccia (1996) independent of the kernel. This choice forces the
+estimate of the distribution function to lie extremely close to the empirical distribution function,
+causing severe undersmoothing even for very large sample sizes.
+For d = dkuip,1, we obtain
+c = 0.2715 for the Gaussian and c = 0.2661 for the Epanechnikov kernel. Similar calculations can
+be carried out for a bandwidth minimizing an upper bound for the L1 risk, but these lead to even
+smaller values of c (Mildenberger, 2011, pp. 44-45).
+4
+Simulation Study
+In this section, we explore how well diﬀerent versions of the discrepancy principle work in practice.
+Mainly in the 1980s and 1990s, several large simulations studies on bandwidth choice methods
+for kernel density estimators have been conducted, of which we just mention Cao et al.
+(1994)
+(with a focus on the L2-risk) and Berlinet and Devroye (1994) and Devroye (1997) in an L1-
+context. To the best of our knowledge, there is no larger simulation study on kernel estimators
+that includes any version of the discrepancy principle, although in Devroye (1997) the version
+11
+
+proposed in Eggermont and LaRiccia (1996) is mentioned but not included in the study. There
+are some smaller simulation studies to be found in the publications in which a particular version of
+the discrepancy principle is suggested or directly building on these (Markovich, 1989; Eggermont
+and LaRiccia, 1996, 2001). Our simulation study is a replication of a part of the more extensive
+study described in Mildenberger (2011). The aim is not to ﬁnd a ’best’ method but to explore
+whether methods based on the discrepancy principle perform reasonably well at all. Since the
+discrepancy principle is not designed with any speciﬁc risk in mind, we look at both the L1- and
+L2-risk (where applicable).
+We use the Epanechnikov kernel as given in (3) and choose the bandwidth as a solution of
+d(Fn, ˆF h
+n ) = s(n). In Eggermont and LaRiccia (1996), a secant method is proposed for solving
+this equation, but we use the related regula falsi which we found to be more stable. Occasionally,
+there may be multiple solutions but we ignore this and take the ﬁrst solution found.
+We compare the following versions of the discrepancy principle:
+• Two versions based on the 0.5 and 0.95 quantiles of the Kolmogorov-Smirnov statistic:
+d = d∞and s(n) = cn−1/2 with c = 0.83 and c = 1.36. These methods are denoted by KS
+.5 and KS .95, respectively.
+• The version proposed by Vapnik: d = d∞and s(n) = 0.6n−1/2. Denoted by V.
+• The rate-corrected version proposed by Eggermont and LaRiccia: d = d∞and s(n) =
+0.35n−2/5. Denoted by E-LR. In contrast to the other versions considered here, this one
+uses a threshold function for which the assumptions in Theorem 2.2 are fulﬁlled.
+• Two versions based on 0.5 and 0.95 quantiles of the Kuiper statistic: d = dkuip,1 and
+s(n) = cn−1/2 with c = 1.22 and c = 1.75. Denoted by Kuip .5 and Kuip .95, respectively.
+• The method based on a normal reference density as given in Example 3.1: d = d∞and
+s(n) = 0.1331n−2/5. Denoted by L2NR.
+For comparison, we include L2 cross-validation as described in Celisse and Robin (2008) (their
+Formula 13 with p = 1). This is denoted by L2CV. The more extensive simulations in Milden-
+berger (2011) include several more variants of the discrepancy principle, a few more standard
+methods for comparison, and all of the 28 densities from Berlinet and Devroye (1994). For the
+sake of brevity, here we just focus on a smaller subset but the conclusions are largely the same.
+We draw 250 samples of sizes 100, 1000 and 2500 from 12 of the 28 test bed densities introduced
+in Berlinet and Devroye (1994). For this, we use the R-package benchden (Mildenberger et al.,
+2012; Mildenberger and Weinert, 2012). The set of densities is depicted in Figure 2. We use the
+same numbering for the densities as in Berlinet and Devroye (1994).
+Figure 3 shows typical kernel estimates for a normal sample of size 100. In the ﬁrst panel,
+the L2-optimal bandwidth (7) was chosen. The second panel shows the result obtained using V,
+which gives a fairly good result. The bandwidth chosen using KS .95 is obviously too large,
+although it will be too small asymptotically. The bandwidth in the fourth panel has been chosen
+using L2NR. Although this will asymptotically result in the optimal bandwidth, the estimate is
+severely undersmoothed.
+The estimated L1 and (squared) L2 risks and the arithmetic means of the chosen bandwidths
+for all densities and sample sizes considered here are given in Tables 1, 2 and 3, respectively. The
+smallest risk for each scenario has been highlighted. Note that Table 2 omits densities 8 and 19,
+since these are not in L2.
+In most cases, either L2CV or one of V and E-LR, which perform very similarly, is the best
+method with respect to the L2-risk. Although L2CV usually selects smaller bandwidths than V
+and E-LR, the resulting risks are close in most cases. The methods based on quantiles of the
+Kolmogorov or Kuiper statistics (KS .5, KS .95, Kuip .5 and Kuip .95) choose larger band-
+widths, which results in oversmoothing in most cases (although, by Theorem 3.1, these methods
+asymptotically suﬀer from undersmoothing). The methods based on the Kuiper statistic are usu-
+ally better than those based on the corresponding quantiles of the Kolmogorov-Smirnov statistic.
+12
+
+−4
+−2
+0
+2
+4
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+x
+f
+L2opt
+−4
+−2
+0
+2
+4
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+x
+f
+V
+−4
+−2
+0
+2
+4
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+x
+f
+KS .95
+−4
+−2
+0
+2
+4
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+x
+f
+L2NR
+Figure 3: Kernel estimates for a normal sample (n = 100). The bandwidth used are the L2-optimal
+choice (7) (L2opt) and three variants of the discrepancy principle.
+The rather large amount of smoothing chosen by these methods is beneﬁcial w.r.t. L1 risk for the
+Cauchy density (number 6), which is mainly due to the fact that the L1 loss penalizes errors in
+the tails quite heavily.
+The method L2NR chooses bandwidths that are much smaller than those chosen by the other
+methods. Although it is guaranteed to asymptotically choose the L2 optimal bandwidth for the
+normal density, the results for both L1 and L2 risk are poor even when the true density is the
+normal (number 11). The small bandwidths seem to be helpful for capturing the ﬁne structure of
+multimodal densities 23, 27 and (less pronounced) 24.
+Except for 8, 15 and 19 all densities are bounded and hence fulﬁll the assumptions of Theorem
+2.2, such that the estimate based on a bandwidth chosen using E-LR will be almost surely
+consistent w.r.t. the L1-distance.
+Density 8 is the density of U 2, where U is a uniform random variable on [0, 1]. This corresponds
+to the density in Example 2.1 for ε = 1/2, such that using E-LR to select the bandwidth will
+result in a consistent estimate w.r.t. L1-loss. The density is not in L2. With respect to L1-risk, at
+least for larger sample sizes all versions of the discrepancy principle except L2NR perform better
+than L2CV. The distribution function corresponding to density 15 is in C0,α for any α < 1, and
+hence using E-LR to select the bandwidth will also lead to L1-consistent estimates by Theorem
+2.2 and Corollary 2.1. This density is in L2. Again, L2CV performs worse than all variants of
+the discrepancy principle except L2NR. Density number 19 is the density of N 3, where N is a
+standard normal random variable. It is not in L2 and it can be shown that
+|F(h) −F ∗Kh(h)| =
+1
+√
+2π h
+1
+3 (1 + o(1)),
+where F is the distribution function and Kh the Epanechnikov-kernel with bandwidth h. Hence, for
+h small enough, the conditions of Theorem 2.3 are fulﬁlled with ε = 1/3 and any 0 < c < (
+√
+2π)−1.
+From this it follows that every version of the discrepancy principle considered in the simulation
+study will lead to inconsistent estimates w.r.t.
+L1-loss almost surely.
+The main Theorem in
+13
+
+Density
+n
+L2CV
+E-LR
+V
+KS .5
+KS .95
+Kuip .5
+Kuip .95
+L2NR
+1
+100
+0.2518
+0.2421
+0.2511
+0.3018
+0.4735
+0.2884
+0.3667
+0.3871
+1000
+0.1043
+0.1095
+0.1035
+0.1204
+0.1831
+0.1086
+0.1341
+0.1132
+2500
+0.0774
+0.0775
+0.0734
+0.0803
+0.1131
+0.0744
+0.085
+0.0819
+6
+100
+0.3316
+0.3324
+0.3293
+0.3583
+0.5169
+0.3442
+0.4163
+0.6787
+1000
+0.1637
+0.158
+0.1581
+0.1627
+0.2097
+0.1576
+0.1714
+0.23
+2500
+0.1242
+0.1247
+0.1248
+0.1258
+0.1493
+0.1237
+0.1294
+0.1547
+8
+100
+0.3784
+0.3892
+0.3741
+0.3521
+0.4426
+0.3608
+0.4368
+0.9115
+1000
+0.3584
+0.2679
+0.3021
+0.2365
+0.1892
+0.2222
+0.1907
+0.6479
+2500
+0.3576
+0.2361
+0.2903
+0.2214
+0.1608
+0.2047
+0.1628
+0.5845
+11
+100
+0.1571
+0.1562
+0.1586
+0.2082
+0.4108
+0.1886
+0.2861
+0.4559
+1000
+0.0613
+0.0641
+0.0604
+0.0735
+0.1326
+0.0627
+0.0859
+0.1047
+2500
+0.0432
+0.0472
+0.0428
+0.0503
+0.0864
+0.0438
+0.0567
+0.0625
+12
+100
+0.2863
+0.2758
+0.2744
+0.2937
+0.4023
+0.2986
+0.3684
+0.5874
+1000
+0.1313
+0.1249
+0.1251
+0.1267
+0.1471
+0.1272
+0.1416
+0.167
+2500
+0.0959
+0.0897
+0.09
+0.0903
+0.1019
+0.0907
+0.0992
+0.1083
+13
+100
+0.3723
+0.3627
+0.3647
+0.4048
+0.596
+0.3922
+0.4764
+0.707
+1000
+0.1945
+0.1816
+0.1808
+0.1862
+0.2251
+0.1813
+0.1936
+0.2213
+2500
+0.151
+0.1362
+0.1363
+0.1373
+0.1583
+0.1356
+0.1401
+0.1627
+15
+100
+0.3072
+0.2946
+0.293
+0.305
+0.3876
+0.3175
+0.38
+0.5593
+1000
+0.1668
+0.1464
+0.1534
+0.1415
+0.147
+0.1399
+0.1482
+0.2257
+2500
+0.1375
+0.1114
+0.1217
+0.1088
+0.1036
+0.1047
+0.1041
+0.1742
+19
+100
+1.0525
+1.0695
+1.013
+0.8101
+0.7173
+0.8545
+0.7274
+1.6579
+1000
+1.4559
+0.9915
+1.107
+0.8598
+0.5813
+1.0131
+0.7704
+1.6414
+2500
+1.5706
+0.9773
+1.1507
+0.9181
+0.5981
+1.0842
+0.8361
+1.6392
+22
+100
+0.1979
+0.1931
+0.1985
+0.2477
+0.3981
+0.2423
+0.3232
+0.4385
+1000
+0.0804
+0.0896
+0.0832
+0.1003
+0.1531
+0.0949
+0.1299
+0.1027
+2500
+0.0566
+0.0649
+0.0577
+0.0683
+0.1015
+0.0641
+0.0856
+0.0644
+23
+100
+0.3829
+0.379
+0.3826
+0.4139
+0.5278
+0.4048
+0.4592
+0.4858
+1000
+0.3498
+0.2826
+0.2364
+0.3301
+0.3546
+0.274
+0.35
+0.1392
+2500
+0.2035
+0.2158
+0.1609
+0.2371
+0.3454
+0.1813
+0.27
+0.0922
+24
+100
+0.3775
+0.4421
+0.4743
+0.6363
+0.8741
+0.5901
+0.7567
+0.4773
+1000
+0.173
+0.2665
+0.2369
+0.3102
+0.4793
+0.2583
+0.3487
+0.1695
+2500
+0.1274
+0.2035
+0.1689
+0.2174
+0.3394
+0.1805
+0.239
+0.1247
+27
+100
+0.6238
+0.583
+0.5966
+0.6489
+0.7636
+0.6376
+0.6985
+0.4514
+1000
+0.5965
+0.5366
+0.4653
+0.5488
+0.5857
+0.52
+0.5337
+0.1682
+2500
+0.5339
+0.4262
+0.3127
+0.4663
+0.5398
+0.3493
+0.5147
+0.1275
+Table 1: Results of the simulation study: Estimated L1 risk for kernel estimators
+Devroye (1989), which states that selecting the bandwidth using L2CV will lead to L1-inconsistent
+estimators for any suﬃciently sharply peaked density is not applicable to density 19. However,
+Table 1 shows that L2CV performs even worse than most versions of the discrepancy principle in
+our simulations (with the versions choosing larger bandwidths doing relatively better).
+Overall, if the discrepancy principle is to be used for choosing a bandwidths, from the simula-
+tions it seems that V and E-LR would be the versions of choice. Although they perform similarly
+in the simulation study, there are good theoretical reasons for preferring E-LR as consistency
+can be guaranteed can be guaranteed for a large class of densities. Generally, the simulations
+show that the asymptotic results are of limited use for the sample sizes considered here (even for
+n = 2500!). This is not so much of a surprise since the asymptotic analysis is largely based on the
+law of the iterated logarithm.
+5
+Conclusions
+The discrepancy principle is a fast and simple method of parameter choice that is also easy to
+implement. Although it is very popular in other branches of applied mathematics (namely in ill-
+posed problems theory), it has only rarely been used in density estimation. While there are many
+shortcomings – it is not optimal in any sense and it can even lead to inconsistent estimates for some
+densities with inﬁnite peaks –, some variants do work surprisingly well for a large set of diﬀerent
+14
+
+Density
+n
+L2CV
+E-LR
+V
+KS .5
+KS .95
+Kuip .5
+Kuip .95
+L2NR
+1
+100
+0.0774
+0.0726
+0.0755
+0.0939
+0.152
+0.0889
+0.117
+0.2511
+1000
+0.0205
+0.0248
+0.022
+0.0295
+0.0526
+0.0245
+0.0349
+0.0215
+2500
+0.012
+0.0156
+0.013
+0.0169
+0.0299
+0.0138
+0.019
+0.0122
+6
+100
+0.008
+0.008
+0.0082
+0.0129
+0.0336
+0.0111
+0.0203
+0.0529
+1000
+0.0014
+0.0016
+0.0014
+0.0021
+0.0055
+0.0016
+0.0027
+0.0028
+2500
+6e-04
+8e-04
+6e-04
+9e-04
+0.0024
+7e-04
+0.0012
+0.001
+11
+100
+0.0072
+0.007
+0.0069
+0.0104
+0.0332
+0.0088
+0.0177
+0.076
+1000
+0.0011
+0.0011
+0.001
+0.0014
+0.004
+0.0011
+0.0018
+0.0036
+2500
+6e-04
+6e-04
+5e-04
+7e-04
+0.0017
+6e-04
+8e-04
+0.0012
+12
+100
+0.0235
+0.0213
+0.0221
+0.0309
+0.0639
+0.0325
+0.0541
+0.1137
+1000
+0.0043
+0.0049
+0.0044
+0.0059
+0.0118
+0.006
+0.0103
+0.0063
+2500
+0.0022
+0.0027
+0.0022
+0.0029
+0.0058
+0.003
+0.0052
+0.0025
+13
+100
+0.039
+0.0379
+0.0394
+0.0511
+0.1017
+0.048
+0.0686
+0.1124
+1000
+0.0124
+0.015
+0.0137
+0.017
+0.0264
+0.0148
+0.0192
+0.0126
+2500
+0.0077
+0.0103
+0.0088
+0.011
+0.0169
+0.0094
+0.0122
+0.0076
+15
+100
+0.3402
+0.2946
+0.3034
+0.3663
+0.5308
+0.397
+0.5167
+0.7157
+1000
+0.1059
+0.1104
+0.1043
+0.122
+0.181
+0.1338
+0.1836
+0.1262
+2500
+0.0688
+0.075
+0.0682
+0.0784
+0.1128
+0.0862
+0.1168
+0.0788
+22
+100
+0.0124
+0.0119
+0.0125
+0.0181
+0.0337
+0.0176
+0.0263
+0.0725
+1000
+0.0021
+0.0028
+0.0023
+0.0036
+0.0081
+0.0032
+0.006
+0.0034
+2500
+0.001
+0.0015
+0.0011
+0.0017
+0.0039
+0.0014
+0.0027
+0.0013
+23
+100
+0.0536
+0.0546
+0.0544
+0.0572
+0.0768
+0.0561
+0.0639
+0.1051
+1000
+0.0485
+0.034
+0.0238
+0.0457
+0.0472
+0.0319
+0.0501
+0.0074
+2500
+0.0236
+0.0202
+0.011
+0.0244
+0.05
+0.014
+0.0317
+0.0033
+24
+100
+0.0444
+0.0547
+0.0597
+0.0856
+0.127
+0.0777
+0.1073
+0.0813
+1000
+0.0116
+0.028
+0.0239
+0.034
+0.0578
+0.0269
+0.0392
+0.0117
+2500
+0.006
+0.0202
+0.0153
+0.022
+0.0378
+0.017
+0.0248
+0.0075
+27
+100
+0.0205
+0.0198
+0.02
+0.0211
+0.0239
+0.0208
+0.0222
+0.0185
+1000
+0.0192
+0.0188
+0.0146
+0.0191
+0.0192
+0.0178
+0.0176
+0.0023
+2500
+0.0171
+0.0123
+0.007
+0.0146
+0.0181
+0.0085
+0.0174
+0.0014
+Table 2: Results of the simulation study: Estimated squared L2 risk for kernel estimators
+densities in simulations and consistency can – at least for some versions – be guaranteed for a
+large class of densities including all square-integrable ones. The simulations also show that the
+behavior of methods based on the discrepancy principle may be quite diﬀerent from the asymptotic
+behavior even for sample sizes as large as n = 2500. Generally, asymptotic results do not help
+much in choosing the threshold function s(n) – the most striking example being the L2 normal
+reference version L2NR which is guaranteed to asymptotically choose the L2 optimal bandwidth
+for the normal distribution but performs very poorly even when the true density is the normal.
+Also taking into account the inconsistency for some densities (a problem that is actually shared
+by many popular bandwidth selectors), the method cannot be recommended in general.
+Acknowledgement
+Large parts of the present work were part of the author’s Ph.D. thesis (Mildenberger, 2011) at the
+Faculty of Statistics of the TU Dortmund University and has been supported by the Collaborative
+Research Center Statistical modeling of nonlinear dynamic processes (SFB 823, Project C1) of the
+German Research Foundation (DFG). The author wants to thank his supervisor Ursula Gather
+for her constant support and for fruitful discussions.
+References
+Aidu, F., and Vapnik, V. (1989), “Estimation of Probability Density on the Basis of the Method
+of Stochastic Regularization,” Automation and Remote Control, 50, 499–509.
+15
+
+Density
+n
+L2CV
+E-LR
+V
+KS .5
+KS .95
+Kuip .5
+Kuip .95
+L2NR
+1
+100
+0.2267
+0.2206
+0.2443
+0.3609
+0.6297
+0.3342
+0.4784
+0.0292
+1000
+0.0651
+0.1073
+0.0913
+0.1286
+0.2149
+0.1055
+0.1502
+0.0363
+2500
+0.0381
+0.077
+0.0599
+0.0838
+0.139
+0.0663
+0.0946
+0.0277
+6
+100
+1.1911
+1.1651
+1.2968
+1.9599
+3.6053
+1.7881
+2.6064
+0.148
+1000
+0.6465
+0.8374
+0.725
+0.9776
+1.4834
+0.8259
+1.1175
+0.2384
+2500
+0.5264
+0.7162
+0.5793
+0.7652
+1.1179
+0.644
+0.8551
+0.2483
+8
+100
+0.0862
+0.0439
+0.0511
+0.0946
+0.2425
+0.1193
+0.2323
+0.0061
+1000
+0.0036
+0.0062
+0.0046
+0.0087
+0.0232
+0.0108
+0.0223
+0.001
+2500
+0.0013
+0.003
+0.0018
+0.0035
+0.0092
+0.0043
+0.0088
+4e-04
+11
+100
+0.9621
+0.9097
+1.0118
+1.4927
+2.4632
+1.3745
+1.9095
+0.0977
+1000
+0.5867
+0.711
+0.6137
+0.8288
+1.2229
+0.6992
+0.9389
+0.1732
+2500
+0.4932
+0.6253
+0.5052
+0.6677
+0.9607
+0.5581
+0.7385
+0.1942
+12
+100
+0.4389
+0.4423
+0.4865
+0.6981
+1.2262
+0.7238
+1.0752
+0.0654
+1000
+0.1945
+0.2675
+0.2374
+0.3063
+0.4542
+0.3081
+0.4212
+0.0996
+2500
+0.1456
+0.2163
+0.1815
+0.2293
+0.3285
+0.2326
+0.3108
+0.0994
+13
+100
+0.4289
+0.4419
+0.4889
+0.7277
+1.3762
+0.6792
+0.9784
+0.0684
+1000
+0.1219
+0.2108
+0.1791
+0.2533
+0.4253
+0.2072
+0.2962
+0.0716
+2500
+0.0723
+0.1507
+0.1167
+0.1641
+0.2737
+0.1308
+0.1871
+0.0538
+15
+100
+0.0903
+0.0631
+0.0703
+0.1104
+0.2223
+0.1286
+0.2116
+0.0113
+1000
+0.0147
+0.0208
+0.0173
+0.0257
+0.0477
+0.0304
+0.0486
+0.0065
+2500
+0.0077
+0.0134
+0.01
+0.0148
+0.027
+0.018
+0.0284
+0.0043
+19
+100
+0.0505
+0.0327
+0.0423
+0.1231
+0.6511
+0.0916
+0.263
+0.0018
+1000
+4e-04
+0.0029
+0.0018
+0.0051
+0.0235
+0.0026
+0.0077
+1e-04
+2500
+1e-04
+0.0011
+5e-04
+0.0014
+0.0066
+7e-04
+0.002
+1e-04
+22
+100
+0.8416
+0.8513
+0.9462
+1.3895
+2.3862
+1.3423
+1.937
+0.1067
+1000
+0.4001
+0.5509
+0.4857
+0.6315
+0.9311
+0.5928
+0.8078
+0.1784
+2500
+0.3116
+0.4587
+0.3814
+0.4865
+0.6895
+0.4525
+0.6014
+0.1844
+23
+100
+0.7869
+0.6109
+0.7071
+1.1304
+1.9354
+1.0402
+1.4977
+0.0718
+1000
+0.5907
+0.3161
+0.2601
+0.4032
+0.7562
+0.3033
+0.4961
+0.0945
+2500
+0.2641
+0.2485
+0.1956
+0.2701
+0.4789
+0.2151
+0.3065
+0.0917
+24
+100
+0.4771
+0.7096
+0.8014
+1.2902
+2.7506
+1.1366
+1.815
+0.097
+1000
+0.1068
+0.4089
+0.3443
+0.4997
+0.8546
+0.3915
+0.5795
+0.1214
+2500
+0.0604
+0.3038
+0.2328
+0.3314
+0.5653
+0.257
+0.3731
+0.1004
+27
+100
+5.7691
+3.876
+4.3972
+6.8032
+12.1572
+6.2664
+9.1695
+0.4075
+1000
+4.7022
+1.6839
+1.3201
+2.1725
+3.9145
+1.5474
+2.6182
+0.4851
+2500
+2.9109
+1.2055
+0.938
+1.3235
+2.405
+1.0177
+1.5117
+0.4597
+Table 3: Results of the simulation study: Chosen Bandwidth
+Berlinet, A., and Devroye, L. (1994), “A Comparison of Kernel Density Estimates,” Publications
+de l’Institute de Statistique de L’Universite de Paris, 38, 3–59.
+Bogachev, V. (2007), Measure Theory. Volume 2., New York: Springer.
+Cao, R., Cuevas, A., and Gonz´alez Manteiga, W. (1994), “A Comparative Study of Several
+Smoothing Methods in Density Estimation,” Computational Statistics and Data Analysis, 17,
+153–176.
+Celisse, A., and Robin, S. (2008), “Nonparametric Density Estimation by Exact Leave-p-Out
+Cross-Validation,” Computational Statistics and Data Analysis, 52, 2350–2368.
+Davies, P.L. (1995), “Data Features,” Statistica Neerlandica, 49, 185–245.
+Davies, P.L. (2008), “Approximating Data (with discussion),” Journal of the Korean Statistical
+Society, 37, 191–240.
+Davies, P.L., Gather, U., Nordman, D.J., and Weinert, H. (2009), “A Comparison of Automatic
+Histogram Constructions,” ESAIM: Probability and Statistics, 13, 181–196.
+Davies, P.L., and Kovac, A. (2004), “Densities, Spectral Densities and Modality,” The Annals of
+Statistics, 32, 1093–1136.
+16
+
+Devroye, L. (1989), “On the Non-Consistency of the L2-Cross-Validated Kernel Density Estimate,”
+Statistics and Probality Letters, 8, 425–433.
+Devroye, L. (1997), “Universal Smoothing Factor Selection in Density Estimation: Theory and
+Practice (with discussion),” Test, 6, 223–320.
+Devroye, L., and Gy¨orﬁ, L. (1985), Nonparametric Density Estimation. The L1 View, New York:
+Wiley.
+Eggermont, P., and LaRiccia, V. (1996), “A simple and Eﬀective Bandwidth Selector for Kernel
+Density Estimation,” Scandinavian Journal of Statistics, 23, 285–301.
+Eggermont, P., and LaRiccia, V. (1997), “Nonlinearly Smoothed EM Density Estimation With Au-
+tomated Smoothing Parameter Selection for Nonparametric Deconvolution Problems,” Journal
+of the American Statistical Association, 92, 1451–1458.
+Eggermont, P., and LaRiccia, V. (2001), Maximum Penalized Likelihood Estimation. Volume I:
+Density Estimation, New York: Springer.
+Hjort, N., and Walker, S. (2001), “A Note on Kernel Density Estimators with Optimal Band-
+widths,” Statistics and Probability Letters, 54, 153–159.
+Katznelson, Y. (2004), An Introduction to Harmonic Analysis. Third Edition, Cambridge: Cam-
+bridge University Press.
+Markovich, N. (1989), “Experimental Analysis of Nonparametric Density Estimates and of Meth-
+ods for Smoothing Them,” Automation and Remote Control, 50, 941–948.
+Mildenberger, T. (2011), “Das Diskrepanzprinzip in der Nichtparametrischen Kurvensch¨atzung,”
+Ph.D. dissertation (in German), TU Dortmund University, Faculty of Statistics.
+Mildenberger, T., and Weinert, H. (2012), “The benchden Package: Benchmark Densities for
+Nonparametric Density Estimation,” Journal of Statistical Software, 46, 1–14.
+Mildenberger, T., Weinert, H., and Tiemeyer, S. (2012), benchden: 28 Benchmark Densities from
+Berlinet/Devroye (1994), R package version 1.0.5 .
+Morozov, V.A. (1966), “On the Solution of Functional Equations by the Method of Regulariza-
+tion,” Soviet Mathematics, 7, 414–417.
+Shapiro, H. (1969), Smoothing and Approximation of Functions, New York: Van Nostrand Rein-
+hold.
+Vapnik, V. (1998), Statistical Learning Theory, New York: Wiley.
+Vapnik, V. (2000), The Nature of Statistical Learning Theory. Second Edition, New York: Springer.
+Vapnik, V., and Stefanyuk, A. (1978), “Nonparametric Methods of Reconstructing the Probability
+Density,” Automation and Remote Control, 39, 1127–1140.
+Wand, M., and Jones, M. (1995), Kernel Smoothing, Boca Raton: Chapman and Hall.
+Yamamoto, H. (1973), “Uniform Convergence of an Estimator of a Distribution Function,” Bulletin
+of Mathematical Statistics, 15, 69–78.
+17

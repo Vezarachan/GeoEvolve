@@ -1,0 +1,1938 @@
+A POLYNOMIAL KERNEL FOR
+DISTANCE-HEREDITARY VERTEX DELETION
+EUN JUNG KIM AND O-JOUNG KWON
+Abstract. A graph is distance-hereditary if for any pair of vertices, their distance in
+every connected induced subgraph containing both vertices is the same as their distance
+in the original graph. The Distance-Hereditary Vertex Deletion problem asks,
+given a graph G on n vertices and an integer k, whether there is a set S of at most k
+vertices in G such that G −S is distance-hereditary. This problem is important due to
+its connection to the graph parameter rank-width that distance-hereditary graphs are
+exactly graphs of rank-width at most 1. Eiben, Ganian, and Kwon (MFCS’ 16) proved
+that Distance-Hereditary Vertex Deletion can be solved in time 2O(k)nO(1), and
+asked whether it admits a polynomial kernelization. We show that this problem admits
+a polynomial kernel, answering this question positively. For this, we use a similar idea
+for obtaining an approximate solution for Chordal Vertex Deletion due to Jansen
+and Pilipczuk (SODA’ 17) to obtain an approximate solution with O(k3 log n) vertices
+when the problem is a Yes-instance, and we exploit the structure of split decompositions
+of distance-hereditary graphs to reduce the total size.
+1. Introduction
+The graph modiﬁcation problems, in which we want to transform a graph to satisfy
+a certain property with as few graph modiﬁcations as possible, have been extensively
+studied. For instance, the Vertex Cover and Feedback Vertex Set problems are
+graph modiﬁcation problems where the target graphs are edgeless graphs and forests,
+respectively. By the classic result of Lewis and Yannakakis [23], it is known that for all
+non-trivial hereditary properties that can be tested in polynomial time, the corresponding
+vertex deletion problems are NP-hard. Hence, the research eﬀort has been directed toward
+designing algorithms such as approximation and parameterized algorithms.
+When the target graph class C admits eﬃcient algorithms for some NP-hard problems,
+the graph modiﬁcation problem related to such a class attracts more attention. In this
+context, vertex deletion problems to classes of graphs of constant tree-width or constant
+tree-depth have been studied. Tree-width w Vertex Deletion 1 is proved to admit
+an FPT algorithm running in time 2O(k)nO(1) and a kernel with O(kg(w)) vertices for
+some function g [15, 22]. Also, it was shown that Tree-depth w Vertex Deletion
+admits uniformly polynomial kernels with O(k6) vertices, for every ﬁxed w [16]. All these
+problems are categorized as vertex deletion problems for F-minor free graphs in a general
+Date: February 22, 2017.
+Key words and phrases. rank-width, kernelization, distance-hereditary.
+The second author was supported by ERC Starting Grant PARAMTIGHT (No.
+280152) and also
+supported by the European Research Council (ERC) under the European Union’s Horizon 2020 research
+and innovation programme (ERC consolidator grant DISTRUCT, agreement No. 648527).
+1Tree-width (or Tree-depth) w Vertex Deletion asks, given a graph G and an integer k, whether
+G contains a vertex set S of at most k vertices such that G −S has tree-width (or tree-depth) at most w.
+1
+arXiv:1610.07229v3  [cs.DS]  20 Feb 2017
+
+2
+EUN JUNG KIM AND O-JOUNG KWON
+setting, when the set F contains at least one planar graph. However, F-minor free graphs
+capture only sparse graphs in a sense that the number of edges of such a graph is bounded
+by a linear function on the number of its vertices. Thus these problems are not very useful
+when dealing with very dense graphs.
+Rank-width [26] and clique-width [7] are graph width parameters introduced for extend-
+ing graph classes of bounded tree-width. Graphs of bounded rank-width represent graphs
+that can be recursively decomposed along vertex partitions (X, Y ) where the number of
+neighborhood types between X and Y are small. Thus, graphs of constant rank-width
+may contain dense graphs; for instance, all complete graphs have rank-width at most 1.
+Courcelle, Makowski, and Rotics [6] proved that every MSO1-expressible problem can be
+solved in polynomial time on graphs of bounded rank-width.
+Motivated from Tree-width w Vertex Deletion, Eiben, Ganian, and the second
+author [10] initiated study on vertex deletion problems to graphs of constant rank-width.
+The class of graphs of rank-width at most 1 is exactly same as the class of distance-
+hereditary graphs [26].
+A graph G is called distance-hereditary if for every connected
+induced subgraph H of G and every two vertices u and v in H, the distance between u
+and v in H is the same as the distance in G. A vertex subset X of a graph G is a distance-
+hereditary modulator, or a DH-modulator in short, if G−X is a distance-hereditary graph.
+We formulate our central problem.
+Distance-hereditary Vertex Deletion (DH Vertex Deletion)
+Input : A graph G, an integer k
+Parameter : k
+Question : Does G contain a DH-modulator of size at most k?
+Eiben, Ganian, and the second author [10] proved that DH Vertex Deletion can be
+solved in time 2O(k)nO(1). It was known before that vertex deletion problems for graphs
+of rank-width w can be solved in FPT time [21] using the fact that graphs of rank-width
+at most w can be characterized by a ﬁnite list of forbidden vertex-minors [26], and Eiben
+et al. devised a ﬁrst elementary algorithm for this problem when w = 1. Furthermore,
+they discussed that the size k of a DH-modulator can be used to obtain a 2O(k)nO(1)-time
+algorithm for problems such as Independent Set, Vertex Cover, and 3-Coloring.
+However, until now, it was not known whether the DH Vertex Deletion problem
+admits a polynomial kernel or not. A kernelization of a parameterized graph problem Π is
+a polynomial-time algorithm which, given an instance (G, k) of Π, outputs an equivalent
+instance (G′, k′) of Π with |V (G′)| + k′ ≤h(k) for some computable function h. The
+resulting instance (G′, k′) of a kernelization is called a kernel, and in particular, when h
+is a polynomial function, Π is said to admit a polynomial kernel.
+Our Contribution. In this paper, we show that DH Vertex Deletion admits a poly-
+nomial kernel.
+Theorem 1.1. DH Vertex Deletion admits a polynomial kernel.
+We ﬁnd in Section 3 an approximate DH-modulator with O(k3 log n) vertices if the
+given instance is a Yes-instance. An important observation here is that in a distance-
+hereditary graph, there is a balanced separator, which is a complete bipartite subgraph
+(possibly containing edges in each part). By recursively ﬁnding such separators, we will
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+3
+decompose the given graph into D⊎K1 ⊎· · ·⊎Kℓ⊎X, where ℓ= O(k log n), D is distance-
+hereditary, each Ki is a complete bipartite subgraph, |X| = O(k3√log k log n). We argue
+that if a graph H is the disjoint union of a distance-hereditary graph and a complete
+bipartite graph, then in polynomial time, one can construct a DH-modulator of size O(k2)
+in H if (H, k) is a Yes-instance. Using this sub-algorithm ℓtimes, we will construct an
+approximate DH-modulator with O(k3 log n) vertices. This part follows a vein similar to
+the approach of Jansen and Pilipczuk [20] for Chordal Vertex Deletion. Given a
+DH-modulator S by adding O(k2) per each vertex in S, we will obtain in Section 4 a new
+DH-modulator S′ of size O(k5 log n) such that for every v ∈S′, G[(V (G)\S)∪{v}] is also
+distance-hereditary. We will call such a DH-modulator a good DH-modulator.
+The remaining part is contributed to reduce the number of vertices in G −S′. Note
+that distance-hereditary graphs may contain a large set of pairwise twins. In Section 5,
+we present a reduction rule that results in bounding the size of each set of pairwise twins
+in G −S′. We give in Section 6 a reduction rule that results in bounding the number of
+connected components of G −S′. The last step is to reduce the size of each connected
+component of G −S′ having at least 2 vertices. For this, we use split decompositions
+of distance-hereditary graphs. Brieﬂy, split decompositions present tree-like structure of
+distance-hereditary graphs, with a decomposition tree with bags for each nodes, such that
+each bag consists of a maximal set of pairwise twins in G−S′. Since the result of Section 5
+provides a bound of each maximal set of pairwise twins in G −S′, it is suﬃcient to bound
+the number of bags in the decomposition tree. We summarize our algorithm in Section 8,
+and conclude with some further discussions in Section 9.
+2. Preliminaries
+In this paper, all graphs are simple and ﬁnite. Given a graph G, we write the vertex
+set and edge set of G as V (G) and E(G) respectively. Unless otherwise stated, we reserve
+n to denote |V (G)|. For a vertex v of G, we denote by G −v the graph obtained from G
+by removing v and all edges incident with it. For a vertex subset S of G, we denote by
+G −S the graph obtained by removing all vertices in S. For a vertex subset S of G, let
+G[S] be the subgraph of G induced by S. For a vertex v in G, we denote by NG(v) the
+set of all neighbors of v in G. For a vertex subset S of G, we denote by NG(S) the set of
+all vertices in V (G) \ S that have a neighbor in S, and let NG[S] := NG(S) ∪S. If the
+graph G is clear from the context, then we may remove G from the notation. We say that
+a graph is trivial if it consists of a single vertex, and non-trivial otherwise.
+For two vertex sets A and B in G, we say A is complete to B if for every v ∈A and
+w ∈B, v is adjacent to w, and A is anti-complete to B if for every v ∈A and w ∈B, v is
+not adjacent to w. A star is a tree with a distinguished vertex, called the center, adjacent
+to all other vertices. A complete graph is a graph with all possible edges. Two vertices v
+and w of a graph G are twins if they have the same neighbors in G −{v, w}. We say a
+vertex subset S of G is a twin set of G if the vertices in S are pairwise twins in G.
+A graph H is a biclique if there is a bipartition of V (H) into non-empty sets A ⊎B
+such that any two vertices a ∈A and b ∈B is adjacent. Notice that there may be edges
+among the vertices of A or B. For a vertex subset K ⊆V (G), we say that K is a biclique
+of G if G[K] is a biclique.
+For a connected graph G, a vertex subset S ⊆V (G) is called a balanced vertex separator
+of G if every component of G −S has at most 2
+3|V (G)| vertices. We allow V (G) to be
+
+4
+EUN JUNG KIM AND O-JOUNG KWON
+house
+gem
+domino
+cycle ≥5
+Figure 1. The induced subgraph obstructions for distance-hereditary graphs.
+a trivial balanced vertex separator of G. For a vertex subset S of G, a path is called an
+S-path if its end vertices are in S and all other internal vertices are in V (G) \ S.
+2.1. Distance-hereditary graphs. A graph G is distance-hereditary if for every con-
+nected induced subgraph H of G, the distance between u and v in H is the same as the
+distance between u and v in G. The class of distance-hereditary graphs was introduced
+by Howorka [19], and attracted much attention after the work of Bandelt and Murder [3]
+in 1982.
+This graph class was characterized in a various way; for instance, distance-
+hereditary graphs are exactly the graphs that can be constructed from a vertex by a
+sequence of adding twins or leaves [3], or these graphs are (5, 2)-crossing chordal graphs
+meaning that every induced cycle of length at least 5 contains two crossing chords [19].
+A graph is called a DH obstruction if it is isomorphic to a gem, a house, a domino or
+an induced cycle of length at least 5, that are depicted in Figure 1. A DH obstruction is
+small if it has at most 6 vertices.
+Theorem 2.1 (Bandelt and Mulder [3]). A graph is distance-hereditary if and only if it
+has no induced subgraph isomorphic to one of DH obstructions.
+The following lemma from [21] is useful to ﬁnd a DH obstruction.
+Lemma 2.2. Given a graph G, if P is an induced path in G of length at least 3 and
+v ∈V (G) \ V (P) is adjacent with the end vertices of P, then G[V (P) ∪{v}] contains a
+DH obstruction including v.
+For a subset S of a graph G, we say that S is a DH-modulator if G −S is distance-
+hereditary. A DH-modulator S is good if every DH obstruction of G contains at least two
+vertices of S, or equivalently, G[(V (G) \ S) ∪{v}] is distance-hereditary for every v ∈S.
+2.2. Split decompositions. We follow the notations in [4]. A split of a graph G is a
+vertex partition (A, B) of G such that |A| ≥2, |B| ≥2, and NG(B) is complete to NG(A).
+A connected graph G is called a prime graph if |V (G)| ≥5 and it has no split. A connected
+graph D with a distinguished set of cut edges M(D) of D is called a marked graph if M(D)
+forms a matching. An edge in M(D) is called a marked edge, and every other edge is called
+an unmarked edge. A vertex incident with a marked edge is called a marked vertex, and
+every other vertex is called an unmarked vertex. Each connected component of D −M(D)
+is called a bag of D. See Figure 2 for an example.
+When G admits a split (A, B), we construct a marked graph D on the vertex set
+V (G) ∪{a′, b′} such that
+• a′b′ is a new marked edge,
+• A is anti-complete to B,
+• {a′} is complete to NG(B), {b′} is complete to NG(A), and
+• for vertices a, b with {a, b} ⊆A or {a, b} ⊆B, ab ∈E(G) if and only if ab ∈E(D).
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+5
+B1
+B2
+B4
+B3
+B5
+G
+Figure 2. An example of a split decomposition of a distance-hereditary
+graph. Dashed edges denote marked edges and each Bi denotes a bag.
+The marked graph D is called a simple decomposition of G. A split decomposition of a
+connected graph G is a marked graph D deﬁned inductively to be either G or a marked
+graph deﬁned from a split decomposition D′ of G by replacing a bag B with its simple
+decomposition. It is known that for two vertices u, v in G, uv ∈E(G) if and only if there is
+a path from u to v in D where its ﬁrst and last edges are unmarked, and an unmarked edge
+and a marked edge alternatively appear in the path [1, Lemma 2.10]. For convenience, we
+call a bag a star bag or a complete bag if it is a star or a complete graph, respectively.
+Naturally, we can deﬁne a reverse operation of decomposing into a simple decomposition;
+for a marked edge xy of a split decomposition D, recomposing xy is the operation of
+removing two vertices x and y and making ND(x) \ {y} complete to ND(y) \ {x} with
+unmarked edges. It is not hard to observe that if D is a split decomposition of G, then G
+can be obtained from D by recomposing all marked edges.
+Note that there are many ways of decomposing a complete graph or a star, because
+every its vertex partition (A, B) with |A| ≥2 and |B| ≥2 is a split. Cunningham and
+Edmonds [8] developed a canonical way to decompose a graph into a split decomposition
+by not allowing to decompose a star bag or a complete bag. A split decomposition D
+of G is called a canonical split decomposition if each bag of D is either a prime graph, a
+star, or a complete graph, and recomposing any marked edge of D violates this property.
+Bouchet [4, (4.3)] observed that every canonical split decomposition has no marked edge
+linking two complete bags, and no marked edge linking a leaf of a star bag and the center
+of another star bag. Furthermore, for each pair of twins a, b in G, it holds that a, b must
+both be located in the same bag of the canonical split decomposition.
+Theorem 2.3 (Cunningham and Edmonds [8]). Every connected graph has a unique
+canonical split decomposition, up to isomorphism.
+Theorem 2.4 (Dahlhaus [9]). The canonical split decomposition of a graph G can be
+computed in time O(|V (G)| + |E(G)|).
+We now give the second characterization of distance-hereditary graphs that is crucial
+for our results.
+Theorem 2.5 (Bouchet [4]). A graph is distance-hereditary if and only if every bag in its
+canonical split decomposition is either a star bag or a complete bag.
+2.3. Extending a canonical split decomposition. Let G and H be connected graphs
+such that G is distance-hereditary and H is obtained from G by adding a vertex v. Gioan
+and Paul [17] characterized when H is again distance-hereditary or not, and described the
+way to extend the canonical split decomposition of G to the canonical split decomposition
+of H when H is distance-hereditary. We need this characterization in Section 7.
+
+6
+EUN JUNG KIM AND O-JOUNG KWON
+B1
+B2
+B4
+B3
+B5
+position
+B1
+B2
+B4
+B
+B5
+B3
+v
+G0
+v
+Figure 3. The way of extending the given split decomposition by adding
+a new vertex v. The pointed position is the marked edge described in (2)
+of Theorem 2.6, and it can be computed in polynomial time. The second
+split decomposition is the modiﬁed split decomposition.
+Let D be the canonical split decomposition of a connected distance-hereditary graph G.
+For S ⊆V (G) and a vertex v in D with a bag B containing v, v is accessible with respect
+to S if either v ∈S, or the component of D −V (B) having a neighbor of v contains a
+vertex in S. For S ⊆V (G) and a bag B of D,
+(1) B is fully accessible with respect to S if all vertices in B are accessible with respect
+to S,
+(2) B is singly accessible with respect to S if B is a star bag of D, and exactly two
+vertices of B including the center of B are accessible with respect to S, and
+(3) B is partially accessible with respect to S if otherwise.
+A star bag B of D is oriented towards a bag B′ (or a marked edge e) in D if the center of
+B is marked, and the path from the center of B to a vertex of B′ (or to end vertices of e)
+contain the marked edge incident with the center of B. For S ⊆V (G), we deﬁne D(S) as
+the minimal connected subdecomposition of D such that
+(1) D(S) is induced by the union of a set of bags of D, and
+(2) D(S) contains all vertices of S.
+Theorem 2.6 (Gioan and Paul, Theorem 3.4 of [17]). Let G and H be connected graphs
+such that G is distance-hereditary and H is obtained from G by adding a vertex v. Let
+NH(v) = S. Then H is distance-hereditary if and only if at most one bag of D(S) is
+partially accessible in D, and
+(1) if there is a partially accessible bag B in D(S), then each star bag B′ ̸= B in D(S) is
+oriented towards B if and only if it is fully accessible,
+(2) otherwise, there exists a marked edge e of D(S) such that each star bag B in D(S) is
+oriented towards e if and only if it is fully accessible.
+Furthermore, we can ﬁnd the partially accessible bag B in (1) or the marked edge e in (2)
+in time O(|V (G)|). 2
+In Section 4.1 of [17], Gioan and Paul explained how to obtain a canonical split decom-
+position of H from D using such a partially accessible bag or a marked edge. Since it is
+suﬃcient to ﬁnd such a bag or a marked edge for our purpose, we will not describe how to
+update it, but we give an example in Figure 3. One important property is that for every
+2Theorem 3.4 of [17] presented one more condition that every complete bag is either fully or partially
+accessible, which is redundant by deﬁnition.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+7
+two vertices in a bag of D that is not the partially accessible bag, they are still twins in
+H.
+3. Approximation algorithm
+We present a polynomial-time algorithm which constructs an approximate DH-modulator
+of G whenever (G, k) is a Yes-instance for DH Vertex Deletion. The main result is
+as follows.
+Theorem 3.1. There is a polynomial-time algorithm which, given a graph G and a positive
+integer k, either correctly reports that (G, k) is a No-instance to DH Vertex Deletion,
+or returns a DH-modulator S ⊆V (G) of size O(k3 · log n).
+Recall that a DH obstruction is said to be small if it contains at most 6 vertices. If G
+contains k +1 vertex-disjoint copies of small DH obstructions, then (G, k) is clearly a No-
+instance. Therefore, we may assume that a maximal packing of small DH obstructions in G
+has cardinality at most k. Notice that after removing all the vertices in a maximal packing,
+the resulting graph has no small DH obstruction. The following is the key statement for
+proving Theorem 3.1 and most part of this section is devoted to its proof.
+Proposition 3.2. There is a polynomial-time algorithm which, given a graph G without
+a small DH obstruction and a positive integer k, either correctly reports that (G, k) is a
+No-instance to DH Vertex Deletion, or returns a DH-modulator S ⊆V (G) of size
+O(k3 · log n).
+A recent work of Jansen and Pilipczuk [20] for a polynomial kernel for Chordal Ver-
+tex Deletion employs an approximation algorithm as an important subroutine. We
+follow a similar vein of approach as in [20] here. The crux is to reduce the problem of ﬁnd-
+ing an approximate DH-modulator to a restricted version where an input instance comes
+with a biclique DH-modulator (which we call a controlled instance). In this special case,
+ﬁnding an approximate DH-modulator boils down to solving Vertex Multicut. We con-
+struct an instance of Vertex Multicut using a feasible solution to the LP relaxation of
+DH Vertex Deletion. To this end, we obtain a decomposition
+V (G) = D ⊎Kℓ⊎· · · K1 ⊎Xℓ⊎· · · X1
+where G[D] is distance-hereditary, each Ki is a biclique, |Xi| = O(k√log k) and ℓ=
+O(k·log n), if (G, k) is a Yes-instance (Proposition 3.10). Such a decomposition is achieved
+by recursively extracting pairs (K, X) from G, where K is a biclique, X is a vertex set
+of size at most O(k√log k) until the resulting graph after removing those sets is distance-
+hereditary. Then in the graph G[D ⊎Kℓ⊎· · · K1], we recursively ﬁnd an approximate
+DH-modulator using the algorithm for a controlled instance.
+As we consider distance-hereditary graphs instead of chordal graphs, our approximation
+algorithm makes some important deviations from [20]. First, we extract a pair containing
+a biclique, instead of a clique. Second, unlike in [20], we cannot guarantee that a long
+induced cycle traverses exactly one connected component of the distance-hereditary graph
+D. Such diﬀerences call for nontrivial tweaks in our approximation.
+Except for the last subsection in which we prove Theorem 3.1, we assume that G
+contains no small DH obstruction.
+
+8
+EUN JUNG KIM AND O-JOUNG KWON
+3.1. LP relaxation and preprocessing. Given a graph G, let x be a mapping from
+V (G) to R and denote x(v) as xv for every v ∈V (G). For a subgraph H of G, we deﬁne
+x(H) := P
+v∈V (H) xv and |x| := x(G). As we assume that G does not contain any small
+DH obstructions, the following is a linear program formulation of DH Vertex Deletion
+for an instance (G, k):
+min
+X
+v
+xv
+s.t
+x(H) ≥1
+∀H is an induced cycle of length at least 7
+xv ≥0
+∀v ∈V (G).
+It is clear that an optimal integral solution corresponds to an optimal DH-modulator and
+vice versa. We call a feasible solution to this LP a feasible fractional solution to DH
+Vertex Deletion (for G).
+Observation 3.3. If x∗is a feasible fractional solution to DH Vertex Deletion for
+a graph G, then for any induced subgraph G′ of G, x∗restricted to V (G′) is a feasible
+fractional solution for G′ as well.
+An optimal fractional solution x∗to DH Vertex Deletion can be found in polynomial
+time using the ellipsoid method3 provided that there is a separation oracle for detecting
+a violated constraint for a fractional solution x′. Such a separation oracle can be easily
+implemented in polynomial time.
+Lemma 3.4. Let G be a graph with non-negative weights x′ : V (G) →Q≥0 and ℓ∈Q≥0.
+For any positive integer d, one can decide in time O(nd+2) whether there is an induced
+cycle H of length at least d with x′(H) < ℓ.
+Proof. For every size-d vertex subset D of G such that G[D] is an induced path, with s and
+t as end vertices, we solve a weighted shortest-path problem on G′ with weights x′|V (G′),
+where G′ is obtained by removing all internal vertices of D and their neighbors, except for
+s and t. Clearly, D together with the obtained shortest (s, t)-path forms an induced cycle
+of length at least d. Conversely, if there is an induced cycle of length at least d, then it
+can be detected by considering all size-d vertex subsets.
+□
+Let x∗be an optimal fractional solution to DH Vertex Deletion for G and let ˜X be
+the set of all vertices v such that x∗
+v ≥1
+20. Observe
+(1)
+k ≥x∗(G) ≥1
+20 · | ˜X| + x∗(G −˜X)
+From Inequality (1), it is easy to see that if | ˜X| > 20k, then (G, k) is a No-instance.
+Therefore, we may assume that | ˜X| ≤20k. Furthermore, by Observation 3.3, x∗restricted
+to V (G)\ ˜X is a feasible fractional solution for G−˜X and x∗
+v < 1
+20 for every v ∈V (G)\ ˜X.
+We add ˜X to the approximate DH-modulator S we are constructing and remove ˜X from G.
+Henceforth, we assume that x∗is a feasible fractional solution to DH Vertex Deletion
+for G such that x∗
+v < 1
+20 for every v ∈V (G). Clearly, |x∗| ≤k.
+3We mention that for our LP relaxation, found optimal solution has all rational values, each being
+represented using polynomial number of digits in n.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+9
+3.2. Decomposition into DH and bicliques. Using the following observations, we
+decompose the vertex set of G into bicliques, a set inducing a distance-hereditary graph,
+and a bounded number of extra vertices.
+We ﬁrst prove an O(n3) bound on the number of maximal bicliques in a graph having
+no small DH obstructions. This can be seen as an extension of an O(n2) bound on the
+number of maximal cliques in graphs without C4 [13, Proposition 2] or an O(n√n) bound
+for graphs without C4 and the diamond [12, Theorem 2.1]. The tightness of the latter
+result was also conﬁrmed. We say two sets A and B cross if A \ B ̸= ∅, A ∩B ̸= ∅, and
+B \ A ̸= ∅.
+Lemma 3.5. Let A be a set and let C = {C1, . . . , Cm} be a family of subsets of A such
+that for each distinct integers i, j ∈{1, . . . , m}, Ci ̸= Cj and Ci and Cj do not cross.
+Then m ≤|A|(|A|+1)
+2
+.
+Proof. We may assume |A| ≥2. Let v ∈A. Note that the sets in C containing v can be
+ordered linearly by the inclusion relation. Therefore, there are at most |A| sets containing
+v. By induction {Ci ∈C : v /∈Ci} contains at most (|A|−1)|A|
+2
+elements. Thus, in total,
+|C| ≤|A|(|A|+1)
+2
+.
+□
+Lemma 3.6. Let G be a graph on n vertices that has no small DH obstructions. Then
+G contains at most n3+5n
+6
+maximal bicliques, and they can be enumerated in polynomial
+time.
+Proof. We claim that every vertex is contained at most (n−1)n
+2
++1 maximal bicliques of G.
+Then by recursively enumerating all maximal bicliques containing v of G and discarding
+v from G, we obtain the bound P
+1≤i≤n
+
+(i−1)i
+2
++ 1
+
+≤n3+5n
+6
+on the number of maximal
+bicliques in total.
+Let v ∈V (G), and let N1 := NG(v) and let N2 be the set of vertices in G−({v}∪NG(v))
+that have a neighbor in N1. We claim that for w, z ∈N2, NG(w) ∩N1 and NG(z) ∩N1
+do not cross. Suppose for contradiction that there exists w, z ∈N2 where NG(w) ∩N1
+and NG(z) ∩N1 cross.
+By deﬁnition, there exists a1 ∈(NG(w) \ NG(z)) ∩N1, a2 ∈
+(NG(w) ∩NG(z)) ∩N1, and a3 ∈(NG(z) \ NG(w)) ∩N1. If wz ∈E(G), then regardless of
+the adjacency between a1 and a3, G[{w, z, a1, a3, v}] is isomorphic to C5 or the house. We
+may assume wz /∈E(G). If a1a3 ∈E(G), then G[{w, z, a1, a2, a3}] is isomorphic to C5,
+the house, or the gem. If a1a3 /∈E(G), then G[{v, w, z, a1, a2, a3}] contains an induced
+subgraph isomorphic to the domino, the house, or the gem. Therefore, we can always ﬁnd
+a small DH obstruction. We conclude that for w, z ∈N2, NG(w) ∩N1 and NG(z) ∩N1 do
+not cross, as G has no small DH obstructions.
+So, {NG(v) ∩N1 : v ∈N2} forms a family of sets such that any two sets do not cross.
+Since |N1| ≤|V (G)| −1, by Lemma 3.5, it contains at most (n−1)n
+2
+sets.
+Notice that every biclique containing v and a vertex in N2 should consists of one part
+with the union of v and a set of vertices in N2 having the same neighbors on N1. Thus,
+the number of such bicliques is at most (n−1)n
+2
+. With the maximal biclique containing
+the trivial biclique with the partitions {v} and N1, there are at most (n−1)n
+2
++ 1 bicliques
+containing v, as required. Furthermore, by classfying the classes of vertices in N2 having
+the same neighborhoods in N1, we can enumerate all bicliques in polynomial time.
+□
+
+10
+EUN JUNG KIM AND O-JOUNG KWON
+One main observation is that every connected distance-hereditary graph admits a bi-
+clique that is also a balanced vertex separator. We prove this.
+Lemma 3.7. Let G be a connected distance-hereditary graph on at least two vertices.
+Then G contains a blicique that is a balanced vertex separator of G.
+Proof. Let D be a canonical split decomposition of G. If D consists of a single bag B, then
+B = G. Note that B is either a star or a complete graph on at least two vertices. In this
+case, we take the whole vertex set V (G) as a balanced vertex separator of G. Henceforth,
+we can assume that D contains at least two bags.
+For every marked edge e = xy of D, let Ux(e) (respectively, Uy(e)) denote the set
+of unmarked vertices contained in the connected component of D −e containing x (re-
+spectively, y). Recall that (Ux(e), Uy(e)) deﬁnes a split of G. Let Rx(e) := NG(Uy(e)),
+Ry(e) := NG(Ux(e)), and Ke := Rx(e) ∪Ry(e). We note that a vertex v belongs to Ry(e)
+if and only if v is an unmarked vertex in D that is connected to y by an odd-length path
+in D −e alternating in marked edges and unmarked edges. Since (Ux(e), Uy(e)) is a split,
+the vertex set Ke forms a biclique.
+Let ⃗D be a graph obtained by orienting every marked edge e = xy from x to y whenever
+G[Uy(e) \ Ry(e)] contains a connected component of size larger than 1
+2n. Note that a
+connected component of G[Uy(e) \ Ry(e)] is a connected component of G −Ke. If there is
+an unoriented edge e = xy in ⃗D, K := Ke is a desired biclique that is a balanced vertex
+separator. Hence we assume that every marked edge is oriented in ⃗D. Since every bag of
+⃗D can have at most one marked edge oriented outward, there exists a bag B such that all
+incident marked edges are oriented toward B in ⃗D.
+Consider the case when B is a leaf bag, e = xy is the unique marked edge incident with
+B oriented from x to y, and y ∈V (B). If B is a complete bag or a star bag in which y is
+the center, clearly all unmarked vertices of B belong to Ry(e), and thus Uy(e)\Ry(e) = ∅,
+contradicting the orientation of e. If B is a star bag in which y is a leaf, the (unmarked)
+center of B belongs to Ry(e). Observe that each unmarked leaf vertex of B forms a trivial
+connected component of G[Uy(e) \ Ry(e)], contradicting the orientation of e.
+Hence B is incident with at least two marked edges, say ei = xiyi for i = 1, 2, . . ., where
+yi ∈V (B) for every i. Let UB be the set of unmarked vertices in B. We argue that B is
+a star bag with its center unmarked.
+(a) B is a complete bag: Observe that for every i, Ryi(ei) = S
+j̸=i Rxj(ej) ∪UB. This
+means Kei = Rxi(ei) ∪Ryi(ei) = S
+j Rxj(ej) ∪B, that is, Kei is the same for every i.
+Moreover, we have UB ⊆Kei. This means that each connected component of G −Kei of
+size at most 1
+2n, contradicting the orientations.
+(b) B is a star bag with its center marked: Notice that the center of B is one of yi’s, say
+y1. The orientation of e1 implies that G[Uy1(e1) \ Ry1(e1)] has a connected component C
+containing more than 1
+2n vertices. On the other hand, all vertices of UB and Rxi(ei) for
+i ̸= 1 have an odd-length path in D −e1 to y1 alternating in marked and unmarked edges,
+implying that UB ∪S
+i̸=1 Rxi(ei) ⊆Ry1(e1). Therefore, C is contained in a connected
+component of G[Uxj(ej) \ Rxj(ej)] for some j ̸= 1. This contradicts the orientation of ej.
+Hence, B is a star bag with its center unmarked. Let v be the center of B and observe
+that for every i, v is the only vertex in Byi(ei). Observe that K := {v} ∪S
+i Rxi(ei) is a
+biclique with the desired property. This completes the proof.
+□
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+11
+The following result is from [14].
+Theorem 3.8 (Feige, Hajiaghayi, and Lee [14]). There is an O(√log opt)-approximation
+algorithm for ﬁnding a balanced vertex separator.
+Lemma 3.9. Let (G, k) be an instance to DH Vertex Deletion such that G is con-
+nected and contains no small DH obstructions. There is a polynomial-time algorithm which
+ﬁnds a balanced vertex separator K ⊎X such that
+- K is a biclique or an empty set,
+- and |X| = O(k√log k)
+whenever (G, k) is a Yes-intance.
+Proof. We perform the following algorithm. Let K be a maximal biclique of G or an
+empty set. If every connected component of G −K contains at most 2
+3n vertices, we take
+X := ∅. Otherwise, we apply Theorem 3.8 to a (unique) largest connected component
+C of G −K to ﬁnd a balanced vertex separator X of C of size O(opt√log opt). In both
+cases, if X is of size at most O(k√log k), then K ⊎X is clearly a desired balanced vertex
+separator.
+If no balanced vertex separator of size at most O(k√log k) is found while
+iterating over all maximal bicliques of G and an empty set as K, then we report that
+there is no DH-modulator of size at most k. This algorithm runs in polynomial time since
+a balanced vertex separator X of a connected component C can be found in polynomial
+time by Theorem 3.8, and Lemma 3.6 provides an eﬃcient way to iterate over all maximal
+bicliques.
+To see the correctness, suppose that (G, k) is a Yes-instance and let X0 be an optimal
+DH-modulator. If G−X0 forms an independent set, then X0 is a balanced vertex separator
+of G −K, where K := ∅. Therefore, the approximation algorithm of Theorem 3.8 will
+indeed ﬁnd O(k√log k)-size balanced vertex separator when the above algorithm considers
+K = ∅.
+Suppose this is not the case, and let C be a largest connected component of G −X0.
+By Lemma 3.7, there is a balanced vertex separator K0 of C which is a biclique. Let K be
+a maximal biclique in G with K0 ⊆K. Since each connected component of G −X0 −K0,
+and thus of G−X0 −K, contains at most 2
+3|C| ≤2
+3n vertices, X0 ∪K is a balanced vertex
+separator of G. Let C′ be any largest connected component of G−K. If C′ contains at most
+2
+3n vertices, then the above algorithm will set X := ∅. If not, observe that (X0 \ K) ∩C′
+is a balanced vertex separator of C′ whose size is at most k. Hence, the above algorithm
+applies the approximation algorithm of Theorem 3.8 to C′, and ﬁnds O(k√log k)-size
+balanced vertex separator X′ of C′. Notice that each connected component of G−K −X′
+has size at most max{1
+3n, 2
+3|C′|} ≤2
+3n. This completes the proof.
+□
+For an instance (G, k) such that G does not contain any small DH obstructions, let
+K1 ⊎X1 be a balanced vertex separator obtained by applying Lemma 3.9 to a connected
+component of G that is not distance-hereditary. Notice that K1 ⊎X1 is not necessarily a
+DH-modulator and there may be a connected component of G −(K1 ⊎X1) which is not
+distance-hereditary. At i-th recursive step, we apply Lemma 3.9 to a connected component
+Gi of G −S
+j<i(Kj ⊎Xj) which is not distance-hereditary and obtain a balanced vertex
+separator Ki⊎Xi of Gi. If the algorithm of Lemma 3.9 reports that (Gi, k) is a No-instance
+for some i, then indeed (G, k) is a No-instance. Otherwise, we obtain a decomposition
+V (G) = D ⊎Kℓ⊎· · · K1 ⊎Xℓ⊎· · · X1,
+
+12
+EUN JUNG KIM AND O-JOUNG KWON
+where G[D] is distance-hereditary, each Ki is a biclique or an empty set, and |Xi| =
+O(k√log k).
+The recursive applications of Lemma 3.9 can be represented as a collection of branching
+trees T , where each internal node corresponds to the initial connected component (that
+are not distance-hereditary) to Lemma 3.9 and its children correspond to the connected
+components obtained after removing a balanced separator. Suppose that (G, k) is a Yes-
+instance and let S be a size-k modulator of G. Observe that each connected component
+corresponding to an internal node of T contains at least one vertex of S.
+Since the
+maximum length of a root-to-leaf path in T is O(log n), any vertex of G (and thus,
+S) appears in at most O(log n) connected components represented as the nodes of T .
+It follows that the number of internal nodes of T is at most O(k log n), and thus ℓ=
+O(k log n). This implies S
+i≤ℓXi has at most O(k2√log k log n) vertices. We add them to
+a DH-modulator S under construction and remove from G.
+We summarize the result of this subsection.
+Proposition 3.10. Let (G, k) be an instance to DH Vertex Deletion such that G
+contains no small DH obstructions. There is a polynomial-time algorithm which, given
+such (G, k), either computes a decomposition
+V (G) = D ⊎Kℓ⊎· · · K1 ⊎X
+such that G[D] is distance-hereditary, each Ki is a biclique, |X| = O(k2√log k log n) and
+ℓ= O(k log n), or correctly reports that (G, k) is a No-instance.
+3.3. Handling a controlled instance. A graph G is called a controlled graph with a
+partition (D, K) if G contains no small DH obstructions and V (G) is partitioned into
+D ⊎K such that G[D] is distance-hereditary and K is a biclique. We ﬁx such a partition
+D ⊎K for a given controlled instance under consideration. Also we ﬁx a bipartition A⊎B
+for the given biclique K such that ab ∈E(G) for every a ∈A and b ∈B. In this part, it
+is important that both A and B are non-empty by the deﬁnition of a biclique.
+The next lemma is useful.
+Lemma 3.11. Let G be a controlled graph with a partition (D, K). For an induced cycle
+H of length at least 7, let ℓbe the number of connected components in G[V (H)∩K]. Then
+the followings hold.
+(a) If ℓ= 1, then both G[V (H) ∩K] and H −K are paths, and |V (H) ∩K| ≤3.
+(b) If ℓ≥2, there exists a subpath P of H such that P is a K-path, and the length of
+P is at least 3.
+Proof. If ℓ= 1, clearly both G[V (H) ∩K] and H −K are (induced) paths. Suppose
+|V (H) ∩K| ≥4, and note that V (H) ∩K are contained in either A or B, say A. Then
+G[(V (H) ∩K) ∪{b}] induces a gem for any b ∈B since G[V (H) ∩K] is an induced
+path. This contradicts that G does not contain any small DH obstructions. It follows
+|V (H) ∩K| ≤3.
+Suppose ℓ≥2. There exist two K-paths on H, say P1 and P2, each containing at least
+one internal vertex and occuring on H consecutively. (Recall that an S-path is a path
+whose end vertices are in S and all of whose internal vertices lie outside S.) We note that
+the end vertices of both P1 and P2 are contained in either A or B, say A; otherwise H
+contains a chord. To prove (b), it suﬃces to show that one of P1 and P2 is of length at least
+three. Obviously, we have |V (Pi)| ≥3 for i = 1, 2. Suppose that |V (P1)| = |V (P2)| = 3.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+13
+Let Q be a component of G[V (H) ∩K] that intersects with both P1 and P2 (possibly Q
+consists of a single vertex). Pick an arbitrary vertex b ∈B; such b exists for B ̸= ∅. If
+|V (Q)| = 1, observe that G[V (P1) ∪V (P2) ∪{b}] induces a gem, a house or a domino, a
+contradiction. If |V (Q)| ≥2, then G[V (P1) ∪V (Q) ∪{b}] contains a gem or a house, a
+contradiction. This establishes (b).
+□
+Lemma 3.12. Let G be a controlled graph with a partition (D, K). If x∗is a fractional
+solution to DH Vertex Deletion for G such that x∗
+v < 1
+20 for every vertex v of G, then
+x′ deﬁned as
+x′
+v =
+(
+0
+if v ∈K
+2x∗
+v
+if v ∈D
+is also a feasible fractional solution.
+Proof. Consider an arbitrary induced cycle H of length at least 7. We only need to verify
+that x′(H) ≥1. There are two possibilities.
+Suppose G[V (H) ∩K] contains exactly one connected component. By Lemma 3.11, we
+have |V (H) ∩K| ≤3. By assumption, we have P
+v∈V (H)∩K x∗
+v < 3 · 1
+20 < 1
+2, and thus
+P
+v∈V (H)∩D x∗
+v ≥1
+2. It follows that
+X
+v∈V (H)
+x′
+v =
+X
+v∈V (H)∩D
+x′
+v =
+X
+v∈V (H)∩D
+2x∗
+v ≥1.
+If G[V (H)∩K] contains at least two connected components, by Lemma 3.11, H contains
+a K-path P of length at least 3 as a subpath. Recall that V (H) ∩K are contained in
+either A or B, say A. Hence, for any b ∈B, G[{b} ∪V (P)] contains an induced cycle H′
+of length at least 7 by Lemma 2.2. Note that G[V (H′) ∩K] has exactly one connected
+component and thus x′(H′) ≥1. Since x′
+b = 0, we have
+X
+v∈V (H)
+x′
+v ≥
+X
+v∈V (P)
+x′
+v ≥
+X
+v∈V (H′)
+x′
+v ≥1.
+□
+We mention that the feasible fractional solution x′ obtained as in Lemma 3.12 meets
+|x′| ≤2|x∗| and for every vertex v of G, we have x′
+v < 1
+10.
+An instance of Vertex Multicut consists of an undirected graph G and a set T of
+(unordered) vertex pairs of G. The goal is to ﬁnd a minimum-size set X ⊆V (G) that
+hits every path from s to t for every (s, t) ∈T . Notice that we are allowed to delete a
+terminal. An LP formulation of (G, T ) of Vertex Multicut is the same as the above
+LP of DH Vertex Deletion, except that we replace the constraints on induced cycles
+of length at least 7 by
+x(P) ≥1
+for every (s, t)-path P with (s, t) ∈T . The following result from [18] is originally stated
+for Directed Multicut, where we want to ﬁnd a minimum set of arcs to hit all directed
+(s, t)-path for every (ordered) terminal pairs. Using standard reductions, one can reduce
+the undirected version of Vertex Multicut to Directed Vertex Multicut, which
+again can be reduced to Directed Multicut. Moreover, these reductions preserve the
+objective values of both the integral solutions and feasible fractional solutions.
+
+14
+EUN JUNG KIM AND O-JOUNG KWON
+Theorem 3.13 (Gupta [18]). Let x′ be a feasible fractional solution to a Vertex Mul-
+ticut instance (G, T ). There exists a constant c such that, in polynomial time, one can
+ﬁnd an integral solution to Vertex Multicut of size at most c · |x′|2.
+Lemma 3.14. Let G be a controlled graph with a partition (D, K) and let x′ be a feasible
+fractional solution to DH Vertex Deletion such that x′
+v < 1
+10 for all v ∈D and x′
+v = 0
+for all v ∈K. There is a polynomial-time algorithm which, given such (G, k) and x′,
+returns a DH-modulator X of size O(|x′|2).
+Proof. We construct an instance (G[D], T ) of Vertex Multicut with terminal pairs
+T := {(s, t) ⊆D × D : distG[D],x′(s, t) ≥1}, where distG[D],x′(s, t) is the minimum x′(P)
+over all (s, t)-paths P.
+Notice that for every terminal pair (s, t) ∈T , and for every
+(s, t)-path P in G[D], we have
+x′(P) ≥distG[D],x′(s, t) ≥1,
+meaning that x′ is a feasible fractional solution to Vertex Multicut for the instance
+(G[D], T ). By Theorem 3.13, we can obtain a vertex set X ⊆D of size O(|x′|2) such that
+G[D \ X] contains no (s, t)-path for every terminal pair (s, t) ∈T in polynomial time.
+It is suﬃcient to show that G −X is distance-hereditary. For the sake of contradiction,
+suppose G−X contains an induced cycle H of length at least 7, and we speciﬁcally choose
+H so as to minimize
+the number of connected components in G[V (H) ∩K]
+Claim 1. G[V (H) ∩K] has exactly one connected component and |V (H) ∩K| ≤3.
+Proof of the Claim: Suppose G[V (H) ∩K] has at least two connected components.
+Observe that V (H) ∩K is entirely contained either in A or B, say A. By Lemma 3.11,
+there exists a subpath P of H that is a K-path and having length at least 3. Choose any
+vertex b ∈B and observe that G[V (P)∪{b}] contains a DH obstruction H′ by Lemma 2.2.
+Especially, H′ must be an induced cycle of length at least 7 since G does not contain any
+small DH obstructions. For B ∩X = ∅, H′ is an induced cycle in G −X having strictly
+less connected components in G[V (H′) ∩K], contradicting the choice of H. This proves
+the ﬁrst part of the statement. The second part follows from Lemma 3.11.
+♦
+By Claim 1, H −K is an induced path P contained in a connected component of G[D].
+Let s and t be the end vertices of P and notice that (s, t) /∈T since P contains no vertex
+of X. Hence, G[D] contains an induced (s, t)-path W such that x′(W) < 1. Since x′ is
+a feasible fractional solution to DH Vertex Deletion, we have x′(P) ≥x′(H) ≥1.
+Therefore, P contains at least 11 vertices since x′
+v <
+1
+10 for every v ∈D and x′
+v = 0 for
+every v ∈K. Since G[D] is distance-hereditary and W is induced, we have |V (W)| =
+|V (P)| ≥11. Let w1(= s), w1, . . . , wp(= t) be the vertices of W in the order of their
+occurrence on W where p ≥11.
+Now we argue that G[V (W) ∪(V (H) ∩K)] contains a DH obstruction.
+Claim 2. G[V (W) ∪(V (H) ∩K)] contains an induced cycle of length at least 7.
+Proof of the Claim: If |V (H) ∩K| = 1, this follows from Lemma 2.2. So, we may
+assume that 2 ≤|V (H) ∩K| ≤3. Let v1, v2 be vertices of V (H) ∩K that are adjacent
+with s = w1 and t = wp, respectively.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+15
+If v1 is adjacent with any of wj with j ≥4, then Lemma 2.2 applies and we have a DH
+obstruction. Such an obstruction can only be an induced cycle of length at least 7 as we
+assume that G does not contain a small DH obstruction. Hence, we may assume that v1
+is not adjacent with any of w4, . . . , wp. By a symmetric argument, we may assume that v2
+is not adjacent with any of w1, . . . , wp−3.
+Let Q be a shortest path between v1 and v2 such that the set of internal vertices of
+Q is non-empty and contained {w1, . . . , wp}. Such Q exists since v1 and v2 are adjacent
+with w1 and wp, respectively. By the assumption that v1 (respectively, v2) is not adjacent
+with wj for 4 ≤j ≤p (respectively, 1 ≤j ≤p −3), the length of Q clearly exceeds
+6. If v1 and v2 are the only vertices of V (H) ∩K, then v1v2 ∈E(G) and observe that
+G[{v1, v2} ∪V (Q)] forms an induced cycle of length at least 7. If there is another vertex
+in V (H) ∩K, observe that the remaining vertex, say v3, is adjacent to v1 and v2. By
+Lemma 2.2, there exists a DH obstruction in G[{v1, v2, v3} ∪V (Q)], which can only be an
+induced cycle of length at least 7.
+♦
+Let ˜H be such an induced cycle of length at least 7 as stated in Claim 2. That V ( ˜H) ⊆
+V (W) ∪(V (H) ∩K) and x′(V (H) ∩K) = 0 implies x′( ˜H) ≤x′(W) < 1. This contradicts
+the assumption that x′ is a feasible fractional solution to DH Vertex Deletion. This
+concludes the proof that G −X is distance-hereditary.
+□
+One can easily obtain the main result of this subsection.
+Proposition 3.15. Let G be a controlled graph with a partition (D, K) and x∗be a feasible
+fractional solution to DH Vertex Deletion such that x∗
+v <
+1
+20 for every v ∈V (G).
+There is a polynomial-time algorithm which, given such G and x∗, ﬁnds a DH-modulator
+X of size at most O(|x∗|2).
+Proof. By Lemma 3.12, we can obtain a feasible fractional solution x′ to DH Vertex
+Deletion such that x′
+v = 0 for every v ∈K, x′
+v <
+1
+10 for every v ∈D and |x′| ≤2|x∗|.
+Such x′ meets the condition of Lemma 3.14, and we can obtain a DH-modulator X of G
+such that |X| = O(|x′|2) = O(|x∗|2) in polynomial time.
+□
+3.4. Proof of Theorem 3.1. We ﬁrst present the proof of Proposition 3.2. Let (G, k)
+be an instance of DH Vertex Deletion such that G does not contain any small DH
+obstructions. Let x∗be an optimal fractional solution to DH Vertex Deletion for
+G. We may assume that |x∗| ≤k, otherwise we immediately report that (G, k) is a No-
+instance. Let ˜X be the set of all vertices v such that x∗
+v ≥
+1
+20. Observe that | ˜X| ≤20k
+since otherwise, |x∗| ≥
+1
+20 · | ˜X| > k, a contradiction. Also x∗restricted to V (G) \ ˜X is a
+fractional feasible solution to DH Vertex Deletion for G −˜X such that x∗
+v <
+1
+20 for
+every v.
+We compute a decomposition V (G −˜X) = D ⊎Sℓ
+i=1 Ki ⊎X as in Proposition 3.10, or
+correctly report (G, k) as a No-instance. Recall that ℓ= O(k log n) and |X| = O(k2√log k·
+log n). Note that V (G −( ˜X ∪X)) = D ⊎Sℓ
+i=1 Ki. From i = 1 up to ℓ, we want to obtain
+a DH-modulator Si of Gi, where G1 := G[D ∪K1] and for i = 2, . . . , ℓ, Gi is the subgraph
+of G induced by (V (Gi−1) \ Si−1) ∪Ki. Notice that for every i = 1, . . . , ℓ−1, if Gi −Si is
+distance-hereditary, then Gi+1 is a controlled graph with a partition (V (Gi)\Si, Ki+1). For
+i = 1, clearly G1 is a controlled graph. Hence, we can inductively apply the algorithm of
+Proposition 3.15 and obtain a DH-modulator Si of size at most O(|x∗|2) of Gi. Especially,
+
+16
+EUN JUNG KIM AND O-JOUNG KWON
+Gℓ−Sℓis distance-hereditary, implying that the set deﬁned as
+S := ˜X ∪X ∪
+ℓ[
+i=1
+Si
+is a DH-modulator of G. From |x∗| ≤k, we have |Si| = O(k2). It follows that |S| =
+O(k3 · log n).
+Proposition 3.2 immediately yields the proof of Theorem 3.1, which we summarize
+below.
+Proof of Theorem 3.1. Let P be a maximal collection of vertex-disjoint copies of small DH
+obstructions in G. If P contains at least k + 1 copies, then clearly (G, k) is a No-instance
+to DH Vertex Deletion. Otherwise, let V (P) be the vertex set of the copies in P and
+notice that |V (P)| ≤6k. Notice that G −V (P) contains no small DH obstruction, and
+thus we can apply the algorithm A of Propositioin 3.2. If A reports that (G −V (P), k)
+is a No-instance, then clearly (G, k) is a No-instance as well. Otherwise, let S be a DH-
+modulator of G −V (P) whose size is O(k3 · log n). It remains to observe that S ∪V (P)
+is a DH-modulator of G whose size is O(k3 · log n).
+□
+4. Good Modulator
+In the previous section, we presented a polynomial-time algorithm, given an instance
+(G, k) which outputs a DH-modulator of size O(k3 · log n) whenever (G, k) is a Yes-
+instance. In this section, we shall see how to obtain a good DH-modulator. In order
+to obtain a good DH-modulator, we need to ﬁnd a small-sized hitting set that intersects
+every DH obstruction having exactly one vertex in S. This task is easy for a small DH
+obstruction, but not straightforward for the induced cycles of length at least 5. We ﬁrst
+present a tool to eﬃciently handle the latter case.
+Proposition 4.1. Let G be a graph without any small DH obstruction, v be a vertex of
+G such that G −v is distance-hereditary and k be a positive integer. In polynomial time,
+one can either
+(1) ﬁnd a set X ⊆V (G) \ {v} of size at most O(k2) such that G −X contains no
+induced cycle of length at least 5 traversing v, or
+(2) correctly reports that any DH-modulator of size at most k must contain v.
+Proof. Consider an instance (G −v, T ) of Vertex Multicut where
+T := {(s, t) : s, t ∈NG(v), distG−v(s, t) ≥3}.
+First, we claim that X ⊆V (G) \ {v} hits all induced cycles of G of length at least
+5 if and only if X is a vertex multicut for (G −v, T ). Suppose X is a vertex multicut
+for (G −v, T ) and H is an induced cycle of length at least 5 in G −X. Since G −v is
+distance-hereditary, v is a vertex of H and H −v is a path of length at least 3 between,
+say, s and t. This means distG−v(s, t) ≥3 because G −v is distance-hereditary and thus
+(s, t) ∈T , contradicting the assumption that X hits all paths between every terminal pair
+in T . Conversely, suppose X ⊆V (G) \ {v} hits all induced cycles of length at least 5 and
+there is an (s, t)-path P in (G −v) −X for some (s, t) ∈T . Note that P is of length
+at least 3 and thus by Lemma 2.2, G[{v} ∪V (P)] contains a DH obstruction H. By the
+assumption that G does not contain a small DH obstruction, H is an induced cycle of
+length at least 7 in G −X, a contradiction.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+17
+Let x∗be an optimal fractional solution to Vertex Multicut, which can be eﬃciently
+found using the ellipsoid method and an algorithm for the (weighted) shortest path prob-
+lem as a separation oracle. If |x∗| ≤k, then we can construct a multicut X ⊆V (G) \ {v}
+of size O(|x∗|2) = O(k2) using the approximation algorithm of Theorem 3.13. By the
+previous claim, we know that X hits all induced cycles of G of length at least 5 (which
+must traverse v). If |x∗| > k, then any integral solution for (G −v, T ) is larger than k.
+By the previous claim, any set X ⊆V (G) \ {v} hitting all induced cycles of G of length
+at least 5 must be larger than k. It follows that any DH-modulator of size at most k must
+contain v, completing the proof.
+□
+The following theorem states that a good DH-modulator of size O(k5 · log n) can be
+constructed eﬃciently.
+Theorem 4.2. There is a polynomial-time algorithm which, given a graph G and a positive
+integer k, either
+(1) returns an equivalent instance (G′, k′) with a good DH-modulator S′ ⊆V (G′) of
+size O(k5 · log n), or
+(2) correctly reports that (G, k) is a No-instance to Distance-hereditary Vertex
+Deletion.
+Proof. We ﬁrst apply the algorithm of Theorem 3.1. If this algorithm reports that (G, k)
+is a No-instance, then we are done.
+Hence, we assume that a DH-modulator S of G
+containing at most O(k3 · log n) vertices is returned. Let U := ∅, and for each v ∈S, let
+Hv := G[(V (G) \ S) ∪{v}].
+For each v ∈S, we do the following. First, ﬁnd either k + 1 small DH obstructions in
+Hv whose pairwise intersection is v, or a vertex set Tv of V (G) \ S such that |Tv| ≤5k
+and Hv −Tv has no small DH obstructions. It can be done in polynomial time by going
+through all 5-size subsets of V (G) \ S. In the former case, we add v to U. Otherwise, we
+obtain a vertex set Tv in the second statement.
+Assume we obtained the vertex set Tv. Since Hv −Tv has no small DH obstructions,
+every DH obstruction in Hv is an induced cycle of length at least 7. We apply the algorithm
+of Proposition 4.1 to Hv−Tv and v, and it returns either a vertex set Xv ⊆V (Hv−Tv)\{v}
+of size O(k2) such that Hv −(Tv ∪Xv) has no DH obstructions, or correctly reports that
+any DH-modulator of size at most k must contain v. In the latter case, we add v to U.
+Otherwise, we obtain such a vertex set Xv. This ﬁnishes the algorithm.
+We claim that (G−U, k −|U|) is an instance equivalent to (G, k) and S ∪(S
+v∈S\U(Tv ∪
+Xv)) is a good DH-modulator for G −U. It is easy to see that if (G −U, k −|U|) a Yes-
+instance, then (G, k) is a Yes-instance. Suppose G has a vertex set T such that |T| ≤k
+and G −T is distance-hereditary. Let v ∈U. Since v ∈U, by the algorithm as above,
+either there are k + 1 pairwise small DH obstructions in Hv whose pairwise intersection
+is v, or any DH-modulator of size at most k must contain v. Thus, T contains v, and it
+implies that U ⊆T. Therefore, T \ U is a solution of (G −U, k −|U|).
+Let S′ := S ∪(S
+v∈S\U(Tv ∪Xv)). It remains to see that S′ is a good DH-modulator
+for G −U. Clearly S′ is a DH-modulator. For contradiction, suppose that F is a DH
+obstruction of G−U and that V (F)∩S′ = {w}. Since S is a DH-modulator of G, w cannot
+be a vertex of S
+v∈S\U(Tv ∪Xv), and thus we have w ∈S and F is an induced subgraph of
+Hw −(Tw ∪Xw). However, Hw −(Tw ∪Xw) has no DH obstruction, contradiction. This
+completes the proof.
+□
+
+18
+EUN JUNG KIM AND O-JOUNG KWON
+We remark that given a graph G and a good DH-modulator removing a vertex v in
+V (G) \ S does not create a new DH obstruction. Hence, S remains a good DH-modulator
+in the graph G −v.
+5. Twin Reduction Rule
+In a distance-hereditary graph, there may be a large set of pairwise twins. We introduce
+a reduction rule that bounds the size of a set of pairwise twins in G−S by O(k2|S|3), where
+S is a DH-modulator. In the FPT algorithm obtained by Eiben, Ganian, and Kwon [10],
+there is a similar rule which reduces the size of a twin set outside of a DH-modulator,
+however, under the assumption that the given instance has no small DH obstructions. For
+our kernelization algorithm, we cannot assume that the given instance has no small DH
+obstructions. Therefore, we need to analyze more carefully.
+The underlying observation is that it suﬃces to keep up to k + 1 vertices that are
+pairwise twins with respect to each subset of S of small size. For a subset S′ ⊆S, two
+vertices u and v in V (G) \ S are S′-twins if u and v have the same neighbors in S′. It
+is not diﬃcult to get an upper bound O(k|S|5), by considering all subsets S′ of S of size
+min{|S|, 5} and marking up to k + 1 S′-twins. To get a better bound, we proceed as
+follows.
+Reduction Rule 1. Let W be a set of pairwise twins in G −S, and let m := min{|S|, 3}.
+(1) Over all subsets S′ ⊆S of size m, we mark up to k + 1 pairwise S′-twins in W that
+are unmarked yet.
+(2) When |S| ≥4, over all subsets S′ ⊆S of size 4, if there is an unmarked vertex v of
+W such that G[S′ ∪{v}] is isomorphic to the house or the gem, then we mark up to
+k + 1 previously unmarked vertices in W including v that are pairwise S′-twins.
+(3) If there is an unmarked vertex v of W after ﬁnishing the marking procedure, we remove
+v from G.
+Lemma 5.1. Reduction Rule 1 is safe
+Proof. We recall that m := min{|S|, 3}. Let W be a set of pairwise twins in G −S, and
+suppose there is an unmarked vertex in W. We show that (G, k) is a Yes-instance if and
+only if (G −v, k) is a Yes-instance. The forward direction is clear. Suppose that G −v
+has a vertex set T with |T| ≤k such that (G −v) −T is distance-hereditary. We claim
+that G −T is also distance-hereditary. For contradiction, suppose G −T contains a DH
+obstruction F. Clearly, v ∈V (F).
+In case when F −v is an induced path, let w, z be the end vertices of the path, and
+choose a set S′ ⊆S of size m containing {w, z} ∩S (possibly, an empty set).
+Since
+v is an unmarked vertex in Reduction Rule 1, there are v1, . . . , vk+1 ∈W \ {v} where
+v1, . . . , vk+1, v are pairwise S′-twins. Note that V (F) ∩{v1, . . . , vk+1} = ∅since no other
+vertex in F is adjacent to both w and z. Thus, there exists v′ ∈{v1, . . . , vk+1} \ T such
+that G[V (F) \ {v} ∪{v′}] is a DH obstruction in (G −v) −T, a contradiction. We may
+assume F −v is not an induced path, and in particular F is not an induced cycle.
+Suppose |V (F) ∩S| ≤3. Then there exists a set S′ ⊆S of size m such that V (F) ∩
+S ⊆S′. Since v remains unmarked in the application of Reduction Rule 1, there are
+v1, . . . , vk+1 ∈W \ {v} where v1, . . . , vk+1, v are pairwise S′-twins. Note that V (F) ∩
+{v1, . . . , vk+1} = ∅since F contains no twins. Thus, there exists v′ ∈{v1, . . . , vk+1} \ T
+such that G[V (F) \ {v} ∪{v′}] is a DH obstruction in (G −v) −T, a contradiction.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+19
+Now we assume |V (F) ∩S| ≥4. There are two possibilities.
+Case 1. F is isomorphic to either the house or the gem.
+Since |V (F) ∩S| ≥4, we have V (F) \ {v} ⊆S. By Step (2) of Reduction Rule 1, there
+are v1, . . . , vk+1 ∈W \ {v} where v1, . . . , vk+1, v are pairwise (V (F) ∩S)-twins. Thus,
+there exists v′ ∈{v1, . . . , vk+1} \ T such that G[V (F) \ {v} ∪{v′}] is a DH obstruction in
+(G −v) −T, contradiction.
+Case 2. F is isomorphic to the domino.
+Since F −v is not an induced path, v is a vertex of degree 2 in F. Let v′, w be the
+neighbors of v having degree 2 and degree 3 in F, respectively. Let w′ be the vertex of
+degree 3 in F other than w. Let z be the vertex in NF (w)\{v, w′} and let z′ be the vertex
+in NF (w′) \ {v′, w}.
+Now, we take a subset S′ of S of size 3 containing S ∩{v′, w, z′} (possibly, an empty
+set). Since v is an unmarked vertex in Reduction Rule 1, there are v1, . . . , vk+1 ∈W \ {v}
+where v1, . . . , vk+1, v are pairwise S′-twins. Note that V (F) ∩{v1, . . . , vk+1} = ∅since no
+other vertex in F is adjacent to both v′, w and not adjacent to z′. Thus, there exists a
+vertex v′′ ∈{v1, . . . , vk+1} \ T.
+If v′′ is adjacent to z, then v′w′wz is an induced path of length 3 and v′′ is adjacent to its
+end vertices. It follows that G[{v′′, v′, w′, w, z}] contains a DH obstruction by Lemma 2.2,
+a contradiction to the assumption that (G−v)−T is distance-hereditary. Suppose that v′′
+is not adjacent to z. If v′′ is adjacent to w′, then G[{v′′, w, w′, z, z′}] is isomorphic to the
+house, and otherwise, G[{v′′, v′, w, w′, z, z′}] is isomorphic to the domino. This contradicts
+the assumption that (G −v) −T is distance-hereditary.
+Therefore, G −T is distance-hereditary, which completes the proof.
+□
+We can apply Reduction Rule 1 exhaustively in polynomial time by considering all twin
+sets of G −S, and for each twin set going through all subsets S′ of S of size min(|S|, 4).
+We observe that the size of a twin set W after applying Reduction Rule 1 is bounded by
+a polynomial function in k and |S|.
+Lemma 5.2. Let S be a DH-modulator of G, and W be a set of pairwise twins in G −S.
+If (G, k) is irreducible with respect to Reduction Rule 1, then we have |W| = O(k2|S|3) or
+(G, k) is a No-instance.
+Proof. Suppose that (G, k) is a Yes-instance. It suﬃces to prove that |W| satisﬁes the
+claimed bound. First assume that |S| ≥4. There are at most
+ |S|
+3
+
+diﬀerent choices of S′
+in Step (1), and for each S′ we mark up to 23(k + 1) vertices of W.
+Consider an auxiliary hypergraph H on the vertex set S. A size-4 subset S′ of S forms a
+hyperedge of H if and only if S′ is used to mark some vertex of W in Step (2). Observe that
+if there exist k + 1 vertex-disjoint hyperedges of H, then there are k + 1 vertex-disjoint
+copies of a house or a gem. As we assume that (G, k) is a Yes-instance, a maximum
+packing of hyperedges has size at most k. Let C be the vertices of S that are contained in
+a maximal packing of hyperedges and notice that |C| ≤4k. Since any hyperedge e of H
+intersects with C, the following count on the maximum number of hyperedges is derived:
+4k
+4
+
++
+4k
+3
+|S|
+1
+
++
+4k
+2
+|S|
+2
+
++
+4k
+1
+|S|
+3
+
+.
+
+20
+EUN JUNG KIM AND O-JOUNG KWON
+For each hyperedge S′ of H, at most 24 diﬀerent sets of pairwise S′-twins, from which we
+mark up to k + 1 vertices. It follows that
+W ≤23(k + 1)
+|S|
+3
+
++ 24(k + 1)
+4k
+4
+
++
+4k
+3
+|S|
+1
+
++
+4k
+2
+|S|
+2
+
++
+4k
+1
+|S|
+3
+
+.
+Assume that |S| ≤3. Then we mark up to 2|S|(k +1) ≤8(k +1) vertices of W. Thus, if
+|W| > 8(k +1), then the set W can be reduced further by removing a vertex. The claimed
+bound follows.
+□
+6. Bounding the number of non-trivial connected components of G −S
+We provide a reduction rule that that bounds the number of connected components of
+G −S each having at least 2 vertices, when S is a good DH-modulator.
+Let (G, k) be an instance, and let S be a good DH-modulator. For each pair of v ∈S
+and a connected component C of G −S, let N(v, C) := NG(v) ∩V (C). Note that for a
+non-trivial connected component C of G −S, (V (C), V (G) \ V (C)) is not a split if and
+only if there exist v, w ∈S such that N(v, C) ̸= ∅, N(w, C) ̸= ∅and N(v, C) ̸= N(w, C).
+We say that a pair (v, w) of vertices in S is a witnessing pair for a connected component
+C of G −S if N(v, C) ̸= ∅, N(w, C) ̸= ∅and N(v, C) ̸= N(w, C).
+The following lemma is essential.
+Lemma 6.1. Let (G, k) be an instance and S be a good DH-modulator. If C1, C2 are two
+connected components of G −S and v, w ∈S such that (v, w) is a witnessing pair for both
+C1 and C2, then G[{v, w} ∪V (C1) ∪V (C2)] contains a DH obstruction.
+Proof. Since N(v, C1) ̸= ∅, N(w, C1) ̸= ∅, and N(v, C1) ̸= N(w, C1), there exists a vertex
+z ∈V (C1) where z is adjacent to only one of v and w. Without loss of generality, we
+may assume that z is adjacent to v. We choose a neighbor z′ of v in C2. Clearly, there is
+a path from z to z′ in G[{v, w} ∪V (C1) ∪V (C2)] −v because w has a neighbor on each
+of C1 and C2. Let P be a shortest path from z to z′ in G[{v, w} ∪V (C1) ∪V (C2)] −v.
+Note that P has length at least 3, as w and z are not adjacent. Thus, by Lemma 2.2,
+G[{v, w} ∪V (C1) ∪V (C2)] contains a DH obstruction.
+□
+Lemma 6.1 observes that if a pair of vertices in S witnesses at least k + 2 non-trivial
+connected components in G −S, at least one of the pair must be contained in any size-
+k DH-modulator. Furthermore, keeping exactly k + 2 non-trivial connected components
+would suﬃce to impose this restriction. This suggests the following reduction rule.
+Reduction Rule 2. For each pair of vertices v and w in S, we mark up to k + 2 non-trivial
+(previously unmarked) connected components C of G −S such that (v, w) is a witnessing
+pair for C. If there is an unmarked non-trivial connected component C after the marking
+procedure, then we remove all edges in C.
+The following is useful to see the safeness of our reduction rule.
+Lemma 6.2. Let G be a graph, and let (A, B) be a split of G.
+Then for every DH
+obstruction H of G, either |V (H) ∩A| ≤1 or |V (H) ∩B| ≤1.
+Proof. Suppose for contradiction that |V (H) ∩A| ≥2 and |V (H) ∩B| ≥2. Since H is
+connected, (V (H) ∩A, V (H) ∩B) is a split of H. This is contradiction because every DH
+obstruction does not have a split.
+□
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+21
+Lemma 6.3. Reduction Rule 2 is safe. Moreover, S remains a good DH-modulator after
+applying the reduction rule.
+Proof. Suppose there is an unmarked non-trivial connected component C of G −S after
+the marking procedure. Let G′ be the graph obtained by removing all edges in C. We
+claim that (G, k) is a Yes-instance if and only if (G′, k) is a Yes-instance.
+We ﬁrst prove the converse direction. Suppose T is a vertex set of G′ such that |T| ≤k
+and G′ −T is distance-hereditary.
+We claim that (V (C) \ T, V (G) \ V (C) \ T) is a
+split of G −T. Suppose (V (C) \ T, V (G) \ V (C) \ T) is not a split of G −T. Thus,
+there are v, w ∈S \ T, where NG(v) ∩(V (C) \ T) ̸= ∅, NG(w) ∩(V (C) \ T) ̸= ∅, and
+NG(v) ∩(V (C) \ T) ̸= NG(w) ∩(V (C) \ T). It further implies that (v, w) is a witnessing
+pair for C in G. Since C is unmarked, there are k + 2 non-trivial connected components
+C1, . . . , Ck+2 of G −S other than C where (v, w) is a witness pair for each Ci in G.
+From |T| ≤k, there are two components Ci, Cj ∈{C1, . . . , Ck+2} that do not contain a
+vertex of T. By Lemma 6.1, the graph (G′ −T)[{v, w} ∪V (C1) ∪V (C2)] contains a DH
+obstruction. It contradicts to the assumption that G′ −T has no DH obstructions. Thus,
+(V (C) \ T, V (G) \ V (C) \ T) is a split of G −T as claimed.
+Suppose for contradiction that G −T contains a DH obstruction H. (V (C) \ T, V (G) \
+V (C) \ T) is a split of G −T, we have either |V (H) ∩V (C)| ≤1 or |V (H) \ V (C)| ≤1
+by Lemma 6.2. As S is a good DH-modulator, the only possibility is |V (H) ∩V (C)| ≤1.
+This means that H is also an induced subgraph of G′ −T, a contradiction. Therefore, T
+is also a solution to (G, k).
+For the forward direction, suppose that T is a vertex set of G such that |T| ≤k
+and G −T is distance-hereditary. By a similar argument as above, one can show that
+(V (C) \ T, V (G′) \ V (C) \ T) is a split in G′ −T. Hence, any DH obstruction H in G′ −T
+contains at most one vertex of C, and thus H is also an induced subgraph of G−T, which
+contradicts to the assumption that G −T is distance-hereditary. We conclude that (G′, k)
+is a Yes-instance if (G, k) is a Yes-instance.
+To see that S remains a good DH-modulator after applying the reduction rule, suppose
+that S is not a good DH-modulator after the application of Reduction Rule 2. It is easy
+to see that S is again a DH-modulator of G′.
+Hence, we may assume there is a DH
+osbtruction F in G′ such that |V (F) ∩S| = 1. Such F must contain at least two vertices
+u, v such that uv ∈E(G) \ E(G′). Notice that the reduction rule ensures that such u, v
+are adjacent only with the vertices of S. Due to the assumption |V (F) ∩S| = 1, u and v
+are pendant vertices in F, which is not possible for a DH obstruction F. Therefore, S is
+a good DH-modulator of G′. This completes the proof.
+□
+Now we analyze the bound on the number of non-trivial connected components in G−S
+after applying Reduction Rule 2. It is not diﬃcult to see that there are at most (k+2)|S|2
+non-trivial connected components in G −S after the reduction. We obtain the following
+bound, which is better than a naive bound whenever |S| is a polynomial in k of degree at
+least two.
+Proposition 6.4. Let (G, k) be an instance and S be a good DH-modulator. If (G, k) is
+irreducible with respect to Reduction Rule 2, then either the number of non-trivial connected
+components is at most O(k2 · |S|) or it is a No-instance.
+The basic idea is that if there is a collection of k + 1 pairwise disjoint pairs in S, each
+witnessing at least two non-trivial connected components of G−S, there exist k+1 disjoint
+
+22
+EUN JUNG KIM AND O-JOUNG KWON
+copies of DH obstructions due to Lemma 6.1. Therefore, after removing the vertices in
+this matching structure, any pair of vertices in the remaining part of S must witness
+at most one connected component. Then, we use Erd˝os-P´osa property for cycles and a
+generalization of Lemma 6.1 to argue that the remaining part of S is sparse, in the sense
+that the number of connected components witnessed by this part is linear in |S|.
+Theorem 6.5 (Erd˝os and P´osa [11]). There exists a constant r such that, given an arbi-
+trary graph G and a positive integer k, either ﬁnds k + 1 vertex-disjoint cycles or a vertex
+set X ⊆V (G) with |X| ≤r · k log k hitting all cycles of G.
+The following is a generalization of Lemma 6.1.
+Lemma 6.6. Let (G, k) be an instance and S be a good DH-modulator. Suppose that
+v1, v2, . . . , vm is a circular ordering of m(≥2) vertices in S and C be a set of non-trivial
+connected components of G −S such that over all i, the pairs (vi, vi+1) witness mutu-
+ally distinct components of C, where vm+1 = v1. Then G[{v1, v2, . . . , vm} ∪S
+C∈C V (C)]
+contains a DH obstruction.
+Proof. We prove by induction on m. Let C1, . . . , Cm be mutually distinct components of
+C witnessed by (vi, vi+1). Let H := G[{v1, v2, . . . , vm} ∪S
+C∈C V (C)]. The statement is
+equivalent to Lemma 6.1 when m = 2, hence we assume m ≥3.
+We claim that for every i, the neighbors of Ci among {v1, . . . , vm} are exactly {vi, vi+1}
+or there is a DH obstruction in H. Suppose that there exist i and vj /∈{vi, vi+1} such
+that vj has a neighbor in Ci. If N(vj, Ci) = N(vi, Ci), then N(vj, Ci) ̸= N(vi+1, Ci),
+and thus (vj, vi+1) is a witnessing pair for Ci. Observe that vi+1, vi+2, . . . , vj is a circular
+ordering (possibly j = i + 2) meeting the condition of the statement, with Ci+1, . . . , Ci as
+the connected components witnessed by the consecutive pairs (vi+1, vi+2), . . . , (vj, vi+1). If
+N(vj, Ci) ̸= N(vi, Ci), the circular ordering vi, vj, . . . , vi−1, possibly with j = i −1, meets
+the condition with Ci, Cj, . . . , Ci−1 witnessed by the pairs (vi, vj), (vj, vj+1), . . . , (vi−1, vi).
+In both cases, we conclude that H contains a DH obstruction by induction hypothesis.
+Therefore, we may assume that for every i, the neighbors of Ci among {v1, . . . , vm} are
+exactly {vi, vi+1}. Since N(v1, C1) ̸= ∅, N(v2, C1) ̸= ∅, and N(v1, C1) ̸= N(v2, C1), there
+exists a vertex z ∈V (C1) where z is adjacent to only one of v1 and v2. By symmetry, we
+may assume that z is adjacent to v1. We choose a neighbor z′ of v1 in Cm. Note that
+H −v1 is connected. Let P be a shortest path from z to z′ in H −v1. Since {v2, . . . , vm}
+separates z and z′ in H −v1 and the only neighbor of C1 in {v2, . . . , vm} is v2 by the above
+claim, the path P traverse v2. From the fact that z is not adjacent with v2, it follows that
+P has length at least 3. By Lemma 2.2, G[V (P) ∪{v1}] contains a DH obstruction. This
+completes the proof.
+□
+We are ready to prove Proposition 6.4
+Proof of Proposition 6.4. If (G, k) is a No-instance, there is nothing to prove. We assume
+that (G, k) is a Yes-instance.
+Let us deﬁne an auxiliary multigraph F on the vertex set S such that for every pair
+v, w ∈S, the multiplicity of the edge vw equals the number of non-trivial connected
+components that are marked by the witness of (v, w) in Reduction Rule 2. Recall that
+each non-trivial connected component of G −S is marked at most once, which implies
+that the edge set of F can be bijectively mapped to the non-trivial connected components
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+23
+of G −S (after removing unmarked components). Therefore, it suﬃces to obtain a bound
+on the number of edges in F with the edge multiplicity taken into account.
+Construct a maximal packing of 2-cycles in F and let S1 ⊆S be the vertices contained
+in the packing. By Lemma 6.1, a packing of size k + 1 implies the existence of k + 1
+vertex-disjoint DH obstructions. Therefore, |S1| ≤2k.
+Again, due to the assumption that (G, k) is a Yes-instance, the subgraph F −S1 does
+not have k + 1 vertex-disjoint cycles: otherwise, G contains k + 1 vertex-disjoint DH
+obstructions by Lemma 6.6.
+Theorem 6.5 implies that there exists a vertex set S2 ⊆
+V (F) \ S1 hitting all cycles of F −S1 with |S2| ≤r · k log k for some constant r.
+Now, the number of edges in F is at most
+|S1| · |S|(k + 2) + |S2| · |S \ S1| + (|S \ S1 \ S2|)
+= 2k(k + 2)|S| + r · k log k · |S| + |S| ≤(7 + r)k2 · |S|,
+which establishes the claimed bound.
+□
+7. Bounding the size of non-trivial connected components of G −S
+In this section, we introduce several reduction rules that reduce the number of bags in
+the canonical split decomposition of a non-trivial connected component of G −S, where
+S is a good DH-modulator of G. Together with Reduction Rule 1 which shrinks the twin
+set in each bag, the result of this section bounds the number of vertices of each non-
+trivial connected component of G −S. In particular, we will prove that if the canonical
+split decomposition of a non-trivial connected component of G −S contains more than
+3|S|(20k + 54) bags, then we can apply some reduction rule.
+Let D be the canonical split decomposition of a connected component H of G −S.
+Since S is a good DH-modulator, for each vertex v of S, G[V (H) ∪{v}] is distance-
+hereditary. In particular, if G[V (H) ∪{v}] is connected, then we can extend D into a
+canonical split decomposition of G[V (H) ∪{v}] using the result by Gioan and Paul [17].
+By Theorem 2.6, in time O(|V (G)|) we can uniquely decide either a bag or a marked edge
+of D that will accommodate v so as to extend the split decomposition D of H into the
+split decomposition of G[V (H) ∪{v}]. See Theorem 2.6 for details on how the unique bag
+(called the partially accessible bag) or marked edge is characterized. The bag or marked
+edge that accommodations v shall be colored for all v ∈S, and also we apply a short-range
+propagation rule on the colored parts. We shall apply reduction rules to shrink uncolored
+parts.
+Let f be the injective function from S ∩NG(V (H)) to the union of the set of all marked
+edges and the set of all bags such that f(v) is the the partially accessible bag or the marked
+edge indicated by Theorem 2.6. We can compute this function f in time O(|S| · |V (G)|).
+A bag or a marked edge in D is S-aﬀected if it is f(v) for some v ∈S, and S-unaﬀected
+otherwise.
+We may assume that D consists of more than one bag. For two adjacent bags B1 and
+B2, we denote by e(B1, B2) the marked edge linking B1 and B2.
+7.1. Reduction Rules to bound the number of leaf bags. We ﬁrst provide simpler
+rules.
+Reduction Rule 3. If v is a vertex of degree at most 1 in G, then remove v.
+The safeness of Reduction Rule 3 is clear.
+
+24
+EUN JUNG KIM AND O-JOUNG KWON
+B
+B0
+B
+B0
+Figure 4. An illustration of Reduction Rule 4.
+Reduction Rule 4. Let B be a leaf bag of D and let B′ be its neighbor bag such that
+• B, B′, and e(B, B′) are S-unaﬀected,
+• D −V (B′) has exactly two connected components, and
+• B′ is a star bag whose center is adjacent to B.
+Then remove the unmarked vertices in B′.
+Reduction Rule 4 is illustrated in Figure 4.
+Lemma 7.1. Reduction Rule 4 is safe.
+Proof. We claim that there is no DH obstruction containing an unmarked vertex in B′.
+First observe that B is not a star bag whose leaf is adjacent to B′ because D is a canonical
+split decomposition.
+Furthermore, vertices in B are pairwise twins in G, as B is S-
+unaﬀected. If G has a DH obstruction H containing an unmarked vertex of B′, then H
+contains at least 2 vertices in B as B, B′, and e(B, B′) are S-unaﬀected. But this is
+not possible since every DH obstruction does not contain twins. Therefore, we can safely
+remove the vertices in B′.
+□
+Reduction Rule 5. Let A ⊆V (H) be a set of vertices that are pairwise twins in G. Flip
+the adjacency relation among the vertices of A if the resulting graph has strictly smaller
+number of bags in D.
+The safety of Reduction Rule 5 is already observed in [10], which is an immediate
+consequence of the fact that every DH obstruction contains at most one vertex among
+pairwise twins.
+Lemma 7.2. One can apply Reduction Rules 3, 4, and 5 exhaustively in polynomial time.
+Furthermore, S is a good DH-modulator in the resulting graph G′.
+Proof. The statement trivially holds for Reduction Rules 3 and 4. Let A ⊆V (H) be a
+set of vertices that are pairwise twins in G. Then A must be contained in a bag of D.
+Notice that a twin set in G −S is a twin set in G if and only if it is either complete or
+anti-complete to each vertex of S, which can be tested in polynomial time. Therefore, by
+skimming through each bag and a twin set contained in it (and modifying the canonical
+split decomposition accordingly), we can detect a set A to apply Reduction Rule 5 or
+correctly decide that no such A exists. Each application of Reduction Rules 3, 4, and 5
+reduces either the number of vertices in G or the number of bags, and the statement
+follows.
+To see the second statement holds, we only need to check that S is a good DH-modulator
+in G′ obtained by applying Reduction Rule 5 once. This is an immediate consequence of
+the fact A is a twin set in G′ and no DH obstruction can contain two twin vertices.
+□
+Lemma 7.3. Let (G, k) be an instance reduced under Reduction Rules 3, 4, and 5. If a
+leaf bag B of D is S-unaﬀected, then
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+25
+(i) either B is a complete bag or it is a star bag whose center is marked, and
+(ii) the unique bag B′ adjacent with B is a star bag whose center is adjacent with B.
+Proof. Suppose B is a star bag whose center is unmarked. Since B is S-unaﬀected, there
+are no edges between S and the set of leaves of B. Thus, each leaf of B is a leaf of G,
+contradicting that (G, k) is reduced under Reduction Rule 3. The ﬁrst statement follows.
+To prove (ii), ﬁrst suppose B′ is a complete bag. Then B cannot be a complete bag since
+there cannot be two complete bags adjacent in a canonical split decomposition. Hence
+by (i), B is a star bag whose center is adjacent with B′. Since B is S-unaﬀected, each
+vertex of S is either complete to the set of unmarked vertices of B, or anti-complete to it.
+So, the set of unmarked vertices of B is a twin set of G and applying Reduction Rule 5
+will recompose the marked edge e(B, B′), strictly reducing the number of bags.
+This
+contradicts that (G, k) is reduced under Reduction Rule 5.
+Therefore, B′ is a star bag. First assume that a leaf of B′ is adjacent to B. In that
+case, B cannot be a star bag whose center is adjacent to B′, because D is a canonical split
+decomposition. Thus, B is a complete bag. Since B is S-unaﬀected, the set of unmarked
+vertices of B is a twin set of G, and applying Reduction Rule 5 will lead to recomposing
+the marked edge e(B, B′), strictly reducing the number of bags. Thus we conclude that
+the center of B′ is adjacent to B.
+□
+Throughout the rest of the section, we assume that (G, k) is reduced under Reduction
+Rules 3, 4, and 5. We call that a bag B is a branch bag if D −V (B) contains at least
+3 connected components having at least two bags. We color the bags of D with red and
+blue in the following way.
+(1) If a bag B is S-aﬀected or incident with an S-aﬀected edge, we color B with red.
+(2) If a bag B is adjacent to an S-aﬀected leaf bag, we color B with red.
+(3) If B is a branch bag, then we color B with red.
+(4) All other bags are colored with blue.
+Let R be the set of all red bags, and let Q be the set of all blue leaf bags B whose
+unique neighbor bag is red. We prove the followings.
+Lemma 7.4. For each bag B, there is at most one blue leaf bag adjacent to B.
+Proof. Suppose for contradiction that there are a bag B and two blue leaf bags B1 and
+B2 adjacent to B. Since each Bi is a blue leaf bag, Bi is S-unaﬀected. Therefore, by
+Lemma 7.3, B is a star bag whose center is adjacent to Bi for both i = 1, 2, which is
+impossible.
+□
+Lemma 7.5. Let (G, k) be an instance reduced under Reduction Rules 3, 4, and 5. For
+any connected components D′ of D −S
+B∈R∪Q V (B), D′ is adjacent with exactly two red
+bags in D.
+Proof. Suppose that D′ is adjacent with exactly one red bag, say L, in D. Notice that D′
+consists of at least two bags since otherwise, the single bag in D′ is in Q.
+Let B be a leaf bag of D′ that is farthest from L in D and B′ be the unique bag adjacent
+with B in D′. Note that B′ ̸= L. Since B is S-unaﬀected, Lemma 7.3 implies that either
+B is a complete bag or it is a star bag whose center is marked, and B′ is a star bag whose
+center is adjacent with B.
+We observe that D −V (B′) has exactly two connected components; the one consisting
+of B and another component adjacent with L in D. Indeed, as we chose B as a farthest
+
+26
+EUN JUNG KIM AND O-JOUNG KWON
+leaf bag from L in D, an additional component adjacent with B′ must consist of a single
+(leaf) bag. However, this is impossible since B is the only leaf bag of D adjacent with B′
+by Lemma 7.4. Now, B and B′ satisfy the condition of Reduction Rule 4, contradicting
+the assumption that (G, k) is reduced under this rule.
+Suppose that D′ is adjacent with at least three red bags, say R1, R2 and R3, in D. Since
+D′ consists solely of blue bags, it does not contain a branch bag. Hence, at least one of
+Ri’s, say R1, is a leaf bag of D. However, R1 could have been colored red only in (1),
+that is, R1 is incident with S-aﬀected edge or it is S-aﬀected itself. In both cases, the bag
+of D′ adjacent with R1 must be colored either by (1) or (2) of the coloring procedure, a
+contradiction. This completes the proof.
+□
+Lemma 7.6. Let (G, k) be an instance reduced under Reduction Rules 3, 4, and 5. Then,
+the number of red bags in D is at most 3|S|.
+Proof. An S-aﬀected edge causes at most two bags to be colored red in (1). An S-aﬀected
+bag B causes at most two bags to be colored red in (2), that is, the bag itself and possibly
+an adjacent bag if B is a leaf bag. Hence, the number of bags colored in (1)-(2), is at most
+2|S|.
+It remains to prove that the number of branch bags is at most |S|. Let B be the set of
+branch bags. We create a graph F on the vertex set B such that two bags B1 and B2 in B
+are adjacent in F if and only if there is a path of bags in D from B1 to B2 that does not
+contain any other branch bag. Since such a path of bags is unique between any B1 and
+B2 in D, F is clearly a tree.
+Let L be a leaf of F. Since D −V (L) contains at least 3 connected components having
+at least two bags, at least two of these components does not contain any other bag in B.
+Consider an arbitrary component D′ of D−V (L) that contains at least two bags and does
+not contain a bag of B. Lemma 7.5 implies that D′ contains a red bag. We argue that D′
+contains either an S-aﬀected bag or an S-aﬀected marked edge. Suppose not, and notice
+that the only red bag in D′ is the one adjacent with L in D. Let us call this bag B. By
+Lemma 7.5, the connected components of D′ −V (B) must be singletons, consisting of a
+leaf bag. There are at most one such component by Lemma 7.4 consisting of a leaf bag
+B′. Then we can apply Reduction Rule 4 to B and B′, a contradiction. We conclude that
+D′ contains either an S-aﬀected bag or an S-aﬀected marked edge.
+Now, every leaf L of F can be associated with two connected components of D −V (L)
+containing either an S-aﬀected bag or an S-aﬀected marked edge. Notice that the two
+connected components, as a set of bags of D, associated to the set of all leaves in F are
+pairwise disjoint. Therefore, the number of leaves of F is at most 1
+2|S|. It follows that F
+contains at most |S| vertices, thus the number of red bags colored in (3) is at most |S|.
+This completes the proof.
+□
+Lemma 7.7. The number of connected components of D −S
+B∈R∪Q V (B) is at most 3|S|
+and |R ∪Q| ≤6|S|.
+Proof. Consider a tree F on the vertex set R in which any two red bag is adjacent if and
+only if there is a path of bags in D containing no red bag. By Lemma 7.5, there is an
+injection from the set of connected components of D −S
+B∈R∪Q V (B) to the set of edges
+of F. Observe that F has at most |R| edges. By Lemma 7.6, we have |R| ≤3|S|, which
+establishes the ﬁrst claimed bound. Lemma 7.4 implies that |Q| ≤|R|. The second bound
+|R ∪Q| ≤6|S| follows immediately.
+□
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+27
+Ba1
+Ba2
+Ba3
+Ba4
+Ba1
+Ba2
+Ba3
+Ba4
+Figure 5. An illustration of Reduction Rule 6.
+7.2. Reducing the length of a sequence of S-unaﬀected bags. We assume that the
+instance (G, k) is reduced under Reduction Rules 3, 4, and 5. Let D′ be a connected
+component of D −S
+B∈R∪Q V (B). We introduce three reduction rules that contribute to
+bound the number of bags in D′. Let us ﬁx the sequence B1, · · · , Bm of bags of D′. For
+1 ≤i < j < k ≤m, a bag Bj is called a (Bi, Bk)-separator bag if the center of Bj is
+adjacent to neither Bj−1 nor Bj+1. For a (B1, Bm)-separator bag B we deﬁne
+• η(B) := {v} if v is the center of B and there is no leaf bag adjacent to B,
+• η(B) := X if there is a leaf bag B′ adjacent to B, and X is the set of unmarked
+vertices in B′.
+Below, we present a rule that gives a bound on the number of (B1, Bm)-separator bags.
+We remark that for every bag Bj in D′ with 1 < j < m other than (B1, Bm)-separator
+bags, there are no leaf bags having Bj as a neighbor bag: if Bj has a leaf bag as a neighbor,
+such a leaf bag must be S-aﬀected because of Lemma 7.3. Then Bj is a red bag by the
+coloring procedure (3), contradicting that Bj is a bag in D′.
+Reduction Rule 6. Let Ba1, Ba2, Ba3, Ba4 be (B1, Bm)-separator bags of D′ such that 1 ≤
+a1 < a2 < a3 < a4 ≤m, for each i ∈{1, . . . , 3} there are no (Bai, Bai+1)-separator bags.
+If there is a bag Bz where a2 < z < a3, then we remove all unmarked vertices in Bz.
+Lemma 7.8. Reduction Rule 6 is safe.
+Proof. Suppose there is a bag Bz where a2 < z < a3, and let v be an unmarked vertex of
+Bz. We claim that there is no DH obstruction containing v, which shows that v can be
+safely removed. Suppose for contradiction that there is a DH obstruction F containing v.
+Since the set of all unmarked vertices in D′ induces a distance-hereditary graph, F must
+contain at least one vertex from S. Notice that η(Ba2) ∪η(Ba3) is a separator between v
+and S and since any DH obstruction is 2-connected, F contains at least two vertices of
+η(Ba2)∪η(Ba3). That each η(Bai) is a twin set in G while F contains no twins imply that
+F contains exactly vertex from η(Ba2) ∪η(Ba3) respectively. A similar argument shows
+F contains exactly one vertex from η(Bai) for each i ∈{1, 2, 3, 4}. Furthermore, as every
+vertex in S cannot be adjacent to both Ba1 and Ba4, we have |F| ≥7, and thus F is an
+induced cycle.
+For each i ∈{1, 2, 3, 4}, let wi be the vertex in V (F) ∩η(Bi).
+If v is contained in a complete bag, then F contains an induced cycle of length 3 together
+with vertices w2 and w3, contradiction. We may assume v is contained in a star bag. So,
+
+28
+EUN JUNG KIM AND O-JOUNG KWON
+Ba1
+Ba2
+Ba3
+Ba4
+Ba5
+Ba1
+Ba2
+Ba4
+Ba5
+Figure 6. An illustration of Reduction Rule 7.
+v is adjacent to one of w2 and w3. Since F has no leaves, there is a neighbor v′ of v in F
+that is not in {w2, w3}. Since v′ is also contained in a star bag, v′ is adjacent to one of w2
+and w3 that is not adjacent to v. However, this implies that F contains an induced cycle
+of length 4, contradiction. Therefore, v cannot be contained any DH obstruction, and we
+can safely remove it.
+□
+We can observe that after applying Reduction Rule 6 exhaustively, if Ba1, Ba2, . . . , Bat
+be the sequence of (B1, Bm)-separator bags where t ≥4 and a1 < a2 < · · · < at, then for
+each i ∈{2, . . . , t −2}, ai+1 = ai + 1, that is, there are no bags between Bai and Bai+1.
+We describe how we reduce the number of (B1, Bm)-separator bags.
+Reduction Rule 7. Let Ba1, Ba2, Ba3, Ba4, Ba5 be (B1, Bm)-separator bags of D′ such that
+1 ≤a1 < a2 < · · · < a5 ≤m, and for each i ∈{1, . . . , 4}, there are no (Bai, Bai+1)-
+separator bags. We ﬁrst remove Ba3 and also remove the leaf bag adjacent to Ba3 if one
+exists, and link marked vertices of Ba2 and Ba4 in D′, which were adjacent to Ba3, by a
+marked edge. If |η(B2)| > |η(B3)| = 1, then we remove the leaf bag adjacent to Ba2, and
+if |η(B2)| > |η(B3)| ≥2, then we remove vertices in η(Ba2) except |η(Ba3)| many vertices.
+Lemma 7.9. Reduction Rule 7 is safe. Furthermore, in the resulting graph, S is again a
+good DH-modulator.
+Proof. Let D′′ be the resulting canonical split decomposition, and let G′ be the resulting
+graph. For each i ∈{1, . . . , 5}, let Ui := η(Bi). In the decomposition D′′, we deﬁne eU as
+• eU := {v} if v is the center of Ba2 and there is no leaf bag adjacent to Ba2,
+• eU := X if there is a leaf bag B adjacent to Ba2, and X is the set of unmarked
+vertices in B.
+Notice that G −(U2 ∪U3) = G′ −eU. We prove that (G, k) is a Yes-instance if and only
+if (G′, k) is a Yes-instance.
+First suppose that G has a vertex set T such that |T| ≤k and G −T is distance-
+hereditary.
+Assume that T contains no vertex in U2 ∪U3.
+We claim that G′ −T is
+distance-hereditary. Suppose for contradiction that G′ −T contains a DH obstruction
+F. If F does not contain a vertex in eU, then F is an induced subgraph of G −T, as
+G −(U2 ∪U3) = G′ −eU. Thus, F contains a vertex in eU, and since eU is a set of pairwise
+twins in G′, we have |V (F) ∩eU| = 1. Let v be the vertex in V (F) ∩eU. We observe that
+• F contain at least one vertex from each of U1, U4, U5,
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+29
+• the vertices in V (F) ∩˜U and V (F) ∩U4 have no neighbors in S,
+• every vertex in S is not adjacent to both η(B1) and η(B5).
+These imply that F is an induced cycle of length at least 6. Thus we can obtain an induced
+cycle of length at least 7 in G from F by replacing v with a vertex of U2 and a vertex of
+U3, contradiction. We conclude that G′ −T is distance-hereditary when T ∩(U2 ∪U3) = ∅.
+Hence, we assume T ∩(U2 ∪U3) ̸= ∅. As Ui is a set of pairwise twins in G, if T ∩Ui ̸= ∅,
+then Ui ⊆T. We can observe that (T \ (U2 ∪U3)) ∪eU is a solution to (G′, k) and we have
+|(T \ (U2 ∪U3)) ∪eU| ≤|T| ≤k. It implies that (G′, k) is a Yes-instance.
+For the converse direction, suppose that G′ has a vertex set T ′ such that |T ′| ≤k and
+G′ −T ′ is distance-hereditary. We ﬁrst assume that T ′ ∩eU = ∅. Suppose G −T ′ has a
+DH obstruction F. We have V (F) ∩(U2 ∪U3) ̸= ∅, otherwise F is an induced subgraph
+of G′ −T ′. As U2 and U3 are twin sets of G, F contains at most one vertex from each
+of U2 and U3. Furthermore, F contains exactly one vertex from each of U1, . . . , U5, and
+thus it is an induced cycle of length at least 7. We can obtain an induced cycle of length
+at least 6 in G′ −T ′ from F by contracting the edge between V (F) ∩U2 and V (F) ∩U3,
+which contradicts to the assumption that G′ −T ′ is distance-hereditary. We conclude that
+G −T ′ is distance-hereditary in the case when T ′ ∩eU = ∅.
+Lastly, suppose T ′ ∩eU ̸= ∅. As eU is a set of pairwise twins in G′, we have eU ⊆T ′.
+We obtain a set T from T ′ by removing eU, and adding Ui with i ∈{2, 3} where |Ui| =
+min{|U2|, |U3|}.
+If |U2| = |U3|, then we add one of them chosen arbitrarily.
+Clearly,
+|T| ≤|T ′| ≤k. We can observe that G −T has no DH obstruction containing a vertex in
+U2 ∪U3. Since G −(U2 ∪U3) = G′ −eU has no DH obstructions, we conclude that G −T
+is distance-hereditary, as required.
+This proves that Reduction Rule 7 is safe.
+We argue that S is again a good DH-
+modulator in G′.
+We need to verify that for every v ∈S, G′ −S \ {v} has no DH
+obstructions. Suppose for contradiction that G′ −S \ {v} contains a DH obstruction F
+for some v ∈S. The obstruction F should contain a vertex in eU, otherwise, F is also a
+DH obstruction in G[(V (G)\S)∪{v}]. Observe that F should contain at least one vertex
+from U1, U4, U5, and thus F is an induced cycle of length at least 6, and the neighbors
+of v in F are contained in U1 and U4. Thus we can obtain an induced cycle of length at
+least 7 by replacing the vertex in V (F) ∩eU with a vertex of U2 and a vertex of U3 in G,
+which implies that G[(V (G) \ S) ∪{v}] contains a DH obstruction. It contradicts to our
+assumption that S is a good DH-modulator. We conclude that S is a good DH-modulator
+in the resulting graph.
+□
+In the following reduction rule, we describe how to reduce a sequence of non-(B1, Bm)-
+separator bags.
+Reduction Rule 8. Let a be a positive integer such that a ≤m −(5k + 11), and for each
+i ∈{1, . . . , 5k + 10}, Ba+i is not a (B1, Bm)-separator bag. Among bags in {Ba+i : 1 ≤
+i ≤5k + 10}, we mark up to k + 1 bags for each types : complete bags, star bags Bj
+whose centers are adjacent to Bj+1, and star bags Bj whose centers are adjacent to Bj−1.
+Choose a bag Ba+j with j ∈{1, . . . , 5k+10} that is not marked after ﬁnishing the marking
+procedure, and remove vertices in Ba+j from G.
+
+30
+EUN JUNG KIM AND O-JOUNG KWON
+We observe the every DH obstruction can be turned into an induced path by removing
+a vertex v. Note that this vertex is not unique; for instance, we can choose any vertex in
+an induced cycle of length 5. We will use this observation.
+Lemma 7.10. Reduction Rule 8 is safe.
+Proof. Suppose there is a bag Ba+j with j ∈{1, . . . , 5k + 10} that is not marked after
+ﬁnishing the marking procedure in Reduction Rule 8, and let v be an unmarked vertex in
+Ba+j. We prove that (G, k) is a Yes-instance if and only if (G −v, k) is a Yes-instance.
+The forward direction is clear. Suppose that G −v has a vertex set T with |T| ≤k such
+that (G −v) −T is distance-hereditary and G −T contains a DH obstruction F. Note
+that v ∈V (F). Let b := a + (5k + 11).
+We partition the vertex set V (G) into four parts. Let U be the set of all unmarked
+vertices contained in Ba+1, Ba+2, . . . , Bb−1. Since D′ consists of only blue bags, there are
+exactly two sets N1 and N2 in {NG(x) ∩U : x ∈V (G) \ U} that correspond to marked
+edges e(Ba, Ba+1) and e(Bb−1, Bb), respectively. We deﬁne
+• Ai := {x ∈V (G) \ U : NG(x) ∩U = Ni} for each i ∈{1, 2}.
+It is clear that A1 and A2 are disjoint. Let W := V (G) \ (U ∪A1 ∪A2).
+We ﬁrst show some necessary lemmas.
+Claim 3. If F is an induced cycle of length at least 5, then |V (F) ∩U| ≤2.
+Proof of the Claim: Suppose F is an induced cycle of length at least 5, and F contains
+at least three vertices w1, w2, w3 in U. Since each wi is contained in either N1 or N2, at
+least two vertices of w1, w2, w3 are contained in the same set of N1 and N2. By relabeling
+if necessary, we assume that w1 and w2 are contained in the same set, say N1. Let Bx
+and By be the two bags containing w1 and w2, respectively, and without loss of generality,
+we may assume x ≤y. Then every neighbor of w1 in G is adjacent to w2, and therefore,
+F contains a cycle of length 4 as a subgraph. This contradicts to the fact that F is an
+induced cycle of length at least 5. We conclude that |V (F) ∩U| ≤2.
+♦
+Claim 4. If F is a DH obstruction that is not an induced cycle, then |V (F) ∩U| ≤4.
+Proof of the Claim: If |V (F) ∩U| ≥5, then |V (F) ∩S| ≤1, contradicting to the
+assumption that S is a good DH-modulator.
+♦
+Claim 5. If there are two vertices v1 ∈A1 and v2 ∈A2 such that v1v2 /∈E(G), then for
+every i ∈{a + 1, a + 2, . . . , b −5}, bags Bi, Bi+1, Bi+2, Bi+3, Bi+4 contain three vertices
+w1, w2, w3 where G[{v1, v2, w1, w2, w3}] is isomorphic to a DH obstruction.
+Proof of the Claim: Suppose there exist v1 ∈A1 and v2 ∈A2 such that v1v2 /∈E(G).
+Let i ∈{a + 1, a + 2, . . . , b −5}. We prove three special cases.
+Case 1. (There exist x, y, z ∈{i, i + 1, . . . , i + 4} with x < y such that Bx is a star bag
+whose center is adjacent to Bx+1, By is a star bag whose center is adjacent to By−1, and
+Bz is a complete bag.)
+Let w1, w2, w3 be unmarked vertices of Bx, By, Bz, respectively. Since v1w2w1v2 is an
+induced path and w3 is adjacent to both v1 and v2, by Lemma 2.2, G[{v1, v2, w1, w2, w3}]
+is isomorphic to a DH obstruction.
+Case 2. (There exist x, y, z ∈{i, i + 1, . . . , i + 4} with x < y < z such that Bx and Bz
+are complete bags, and By is a star bag.)
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+31
+Let w1, w2, w3 be unmarked vertices of Bx, By, Bz, respectively. Assume By is a star
+bag whose center is adjacent to By−1.
+Since w2v1w3v2 is an induced path and w1 is
+adjacent to both w2 and v2, by Lemma 2.2, G[{v1, v2, w1, w2, w3}] is isomorphic to a DH
+obstruction. If By is a star bag whose center is adjacent to By+1, then w2v2w1v1 is an
+induced path and w3 is adjacent to both w2 and v1, G[{v1, v2, w1, w2, w3}] is isomorphic
+to a DH obstruction.
+Case 3. (There exist x1, x2, x3, x4 ∈{i, i+1, . . . , i+4} with x1 < x2 < x3 < x4 such that
+Bx1 and Bx3 are star bags whose centers are adjacent to the next bags, and Bx2 and Bx4
+are star bags whose centers are adjacent to the previous bags.)
+Let w1, w2, w3, w4 be unmarked vertices of Bx1, Bx2, Bx3, Bx4, respectively. It is not
+hard to verify that G[{v1, v2, w1, w2, w3, w4}] is isomorphic to the domino.
+Now we prove in general. Since D is a canonical split decomposition, one of Bi and
+Bi+1 is either a complete bag or a star bag whose center is adjacent to the next bag. Let
+Bi′ be such a bag. Assume Bi′ is a complete bag. Then Bi′+1 is a star bag. If there is
+a complete bag among Bi′+2, Bi′+3, then the claim holds by Case 2. Otherwise, all of
+Bi′+1, Bi′+2, Bi′+3 are star bags, and the claim holds by Case 1.
+Assume Bi′ is a star bag whose center is adjacent to Bi′+1. If all of Bi′+1, Bi′+2, Bi′+3
+are star bags, then the claim holds by Case 3. We may assume there exists a complete
+bag in Bi′+1, Bi′+2, Bi′+3. If two other bags are star bags whose centers are adjacent to
+the next bags, then the claim holds by Case 2. Otherwise, there is a star bag whose
+center is adjacent to the previous bag, and the claim holds by Case 1.
+♦
+Claim 6. If there are three vertices v1 ∈A1, v2 ∈A2, v3 ∈W such that v1v2, v2v3, v3v1 ∈
+E(G), then for every i ∈{a + 1, a + 2, . . . , b −4}, bags Bi, Bi+1, Bi+2, Bi+3 contain two
+vertices w1, w2 where G[{v1, v2, v3, w1, w2}] is isomorphic to a DH obstruction.
+Proof of the Claim: Suppose there are three vertices v1 ∈A1, v2 ∈A2, v3 ∈W such
+that v1v2, v2v3, v3v1 ∈E(G). Let i ∈{a+1, a+2, . . . , b−4}. We prove three special cases.
+We observe that there is x ∈{i, i + 1, i + 2, i + 3} such that either
+(1) Bx is a complete bag and Bx+1 is a star bag whose center is adjacent to Bx,
+(2) Bx is a star bag whose center is adjacent to Bx+1 and Bx+1 is a complete bag, or
+(3) Bx and Bx+1 are star bags and their centers are adjacent.
+Since D is a canonical split decomposition, one of Bi and Bi+1 is either a complete bag
+or a star bag whose center is adjacent to the next bag. Let Bi′ be such a bag. Assume
+Bi′ is a complete bag. Then Bi′+1 is a star bag. If its center is adjacent to Bi′, then the
+statement (1) holds. We may assume the center of Bi′+1 is adjacent to Bi′+2. If Bi′+2 is
+a complete bag, then the statement (2) holds, and if Bi′+2 is a star bag whose center is
+adjacent to Bi′+1, then the statement (3) holds. Assume Bi′ is a star bag whose center is
+adjacent to Bi′+1. If Bi′+1 is a complete bag, then the statement (2) holds, and if Bi′+1
+is a star bag whose center is adjacent to Bi′, then the statement (3) holds.
+Let w1 ∈Bx, w2 ∈Bx+1 be unmarked vertices for such bags Bx and Bx+1. One can
+observe that in any case, G[{v1, v2, v3, w1, w2}] is isomorphic to a DH obstruction.
+♦
+Claim 7. If there are four vertices v1 ∈A1, v2 ∈A2, v3, v4 ∈W such that v1v2, v2v3, v3v4, v4v1 ∈
+E(G) and v1v3, v2v4 /∈E(G), then for every i ∈{a+1, a+2, . . . , b−3}, bags Bi, Bi+1, Bi+2
+contain two vertices w1, w2 where G[{v1, v2, v3, v4, w1, w2}] contains an induced subgraph
+isomorphic to a DH obstruction.
+
+32
+EUN JUNG KIM AND O-JOUNG KWON
+Proof of the Claim: Suppose there are four vertices v1 ∈A1, v2 ∈A2, v3, v4 ∈W such
+that v1v2, v2v3, v3v4, v4v1 ∈E(G) and v1v3, v2v4 /∈E(G). Let i ∈{a + 1, a + 2, . . . , b −3}.
+If Bi, Bi+1, Bi+2 contains a complete bag, then an unmarked vertex w in the bag satisﬁes
+that G[{v1, v2, v3, v4, w}] is isomorphic to the house. We may assume those bags are star
+bags. Then there is i′ ∈{i, i + 1} such that Bi′ is a star bag whose center is adjacent to
+Bi′+1 and Bi′+1 is a star bag whose center is adjacent to Bi′. Let w1 ∈Bi′, w2 ∈Bi′+1 be
+unmarked vertices. One can observe G[{v1, v2, v3, v4, w1, w2}] is isomorphic to the domino.
+♦
+Now, we prove the result based on the previous claims.
+Suppose |V (F) ∩U| = 1.
+In this case, by the marking procedure of Reduction Rule 8, there are distinct integers
+j1, j2, . . . , jk+1 ∈{1, . . . , 5k + 10} \ {j} such that Ba+j, Ba+j1, Ba+j2, . . . , Ba+jk+1 have
+the same type (recall that Ba+j is an unmarked bag in the application of Reduction 8 abd
+v ∈Ba+j). Therefore, there is a vertex v′ not contained in T, where v and v′ have the same
+neighborhood on V (F)\{v}, which implies that G[(V (F)\{v})∪{v′}] is a DH obstruction
+of (G −v) −T. This is contradiction. Thus, we may assume that |V (F) ∩U| ≥2.
+We choose q ∈V (F) such that F −q is an induced path, and
+• q = v if F is an induced cycle,
+• q is the closest vertex to v in the underlying cycle if F is either the house, the
+gem, or the domino.
+Let P := F −q, and let w and z be the end vertices of P, and let w′ and z′ be the neighbors
+of w and z in P, respectively.
+We divide into following four cases depending on the places of w and z:
+(1) Both w and z are contained in U.
+(2) One of w and z is in A1 ∪A2 and the other is contained in U.
+(3) Both w and z are contained in A1 ∪A2.
+(4) One of w and z is contained in W.
+We aim to show that these cases are not possible, because (G−v)−T is distance-hereditary.
+First observe that w and z are not contained in U together. Suppose w and z are
+contained in U. Let Bx and By be the bags containing w and z, respectively. We can
+assume x ≤y, otherwise the proof is symmetric. Since they are not adjacent, either Bx is
+a star whose center is adjacent to Bx−1 or By is a star whose center is adjacent to By+1.
+By symmetry, assume that By is a star bag whose center is adjacent to By+1. Since q is
+adjacent to both w and z, Bx should be either a complete bag, or a star bag whose center
+is adjacent to Bx+1. Then z′ should be also adjacent to w, contradicting to the fact that
+F −q is an induced path.
+Secondly, assume that one of w and z is in A1 ∪A2 and the other is contained in U.
+We assume that w ∈A1 and z ∈U.
+For the other cases (w ∈A2 and z ∈U) and
+(z ∈A1 and w ∈U) and (z ∈A2 and w ∈U), we can prove in the similar way. Since
+wz /∈E(G), z is contained in a star bag Bx whose center is adjacent to Bx+1 for some
+x ∈{a + 1, a + 2, . . . , b −1}. Furthermore, if z′ ∈U, then z′ should be adjacent to w,
+a contradiction. Thus, we have z′ ∈A2. Note that w, z′ /∈T and wz′ /∈E(G). Since
+b −a −1 ≥5(k + 2), by Claim 5, there exists i ∈{a + 1, a + 2, . . . , b −5} such that bags
+Bi, Bi+1, Bi+2, Bi+3, Bi+4 contain three vertices w1, w2, w3 where w1, w2, w3 /∈T ∪{v}
+and G[{w, z′, w1, w2, w3}] is isomorphic to a DH obstruction.
+This contradicts to the
+assumption that (G −v) −T is distance-hereditary.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+33
+Thirdly, assume that both w and z are contained in A1 ∪A2. If w and z are contained
+in distinct sets of A1 and A2, then by the same argument in the previous paragraph, there
+exists i ∈{a + 1, a + 2, . . . , b −5} such that bags Bi, Bi+1, Bi+2, Bi+3, Bi+4 contain three
+vertices w1, w2, w3 where w1, w2, w3 /∈T ∪{v} and G[{w, z, w1, w2, w3}] is isomorphic to
+a DH obstruction. Thus, we may assume both w and z are contained in Ai for some
+i ∈{1, 2}. Without loss of generality, we assume w, z ∈A1. Suppose there are at least
+k + 5 bags Bx in {Ba+1, Ba+2, . . . , Bb−1} that are either complete bags or star bags whose
+centers are adjacent to Bx−1. Note that by Claims 3 and 4, |V (F)∩U| ≤4. Thus, there is
+a bag among them having no vertex in T ∪V (F), and an unmarked vertex in the bag will
+form a DH obstruction with P in (G−v)−T. Therefore, there are at most k+4 such bags.
+This implies that there are at most 2k+9 bags, as there are no two consecutive bags in the
+canonical split decomposition. It contradicts to our assumption that b −a −1 ≥5k + 10.
+Lastly, we assume that one of w and z is contained in W. If q = v, then w or z cannot
+be in W. Especially, F is a DH obstruction that is not an induced cycle. Let q′ be the
+vertex of degree 3 other than q if F is the domino. Let us assume w ∈W. The proof is
+symmetric when z ∈W.
+If q ∈W, then {q, w, w′, z} ⊆A1 ∪A2 ∪W.
+Since |V (F) ∩U| ≥2, F should be
+isomorphic to the domino and V (F) ∩U = {q′, z′}. But since q is adjacent to q′, this is
+contradiction. Therefore, we have q ∈A1 ∪A2. We remark that if V (F) ∩Ai = ∅for
+some i ∈{1, 2}, then (V (F) ∩U, V (F) ∩(W ∪A3−i)) is a split of F, contradicting the fact
+that F has no splits. Hence, it holds that V (F) ∩Ai ̸= ∅for i ∈{1, 2}. We divide cases
+depending on whether F is isomorphic to the domino or not.
+Case 1. F is not isomorphic to the domino.
+Note that {q, w, w′} ⊆A1 ∪A2 ∪W. Since |V (F)| = 5 and |V (F) ∩U| ≥2, we have
+V (F) ∩U = {z, z′}.
+Furthermore, q and w′ are contained in distinct sets of A1 and
+A2. By Claim 6, for every i ∈{a + 1, a + 2, . . . , b −4}, Bi, Bi+1, . . . , Bi+3 contain two
+vertices w1 and w2 where G[{q, w, w′, w1, w2}] is isomorphic to a DH obstruction.
+As
+b −a −1 ≥4(k + 2), there is a pair of such vertices w1 and w2 not contained in T ∪{v}.
+So, (G −v) −T contains a DH obstruction, which is contradiction.
+Case 2. F is isomorphic to the domino.
+Recall that q is chosen as the vertex of degree 3 in F closer to v. Since q /∈U, v is a
+vertex of degree 2. Furthermore, since w ∈W, we have z = v.
+Note that w′ ∈W∪A1∪A2. Suppose q and w′ are contained in distinct sets of A1 and A2.
+Since b−a−1 ≥5(k+2), by Claim 5, there exists i ∈{a+1, a+2, . . . , b−5} such that bags
+Bi, Bi+1, Bi+2, Bi+3, Bi+4 contain three vertices w1, w2, w3 where w1, w2, w3 /∈T ∪{v}
+and G[{q, w′, w1, w2, w3}] is isomorphic to a DH obstruction. If q and w′ are contained in
+the same set of A1 or A2, then z should be adjacent to w′, contradiction. Thus, we can
+conclude that w′ ∈W. Therefore, q′ /∈U, and {z, z′} ⊆U. Since q′ is not adjacent to z,
+q and q′ are contained in distinct sets of A1 and A2.
+Now, by Claim 7, for every i ∈{a+1, a+2, . . . , b−3}, bags Bi, Bi+1, Bi+2 contain two
+vertices w1, w2 where G[{w, w′, q, q′, w1, w2}] contains an induced subgraph isomorphic to
+a DH obstruction. As b −a −1 ≥3(k + 2), there is a pair of such vertices w1 and w2 not
+contained in T ∪{v}. So, (G −v) −T contains a DH obstruction, which is contradiction.
+We proved that |V (F) ∩U| ≥2 cannot hold when (G −v, k) is a Yes-instance. We
+conclude that (G, k) is a Yes-instance if and only if (G −v, k) is a Yes-instance.
+□
+
+34
+EUN JUNG KIM AND O-JOUNG KWON
+7.3. The size of a non-trivial component.
+Lemma 7.11. Let (G, k) be an instance reduced under Reduction Rules 3, 4, 5, 6, 7, and
+8 and let D be the canonical split decomposition of a non-trivial connected component of
+G −S. If D′ be a connected component of D −S
+B∈R∪Q V (B), then D′ contains at most
+20k + 52 bags.
+Proof. Let B1, · · · , Bm be a sequence of bags in D′. By Reduction Rule 7, D′ contains
+at most four (B1, Bm)-separator bags Bj, and by Reduction Rule 6, if there are four
+(B1, Bm)-separators bags, then there are no bags between the second and third (B1, Bm)-
+separator bags. Also, there is at most leaf bag adjacent to a (B1, Bm)-separator bag, and
+there are no leaf bags adjacent to a non-(B1, Bm)-separator bag. By Reduction Rule 8,
+there are at most 5k + 11 consecutive bags Bj that are not (B1, Bm)-separator bags. In
+total, D′ contains at most 4(5k + 11) + 4 · 2 = 20k + 52 bags.
+□
+We summarized the main result of this section.
+Lemma 7.12. Let (G, k) be an instance reduced under Reduction Rules 3, 4, 5, 6, 7, and
+8 and let D be the canonical split decomposition of a non-trivial connected component of
+G −S. Then D has at most 3|S|(20k + 54) bags.
+Proof. Lemma 7.7 states that |R ∪Q| ≤6|S| and there are at most 3|S| connected com-
+ponents of D −S
+B∈R∪Q V (B).
+By Lemma 7.11, each connected component of D −
+S
+B∈R∪Q V (B) contains at most 20k + 52 bags. Therefore, D contains at most 6|S| +
+3|S|(20k + 52) = 3|S|(20k + 54) bags.
+□
+8. Polynomial kernel for Distance-hereditary Vertex Deletion
+We present a proof of Theorem 1.1 in this section.
+Proof of Theorem 1.1. We ﬁrst prove that given an instance (G, k) and a good DH-modulator
+S, one can output an equivalent instance of size O(k5|S|5). We ﬁrst apply Reduction Rule 2
+to (G, k) with S. After that, G −S has O(k2|S|) non-trivialial connected components or
+we can correctly report that (G, k) is a No-instance by Lemma 6.4. Notice that S remains
+a good DH-modulator after the application of Reduction Rule 2 by Lemma 6.3.
+We apply Reduction Rules 3, 4, 5, 6, 7 and 8 exhaustively. The ﬁrst three rules can
+be applied exhaustively in polynomial time by Lemma 7.2. Polynomial-time applicability
+of Reduction Rules 7, and 8 is straightforward. We remark that S remains a good DH-
+modulator after each application of Reduction Rules 3, 4 and 5 by Lemma 7.2.
+Also
+Reduction Rules 6 and 8 preserves S as a good DH-modulator since these rules delete
+vertices not contained in S. The application of Reduction Rule 7 preserves the goodness of
+S by Lemma 7.9. Then the canonical split decomposition D of each non-trivial connected
+component of G −S has at most 3|S|(20k + 54) bags by Lemma 7.12.
+Then apply Reduction Rule 1 exhaustively in polynomial time. This bounds the size of
+a twin set in G −S by O(k2|S|3) by Lemma 5.2. We note that the unmarked vertices of a
+bag form at most two twin sets. Therefore, the number of unmarked vertices in a bag is
+bounded by O(k2|S|3) by Lemma 5.2. Especially, the same bounds apply to the number
+of trivial components in G −S since they form an independent set in G −S.
+Let (G′, k′) be the resulting instance. Combining the previous bounds altogether, we
+conclude that V (G′) = O(k5 · |S|5).
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+35
+We may assume that the input instance (G, k) satisﬁes n ≤2ck for some constant c.
+Recall that there is an algorithm for Distance-hereditary Vertex Deletion running
+in time 2ck ·nO(1) by Eiben, Ganian, and Kwon [10]. If n > 2ck, then the algorithm of [10]
+solves the instance (G, k) correctly in polynomial time, in which case we can output a
+trivial equivalent instance. By Theorem 4.2, we can obtain a good DH-modulator S of
+size O(k5 log n) = O(k6) in polynomial time or correctly report (G, k) as a No-instance.
+The previous argument yields that in polynomial time, an equivalent instance (G′, k′)
+of size O(k35) can be constructed. Now, applying Theorem 4.2 again4 to (G′, k′), we can
+either correctly conclude that (G′, k′), and thus (G, k), is a No-instance or output a good
+DH-modulator S′ of size O(k5 log k). Now we obtain a kernel of size O(k30 · log5 k).
+□
+9. Concluding remarks
+Apparently, there is much room to improve the kernel size O(k30 log5 k) presented in
+this work.
+It is not diﬃcult to convert our approximation algorithm in Theorem 3.1
+to an O(opt2 log n)-approximation algorithm. It is an intriguing question to obtain an
+approximation algorithm with better performance ratio. This will immediately improve
+our kernelization bound of this paper.
+Given a DH-modulator S, Proposition 4.1 states that extra factor of O(k2) will be
+incurred per vertex in S in the course of obtaining a good DH-modulator.
+In fact, a
+good DH-modulator of size O(k|S|) can be constructed in polynomial time using Mader’s
+S-path theorem. Given a collection S of disjoint vertex sets in G, an S-path is a path
+whose end vertices belong to distinct sets in S. Mader’s S-path theorem provides a primal-
+dual characterization of the maximum number of pairwise vertex-disjoint S-paths. From
+S-path theorem, one can show the following alternative to Proposition 4.1.
+Proposition 9.1. Let G be a graph without any small DH obstruction, v be a vertex of
+G such that G −v is distance-hereditary and k be a positive integer. In polynomial time,
+one can decide whether there is k + 1-sunﬂower at v or ﬁnd a set X ⊆V (G) \ {v} of size
+at most 2k such that G −X contains no induced cycle of length at least 5 traversing v.
+This proposition holds because the property of distance at most two in G −v between
+neighbors of v gives an equivalent relation, and thus hitting induced cycles of length at
+least 5 traversing v can be translated to hitting all paths linking two distinct equivalent
+classes, and we can use Mader’s S-path Theorem.
+The caveat here is that the polynomial time algorithm in this proposition calls as a
+subroutine an algorithm which can eﬃciently compute both a primal and a dual optimal
+solutions of Mader’s characterization. Lovasz [24] showed that S-path packing problem
+and the min-max duality is a special case of linear matroid parity problem and the cor-
+responding duality. Matroid parity problem is NP-hard even with a compact representa-
+tion [24], but for linear matroid it can be eﬃciently solved. We can use such an algorithm
+A, for example [24] or [5] for a more recent treatement. Moreover, the optimal dual so-
+lution satisfying Mader’s S-path theorem can be eﬃciently computed via computing an
+optimal dual solution for the corresponding linear matroid parity problem, see [25].
+In this paper, we give a simpler-to-describe algorithm using an approximation algorithm
+for Vertex Multicut instead of relying on a reduction to linear matroid parity problem.
+An interesting question is, can we eﬃciently ﬁnd the primal and dual optimal solution
+4That applying kernelization twice can yield an improved bound was adequately observed in [2].
+
+36
+EUN JUNG KIM AND O-JOUNG KWON
+satisfying Mader’s S-path theorem without using a reduction to linear matroid parity
+problem? We are not aware of any literature claiming such a result.
+One might also ask for a kernelization lower bound for Distance-hereditary Vertex
+Deletion parameterized by the size of a DH-modulator or by k.
+Acknowledgement
+We thank Saket Saurabh for pointing to the idea of [2] to apply the kernelization twice,
+which leads to an improved bound in Theorem 1.1.
+References
+[1] I. Adler, M. M. Kant´e, and O. Kwon. Linear rank-width of distance-hereditary graphs I. A polynomial-
+time algorithm. Algorithmica, pages 1–36, 2016.
+[2] A. Agrawal, D. Lokshtanov, P. Misra, S. Saurabh, and M. Zehavi. Feedback vertex set inspired kernel
+for chordal vertex deletion. In Proceedings of the Twenty-Eighth Annual ACM-SIAM Symposium on
+Discrete Algorithms, SODA 2017, Barcelona, Spain, Hotel Porta Fira, January 16-19, pages 1383–
+1398, 2017.
+[3] H.-J. Bandelt and H. M. Mulder. Distance-hereditary graphs. J. Combin. Theory Ser. B, 41(2):182–
+208, 1986.
+[4] A. Bouchet. Transforming trees by successive local complementations. J. Graph Theory, 12(2):195–
+207, 1988.
+[5] H. Y. Cheung, L. C. Lau, and K. M. Leung. Algebraic algorithms for linear matroid parity problems.
+ACM Trans. Algorithms, 10(3):10:1–10:26, 2014.
+[6] B. Courcelle, J. A. Makowsky, and U. Rotics. Linear time solvable optimization problems on graphs
+of bounded clique-width. Theory Comput. Syst., 33(2):125–150, 2000.
+[7] B. Courcelle and S. Olariu. Upper bounds to the clique width of graphs. Discrete Appl. Math., 101(1-
+3):77–114, 2000.
+[8] W. H. Cunningham and J. Edmonds. A combinatorial decomposition theory. Canad. J. Math.,
+32(3):734–765, 1980.
+[9] E. Dahlhaus. Parallel algorithms for hierarchical clustering, and applications to split decomposition
+and parity graph recognition. Journal of Algorithms, 36(2):205–240, 2000.
+[10] E. Eiben, R. Ganian, and O. Kwon. A Single-Exponential Fixed-Parameter Algorithm for Distance-
+Hereditary Vertex Deletion. In P. Faliszewski, A. Muscholl, and R. Niedermeier, editors, 41st In-
+ternational Symposium on Mathematical Foundations of Computer Science, MFCS 2016, volume 58
+of Leibniz International Proceedings in Informatics (LIPIcs), pages 34:1–34:14, Dagstuhl, Germany,
+2016. Schloss Dagstuhl–Leibniz-Zentrum fuer Informatik.
+[11] P. Erd˝os and L. P´osa. On independent circuits contained in a graph. Canad. J. Math., 17:347–352,
+1965.
+[12] E. M. Eschen, C. T. Ho`ang, J. P. Spinrad, and R. Sritharan. On graphs without a C4 or a diamond.
+Discrete Appl. Math., 159(7):581–587, 2011.
+[13] M. Farber. On diameters and radii of bridged graphs. Discrete Math., 73(3):249–260, 1989.
+[14] U. Feige, M. Hajiaghayi, and J. R. Lee. Improved approximation algorithms for minimum weight
+vertex separators. SIAM J. Comput., 38(2):629–657, 2008.
+[15] F. V. Fomin, D. Lokshtanov, N. Misra, and S. Saurabh. Planar F-Deletion: approximation, ker-
+nelization and optimal FPT algorithms. In 2012 IEEE 53rd Annual Symposium on Foundations of
+Computer Science—FOCS 2012, pages 470–479. IEEE Computer Soc., Los Alamitos, CA, 2012.
+[16] A. C. Giannopoulou, B. M. P. Jansen, D. Lokshtanov, and S. Saurabh. Uniform kernelization com-
+plexity of hitting forbidden minors. In Automata, languages, and programming. Part I, volume 9134
+of Lecture Notes in Comput. Sci., pages 629–641. Springer, Heidelberg, 2015.
+[17] E. Gioan and C. Paul. Split decomposition and graph-labelled trees: characterizations and fully
+dynamic algorithms for totally decomposable graphs. Discrete Appl. Math., 160(6):708–733, 2012.
+[18] A. Gupta. Improved results for directed multicut. In Proceedings of the Fourteenth Annual ACM-
+SIAM Symposium on Discrete Algorithms, SODA 2003, January 12-14, 2003, Baltimore, Maryland,
+USA., pages 454–455, 2003.
+
+A POLYNOMIAL KERNEL FOR DISTANCE-HEREDITARY VERTEX DELETION
+37
+[19] E. Howorka. A characterization of distance-hereditary graphs. Quart. J. Math. Oxford Ser. (2),
+28(112):417–420, 1977.
+[20] B. M. P. Jansen and M. Pilipczuk. Approximation and kernelization for chordal vertex deletion. In
+28th Annual ACM-SIAM Symposium on Discrete Algorithms, SODA 2017, January 16-19, 2017,
+Barcelona, Spain., 2017. To appear.
+[21] M. M. Kant´e, E. J. Kim, O. Kwon, and C. Paul. An fpt algorithm and a polynomial kernel for linear
+rankwidth-1 vertex deletion. Algorithmica, pages 1–30, 2016.
+[22] E. J. Kim, A. Langer, C. Paul, F. Reidl, P. Rossmanith, I. Sau, and S. Sikdar. Linear kernels and
+single-exponential algorithms via protrusion decompositions. ACM Trans. Algorithms, 12(2):Art. 21,
+41, 2016.
+[23] J. M. Lewis and M. Yannakakis. The node-deletion problem for hereditary properties is NP-complete.
+J. Comput. Syst. Sci., 20(2):219–230, 1980.
+[24] L. Lov´asz. Matroid matching and some applications. J. Comb. Theory, Ser. B, 28(2):208–236, 1980.
+[25] J. B. Orlin. A fast, simpler algorithm for the matroid parity problem. In Integer Programming and
+Combinatorial Optimization, 13th International Conference, IPCO 2008, Bertinoro, Italy, May 26-28,
+2008, Proceedings, pages 240–258, 2008.
+[26] S. Oum. Rank-width and vertex-minors. J. Combin. Theory Ser. B, 95(1):79–100, 2005.
+(Kim) CNRS-Universit´e Paris-Dauphine, Place du Marechal de Lattre de Tassigny, 75775
+Paris cedex 16, France
+(Kwon) Institute of Software Technology and Theoretical Computer Science, Technische
+Universit¨at Berlin, Germany.
+E-mail address: eunjungkim78@gmail.com
+E-mail address: ojoungkwon@gmail.com

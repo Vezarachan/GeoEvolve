@@ -1,0 +1,1127 @@
+Efﬁcient and Adaptive Kernelization for Nonlinear
+Max-margin Multi-view Learning
+Changying Du1,3 B, Jia He2,5, Changde Du4,5, Fuzhen Zhuang2, Qing He2,5, and
+Guoping Long3
+1 Huawei Noah’s Ark Lab, Beijing 100085, China
+2 Key Laboratory of Intelligent Information Processing, Institute of Computing Technology,
+Chinese Academy of Sciences, Beijing 100190, China
+3 Institute of Software, Chinese Academy of Sciences, Beijing 100190, China
+4 Research Center for Brain-Inspired Intelligence, Institute of Automation, CAS, Beijing, China
+5 University of Chinese Academy of Sciences, Beijing 100049, China
+ducyatict@gmail.com
+Abstract. Existing multi-view learning methods based on kernel function either
+require the user to select and tune a single predeﬁned kernel or have to compute
+and store many Gram matrices to perform multiple kernel learning. Apart from
+the huge consumption of manpower, computation and memory resources, most of
+these models seek point estimation of their parameters, and are prone to overﬁt-
+ting to small training data. This paper presents an adaptive kernel nonlinear max-
+margin multi-view learning model under the Bayesian framework. Speciﬁcally,
+we regularize the posterior of an efﬁcient multi-view latent variable model by
+explicitly mapping the latent representations extracted from multiple data views
+to a random Fourier feature space where max-margin classiﬁcation constraints
+are imposed. Assuming these random features are drawn from Dirichlet process
+Gaussian mixtures, we can adaptively learn shift-invariant kernels from data ac-
+cording to Bochners theorem. For inference, we employ the data augmentation
+idea for hinge loss, and design an efﬁcient gradient-based MCMC sampler in the
+augmented space. Having no need to compute the Gram matrix, our algorithm
+scales linearly with the size of training set. Extensive experiments on real-world
+datasets demonstrate that our method has superior performance.
+Keywords: Multi-view learning, Adaptive kernel, Maximum margin learning,
+Linear scalability, Dirichlet process Gaussian mixtures, Bayesian inference, Data
+augmentation, Hamiltonian Monte Carlo
+1
+Introduction
+Nowadays data typically can be collected from various information channels, e.g., a
+piece of news is consisted of text, audio, video clip and hyperlink. How to effectively
+and efﬁciently fuse the information from different channels for speciﬁc learning tasks
+is a problem (known as multi-view learning) attracting more and more attention. For
+supervised learning, e.g., news classiﬁcation, we have not only these multi-channel
+features but also the corresponding category labels. Making full use of the label in-
+formation usually is critical for the construction of predictive multi-view models since
+arXiv:1910.05250v1  [cs.LG]  11 Oct 2019
+
+2
+C. Du et al.
+it can help to learn more discriminative features for classiﬁcation. A popular choice is
+to exploit the maximum margin principle to guarantee the learned model to have a good
+generalization ability [31, 6, 13]. Though improved performance is reported on many
+problems, these methods have made linearity assumption on the data, which may be
+inappropriate for multi-view data revealing nonlinearities.
+Kernel method [15] is a principled way for introducing nonlinearity into linear mod-
+els, and a kernel machine can approximate any function or decision boundary arbitrar-
+ily well by tuning its kernel parameter. Along this line, many single kernel multi-view
+learning methods have been proposed [8, 28, 7, 27, 22, 31], which typically require the
+user to select and tune a predeﬁned kernel for every view. Choosing an appropriate
+kernel for real-world situations is usually not easy for users without enough domain
+knowledge. The performance of these models may be greatly affected by the choice of
+kernel. An alternative solution to resolve this problem is provided by multiple kernel
+learning (MKL), which can predeﬁne different kernels for each data view and then in-
+tegrate the kernels by algorithms such as semi-deﬁnite programming (SDP) [18], semi-
+inﬁnite linear programming (SILP) [26], and simple MKL [24]. However, MKL mod-
+els inherently have to compute and store many Gram matrices to get good performance
+while computing a Gram matrix for a data set with N instances and D features needs
+O(N 2D) operations and storing too many Gram matrices often leads to out of memory
+on commonly used computers. Besides, all the aforementioned kernelized models seek
+single point estimation of their parameters, thus are prone to overﬁtting to small train-
+ing data. Under the Bayesian framework, BEMKL [11] is a state-of-the-art variational
+method that estimates the entire posterior distribution of model weights. Unfortunately,
+BEMKL has to perform time-consuming matrix inversions to compute the posterior
+covariances of sample and kernel weights. Moreover, BEMKL’s performance may be
+limited by its mean-ﬁeld assumption on the approximate posterior and the absence of
+max-margin principle. To improve BEMKL, [5] proposed an efﬁcient MCMC algorithm
+in the augmented variable space, however, it was still limited by the memory efﬁciency
+issue. To improve both time and memory efﬁciencies, [4] proposed an online Bayesian
+MKL model, which still relied on predeﬁned kernels.
+To address the aforementioned problems, we propose an adaptive kernel maximum
+margin multi-view learning (M3L) model with low computational complexity. Speciﬁ-
+cally, we ﬁrstly propose an efﬁcient multi-view latent variable model (LVM) based on
+the traditional Bayesian Canonical Correlation Analysis (BCCA) [30], which learns the
+shared latent representations for all views. To adaptively learn the kernel, we introduce
+the random Fourier features which constructs an approximate primal space to estimate
+kernel evaluations K(x, x′) as the dot product of ﬁnite vectors ϕ(x)T ϕ(x′) [23]. As-
+suming these random features are drawn from Dirichlet process (DP) Gaussian mix-
+tures, we can adaptively learn shift-invariant kernels from data according to Bochners
+theorem. With such a stochastic random frequency distribution, it is more general than
+the traditional kernel method approach with a ﬁxed kernel. Secondly, to make full use
+of the label information, we impose max-margin classiﬁcation constraints on the ex-
+plicit expressions ϕ(x) in random Fourier feature space. Next, we regularize the pos-
+terior of the efﬁcient multi-view LVM by explicitly mapping the latent representations
+to a random Fourier feature space where max-margin classiﬁcation constraints are im-
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+3
+posed. Our model is based on the data augmentation idea for max-margin learning in the
+Bayesian framework, which allows us automatically infer parameters of adaptive ker-
+nel and the penalty parameter of max-margin learning model. For inference, we devise
+a hybrid Markov chain Monte Carlo (MCMC) sampler. To infer random frequencies,
+we use an effective distributed DP mixture models (DPMM) [9]. Moreover, some key
+parameters don’t have corresponding conjugate priors. So we adopt the gradient-based
+MCMC sampler Hamiltonian Monte Carlo (HMC) [19] for faster convergence. The
+computational complexity of our algorithm is linear w.r.t. the number of instances N.
+Extensive experiments on real-world datasets demonstrate our method has a superior
+performance, compared with a number of competitors.
+2
+Model
+BCCA [30] assumes the following generative process to learn the shared latent repre-
+sentations from multiple views {xi}Nv
+i=1, where Nv is the number of views:
+h ∼N(0, I)
+xi ∼N(Wih, Ψi),
+where N(·) denotes the normal distribution, h ∈Rm is the shared latent variable,
+Wi ∈RDi×m is the linear transformation and Ψi ∈RDi×Di denotes covariance
+matrix. A commonly used prior is the Wishart distribution for Ψ−1
+i .
+2.1
+An Efﬁcient Multi-view LVM
+However, BCCA has to perform time-consuming inversions of the high-dimension co-
+variance matrix Ψi which could result in a severe computational problem. To solve the
+problem, we propose an efﬁcient model by introducing additional latent variables. We
+assume the following generative process:
+h, ui ∼N(0, I)
+xi ∼N(Wih + Viui, τ −1
+i
+I),
+where ui ∈RKi is the additional latent variable. Gamma prior can be used for τi and
+popular automatic relevance determination (ARD) prior can be imposed on projection
+matrices Wi, Vi ∈RDi×Ki, i.e.,
+ri ∼Qm
+j=1 Γ(rij|ar, br)
+Wi ∼Qm
+j=1 N(wi,·j|0, r−1
+ij I)
+Vi ∼QKi
+j=1 N(vi,·j|0, η−1I)
+τi ∼Γ(τi|aτ, bτ),
+where i = 1, · · · , Nv, Γ(·) denotes Gamma distribution, wi,·j represents the j-th
+column of the transformation matrix Wi and vi,·j represents the j-th column of Vi.
+This model can be shown to be equivalent to imposing a low-rank assumption Ψi =
+
+4
+C. Du et al.
+ViVT
+i + τ −1
+i
+I for the covariances, which allows decreasing the computational com-
+plexity.
+We deﬁne that the data matrix of the i-th view is Xi ∈RDi×N consisting of N
+observations {xn
+i }N
+n=1, eX = {Xi}Nv
+i=1 , H = {hn}N
+n=1 and Ui = {un
+i }N
+n=1. For
+simplicity, let Ω= (ri, Vi, Wi, η, τi, H, Ui) be the parameters of the multi-view LVM
+and p0(Ω) be the prior of Ω. We can verify that the Bayesian posterior distribution
+p(Ω| eX) = p0(Ω)p( eX|Ω)/p( eX) can be equivalently obtained by solving the following
+optimization problem:
+min
+q(Ω)∈P KL(q(Ω)∥p0(Ω)) −Eq(Ω)[logp( eX|Ω)],
+where KL(q∥p) is the Kullback-Leibler divergence, and P is the space of probability
+distributions. When the observations are given, p( eX) is a constant.
+2.2
+Adaptive Kernel M3L
+From the description above, we can see that the multi-view LVM is an unsupervised
+model which learns the shared latent variables from the observations without using any
+label information. In general, we prefer that the shared latent representation can not
+only explain the observed data well but also help to learn a predictive model, which
+predicts the responses of new observations as accurate as possible.
+Moreover, this multi-view LVM is a linear multi-view representation learning algo-
+rithm, but multi-view data usually reveal nonlinearities in many scenarios of real-world.
+As is well known, kernel methods are attractive because they can approximate any func-
+tion or decision boundary arbitrarily well. So in this section we propose an adaptive
+kernel max-margin multi-view learning (M3L) model. With the method named random
+features for the approximation of kernels [23], we can get explicit expression of the la-
+tent variable h in random feature space. Then we can classify these explicit expression
+linearly by introducing the max-margin principle which has good generalization per-
+formance. To incorporate the nonlinear max-margin method to the unsupervised multi-
+view LVM, we adopt the posterior regularization strategy [16, 34]. Suppose we have
+a 1 × N label vector y with its element yn ∈{+1, −1}, n = 1, · · · , N. Then we
+deﬁne the following pseudo-likelihood function of latent representation hn for the n-th
+observation {xn
+i }Nv
+i=1:
+ℓ(yn| ˜ϕ(hn), β) = exp{−2C · max(0, 1 −ynβT ˜ϕ(hn))},
+ϕ(hn) =
+1
+√
+M
+[cos(ωT
+1 hn), · · · , cos(ωT
+Mhn), sin(ωT
+1 hn), · · · , sin(ωT
+Mhn)]T,
+where C is the regularization parameter, ˜ϕ(hn) is the explicit expression of the latent
+variable hn in random Fourier feature space and ˜ϕ(hn) = (ϕ(hn)T, 1)T. ωi ∈Rm
+denotes random frequency vector and βT ˜ϕ(hn) is a discrimination function parameter-
+ized by β ∈R2M+1.
+Bochners theorem states that a continuous shift-invariant kernel K(h, ¯h) = k(h −
+¯h) is a positive deﬁnite function if and only if k(t) is the Fourier transform of a non-
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+5
+negative measure ρ(ω) [25]. Further, we note that if k(0) = 1, ρ(ω) will be a normal-
+ized density. So we can get
+k(h −¯h) =
+Z
+Rm ρ(ω) exp(iωT(h −¯h))dω = Eω∼ρ[exp(iωTh) exp(iωT¯h)∗]
+≈1
+M
+M
+X
+j=1
+exp(iωT
+j h) exp(iωT
+j ¯h)∗.
+If the kernel k is real-valued, we can discard the imaginary part:
+k(h −¯h) ≈ϕ(h)Tϕ(¯h)
+ϕ(h) ≡
+1
+√
+M
+[cos(ωT
+1 h), · · · , cos(ωT
+Mh), sin(ωT
+1 h), · · · , sin(ωT
+Mh)]T.
+A robust and ﬂexible choice of ρ(ω) is a Gaussian mixture model. Mixture models
+based on DPs treat the number of represented mixture components as a latent variable,
+and infer it automatically from observed data. DP Gaussian mixture prior is widely
+used for density estimation [20]. Assuming these random features are drawn from DP
+Gaussian mixtures, we can adaptively learn shift-invariant kernels from data according
+to Bochners theorem. We impose DP Gaussian mixture prior for the variables ωj, j =
+1, · · · , M. Suppose the DP has base distribution G0 and concentration parameter α,
+then we have
+ζk ∼G0, νk ∼Beta(1, α), ϖk = νk
+k−1
+Y
+i=1
+(1 −νi)
+zj ∼Cat(ϖ),
+ωj ∼N(ζzj),
+where k = 1, · · · , ∞, and ζk = (µk, Σk) contains the mean and covariance parame-
+ters of the k-th Gaussian component. Popular choice would be Normal-Inverse-Wishart
+prior G0 for the mixture components:
+Σk ∼W−1(Ψ0, ν0),
+µk ∼N(µ0, 1
+κ0
+Σk),
+where W−1(·) denotes Inverse-Wishart distribution. Next, we impose prior on β as the
+following form
+p(β|v) ∼N(β|0, v−1I(2M+1)),
+where av and bv are hyper-parameters and v plays a similar role as the penalty parameter
+in SVM.
+For simplicity, let Θ = (β, v, νk, ϖk, ζk, zi, ωi, µk, Σk) be the variables of the
+nonlinear max-margin prediction model. Now, we can formulate our ﬁnal modal as
+min
+q(Ω,Θ)∈P KL(q(Ω, Θ)∥p0(Ω, Θ)) −Eq(Ω)[logp( eX|Ω)] −Eq(Ω,Θ)[log(ℓ(y|H, Θ)],
+
+6
+C. Du et al.
+where p0(Ω, Θ) is the prior, p0(Ω, Θ) = p0(Ω)p0(Θ) and p0(Θ) is the prior of Θ. By
+solving the optimization above, we get the desired post-data posterior distribution [10]
+q(Ω, Θ) = p0(Ω, Θ)p( eX|Ω)ℓ(y|H, Θ)
+Ξ( eX, y)
+,
+where Ξ( eX, y) is the normalization constant.
+3
+Post-Data Posterior Sampling with HMC
+As we can see, the post-data posterior above is intractable to compute. Firstly, the
+pseudo-likelihood function ℓ(·) involves a max operater which mixes the posterior infer-
+ence difﬁcult and inefﬁcient. We introduce the data augmentation idea [21] to solve this
+problem. Secondly, the form of ˜ϕ(hn) mixes local conjugacy. So we adopt the gradient-
+based MCMC sampler for faster convergence. Thirdly, we introduce the ditributed
+DPMM to improve the efﬁciency. In the following, we devise a hybrid MCMC sam-
+pling algorithm that generates a sample from the post-data posterior distribution of each
+variable in turn, conditional on the current values of the other variables. It can be shown
+that the sequence of samples constitutes a Markov chain and the stationary distribution
+of that Markov chain is just the joint posterior.
+3.1
+Updating variables β, λn, ωj and hn
+In this part, we develop a MCMC sampler for β, λn, ωj and hn by introducing aug-
+mented variables.
+Data augmentation: The pseudo-likelihood function ℓ(·) involves a max operater
+which mixes the posterior inference difﬁcult and inefﬁcient. So we re-express the pseudo-
+likelihood function into the integration of a function with augmented variable based on
+the data augmentation idea:
+ℓ(yn| ˜ϕ(hn), β)=
+Z ∞
+0
+exp{ −[λn+C(1−ynβT ˜ϕ(hn))]2
+2λn
+}
+√
+2πλn
+dλn.
+Then we can get the non-normalized joint distribution of y and λ conditional on H and
+Θ:
+ℓ(y, λ|H, Θ)=
+N
+Y
+n=1
+exp{ −1
+2λn [λn + C(1 −ynβT ˜ϕ(hn))]2}
+√
+2πλn
+.
+Sampling β : The conditional distribution of β is
+q(β|v, H, ω, y, λ) ∼p(β|v)
+N
+Y
+n=1
+ℓ(yn, λn| ˜ϕ(hn), β)
+∝exp(−v||β||2
+2
+−
+N
+X
+n=1
+[λn + Λ]2
+2λn
+),
+(1)
+where Λ = C(1 −ynβT ˜ϕ(hn)). This conditional distribution is a Gaussian distribu-
+tion with covariance Σβ = {vI2M+1 + PN
+n=1
+C2 ˜ϕ(hn) ˜ϕ(hn)T
+λn
+}−1 and mean µβ =
+Σβ
+PN
+n=1( Cλn+C2
+λn
+)yn ˜ϕ(hn)).
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+7
+Sampling λn : The conditional distribution over the augmented variable λn is a gen-
+eralized inverse Gaussian distribution:
+q(λn|hn, ω, yn, β) ∝exp(−1
+2λn {λn + C[1 −ynβT ˜ϕ(hn)]}2)
+∼GIG(λn|1
+2, 1, C2[1 −ynβT ˜ϕ(hn)]2).
+(2)
+Sampling ωj, hn: Unfortunately, we ﬁnd the conditional distribution over ωj
+q(ωj|H, λ, β, y) ∼p(ωj|µzj, Σzj)
+N
+Y
+n=1
+ℓ(yn, λn| ˜ϕ(hn), β)
+∝exp{−
+(ωj −µzj)T Σ−1
+zj (ωj −µzj)
+2
+−
+N
+X
+n=1
+[λn + Λ]2
+2λn
+},
+(3)
+where ˜ϕ(hn) = (ϕ(hn)T, 1)T = {
+1
+√
+M [cos(ωT
+1 hn), · · · , cos(ωT
+Mhn), sin(ωT
+1 hn), · · · ,
+sin(ωT
+Mhn)], 1}T is too complex and the prior is non-conjugated. So it is hard to get the
+analytical form of the above distribution. To generate a sample from q(ωj|H, λ, β, y)
+with its non-normalized density, we appeal to the HMC method [19]. Sampling from a
+distribution with HMC requires translating the density function for this distribution to a
+potential energy function and introducing ’momentum’ variables to go with the original
+variables of interest (’position’ variables). We need to constitute a Markov chain. Each
+iteration has two steps. In the ﬁrst step, we sample the momentum which needs the gra-
+dient of the potential energy function. In the second step, we do a Metropolis update
+with a proposal found by using Hamiltonian dynamics.
+Similar to ωj, we also ﬁnd the conditional posterior distribution over hn
+q(hn|ω, λ, β, y, X) ∼p(hn|0, I)
+Nv
+Y
+i=1
+p(xn
+i |Wi, hn, un
+i , τi)ℓ(yn| ˜ϕ(hn), β)
+∝exp{−||hn||2
+2
+−
+Nv
+X
+i=1
+τi||xn
+i −Wihn −Viun
+i ||2
+2
+−[λn + Λ]2
+2λn
+},
+(4)
+doesn’t have the analytical form. So we can sample hn with the HMC sampler.
+3.2
+Updating the variables in distributed DPMM
+Unlike a Gibbs sampler using the marginal representation of the DP mixtures, slice
+sampling methods [29, 17, 9] employ the random measure G directly. It consists of the
+imputation of G and subsequent Gibbs sampling of the component assignments from
+their posteriors. To be able to represent the inﬁnite number of components in G0, we
+have to introduce some auxiliary (slice) variables tj, j = 1, · · · , M. Through introduc-
+ing an auxiliary variable tj, the joint density of ωj and the latent variable tj becomes
+
+8
+C. Du et al.
+p(ωj, tj|ϖ, ζ) =
+∞
+X
+k=1
+ϖkUnif(tj|0, ϖk)p(ωj|ζk) =
+∞
+X
+k=1
+1(tj ≤ϖk)p(ωj|ζk),
+where 1(·) is the indicator function. We can easily verify that when tj is integrated over,
+the joint density is equivalent to p(ωj|ϖ, ζ). Thus the interesting fact is that given the
+latent variable tj, the number of mixtures needed to be represented is ﬁnite.
+Through introducing the slice variable, the conditional posterior distribution of ωj
+becomes independent so it is possible to derive a parallel sampler for the DP mixture
+model under the Map-Reduce framework. The latent variable tj does not change the
+marginal distribution of other variables, thus the sampler target the correct posterior
+distribution. Another important feature of the slice sampler is that it enables direct in-
+ference of random measure G.
+Step 1: Sample slice variables and ﬁnd the minimum
+tj ∼Unif(0, ϖzj),
+∀j = 1, ..., M;
+t∗= min
+j
+tj.
+(5)
+Step 2: Create new components through stick breaking until ϖ∗< t∗with ϖ∗being
+the remaining stick length and K∗the number of instantiated components
+K∗←K∗+ 1,
+νK∗∼Beta(1, α),
+ϖK∗= ϖ∗νK∗,
+ζK∗∼G0,
+ϖ∗←ϖ∗(1 −νK∗).
+(6)
+Step 3: Sample the component assignment zj
+p(zj = k|ωj, tj, ϖ, ζ) ∝
+
+p(ωj|ζk)
+if ϖk ≥tj
+0
+otherwise.
+(7)
+Step 4: For each active component k, sample component parameters ζk
+ζk|z, G0 ∼G0(ζk)
+Y
+j:zj=k
+p(ωj|ζk).
+(8)
+Step 5: For each component k, sample component weights:
+ϖ|z, α ∼Dir(s1, s2, ..., sK, α).
+(9)
+where sk is the number of variables ωj assigned to component k, and K is the number
+of active components. Our parallel sampler in distributed DPMM is similar as that in
+[9], thus is omitted here.
+3.3
+Updating the other variables
+In this part, the other variables all have the conjugate prior. So we get the analytic
+conditional posterior distributions of them.
+Sampling un
+i : The conditional posterior of un
+i is
+q(un
+i |τi, hn, xn
+i , Wi) ∼p(un
+i |0, I)p(xn
+i |Wi, hn, un
+i , Vi, τi)
+∝exp{−1
+2(||un
+i ||2 −τi||xn
+i −Wihn −Viun
+i ||2)},
+(10)
+a Gaussian distribution with covariance Σun
+i = (I + τiVi
+TVi)−1 and mean µun
+i =
+Σun
+i [Vi
+T(xn
+i −Wihn)τi].
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+9
+Sampling Wi: The conditional posterior distribution of Wi is proportional to the prior
+times the likelihood:
+q(wi,·j|ri,j, τi, H, Ui, Xi, Vi) ∼p(wi,·j|0, r−1
+i,j I)p(Xi|Wi, H, Ui, Vi, τi)
+∝exp{−1
+2(rij||wi,·j||2 +
+N
+X
+n=1
+τi||xn
+i −Wihn −Viun
+i ||2)},
+(11)
+where j = 1, · · · , m. This is a Gaussian distribution with covariance Σwi,·j = (rij +
+τi||hj·||2)−1I and mean µwi,·j = Σwi,·j{
+N
+P
+n=1
+[xn
+i −
+m
+P
+k̸=j
+wi,·khkn −Viui,jn]τihjn}.
+Sampling Vi : Similar to Wi, conditional posterior of Vi is a Gaussian distribution
+q(vi,·j|η, τi, H, Ui, Xi, Wi) ∼p(vi,·j|0, η−1I)p(Xi|Wi, H, Ui, Vi, τi)
+∝exp{−1
+2(η||vi,·j||2 +
+N
+X
+n=1
+τi||xn
+i −Wihn −Viun
+i ||2)},
+(12)
+with covariance Σvi,·j = (η + τi||ui,·j||2)−1I and mean µvi,·j = Σvi,·j{PN
+n=1[xn
+i −
+m
+P
+k̸=j
+vi,·kui,kn −Viui,jn]τihjn}.
+Sampling ri: For each rij, j = 1, · · · , m, its conditional distribution is
+q(rij) ∼p(rij|ar, br)p(wi,·j|0, r−1
+ij I)
+∝r
+ar−1+ Di
+2
+ij
+exp{−rij(br +
+Di
+X
+d=1
+1
+2||wi,·j||2)},
+(13)
+a Gamma distribution with the shape and rate parameter arij = ar + Di
+2 , brij =
+br +
+Di
+P
+d=1
+1
+2||wi,·j||2.
+Sampling τi : Similar to sampling ri, the conditional distribution of τi is a Gamma
+distribution
+q(τi) ∼p(τi|aτ, bτ)p(Xi|Wi, H, Ui, Vi, τi)
+∝τi
+aτ −1+ NDi
+2
+exp{−τ(bτ +
+N
+X
+n=1
+1
+2||xn
+i −Wihn −Viun
+i ||2)},
+(14)
+with the shape and rate parameter aτi = aτ+ NDi
+2 , bτi = bτ+
+N
+P
+n=1
+1
+2||xn
+i −Wihn −Viun
+i ||2.
+We summarize the above post-data posterior sampling process in Alg. 1.
+
+10
+C. Du et al.
+Algorithm 1 Post-Data Posterior Sampling for M3LAK
+Input:
+the multi-view data {Xi}Nv
+i=1, the label vector y, the subspace dimension m, the number of
+random features M, the hyper-parameters η, α, ar, br, aτ, bτ, v, and the maximal number
+of iterations maxIter.
+Output:
+{τi, Wi, Vi}Nv
+i=1, {ωj}M
+j=1, β
+Method:
+1: Initialize all variables β, λ, {ωj, zj}M
+j=1, ζ, ϖ, ν, U, W, V, {ri, τi}m
+i=1;
+2: for iter = 1 to maxIter do
+3:
+Update β according to Eq.(1);
+4:
+Update λ according to Eq.(2);
+5:
+Update {ωj}M
+j=1, H using the HMC sampler in [19];
+6:
+Update ( {zj}M
+j=1, ζ, ϖ, ν ) through introducing some auxiliary variables {tj}M
+j=1
+according to Eq.(5)-Eq.(9), which can be paralleled in Map-Reduce framework similar as
+that in [9];
+7:
+Update U according to Eq.(10);
+8:
+Update W according to Eq.(11);
+9:
+Update V according to Eq.(12);
+10:
+Update {ri}m
+i=1 according to Eq.(13);
+11:
+Update {τi}m
+i=1 according to Eq.(14);
+12: end for
+13: return {τi, Wi, Vi}Nv
+i=1, {ωj}M
+j=1, β .
+Computational Complexity: In our post-data posterior sampling, the dominant com-
+putation is spent on sampling latent shared variables H. In each round of parameter
+sampling, our algorithm consumes O(NL
+Nv
+P
+i=1
+Di(m + Ki)) operations where L is the
+number of steps for the leapfrog method in HMC. So the computational complexity of
+our algorithm M3LAK is linear w.r.t. the number of instances N. The source code of
+this work is available on 1.
+4
+Experiments
+In this section, we evaluate our proposed model (M3LAK) on various classiﬁcation
+tasks. The code for M3LAK was written purely in Matlab and all experiments were
+performed on a desktop with 2.10 GHz CPU and 128 GB memory.
+4.1
+Data Description
+The Flickr dataset contains 3,411 images of 13 animals [2]. For each image, two types
+of features are extracted, including 634-dim real-valued features and 500-dim bag of
+word SIFT features. The NUS-WIDE dataset is a subset selected from [3]. NUS-WIDE
+dataset contains 21935 web images that belongs to three categories (‘water’, ‘vehicle’,
+‘ﬂowers’). Each image includes six types of low-level features (64-D color histogram,
+1 https://github.com/hezi73/M3LAK
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+11
+144-D color correlogram, 73-D edge direction histogram, 128-D wavelet texture, 225-D
+block-wise color moments). Trecvid contains 1,078 manually labeled video shots that
+belongs to ﬁve categories [2]. And each shot is represented by a 1,894-dim binary vector
+of text features and a 165-dim vector of HSV color histogram. The web-page data set
+has two views, including the content features of the web pages and the link features
+exploited from the link structures. This data set consists of web pages from computer
+science department in three universities, i.e., Cornell, Washington, Wisconsin.
+We transform these multi-class data sets into binary ones by following the way in
+[35]. For example, the web-page classiﬁcation with ﬁve categories (‘course’, ‘faculty’,
+‘student’, ‘project’, ‘staff’), we select category ‘student’ as a group and the other four
+categories as another group, since the number of examples in category ‘student’ is sim-
+ilar with the one belonging to the other four categories. The other data sets are similarly
+constructed. The details of these data sets are shown in Table 1.
+Table 1. Detail description of datasets.
+Datasets
+Trecvid
+Flickr
+Cornell
+Washington
+Wisconsin
+NUS-WIDE
+#Size
+1078
+3411
+195
+217
+262
+21935
+#D1
+1894
+634
+1703
+1703
+1703
+64
+#D2
+165
+500
+195
+217
+262
+144
+#D3
+-
+-
+-
+-
+-
+73
+#D4
+-
+-
+-
+-
+-
+128
+#D5
+-
+-
+-
+-
+-
+225
+4.2
+Baselines
+We compare our model with ﬁve competitors:
+– BM2SMVL [13]: a linear Bayesian max-margin subspace multi-view learning method.
+– MVMED [27]: a multi-view maximum entropy discrimination model.
+– VMRML [22]: a vector-valued manifold regularization multi-view learning method.
+– MMH [2]: a predictive latent subspace Markov network multi-view learning model.
+– BEMKL [11]: a state-of-the-art Bayesian multiple kernel learning method which
+we use for multi-view learning. For each view, we construct Gaussian kernels with
+21 different widths {2−10, 2−9, · · · , 210} on all features by using its public imple-
+mentation 2.
+4.3
+Experimental Setting
+In M3LAK, we perform 5-fold cross-validation on training set to decide the regulariza-
+tion parameter C from the integer set {1, · · · , 10} for each data set. The rest parameters
+are ﬁxed as follows for all data sets, i.e., m = 20, M = 100, η = 1e+3, α = 1, ar = 1e-
+1, aτ = v = 1e-2, bτ = br = 1e-5. For fair comparison, the subspace dimension m in
+2 http://users.ics.aalto.ﬁ/gonen/bemkl/
+
+12
+C. Du et al.
+BM2SMVL and MMH is also ﬁxed to 20 for all data sets. For BM2SMVL, the regular-
+ization parameter ‘C’ is chosen from the integer set {1, 2, 3} by 5-fold cross-validation
+on training set according to its original paper. For MVMED, we choose ‘c’ from 2[−5:5]
+for each data set as suggested in its original paper. For VMRML, the parameters are set
+as the default values in its paper. For RBF kernel’s parameter of MVMED and VMRML,
+we carefully tune them on each data set separately. For MMH, we tune its parameters
+as suggested in its original papers.
+On each data set except NUS-WIDE, we conduct 10-fold cross validation for all
+the algorithms, where nine folds of the data are used for training while the rest for
+testing. And we run 1000 MCMC iterations of M3LAK and use the samples collected
+in the last 200 iterations for prediction. The averaged accuracies over these 10 runs are
+reported in Table 2. We use the same training/testing split of the NUS-WIDE data set
+as in [3]. To compare the time efﬁciency, we conduct experiments on NUS-WIDE with
+different numbers of the training data (1000, 2000, 3000, 5000, 10000) and keep the
+testing data the same. The training data are selected randomly from the training split of
+NUS-WIDE. Because the data size of NUS-WIDE is big, we run 200 MCMC iterations
+of M3LAK and use the samples collected in the last 100 iterations for prediction. The
+result is reported in Table 3 in terms of testing accuracy and training time. Since MMH
+can only deal with two-view data in its code3, its result is missing for NUS-WIDE in
+Table 3.
+Table 2. Comparison of test accuracies (mean ± std) on all datasets. Bold face indicates highest
+accuracy.
+MMH
+MVMED
+VMRML
+BM2SMVL
+BEMKL
+M3LAK
+Trecvid-a
+.939 ± .066 .913 ± .030 .921 ± .028 .901 ± .019 .944 ± .033 .954 ± .033
+Trecvid-b
+.944 ± .034 .920 ± .068 .932 ± .063 .912 ± .059 .932 ± .060 .940 ± .054
+Flickr-a
+.820 ± .085 .854 ± .088 .800 ± .068 .827 ± .070 .857 ± .087 .855 ± .056
+Flickr-b
+.823 ± .055 .858 ± .065 .834 ± .044 .856 ± .048 .871 ± .046 .871 ± .034
+Cornell
+.862 ± .063 .861 ± .080 .882 ± .069 .882 ± .072 .861 ± .060 .903 ± .065
+Washington .909 ± .042 .852 ± .077 .874 ± .069 .896 ± .055 .874 ± .052 .913 ± .058
+Wisconsin
+.906 ± .043 .872 ± .047 .883 ± .073 .921 ± .072 .902 ± .072 .936 ± .050
+Average
+.886
+.876
+.875
+.885
+.892
+.910
+4.4
+Experimental Results
+We have the following insightful observations:
+- M3LAK consistently outperforms BM2SMVL. The reason may be that BM2SMVL
+is a linear multi-view method with limited modeling capabilities.
+3 http://bigml.cs.tsinghua.edu.cn/ ningchen/MMH.htm
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+13
+Table 3. Comparison of various multi-view methods on binary classiﬁcation tasks. Each element
+in the table shows the testing accuracies/training times on the NUS-WIDE dataset. ‘N/A’ means
+that no result returns after 24 hours. ‘-’ means out of memory. All experiments were conducted
+in Matlab.
+Algorithm
+Metric
+Ntrain=1000Ntrain=2000Ntrain=3000Ntrain=5000Ntrain=10000
+Ntest=8033 Ntest=8033 Ntest=8033 Ntest=8033
+Ntest=8033
+BM2SMVL Test-Acc (%)
+72.02
+77.12
+77.54
+77.29
+77.67
+Train-Time (s)
+234
+277
+340
+490
+776
+VMRML
+Test-Acc (%)
+74.58
+76.09
+76.29
+76.43
+76.68
+Train-Time (s)
+4
+18
+50
+210
+1335
+MVMED
+Test-Acc (%)
+67.09
+76.66
+N/A
+N/A
+N/A
+Train-Time (s)
+1363
+9721
+N/A
+N/A
+N/A
+BEMKL
+Test-Acc (%)
+-
+-
+-
+-
+-
+Train-Time (s)
+-
+-
+-
+-
+-
+M3LAK
+Test-Acc (%)
+75.46
+77.22
+77.47
+78.08
+78.68
+Train-Time (s)
+402
+844
+1283
+2211
+5541
+- On most data sets, M3LAK performs better than MMH. This may be because that
+unlike MMH which are under the maximum entropy discrimination framework,
+and can not infer the penalty parameter of max-margin models in a Bayesian style,
+our method is based on the data augmentation idea for max-margin learning, which
+allows us to automatically infer the weight parameters and the penalty parameter.
+- M3LAK has better performance than the single kernel multi-view learning meth-
+ods VMRML and MVMED on all considered data sets. The reason may be that
+M3LAK infers a posterior under the Bayesian framework instead of a point es-
+timate as in VMRML. With Baysian model averaging over the posterior, we can
+make more robust predictions than VMRML. And MVMED is also under the max-
+imum entropy discrimination framework, and can not infer the penalty parameter
+of max-margin models in a Bayesian style.
+- M3LAK performs better than BEMKL on most data sets. BEMKL’s performance
+may be limited by its mean-ﬁeld assumption on the approximate posterior and
+the absence of max-margin principle while M3LAK introduces the popular max-
+margin principle which has a great generalization ability. Although BEMKL per-
+forms better than M3LAK on some data sets, BEMKL scales cubically with the
+number of kernels and scales cubically with the number of training samples. Be-
+sides, BEMKL needs to store many Gram matrix to get good performances. How-
+ever, storing too many Gram matrix leads to out of memory on commonly used
+computers. For example, it needs to calculate 21 × 5 = 105 Gram matrixes on
+NUS-WIDE not only for the training data but also for the large amount of testing
+data. So BEMKL leads to out of memory on NUS-WIDE dataset.
+- As shown in Table 3, M3LAK scales linearly with the number of training data
+N which coincides with the computational complexity of M3LAK discussed in
+Section Computational Complexity. The linear multi-view method BM2SMVL also
+scales linearly with N, but it performs worse than M3LAK on all considered data.
+Although the training time efﬁciency of VMRML is better than that of M3LAK in
+
+14
+C. Du et al.
+Table 3, it seems that VMRML scales squarely with the number of training data and
+VMRML needs to store 5 Gram matrixes for both training and testing data on NUS-
+WIDE data set. Further more, we conduct a experiment with 20000 training data,
+VMRML is out of memory while M3LAK still works. Besides, M3LAK performs
+better than VMRML on all considered data.
+4.5
+Parameter Study and Convergence
+We study the performance change of the three subspace learning methods (BM2SMVL,
+MMH and M3LAK). Performances change when the subspace dimension m varies on
+two datasets (Cornell and Wisconsin). The averaged results are shown in Figure 1. As
+we can see, different methods prefer different values of m. On some data sets, when
+m becomes too large, the performances of these three methods become poor. When m
+ranges from 5 to 30, M3LAK performs better than other subspace learning methods in
+general.
+Also, we set m as 20 and study the inﬂuence of regularization parameter C. From
+the results in Figure 2 (a) , we can ﬁnd that different data sets may prefer different
+values of C. C balances the nonlinear classiﬁer with adaptive kernel and the multi-view
+latent variable model, so M3LAK cannot get the best performance when C is too large
+or small.
+Figure 2 (b) shows the convergency of M3LAK on two data sets. We ﬁnd that
+M3LAK has a fast convergence rate, which we contribute to the efﬁcient gradient-based
+HMC sampler [19].
+5
+10
+15
+20
+25
+30
+Subspace dimension m
+0.77
+0.79
+0.81
+0.83
+0.85
+0.87
+0.89
+0.91
+Test accuracy
+BM2SMVL
+MMH
+M3LAK
+(a) Cornell
+5
+10
+15
+20
+25
+30
+Subspace dimension m
+0.85
+0.87
+0.89
+0.91
+0.93
+0.95
+Test accuracy
+BM2SMVL
+MMH
+M3LAK
+(b) Wisconsin
+Fig. 1. Effect of subspace dimension m.
+5
+Related Work
+The earliest works of multi-view learning are introduced by Blum and Mitchell [1] and
+Yarowsky [32]. Nowadays, a large number of studies are devoted to multi-view learn-
+ing, e.g., multiple kernel learning [12], disagreement-based multi-view learning [1] and
+late fusion methods which combine outputs of the models constructed from different
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+15
+1
+2
+3
+4
+5
+6
+7
+8
+9 10
+Regularization parameter C
+0.85
+0.875
+0.9
+0.925
+0.95
+Test accuracy
+Washington
+Trecvid-b
+(a) Effect of C
+50
+100
+150
+200
+250
+300
+Iteration
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+Test accuracy
+Cornell
+Trecvid-b
+(b) Convergency
+Fig. 2. (a) Effect of regularization parameter C in M3LAK; (b) Convergency of M3LAK.
+view features [33]. Though some linear multi-view learning methods [31, 13] are re-
+ported to have a good performance on many problems, these methods have made lin-
+earity assumption on the data, which may be inappropriate for multi-view data revealing
+nonlinearities.
+As is well known, Kernel method is a principled way for introducing nonlinearity
+into linear models. So many single kernel nonlinear multi-view learning methods have
+been proposed [8, 28, 7, 27, 22], which typically require the user to select and tune a
+predeﬁned kernel for each view. Choosing an appropriate kernel for real-world situa-
+tions is usually not easy for users without enough domain knowledge. The performance
+of these models may be greatly affected by the choice of kernel. An alternative solu-
+tion to resolve this problem is provided by multiple kernel learning (MKL), which can
+predeﬁne different kernels for each data view and then integrate the kernels by algo-
+rithms such as SDP [18], SILP [26], simple MKL [24] and BEMKL [11]. However,
+MKL models inherently have to compute and store many Gram matrices to get good
+performance while computing a Gram matrix needs O(N 2D) operations and storing
+too many Gram matrices often leads to out of memory on commonly used computers.
+Besides, a nonlinear support vector machines is proposed by using a Gaussian pro-
+cess prior [14]. But the time complexity for computing the inverse of a covariance
+matrix is O(N 3).
+6
+Conclusion
+In this paper, we present an adaptive kernel nonlinear max-margin multi-view learn-
+ing framework. It regularizes the posterior of an efﬁcient multi-view LVM by explic-
+itly mapping the latent representations extracted from multiple data views to a random
+fourier feature space where max-margin classiﬁcation constraints are imposed. Having
+no need to compute the Gram matrix, the computational complexity of our algorithm is
+linear w.r.t. N. Extensive experiments on real-world datasets demonstrate our method
+has a superior performance, compared with a number of competitors.
+
+16
+C. Du et al.
+7
+Acknowledgments
+This work was supported by the National Natural Science Foundation of China (No.
+61602449, 61473273, 91546122, 61573335, 61602438, 61473274), National High-tech
+R&D Program of China (863 Program) (No.2014AA015105), Guangdong provincial
+science and technology plan projects (No. 2015 B010109005), the Youth Innovation
+Promotion Association CAS 2017146.
+References
+1. Avrim Blum and Tom Mitchell. Combining labeled and unlabeled data with co-training. In
+COLT, pages 92–100, 1998.
+2. Ning Chen, Jun Zhu, Fuchun Sun, and Eric Poe Xing. Large-margin predictive latent sub-
+space learning for multiview data analysis. PAMI, 34(12):2365–2378, 2012.
+3. Tat-Seng Chua, Jinhui Tang, Richang Hong, Haojie Li, Zhiping Luo, and Yan-Tao. Zheng.
+Nus-wide: A real-world web image database from national university of singapore. In CIVR,
+Santorini, Greece., July 8-10, 2009.
+4. Changying Du, Changde Du, Guoping Long, Qing He, and Yucheng Li. Online bayesian
+multiple kernel bipartite ranking. In Conference on Uncertainty in Artiﬁcial Intelligence,
+2016.
+5. Changying Du, Changde Du, Guoping Long, Jin Xin, and Yucheng Li. Efﬁcient bayesian
+maximum margin multiple kernel learning. In ECML-PKDD, 2016.
+6. Changying Du, Shandian Zhe, Fuzhen Zhuang, Qi Yuan, and Zhongzhi Shi. Bayesian max-
+imum margin principal component analysis. In Twenty-ninth AAAI Conference on Artiﬁcial
+Intelligence, 2015.
+7. Zheng Fang and Zhongfei Zhang. Simultaneously combining multi-view multi-label learning
+with maximum margin classiﬁcation. In ICDM, pages 864–869, 2012.
+8. Jason Farquhar, David Hardoon, Hongying Meng, John S Shawe-taylor, and Sandor Szed-
+mak. Two view learning: Svm-2k, theory and practice. In Advances in neural information
+processing systems, pages 355–362, 2005.
+9. Hong Ge, Yutian Chen, ENG CAM, Moquan Wan, and Zoubin Ghahramani. Distributed
+inference for dirichlet process mixture models. In ICML, pages 2276–2284, 2015.
+10. Jayanta K Ghosh and RV Ramamoorthi. Bayesian nonparametrics, volume 1. Springer New
+York, 2003.
+11. Mehmet Gonen. Bayesian efﬁcient multiple kernel learning. In ICML, pages 1–8, 2012.
+12. Mehmet G¨onen and Ethem Alpaydın. Multiple kernel learning algorithms. JMLR, 12:2211–
+2268, 2011.
+13. Jia He, Changying Du, Fuzhen Zhuang, Xin Yin, Qing He, and Guoping Long.
+Online
+bayesian max-margin subspace multi-view learning. IJCAI, pages 1555–1561, 2016.
+14. Ricardo Henao, Xin Yuan, and Lawrence Carin. Bayesian nonlinear support vector machines
+and discriminative factor modeling. In Neural Information Processing Systems, pages 1754–
+1762, 2014.
+15. Thomas Hofmann, Bernhard Sch¨olkopf, and Alexander J. Smola. Kernel methods in machine
+learning. Annals of Statistics, 36(3):1171–1220, 2007.
+16. Tommi Jaakkola, Marina Meila, and Tony Jebara. Maximum entropy discrimination. In
+Advances in neural information processing systems, 1999.
+17. Maria Kalli, Jim E Grifﬁn, and Stephen G Walker. Slice sampling mixture models. Statistics
+and computing, 21(1):93–105, 2011.
+
+Efﬁcient and Adaptive Kernelization for Nonlinear Max-margin Multi-view Learning
+17
+18. Gert RG Lanckriet, Nello Cristianini, Peter Bartlett, Laurent El Ghaoui, and Michael I Jor-
+dan. Learning the kernel matrix with semideﬁnite programming. JMLR, 5:27–72, 2004.
+19. Radford M Neal. Mcmc using hamiltonian dynamics. Handbook of Markov Chain Monte
+Carlo, 2:113–162, 2011.
+20. Junier Oliva, Avinava Dubey, Barnabas Poczos, Jeff Schneider, and Eric P. Xing. Bayesian
+nonparametric kernel learning. AISTATS, 2016.
+21. Nicholas G Polson and Steven L Scott. Data augmentation for support vector machines.
+Bayesian Analysis, 6(1):1–23, 2011.
+22. Minh H Quang, Loris Bazzani, and Vittorio Murino. A unifying framework for vector-valued
+manifold regularization and multi-view learning. In ICML, pages 100–108, 2013.
+23. Ali Rahimi and Benjamin Recht.
+Random features for large-scale kernel machines.
+In
+Advances in neural information processing systems, pages 1177–1184, 2007.
+24. Alain Rakotomamonjy, Francis R Bach, St´ephane Canu, and Yves Grandvalet. Simplemkl.
+JMLR, 9(Nov):2491–2521, 2008.
+25. Walter Rudin. Fourier analysis on groups. John Wiley & Sons, 2011.
+26. S¨oren Sonnenburg, Gunnar R¨atsch, Christin Sch¨afer, and Bernhard Sch¨olkopf. Large scale
+multiple kernel learning. JMLR, 7(2006):1531–1565, 2006.
+27. Shiliang Sun and Guoqing Chao. Multi-view maximum entropy discrimination. In IJCAI,
+pages 1706–1712, 2013.
+28. Sandor Szedmak and John Shawe-Taylor. Synthesis of maximum margin and multiview
+learning using unlabeled data. Neurocomputing, 70(7-9):1254–1264, 2007.
+29. Stephen G Walker. Sampling the dirichlet mixture model with slices. Communications in
+Statistics-Simulation and Computation R⃝, 36(1):45–54, 2007.
+30. Chong Wang. Variational bayesian approach to canonical correlation analysis. Neural Net-
+works, 18(3):905–910, 2007.
+31. Chang Xu, Dacheng Tao, Yangxi Li, and Chao Xu. Large-margin multi-view gaussian pro-
+cess. Multimedia Systems, 21(2):147–157, 2014.
+32. David Yarowsky. Unsupervised word sense disambiguation rivaling supervised methods. In
+ACL, pages 189–196, 1995.
+33. Guangnan Ye, Dong Liu, I-Hong Jhuo, Shih-Fu Chang, et al. Robust late fusion with rank
+minimization. In CVPR, pages 3021–3028, 2012.
+34. Jun Zhu, Amr Ahmed, and Eric P Xing. Medlda: maximum margin supervised topic models.
+JMLR, 13(1):2237–2278, 2012.
+35. Fuzhen Zhuang, George Karypis, Xia Ning, Qing He, and Zhongzhi Shi. Multi-view learning
+via probabilistic latent semantic analysis. Information Sciences, 199(15):20–30, 2012.

@@ -1,0 +1,854 @@
+HOW TO MODEL THE COVARIANCE STRUCTURE IN A
+SPATIAL FRAMEWORK: VARIOGRAM OR CORRELATION
+FUNCTION?
+GIOVANNI PISTONE AND GRAZIA VICARIO
+Abstract. The basic Kriging’s model assumes a Gaussian distribution
+with stationary mean and stationary variance. In such a setting, the joint
+distribution of the spatial process is characterized by the common variance
+and the correlation matrix or, equivalently, by the common variance and
+the variogram matrix. We discuss in in detail the option to actually use
+the variogram as a parameterization.
+Kriging, Universal Kriging, Non-parametric Kriging, Elliptope, Bayes
+1. Introduction
+The present note is a development of the Author’s paper [7]. An application
+was implemented in Vicario et al. paper [12]. In the interest of clarity we allow
+here for a little overlap with the papers referred to above.
+We discuss the notion of variogram as it is used in Geostatistics and we oﬀer
+some preliminary thought about the possibility of a non-parametric approach
+to Universal Kriging aiming to the use of a Bayes methodology. Variograms
+are due to Matheron [6], and there are many modern expositions i.e., Cressie
+[3, Ch. 2], Chiles and Delﬁner [2, Ch. 2], Gneiting et al. [5], Gaetan and
+Guyon [4, Ch.1].
+In Sec. 2 we give a brief overview of the so called Universal Kriging model
+and its parameterization with the Matheron’s variogram function. In Sec. 3
+we deﬁne the general variogram matrix and give a necessary and suﬃcient
+condition for a positive variance σ2 and a matrix Γ to be a variogram matrix
+of a covariance σ2R, where R is a correlation matrix. In Sec. 4 we provide
+some useful computations concerning the inverse variogram matrix. Sec 5 is
+devoted to an interpretation of the variogram matrix as related to a projection
+of the Gaussian ﬁeld. In Sec. 6 we discuss the shape of the set of parameters
+of the general Kriging model. A section of conclusions closes the paper.
+2. Universal Krige setup
+We consider a Gaussian n-vector Y , n ≥2, whose mean has the form
+µ = µ1 and whose covariance matrix Σ = [σij]n
+ij=1 has constant diagonal
+σii = σ2, i = 1, . . . , n. The assumption on the mean and the diagonal terms
+is the weakest stationarity assumption, i.e. a 1-st order stationarity. We can
+write Y ∼Nn(µ1, σ2R), where µ is a general mean value, σ2 the common
+variance, and R = [ρij]n
+i,j=1 a generic correlation matrix.
+1
+arXiv:1503.07686v3  [math.ST]  9 Dec 2016
+
+2
+PISTONE AND VICARIO
+The variogram of Y is the n × n matrix Γ = [γij]n
+i,j=1 whose element γij
+is half the variance of the diﬀerence Yi −Yj. As the mean value is constant,
+the variance of the diﬀerence is equal to the second moment of the diﬀerence.
+It is expressed in terms of the common variance σ2 and the correlations ρij,
+i, j = 1, . . . , n, as
+2γij = Var (Yi −Yj) = σ2(ei −ej)′R(ei −ej) =
+σ2 (ρii + ρjj −2ρij) = 2σ2(1 −ρij) ,
+and, in matrix form, as
+Γ = σ2(11′ −R).
+The simple Gaussian model described above is commonly used in Geostatis-
+tics, when each random component Yi of the random vector Y is associated
+to a location xi, i = 1, . . . , n, in a given region X, xi ∈X, i = 1, . . . , n.
+We brieﬂy describe the most common set-up in Geostatistics. The elements
+of the variogram matrix γij are assumed to be a given function γ of the distance
+between two locations, γi,j = γ(d(xi, xj)). In such a case the statistical model
+is characterized by the choice of a distance d(x, y), x, y ∈X, and by the choice
+of a function γ, called variogram function, deﬁned on a real domain containing
+{d(x, y)|x, y ∈X} . The existence of a positive σ2 and a correlation matrix
+R = [ρij] such that σ2(1 −ρij) = γ(d(xi, xj)) imposes a nontrivial condition
+on the function γ, see Sasv´ari [11] and Gneiting et al. [5] and []. Such a
+model, where it is assumed that the vector of means is constant, µ = µ1 is
+called universal Krige model. We do not consider the more general case of a
+non-constant mean.
+Krige has further qualiﬁed this model by adding assumptions on the vari-
+ance function and suggesting a statistical method to estimate the value at
+an untried point x0 given a set of observation Y1, . . . , Yn at points x1, . . . , xn.
+Precisely:
+(1) Krige’s modeling idea is to assume the variogram function γ to be
+an increasing function on [0, ∞[, so that the variogram’s values are
+increasing with the distance. Moreover, the correlation between loca-
+tions is assumed to be positive. The rational is to model a variability
+which increases with the distance and is bounded by a general variance:
+0 ≤1
+2 Var (Yi −Yj) = γij = γ(d(xi, xj)) = σ2(1 −ρij) ≤σ2 .
+The increasing function γ : R+ →R+ is assumed to be continuous
+everywhere but at 0. As it is bounded at +∞, the general shape is as
+in Fig. 1.
+The parameters in the Krige’s universal model are unrestricted val-
+ues of µ ∈R, σ2 > 0, and restricted values of R that are usually
+estimated over a suitable parametric model.
+(2) Krige’s idea is to predict the value Y0 = Yx0 at an untried location
+x0 with the conditional expectation based on a plug-in estimate of
+the parameters. If I = {1, . . . , n} and the locations in the model are
+
+MODELLING COVARIANCES WITH VARIOGRAMS
+3
+0
+0,2
+0,4
+0,6
+0,8
+1
+1,2
+1,4
+0
+1
+2
+3
+4
+variogram
+distance
+Sill 
+Nugget effect 
+Range
+Figure 1. A general variogram function is 0 at 0, can have
+jump at 0 which is called Nugget, has a ﬁnite limit at +∞
+named Sill. The Range is a length such that the value is equal
+to the limit value for any practical purpose.
+x0, x1, . . . , xn, the regression value is
+\
+Y0 −µ = Σ0,IΣ−1
+I,I(YI −µ1I),
+with
+Σ =
+
+ΣI,I
+ΣI,0
+Σ0,I
+σ2 .
+
+The set of data that give the same prediction is an aﬃne plane in Rn.
+The variance of the prediction is σ2
+0 −Σ0,IΣ−1
+I,IΣI,0.
+In this paper we do not follow this approach, but we adopt a general non-
+parametric attitude, where µ is real number, σ2 is a positive real number, R
+is a positive deﬁnite matrix with unit diagonal, possibly with positive entries.
+The variogram matrix Γ is not restricted and we do not enforce the existence
+of any special form.
+3. The variogram matrix
+Our plan now is to express the Krige’s computations in term of Matheron’s
+variogram matrix Γ. One good reason to use Γ as a basic parameter is because
+its empirical estimator is unbiased.
+Let us discuss in some detail the basic transformation of matrix parameters
+(1)
+Γ = σ2(11′ −R) = σ211′ −Σ .
+We note that Γ = 0 if, and only if, R = 11′, such extreme case being always
+excluded in the following. In fact, in most cases we will assume det R ̸= 0.
+The entries of Γ are nonnegative and bounded by 2σ2 because the correla-
+tions are bounded between −1 and 1. If all the correlations are nonnegative,
+the the entries of Γ are bounded by σ2.
+
+4
+PISTONE AND VICARIO
+The diﬀerence between the covariance matrix and the variogram matrix is
+a matrix of rank 1, Γ + Σ = σ211′. Let us remark moreover that
+(2)
+1
+n11′ =
+1
+nσ2(Γ + Σ)
+is the orthogonal projector on the space of constant vectors Span (1).
+We denote by S= the cone of nonnegative deﬁnite matrices with constant
+diagonal, by S=1 the convex set of correlation matrices, and by V the cone of
+variogram matrices. We have the following characterization of V.
+Proposition 1. A nonzero matrix Γ is the variogram matrix of some covari-
+ance matrix of the form Σ = σ2R, with σ2 > 0 and R a correlation matrix, if,
+and only if, the three following conditions hold
+(1) Γ is symmetric, and has zero diagonal;
+(2) Γ is conditionally negative deﬁnite, i.e. wΓw ≤0 if w′1 = 0;
+(3) sup {x′Γx|x′1 = 1} ≤σ2.
+Proof. Assume Γ = σ2(11′ −R) ̸= 0 with R correlation matrix and σ2 > 0.
+Condition 1 follows from the deﬁnition. If we write a generic vector as x =
+w + α1 with w′1 = 0, we have
+n2σ2α2 = x′Γx + x′Σx .
+In particular, Condition 2 follows because α = 0 implies x′Γx = −x′Σx.
+Finally, if x′1 = 1, that is nα = 1, we have x′Γx −σ2 = x′Σx ≥0 and
+Condition 3 follows.
+Viceversa, consider the matrix 11′ −σ−2Γ.
+It is symmetric, with unit
+diagonal. We need only to show it is positive deﬁnite:
+x′(11′ −σ−2Γ)x = (x′1)2 −σ−2x′Γx =
+(x′1)2(1 −σ−2
+ 1
+x′1x
+′
+Γ
+ 1
+x′1x
+
+≥0
+because of Condition 3.
+□
+The lower bound imposed on σ2 means that the parameterization with σ2,
+carrying one degree of freedom, and with Γ, carrying n(n −1)/2 degrees of
+freedom, has a drawback in that the two parameters are not independently
+deﬁned on a product set. Note the relation 1′Γ1 = σ2(n2 −1′R1) that we are
+going to discuss in Sec. 4 below.
+In conclusion, there is a one-to-one transformation of parameters
+(σ2, Γ) ↔(σ2, R) ↔Σ
+with σ2 ∈R>, Γ ∈V, R ∈S=1, Σ ∈S=, namely:
+(1) The mapping from Σ ∈S= to the couple (σ2, Γ) ∈R> × V factors as
+S= ∋Σ 7→(1
+n Tr (Σ) ,
+1
+n Tr (Σ)
+−2
+Σ) = (σ2, R) ∈]0, ∞[×R
+
+MODELLING COVARIANCES WITH VARIOGRAMS
+5
+and
+]0, ∞[×R ∋(σ2, R) 7→(σ2, σ2(11′ −R)) =
+(σ2, Γ) ∈
+
+(σ2, Γ)
+Γ ∈V, sup {x′Γx|x′1 = 1} ≤σ2	
+.
+(2) Inverse is
+
+(σ2, Γ)
+Γ ∈V, sup {x′Γx|x′1 = 1} ≤σ2	
+∋(σ2, Γ) 7→
+σ211′ −Γ = Σ ∈S=
+4. Inverse variogram matrix Γ−1
+The equations two above, both based on the deﬁnition of the variogram
+matrix as Γ = σ2(11′ −R), provide a simple connection between the param-
+eterization based on the covariance matrix Σ and the parameterization based
+on the couple σ2 and Γ. However, we want to spell out the computation of
+an other key statistical parameter, namely the concentration matrix Σ−1. We
+begin by recalling a well known equation in matrix algebra [8]. We review the
+result in detail as we need an exact statement of the conditions under which
+is true in our case.
+Proposition 2 (Sherman-Morrison formula). Assume the matrix A is invert-
+ible. The matrix 11′ −A is invertible if, and only if, 1′A−11 ̸= 1. In such a
+case,
+det(11′ −A) = (−1)n(1 −1′A−11) det A ,
+(11′ −A)−1 = −A−1 −(1 −1′A−11)−1A−111′A−1.
+Proof. The multi-linear expansion of det(11′ −A) is written in terms of the
+adjoints (−A)ij of each element (−A)ij by
+det(11′ −A) = det (−A) +
+n
+X
+j=1
+n
+X
+i=1
+(−A)ij
+= (−1)n det A −(−1)n−1
+n
+X
+i,j=1
+Aij
+= (−1)n det A −(−1)n−11(adj A)1′ .
+As det A ̸= 0, we can factor-out (−1)n(det A) to get
+det(11′ −A) = (−1)n(det A)(1 −1′A−11)
+and the statement about the determinant follows. The inversion formula is
+directly checked.
+□
+We are concerned with the invertibility of Γ = σ2(11′ −R), hence we need
+to discuss the condition 1′R−11 ̸= 1.
+Proposition 3. Let R be a correlation matrix and assume det R ̸= 0. Let
+λj > 0, j = 1, . . . , n, be the spectrum of R and let uj be a set of unit eigen-
+vectors. It can be proved:
+
+6
+PISTONE AND VICARIO
+(1) Tr R = Pn
+j=1 λj = n and det R = Qn
+j=1 λj ≤1, with equality if, and
+only if, R = I.
+(2) Tr R−1 = Pn
+j=1 λ−1
+j
+≥n with equality if, and only if, R = I.
+(3) 1′R−11 ̸= 1.
+Proof.
+(1) n = Tr R = Pn
+j=1 λj. From det R = Qn
+j=1 λj, as the arithmetic
+mean is larger than the the geometric mean,
+1 =
+Pn
+j=1 λj
+n
+≥
+ n
+Y
+j=1
+λj
+! 1
+n
+= (det R)
+1
+n ,
+with equality if, and only if the λj’s are all equal, hence equal to 1,
+which happens if R = I.
+(2) The geometric mean is larger or equal than the harmonic mean, hence
+1 ≥(det R)
+1
+n =
+ n
+Y
+j=1
+λj
+! 1
+n
+≥n
+ n
+X
+j=1
+λ−1
+j
+!−1
+,
+with equality if, and only if, λj = 1, j = 1, . . . , n. It follows 1
+n
+Pn
+j=1 λ−1
+j
+≥
+1.
+(3) We derive a contradiction from 1 = 1′R−11. As R−1 = Pn
+j=1 λ−1
+j uju′
+j
+and Pn
+j=1(1′uj)2 = ∥1∥2 = n2,
+1 = 1′R−11 =
+n
+X
+j=1
+λ−1
+j (1′uj)2 = n2
+n
+X
+j=1
+(λj)−1θj ,
+where θj = (1′u)2/n2 ≥0 and Pn
+j=1 θj = 1. From the convexity of
+λ 7→λ−1 we obtain
+1 = n2
+n
+X
+j=1
+(λj)−1θj ≥n2
+ n
+X
+j=1
+λjθj
+!−1
+,
+hence the contradiction
+1 ≤1
+n2
+n
+X
+j=1
+λjθj ≤1
+n2 max {λj|j = 1, . . . , n} ≤1
+n .
+□
+From Proposition 3 we have immediately the following result of interest.
+Proposition 4. Assume the correlation matrix Σ = σ2R ∈S= is invertible.
+It follows that Γ = σ2(11′ −R) is invertible, with
+(3)
+Γ−1 = −Σ−1 −(σ−2 −1′Σ−11)−1Σ−111′Σ−1
+and
+(4)
+Σ−1 = −Γ−1 −(σ−2 −1′Γ−11)−1Γ−111′Γ−1
+
+MODELLING COVARIANCES WITH VARIOGRAMS
+7
+Proof. From the assumption it follows det R ̸= 0 so that
+σ−2 −1′Σ−11 = σ−2(1 −1′R1) ̸= 0 ,
+hence the conclusion.
+□
+We can now analyze the likelihood of the Gaussian model N(µ1, σ2R) in
+terms of the variogram.
+First, we compute the determinant of the correlation matrix
+det
+ σ2R
+
+= det
+ σ211′ −Γ
+
+= σ2n det
+ 11′ −σ−2Γ
+
+= σ2n 
+det
+ −σ−2Γ
+
++ 1′ adj
+ −σ−2Γ
+
+1
+
+= det (−Γ) −σ21′ adj (−Γ) 1 .
+Second, we compute the quadratic form of the concentration matrix
+y′Σ−1y = y′  −Γ−1 −(σ−2 −1′Γ−11)−1Γ−111′Γ−1
+y
+= −y′Γ−1y −(σ−2 −1′Γ−11)−1(y′Γ−11)2.
+Third, we compute the log-likelihood with µ = 0:
+log p
+ y
+σ2, Γ
+
+=
+−n
+2 log (2π) −1
+2 log
+ det
+ 11′ −σ−2Γ
+
+−
+1
+2σ2y′(11′ −σ−2Γ)−1y =
+−n
+2 log (2π) −1
+2 log
+ det (−Γ) −σ21′ adj (−Γ) 1
+
++ 1
+2y′Γ−1y + 1
+2(σ2 −1′Γ−11)−1(y′Γ−11)2 .
+Here are the essentials of the computations leading to a maximum likelihood
+estimation of Γ are the following. In the direction of a generic symmetric
+matrix with zero diagonal H,
+dH(Γ 7→log
+ det
+ 11′ −σ−2Γ
+
+) = Tr
+ (σ211′ −Γ)−1H
+
+and
+dH(Γ 7→y′(11′ −σ−2Γ)−1y)
+= σ2 Tr
+ (σ211′ −Γ)−1yy′(σ211′ −Γ)−1H
+
+.
+so that the normal equations for Γ reduce to the condition
+−(σ211′ −Γ)−1 + (σ211′ −Γ)−1yy′(σ211′ −Γ)−1
+is diagonal .
+The approach with parameters σ2, Γ is feasible in principle, but it does not
+appear promising in term of ease of computation. We will see in Sec. 5 below
+a diﬀerent, possibly better, approach.
+
+8
+PISTONE AND VICARIO
+5. Projecting on Span (1)⊥
+We now change our point of view to consider the same problem from a
+diﬀerent angle suggested by the observation the variogram does not change if
+we change the general mean µ. In fact, we can associate the variogram with
+the state space description of the Gaussian vector.
+The following proposition is a new characterization of the variogram matrix
+in our setting.
+Proposition 5.
+(1) The matrix Γ is a variogram matrix of a covariance
+matrix Σ ∈V+ if, and only if, the matrix
+(5)
+Σ0 = −
+
+I −1
+n11′
+′
+Γ
+
+I −1
+n11′
+
+is symmetric, positive deﬁnite and with constant diagonal.
+(2) If Y0 ∼Nn(0, Σ0), then its variogram is Γ and Y0 is supported by
+Span (1)⊥.
+Proof.
+(1) If Γ = σ2(11′ −R) is the variogram matrix of Σ = σ2R, then
+from Eq. (5) we have
+Σ0 = σ2
+
+I −1
+n11′
+′
+R
+
+I −1
+n11′
+
+,
+which is indeed positive deﬁnite. Let us show that the diagonal ele-
+ments of Σ0 are constant.
+(Σ0)ii = σ2e′
+i
+
+I −1
+n11′
+′
+R
+
+I −1
+n11′
+
+ei
+= σ2
+
+ei −1
+n1
+′
+R
+
+ei −1
+n1
+
+= σ2
+
+e′
+iRei −2
+neiR1 + 1
+n21′R1
+
+= σ2
+ 1
+n21′R1 −1
+
+Viceversa, assume Σ0 is a covariance matrix. As ei−ej ∈Span (1)⊥,
+the variogram of Σ0 has elements
+(ei −ej)′Σ0(ei −ej) =
+(ei −ej)′
+
+I −1
+n11′
+′
+(−Γ)
+
+I −1
+n11′
+
+(ei −ej) =
+−(ei −ej)′Γ(ei −ej) = −γii −γjj + 2γij = 2γij.
+(2) As 1′(ei −ej) = 0, then 1′  I −1
+n11′′ (−Γ)
+ I −1
+n11′
+1 = 0, hence
+the distribution of Y0 is supported by the space Span (1)⊥.
+□
+
+MODELLING COVARIANCES WITH VARIOGRAMS
+9
+It is possible to split every Gaussian Y with covariance matrix Σ ∈S=
+according the splitting Rn = Span (1) ⊕Span (1)⊥. The corresponding pro-
+jections split the Gaussian process Y into two components, one with the co-
+variance as in Proposition 5, the other proportional to the empirical mean.
+Note that the two components have a singular covariance matrix.
+Proposition 6. Let Y ∼Nn(µ, Σ), Σ = σ2R ∈S+ with variogram Γ =
+σ2(11′ −R). Let bY =
+ I −1
+n11′
+Y ∼Nn (0, Σ0) be the projection of Y onto
+Span (1)⊥so that we can write Y = bY +Y , where each component of Y is the
+empirical mean 1
+n1′Y .
+(1) The distribution of bY depends on the variogram only,
+bY ∼Nn
+
+0, −
+
+I −1
+n11′
+′
+Γ
+
+I −1
+n11′
+
+,
+and the variogram matrix of bY is Γ.
+(2) The distribution of 1
+n1′Y , conditionally to bY is Gaussian with mean µ.
+Proof.
+−
+
+I −1
+n11′
+′
+Γ
+
+I −1
+n11′
+
+=
+
+I −1
+n11′
+′
+Σ
+
+I −1
+n11′
+
+.
+□
+This suggests the following empirical estimation algorithm.
+(1) Project the independent sample data y1, . . . , yN onto Span (1)⊥by
+subtracting the empirical mean y+ =
+1
+n
+P yi, to get by1 = y1 −
+y+, . . . , byN = yN −y+. Use the empirical estimator of the variogram
+matrix on the projected data.
+(2) Estimate µ with the empirical mean.
+In the same spirit, we could suggest the simulation of a random variable
+with variogram matrix Γ by the generation of Nn(0, Σ0) data in Span (1)⊥.
+Both suggestions will be further discussed in future work.
+6. Elliptope
+We now turn to the geometrical description of the set of variograms. From
+the basic equation Γ = σ2(11′−R) it follows that the set of variogram matrices
+is an aﬃne image of the set of correlation matrices in the space of symmetric
+matrices.
+The set of correlation matrices is a convex bounded set whose
+geometrical shape has been studied in a number of papers, i.e. [10], [10], [9].
+Such a shape is of central interest in a non parametric Bayesian approach
+to the statistics of the universal Kriging model. It appears also in convex
+optimization, where it has been called elliptope.
+Let us discuss the case n = 3. All principal minors of R are nonnegative,
+det (R) = det
+
+
+
+
+1
+x
+y
+x
+1
+z
+y
+z
+1
+
+
+
+= 1 −x2 −y2 −z2 + 2xyz ≥0
+
+10
+PISTONE AND VICARIO
+Figure
+2. The
+3-elliptope
+Figure
+3. Algebraic
+variety
+and 1 −x2, 1 −y2, 1 −z2 ≥0. The three last inequalities deﬁne the cube
+Q = [−1, +1]3 while the equation 1 −x2 −y2 −z2 + 2xyz = 0 is a cubic
+algebraic variety whose intersection with the cube Q is the border of the
+elliptope. All horizontal section z = c, −1 ≤c ≤1, of the elliptope are the
+interior of the ellipses
+1 −x2 −y2 + 2cxy ≥c2
+Same for other sections. See Fig.s 2 and 3.
+Various proposals of apriory distribution on the elliptope exist, see for ex-
+ample [1].
+Going on with the discussion of our example, the volume is easily computed
+and the uniform apriori is deﬁned.
+Simulation is feasible for example by
+rejection method. An other option is to write R = A′A where the columns of A
+are unit vectors. This gives an other possible apriori starting from independent
+unit vectors. Simulation is feasible, for example starting with independent
+standard Gaussians.
+An interesting option is the Cholesky representation. A symmetric matrix
+A is positive deﬁnite if there exists an upper triangular matrix
+T =
+
+
+t′
+1
+t′
+2
+t′
+3
+
+=
+
+
+t11
+t12
+t13
+0
+t22
+t23
+0
+0
+t33
+
+,
+tii ≥0
+such that
+A = T ′T = [ti · tj]ij =
+
+
+t2
+11
+t11t12
+t11t13
+t11t12
+t2
+12 + t2
+22
+t12t13 + t22t23
+t11t13
+t12t13 + t22t23
+t2
+13 + t2
+23 + t2
+33
+
+
+Moreover, t11t22t33 ̸= 0 ⇔T is unique and invertible if, and only if, A is
+invertible. It is an identiﬁable parameterization for non singular matrices.
+
+MODELLING COVARIANCES WITH VARIOGRAMS
+11
+In the case of a the correlation matrix R = T ′T with
+T =
+
+
+t′
+1
+t′
+2
+t′
+3
+
+=
+
+
+p
+1 −t2
+12 −t2
+13
+t12
+t13
+0
+p
+1 −t2
+23
+t23
+0
+0
+1
+
+,
+ti ∈0i−1 × S+
+n−1+1
+It follows
+R =
+
+
+1
+p
+1 −t2
+12 −t2
+13t12
+p
+1 −t2
+12 −t2
+13t13
+p
+1 −t2
+12 −t2
+13t12
+1
+t12t13 +
+p
+1 −t2
+23t23
+p
+1 −t2
+12 −t2
+13t13
+t12t13 +
+p
+1 −t2
+23t23
+1
+
+
+and
+det (R) = (1 −t2
+12 −t2
+13)(1 −t2
+23)
+7. Conclusion
+In the last decades Kriging models have been recommended not only for the
+original application, but spatial noisy data in general. Thanks to the availabil-
+ity of comprehensive computing facilities and the recent progresses in software
+development, the numerical simulation of technologically complex systems has
+become an attractive alternative option to the physical experimentation. The
+most popular meta-model used when dealing with Computer Experiments
+(CE) is the Kriging model. The accuracy of this model strongly depends on
+the detection of the correlation structure of the responses. In the Bayesian
+approach, where the posterior distribution of a prediction Krige’s Y0 given the
+training set (Y1, . . . , Yn) requires less uncertainty as possible on the correla-
+tion function, the use of the variogram as a parameter should be preferred
+because it does not demand a parametric approach as the correlation estima-
+tion does. The authors proved in a previous paper [7] the equivalence between
+variogram and spatial correlation function for stationary and intrinsically sta-
+tionary processes. Here the study has been devoted to the characterization
+of matrices which are admissible variograms in the case of 1-stationarity. We
+expect these ﬁndings will allow for the imputation of an apriori distribution
+on the set of variogram matrices, as Bayesians do for the correlation in the
+Kriging modernization.
+Acknowledgments
+An early version of this paper was presented at the 4th Stochastic Model-
+ing Techniques and Data Analysis International Conference, June 1–4, 2016,
+University of Malta, Valletta, Malta, with the title Bayes and Krige: General-
+ities. The Authors thank both Guillaume Kon Kam King (CCA, Moncalieri)
+and Luigi Malag`o (CCA, Moncalieri) for suggesting relevant references. We
+thank Emilio Musso (DISMA, Politecnico di Torino) for help with the ellip-
+topes picture. G. Pistone is supported by de Castro Statistics, Collegio Carlo
+Alberto, Montalieri, and he is a member of GNAFA-INDAM.
+
+12
+PISTONE AND VICARIO
+References
+[1] John Barnard, Robert McCulloch, and Xiao-Li Meng. Modeling covariance matrices in
+terms of standard deviations and correlations, with application to shrinkage. Statist.
+Sinica, 10(4):1281–1311, 2000.
+[2] Jean-Paul Chil`es and Pierre Delﬁner. Geostatistics. Modeling spatial uncertainty. Wiley
+Series in Probability and Statistics. John Wiley & Sons Inc., Hoboken, NJ, 2nd edition,
+2012.
+[3] Noel A. C. Cressie. Statistics for spatial data. Wiley Series in Probability and Math-
+ematical Statistics: Applied Probability and Statistics. John Wiley & Sons Inc., New
+York, 1993. Revised reprint of the 1991 edition, A Wiley-Interscience Publication.
+[4] Carlo Gaetan and Xavier Guyon. Spatial statistics and modeling. Springer Series in
+Statistics. Springer, New York, 2010. Translated by Kevin Bleakley.
+[5] Tilmann Gneiting, Zolt´an Sasv´ari, and Martin Schlather. Analogies and correspon-
+dences between variograms and covariance functions. Adv. in Appl. Probab., 33(3):617–
+630, 2001.
+[6] Georges Matheron. Trait´e de g´eostatistique appliqu´e. Number 14 in Mem. Bur. Rech.
+Geog. Minieres. Editions Technip, 1962.
+[7] Giovanni Pistone and Grazia Vicario. A note on semivariogram. In T. Di Battista,
+E. Moreno, and W. Racugno, editors, Topics on methodological and Applied Statistical
+Inference, Studies in Theoretical and Applied Statistics, pages 181–190. Springer, 2016.
+[8] William H. Press, Saul A. Teukolsky, William T. Vetterling, and Brian P. Flannery.
+Numerical recipes: the art of scientiﬁc computing. Cambridge University Press, Cam-
+bridge, 1996.
+[9] Francesco Rapisarda, Damiano Brigo, and Fabio Mercurio. Parameterizing correla-
+tions: a geometric interpretation. IMA J. Manag. Math., 18(1):55–73, 2007.
+[10] Peter J. Rousseeuw and Geert Molenberghs. The shape of correlation matrices. Amer.
+Statist., 48(4):276–279, 1994.
+[11] Zolt´an Sasv´ari. Positive deﬁnite and deﬁnitizable functions, volume 2 of Mathematical
+Topics. Akademie Verlag, Berlin, 1994.
+[12] Grazia Vicario, Giuseppe Craparotta, and Giovanni Pistone. Meta-models in computer
+experiments: Kriging vs artiﬁcial neural networks. Quality and Reliability Engineering
+International, 32:2055–2065, 2016.
+G.Pistone: de Castro Statistics, Collegio Carlo Alberto, Via Real Colle-
+gio 30, 10024 Moncalieri, Italy (E-mail: giovanni.pistone@carloalberto.org).
+G. Vicario: DISMA Luigi Lagrange, Politecnico di Torino, Corso Duca degli
+Abruzzi 24, 10124 Torino, Italy (E-mail: grazia.vicario@polito.it)

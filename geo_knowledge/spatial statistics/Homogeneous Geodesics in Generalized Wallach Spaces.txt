@@ -1,0 +1,1358 @@
+arXiv:1603.06913v1  [math.DG]  22 Mar 2016
+HOMOGENEOUS GEODESICS IN GENERALIZED WALLACH
+SPACES
+ANDREAS ARVANITOYEORGOS AND YU WANG
+Abstract. We classify generalized Wallach spaces which are g.o. spaces. We also in-
+vestigate homogeneous geodesics in generalized Wallach spaces for any given invariant
+Riemannian metric and we give some examples.
+2000 Mathematical Subject Classiﬁcation. Primary 53C25. Secondary 53C30.
+Key words.
+Homogeneous geodesic; g.o. space; invariant metric; geodesic vector;
+naturally reductive space; generalized Wallach space.
+Introduction
+Let (M, g) be a homogeneous Riemannian manifold, i.e. a connected Riemannian
+manifold on which the largest connected group G of isometries acts transitively. Then
+M can be expressed as a homogeneous space (G/K, g) where K is the isotropy group at
+a ﬁxed pointed o of M, and g is a G-invariant metric. In this case the Lie algebra g of
+G has an Ad(K)-invariant decomposition g = k ⊕m, where m ⊂g is a linear subspace
+of g and k is the Lie algebra of K. In general such decomposition is not unique. The
+ad(K)-invariant subspace m can be naturally identiﬁed with the tangent space ToM
+via the projection π : G →G/K.
+A geodesic γ(t) through the origin o of M = G/K is called homogeneous if it is an
+orbit of a one-parameter subgroup of G, that is
+γ(t) = exp(tX)(o),
+t ∈R,
+(1)
+where X is a non zero vector of g.
+A homogeneous Riemannian manifold is called a g.o.
+space, if all geodesics are
+homogeneous with respect to the largest connected group of isometries. All naturally
+reductive spaces are g.o. spaces ([15]), but the converse is not true in general. In [13] A.
+Kaplan proved the existence of g.o. spaces that are in no way naturally reductive. These
+are generalized Heisenberg groups with two-dimensional center. In [16] O. Kowalski, F.
+Pr¨ufer and L. Vanhecke made an explicit classiﬁcation of all naturally reductive spaces
+up to dimension ﬁve. In [18] O. Kowalski and L. Vanhecke gave a classiﬁcation of all
+g.o. spaces, which are in no way naturally reductive, up to dimension six. In [11] C.
+Gordon described g.o. spaces which are nilmanifolds and in [29] H. Tamaru classiﬁed
+homogeneous g.o. spaces which are ﬁbered over irreducible symmetric spaces. In [6]
+and [7] O. Kowalski and Z. Duˇsek investigated homogeneous geodesics in Heisenberh
+groups and some H-type groups. Examples of g.o. spaces in dimension seven were
+obtained by Duˇsek, O. Kowalski and S. Nikˇcevi´c in ([9]). Also, in [1] the ﬁrst author
+and D.V. Alekseevsky classiﬁed generalized ﬂag manifolds which are g.o. spaces.
+Concerning the existence of homogeneous geodesics in homogeneous Riemannian
+manifold, we recall the following. V.V. Kajzer proved that a Lie group endowed with a
+left-invariant metric admits at least one homogeneous geodesic ([12]). O. Kowalski and
+J. Szenthe extended this result to all homogeneous Riemannian manifolds ([17]). An
+extension of the result of [17] to reductive homogeneous pseudo-Riemannian manifolds
+1
+
+2
+ANDREAS ARVANITOYEORGOS AND YU WANG
+has been also obtained ([7], [24]). Also, O. Kowalski, S. Nikˇcevi´c and Z. Vl´aˇsek studied
+homogeneous geodesics in homogneous Riemannian manifolds ([14]), and G. Calvaruso
+and R. Marinosci studied homogeneous geodesics in three-dimension Lie groups ([21],
+[5]).
+Homogeneous geodesics were studied by J. Szenthe ([25], [26], [27], [28]).
+In
+addition, D. Latiﬁstudied homogeneous geodesics in homogeneous Finsler spaces ([19]),
+and the ﬁrst author investigated homogeneous geodesics in the ﬂag manifold SO(2l +
+1)/U(l −m) × SO(2m + 1) ([3]).
+Homogeneous geodesics in the aﬃne setting were studied in [10].
+Finally, D.V.
+Alekseevsky and Yu. G. Nikonorov in [2] studied the structure of compact g.o. spaces
+and gave some suﬃcient conditions for existence and non existence of an invariant
+metric with homogeneous geodesics on a homogeneous space of a compact Lie group
+G. They also gave a classiﬁcation of compact simply connected g.o. spaces of positive
+Euler characteristic.
+Because of these results, it is natural to study g.o. spaces as well as to describe
+homogeneous geodesics for other large classes of homogeneous spaces. In this paper,
+we study this problem for generalized Wallach spaces. These spaces were well known
+before as three-locally-symmetric spaces ([20]), however they were recently classiﬁed
+by Z. Chen, Y. Kang and K. Liang ([4]) and Yu.G. Nikonorov ([23]). We search for
+homogeneous geodesics in these spaces.
+One of the main results in the present paper is Theorem 2, which classiﬁes generalized
+Wallach spaces which are g.o. spaces. For those which are not, we show how to obtain
+homogeneous geodesics. We make explicit computations for the three dimensional Lie
+group SU(2) (thus recovering a result of R.A. Marinosci), and for the Stiefel manifold
+SO(4)/SO(2).
+The paper is organised as follows: In Section 1 we recall the basic deﬁnitions and
+properties of homogeneous geodesics in a Riemannian manifold. In Section 2 we recall
+the deﬁnition of generalized Wallach spaces as well as their classiﬁcation from [23]. In
+Section 3 we classify g.o. spaces among generalized Wallach spaces. For those which
+are not g.o. spaces, in Section 4 we discuss how to ﬁnd all homogeneous geodesics for
+a given G-invariant Riemannian metric.
+Acknowledgements. The ﬁrst author was supported by Grant # E.037 from the
+research committee of the University of Patras.
+The second author is supported by NSFC 11501390, by Sichuan Province Univer-
+sity Key Laboratory of Bridge Non-destruction Detecting and Engineering Computing
+2014QZJ03, by funding of the Education Department of Sichuan Province 15ZB0218,
+15ZA0230, 15SB0122, and by funding of Sichuan University of Science and Engineering
+grant 2014PY06, 2015RC10.
+The second author also acknowledges the hospitality of the University of Patras, during
+her visit 2015-2016.
+1. Homogeneous geodesics in homogeneous Riemannian manifolds
+Let (M = G/K, g) be a homogeneous Riemannian manifold. Let g and k be the Lie
+algebras of G and K respectively and let
+g = k ⊕m
+(2)
+be a reductive decomposition. The canonical projection π : G →G/K induces an
+isomorphism between the subspace m and the tangent space ToM at the identity o =
+
+HOMOGENEOUS GEODESICS IN GENERALIZED WALLACH SPACES
+3
+eK. The G-invariant metric g induces a scalar product ⟨·, ·⟩on m which is Ad(K)-
+invariant. Let B(·, ·) = −Killing form on g. Then any Ad(K)-invariant scalar product
+⟨·, ·⟩on m can be expressed as ⟨x, y⟩= B(Λx, y) (x, y ∈m), where Λ is an Ad(K)-
+equivariant positive deﬁnite symmetric operator on m. Conversely, any such operator
+Λ determines an Ad(K)-invariant scalar product ⟨x, y⟩= B(Λx, y) on m, which in turn
+determines a G-invariant Riemannian metric g on m. We say that Λ is the operator
+associated to the metric g, or simply the associated operator.
+Also, a Riemannian
+metric generated by inner product B(·, ·) is called standard metric.
+Deﬁnition 1. A nonzero vector X ∈g is called a geodesic vector if the curve (1) is a
+geodesic.
+Lemma 1 ([18]). A nonzero vector X ∈g is a geodesic vector if and only if
+⟨[X, Y ]m, Xm⟩= 0,
+(3)
+for all Y ∈m. Here the subscript m denotes the projection into m.
+A useful description of homogeneous geodesics (1) is provided by the following :
+Proposition 1 ([1]). Let (M = G/K, g) be a homogeneous Riemannian manifold and
+Λ be the associated operator. Let a ∈k and x ∈m. Then the following are equivalent:
+(1) The orbit γ(t) = expt(a+x)·o of the one-parameter subgroup expt(a+x) through
+the point o = eK is a geodesic of M.
+(2) [a + x, Λx] ∈k.
+(3) ⟨[a, x], y⟩= ⟨x, [x, y]m⟩for all y ∈m.
+(4) ⟨[a + x, y]m, x⟩= 0 for all y ∈m.
+An important corollary of Proposition 1 is the following:
+Corollary 1 ([1]). Let (M = G/K, g) be a homogeneous Riemannian manifold. Then
+(M = G/K, g) is a g.o. space if and only if for every x ∈m there exists an a(x) ∈k
+such that
+[a(x) + x, Λx] ∈k.
+If we want to decide whether a homogeneous Riemannian manifold (M = G/K, g)
+is a g.o. space or not, we need to ﬁnd a decomposition of the form (2) and look for
+geodesic vectors of the form
+X =
+s
+X
+i=1
+aiei +
+l
+X
+j=1
+xjAj.
+(4)
+Here {ei : i = 1, 2, . . . , s} is a basis of m and {Aj : j = 1, 2, . . . , l} is a basis of k. By
+substituting X into equation (3) we obtain a system of linear algebraic equations for
+the parameters xj. If for any X ∈m \ {0} this system for the variables xj has real
+solutions, then it follows that the homogeneous Riemannian manifold (M = G/K, g)
+is a g.o. space.
+If, on the other hand, we need to ﬁnd all homogeneous geodesics in the homogeneous
+Riemannian manifold (M = G/K, g), then we have to calculate all geodesic vectors in
+the Lie algebra g. Condition (3) reduces to a system of s quadratic equations for the
+variables xj and ai. Then the geodesic vectors correspond to those solutions of this
+system for the variables x1, . . . , xl, a1, . . . , as, which are not all equal to zero.
+
+4
+ANDREAS ARVANITOYEORGOS AND YU WANG
+2. Generalized Wallach spaces
+Let G/K be a compact homogeneous space with connected compact semisimple Lie
+group G and a compact subgroup K. Denoted by g and k Lie algebras of G and K
+respectively. We assume that G/K is almost eﬀective, i.e., there are no non-trial ideals
+of the Lie algebra g in k ⊂g. Let ⟨·, ·⟩= B(Λ·, ·) be an Ad(K)-invariant scalar product
+on m, where Λ is the associated operator.
+We assume that the homogeneous space G/K has the following property. The module
+m decomposes into a direct sum of three Ad(K)-invariant irreducible modules pairwise
+orthogonal with respect to B, i.e.
+m = m1 ⊕m2 ⊕m3,
+(5)
+such that
+[mi, mi] ⊂k
+i = 1, 2, 3.
+(6)
+A homogeneous space with this property are called generalized Wallach space.
+Some examples of these spaces are the manifolds of completely ﬂags in the com-
+plex, quaternionic, and Cayley projective planes, that is SU(3)/Tmax, Sp(3)/Sp(1) ×
+Sp(1) × Sp(1), F4/Spin(8) (known as Wallach spaces), and the generalized ﬂag man-
+ifolds SU(n1 + n2 + n3)/S(U(n1) × U(n2) × U(n3)), SO(2n)/U(1) × U(n −1) and
+E6/U(1) × U(1) × SO(8).
+Every generalized Wallach space admits a three parameter family of invariant Rie-
+mannian metrics determined by Ad(K)-invariant inner products
+⟨·, ·⟩= λ1B(·, ·) |m1 +λ2B(·, ·) |m2 +λ3B(·, ·) |m3,
+(7)
+where λ1, λ2, λ3 are positive real numbers.
+Let di be the dimension of mi. Let {ej
+i} be an orthonormal basis of mj with respect
+to B, where j = 1, 2, 3 and 1 ≤i ≤dj. Consider the expression [ijk] deﬁned by the
+equality
+[ijk] =
+X
+α,β,γ
+B([ei
+α, ej
+β], ek
+γ)2,
+(8)
+where α, β, γ range from 1 to di, dj and dk respectively (cf. [30]). The symbols [ijk] are
+symmetric in all three indices due to the bi-invariance of the metric ⟨·, ·⟩. Moreover,
+for the spaces under consideration we have [ijk] = 0, if two induces coincide.
+We recall the classiﬁcation of generalized Wallach spaces that was recently obtained
+by Yu.G. Nikoronov ([23]) and Z. Chen, Y. Kang, K. Liang ([4]):
+Theorem 1 ([23], [4]). Let G/K be a connected and simply connected compact ho-
+mogeneous space. Then G/K is a generalized Wallach space if and only if one of the
+following types:
+1) G/K is a direct product of three irreducible symmetric spaces of compact type
+([ijk] = 0 in this case).
+2) The group is simple and the pair (g, k) is one of the pairs in Table 1.
+3) G = F × F × F × F and H = diag(F) ⊂G for some connected simple connected
+compact simple Lie group F, with the following description on the Lie algebra level:
+(g, k) = (f ⊕f ⊕f ⊕f, diag(f) = {(X, X, X, X) | X ∈f},
+where f is the Lie algebra of F, and (up to permutation) m1 = {(X, X, −X, −X) | X ∈
+f}, m2 = {(X, −X, X, −X) | X ∈f}, m3 = {(X, −X, −X, X) | X ∈f}.
+
+HOMOGENEOUS GEODESICS IN GENERALIZED WALLACH SPACES
+5
+g
+k
+g
+k
+so(k + l + m)
+so(k) ⊕so(l) ⊕so(m)
+e7
+so(8) ⊕3sp(1)
+su(k + l + m)
+su(k) ⊕su(l) ⊕su(m)
+e7
+su(6) ⊕sp(1) ⊕R
+sp(k + l + m)
+sp(k) ⊕sp(l) ⊕sp(m)
+e7
+so(8)
+su(2l), l ≥2
+u(l)
+e8
+so(12) ⊕2sp(1)
+so(2l), l ≥4
+u(l) ⊕u(l −1)
+e8
+so(8) ⊕so(8)
+e6
+su(4) ⊕2sp(1) ⊕R
+f4
+so(5) ⊕2sp(1)
+e6
+so(8) ⊕R2
+f4
+so(8)
+e6
+sp(3) ⊕sp(1)
+Table 1.
+The pairs (g, k) corresponding to generalized Wallach spaces G/K with G simple.
+3. g.o. generalized Wallach spaces
+Let (G/K, g) be a generalized Wallach space with reductive decomposition g = k⊕m,
+equipped with a G-invariant metric corresponding to a scalar product of the form (7).
+Let l = dimk and di = dim(mi) (i = 1, 2, 3), and let {e0
+i } and {ej
+s} be orthogonal bases
+of k and mj respectively with respect to B, where 1 ≤i ≤l, j = 1, 2, 3 and 1 ≤s ≤dj.
+For any X ∈g \ {0} we write
+X =
+l
+X
+i=1
+xie0
+i +
+d1
+X
+j=1
+aje1
+j +
+d2
+X
+k=1
+bke2
+k +
+d3
+X
+s=1
+cse3
+s,
+xi, aj, bk, cs ∈R.
+(9)
+Then by Lemma 1 it follows that X is a geodesic vector if and only if
+⟨[
+l
+X
+i=1
+xie0
+i +
+d1
+X
+j=1
+aje1
+j +
+d2
+X
+k=1
+bke2
+k +
+d3
+X
+s=1
+cse3
+s, Y ]m,
+d1
+X
+j=1
+aje1
+j +
+d2
+X
+k=1
+bke2
+k +
+d3
+X
+s=1
+ase3
+s⟩= 0, (10)
+for all Y ∈m. Hence we obtain the following system of d1 + d2 + d3 equations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+−Pl
+i=1(Pd1
+j=1 ajB([e0
+i , e1
+1]m, e1
+j))xiλ1 = Pd2
+k=1
+Pd3
+s=1 bkcsB([e2
+k, e1
+1]m, e3
+s)(λ3 −λ2)
+...
+...
+−Pl
+i=1(Pd1
+j=1 ajB([e0
+i , e1
+d1]m, e1
+j))xiλ1 = Pd2
+k=1
+Pd3
+s=1 bkcsB([e2
+k, e1
+d1]m, e3
+s)(λ3 −λ2)
+−Pl
+i=1(Pd2
+k=1 bkB([e0
+i , e2
+1]m, e2
+k))xiλ2 = Pd1
+j=1
+Pd3
+s=1 ajcsB([e1
+j, e2
+1]m, e3
+s)(λ3 −λ1)
+...
+...
+−Pl
+i=1(Pd2
+k=1 bkB([e0
+i , e2
+d2]m, e2
+k))xiλ2 = Pd1
+j=1
+Pd3
+s=1 ajcsB([e1
+j, e2
+d2]m, e3
+s)(λ3 −λ1)
+−Pl
+i=1(Pd3
+s=1 csB([e0
+i , e3
+1]m, e3
+s))xiλ3 = Pd1
+j=1
+Pd2
+k=1 ajbkB([e1
+j, e3
+1]m, e2
+k)(λ2 −λ1)
+...
+...
+−Pl
+i=1 B(Pd3
+s=1 csB([e0
+i , e3
+d3]m, e3
+s))xiλ3 = Pd1
+j=1
+Pd2
+k=1 ajbkB([e1
+j, e3
+d3]m, e2
+k)(λ2 −λ1).
+(11)
+
+6
+ANDREAS ARVANITOYEORGOS AND YU WANG
+If we set
+A = −
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pd1
+j=1 ajB([e0
+1, e1
+1]m, e1
+j)λ1
+· · ·
+Pd1
+j=1 ajB([e0
+l , e1
+1]m, e1
+j)λ1
+...
+...
+Pd1
+j=1 ajB([e0
+1, e1
+d1]m, e1
+j)λ1
+· · ·
+Pd1
+j=1 ajB([e0
+l , e1
+d1]m, e1
+j)λ1
+Pd2
+k=1 bkB([e0
+1, e2
+1]m, e2
+k)λ2
+· · ·
+Pd2
+k=1 bkB([e0
+l , e2
+1]m, e2
+k)λ2
+...
+...
+Pd2
+k=1 bkB([e0
+1, e2
+d2]m, e2
+k)λ2
+· · ·
+Pd2
+k=1 bkB([e0
+l , e2
+d2]m, e2
+k)λ2
+Pd3
+s=1 csB([e0
+1, e3
+1]m, e3
+s)λ3
+· · ·
+Pd3
+s=1 csB([e0
+l , e3
+1]m, e3
+s)λ3
+...
+...
+Pd3
+s=1 csB([e0
+1, e3
+d3]m, e3
+s)λ3
+· · ·
+Pd3
+s=1 csB([e0
+l , e3
+d3]m, e3
+s)λ3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,
+X =
+
+
+
+
+x1
+x2
+...
+xl
+
+
+
+,
+and
+B =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pd2
+k=1
+Pd3
+s=1 bkcsB([e2
+k, e1
+1]m, e3
+s)(λ3 −λ2)
+...
+Pd2
+k=1
+Pd3
+s=1 bkcsB([e2
+k, e1
+d1]m, e3
+s)(λ3 −λ2)
+Pd1
+j=1
+Pd3
+s=1 ajcsB([e1
+j, e2
+1]m, e3
+s)(λ3 −λ1)
+...
+Pd1
+j=1
+Pd3
+s=1 ajcsB([e1
+j, e2
+d2]m, e3
+s)(λ3 −λ1)
+Pd1
+j=1
+Pd2
+k=1 ajbkB([e1
+j, e3
+1]m, e2
+k)(λ2 −λ1)
+...
+Pd1
+j=1
+Pd2
+k=1 ajbkB([e1
+j, e3
+d3]m, e2
+k)(λ2 −λ1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,
+then System (11) is equivalent to AX = B. Then we have the following:
+Proposition 2. Let (G/K, g) be a generalized Wallach space, where the metric g is
+determined by the scalar product (7). Then for any aj (j = 1, . . . , d1), bk (k = 1, . . . , d2)
+and cs (s = 1, . . . , d3) not all equal to zero, (G/K, g) is a g.o. space if and only if
+rank(A) = rank(A, B).
+Proof. By Propostion 1 and Corollary 1 it follows that (G/K, g) is a g.o. space if and
+only if for any X ∈m \ {0} there exists an a(X) such that the curve expt(a(X) +
+X) · o (t ∈R) is a geodesic. This means that System (11) of d1 + d2 + d3 equations
+for the variables xi (i = 1, . . . , l) has real solutions for any aj, bk, cs (j = 1, . . . , d1, k =
+1, . . . , d2, s = 1, . . . , d3) not all equal to zero. Then system AX = B has real solutions
+if and only if rank(A) = rank(A, B).
+□
+Next, we shall investigate which of the families of spaces listed in Theorem 1 are g.o.
+spaces.
+Theorem 2. Let (G/K, g) be a generalized Wallach space as listed in Theorem 1. Then
+1) If (G/K, g) is a space of type 1) then this is a g.o. space for any Ad(K)-invariant
+Riemannian metric.
+
+HOMOGENEOUS GEODESICS IN GENERALIZED WALLACH SPACES
+7
+2) If (G/K, g) is a space of type 2) or 3) then this is a g.o. space if and only if g
+is the standard metric.
+Proof. 1) In this case it is [ijk] = 0 for all i, j, k, therefore B([ei
+α, ej
+β], ek
+γ) = 0 for any
+i, j, k and α, β, γ. So for any Ad(K)-invariant Riemannian metric (λ1, λ2, λ3) and any
+non zero vector X ∈m \ {0}, system (11) for the variables xi (i = 1, . . . , l) has real
+solutions, hence (G/K, g) is a g.o. space.
+2) The only non zero [ijk] is [123] (cf. [22]), so B([e1
+α, e2
+β], e3
+γ) ̸= 0 for some α, β, γ.
+Let (λ1, λ2, λ3) be a g.o. metric, that is the generalized Wallach space is a g.o. space.
+Then for any non zero vector X ∈m, there exists a(X), such that X + a(X) is a
+geodesic vector.
+We assume that X ∈m1 ⊕m2. Then in system (11) all c1, c2, . . . , cd3 are zero, hence
+it follows that
+A = −
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pd1
+j=1 ajB([e0
+1, e1
+1]m, e1
+j)λ1
+· · ·
+Pd1
+j=1 ajB([e0
+l , e1
+1]m, e1
+j)λ1
+...
+...
+Pd1
+j=1 ajB([e0
+1, e1
+d1]m, e1
+j)λ1
+· · ·
+Pd1
+j=1 ajB([e0
+l , e1
+d1]m, e1
+j)λ1
+Pd2
+k=1 bkB([e0
+1, e2
+1]m, e2
+k)λ2
+· · ·
+Pd2
+k=1 bkB([e0
+l , e2
+1]m, e2
+k)λ2
+...
+...
+Pd2
+k=1 bkB([e0
+1, e2
+d2]m, e2
+k)λ2
+· · ·
+Pd2
+k=1 bkB([e0
+l , e2
+d2]m, e2
+k)λ2
+0
+· · ·
+0
+...
+...
+0
+· · ·
+0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,
+B =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
+...
+0
+0
+...
+0
+Pd1
+j=1
+Pd2
+k=1 ajbkB([e1
+j, e3
+1]m, e2
+k)(λ2 −λ1)
+...
+Pd1
+j=1
+Pd2
+k=1 ajbkB([e1
+j, e3
+d3]m, e2
+k)(λ2 −λ1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.
+Then it is rank(A) = rank(A, B) for any aj, bk (j = 1, . . . , d1, k = 1, . . . , d2) not all
+equal to zero if and only if λ1 = λ2.
+We now assume that X ∈m1 ⊕m3. Then in system (11) all b1, b2, . . . , bd3 are zero,
+hence we obtain that
+
+8
+ANDREAS ARVANITOYEORGOS AND YU WANG
+A = −
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Pd1
+j=1 ajB([e0
+1, e1
+1]m, e1
+j)λ1
+· · ·
+Pd1
+j=1 ajB([e0
+l , e1
+1]m, e1
+j)λ1
+...
+...
+Pd1
+j=1 ajB([e0
+1, e1
+d1]m, e1
+j)λ1
+· · ·
+Pd1
+j=1 ajB([e0
+l , e1
+d1]m, e1
+j)λ1
+0
+· · ·
+0
+...
+...
+0
+· · ·
+0
+Pd3
+s=1 csB([e0
+1, e3
+1]m, e3
+s)λ3
+· · ·
+Pd3
+s=1 csB([e0
+l , e3
+1]m, e3
+s)λ3
+...
+...
+Pd3
+s=1 csB([e0
+1, e3
+d3]m, e3
+s)λ3
+· · ·
+Pd3
+s=1 csB([e0
+l , e3
+d3]m, e3
+s)λ3
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+,
+B =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+0
+...
+0
+Pd1
+j=1
+Pd3
+s=1 ajcsB([e1
+j, e2
+1]m, e3
+s)(λ3 −λ1)
+...
+Pd1
+j=1
+Pd3
+s=1 ajcsB([e1
+j, e2
+d2]m, e3
+s)(λ3 −λ1)
+0
+...
+0
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.
+Therefore, rank(A) = rank(A, B) for any aj, cs (j = 1, . . . , d1, s = 1, . . . , d3, ) not
+all equal to zero, if and only if λ1 = λ3. We conclude that the generalized Wallach
+spaces of types 2), 3) in Theorem 1 are g.o. spaces, if and only if the metric (λ1, λ2, λ3)
+satisﬁes λ1 = λ2 = λ3.
+□
+4. Homogeneous geodesics in generalized Wallach spaces
+Let (G/K, g) be a generalized Wallach space with B-orthogonal decomposition g =
+k ⊕m, where m = m1 ⊕m2 ⊕m3 and B = −Killing form on g. Let {e0
+i } and {ej
+s} be
+the orthogonal bases of k and mj respectively with respect to B (1 ≤i ≤l, j = 1, 2, 3,
+1 ≤s ≤dj). For any X ∈g \ {0} we write
+X =
+l
+X
+i=1
+xie0
+i +
+d1
+X
+j=1
+aje1
+j +
+d2
+X
+k=1
+bke2
+k +
+d3
+X
+s=1
+cse3
+s,
+xi, aj, bk, cs ∈R.
+In order to ﬁnd all homogeneous geodesics in G/K, it suﬃces to ﬁnd all the real
+solutions of system (11), of d1+d2+d3 quadratic equations for the variables xi, aj, bk, cs,
+which are not all equal to zero.
+By Theorem 2 we only consider homogeneous geodesics in generalized Wallach spaces
+types 2) and 3) given in Theorem 1 for the metric (λ1, λ2, λ3), where at least two of
+λ1, λ2, λ3 are diﬀerent.
+Then the geodesic vectors correspond to those solutions of
+system (11) for the variables xi, aj, bk, cs, which are not all equal to zero. However, for
+many generalized Wallach spaces it is diﬃcult to ﬁnd all the real solutions of system
+(11).
+Next, we will give two examples of generalized Wallach spaces and give all the ho-
+mogeneous geodesics for any given metric.
+
+HOMOGENEOUS GEODESICS IN GENERALIZED WALLACH SPACES
+9
+Example 1. We consider the generalized Wallach space SU(2)/{e}.
+Let {√−1hα, Aα
+√
+2, Bα
+√
+2} be an orthogonal basis of su(2) with respect to B, where α
+denotes a simple root of the Lie algebra su(2), and Aα = Eα −E−α, Bα = √−1(Eα +
+E−α). Here {Eα} denotes the Weyl basis of su(2). We set Xα = Aα
+√
+2, Yα = Bα
+√
+2. Then
+we have that
+[
+√
+−1hα, Xα] = α(hα)Yα = Yα,
+[
+√
+−1hα, Yα] = −α(hα)Xα = −Xα,
+[Xα, Yα] =
+√
+−1hα.
+The Lie algebra su(2) has an orthogonal decomposition su(2) = m1 ⊕m2 ⊕m3, where
+m1, m2, m3 are spanned by √−1hα, Xα and Yα respectively. For any X ∈su(2) we write
+X = a
+√
+−1hα + bXα + cYα,
+a, b, c ∈R.
+We will ﬁnd all geodesic vectors of SU(2)/{e} for a given metric (λ1, λ2, λ3). System
+(11) for SU(2)/{e} is
+
+
+
+
+
+bc(λ3 −λ2) = 0
+ac(λ3 −λ1) = 0
+ab(λ2 −λ1) = 0.
+(12)
+Case 1. λ1 = λ2 ̸= λ3. The solutions of the system (12) are c = 0 or c ̸= 0, a = b = 0,
+so the geodesic vectors are X = a√−1hα + bXα and X = cYα.
+Case 2. λ1 = λ3 ̸= λ2. The solutions of the system (12) are b = 0 or b ̸= 0, a = c = 0,
+so the geodesic vectors are X = a√−1hα + cYα and X = bXα.
+Case 3. λ2 = λ3 ̸= λ1. The solutions of the system (12) are a = 0 or a ̸= 0, b = c = 0,
+so the geodesic vectors are X = bXα + cYα and X = a√−1hα.
+Case 4. λ1, λ2, λ3 are distinct. Then system (12) reduces to ab = ac = bc = 0, whose
+solutions are a = b = 0 or a = c = 0 or b = c = 0. In this case any vector X ∈mi\{0}
+(i = 1, 2, 3) is a geodesic vector.
+Therefore we obtain the following theorem, which recovers a result on R.A. Marinosci
+[21, p. 266]
+Proposition 3. For the generalized Wallach space SU(2)/{e} the only geodesic vectors
+for a given metric (λ1, λ2, λ3) are the following:
+1) If λi = λj ̸= λk (i, j, k ∈{1, 2, 3}), then any vector X ∈mk\{0} or X ∈(mi ⊕
+mj)\{0}.
+2) If λ1, λ2, λ3 are distinct, then any vector X ∈m1 ∪m2 ∪m3.
+Example 2. We consider the generalized Wallach space SO(n)/SO(n −2), (n ≥4).
+This is the Stiefel manifold of orthonormal 2-frames in Rn. Let so(n) and so(n −2)
+be the Lie algebras of SO(n) and SO(n −2) respectively. Let Eab denote the n × n
+matrix with 1 in the (ab)-entry and 0 elsewhere.
+If eab = Eab −Eba, then the set
+B = {eij = Eij −Eji : 1 ≤i < j ≤n} is a B-orthogonal basis of so(n).
+The
+multiplication table of the elements in B is given as follows:
+Lemma 2. If all four indices are distinct, then the Lie brackets in B are zero. Other-
+wise, it is [eij, ejk] = eik, where i, j, k are distinct.
+
+10
+ANDREAS ARVANITOYEORGOS AND YU WANG
+Let so(n) = k ⊕m1 ⊕m2 ⊕m3 be an orthogonal decomposition of so(n) with respect
+to B, where k = spanR{eij : 3 ≤i < j ≤n}, m1 = spanR{e12}, m2 = spanR{e1j : 3 ≤
+j ≤n}, and m3 = spanR{e2j : 3 ≤j ≤n}. For any X ∈so(n) we write
+X =
+X
+3≤i<j≤n
+aijeij + a12e12 +
+X
+3≤j≤n
+a1je1j +
+X
+3≤j≤n
+a2je2j,
+aij ∈R.
+Then system (11) for SO(n)/SO(n −2) takes the form
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(a13a23 + a14a24 + · · · + a1na2n)(λ3 −λ2) = 0
+−(a14a34 + a15a35 + · · · + a1,na3n)λ2 = a12a23(λ3 −λ1)
+(a13a34 −a15a45 −a16a46 −· · · −a1na4n)λ2 = a12a24(λ3 −λ1)
+(a13a35 + a14a45 −a16a56 −a17a57 −· · · −a1na5n)λ2 = a12a25(λ3 −λ1)
+...
+(a13a3,n−1 + · · · + a1,n−2an−2,n−1 −a1nan−1,n)λ2 = a12a2,n−1(λ3 −λ1)
+(a13a3n + a14a4,n + · · · + a1,n−1an−1,n)λ2 = a12a2n(λ3 −λ1)
+−(a24a34 + a25a35 + · · · + a2na3n)λ3 = a12a13(λ1 −λ2)
+(a23a34 −a25a45 −a26a46 −· · · −a2na4n)λ3 = a12a14(λ1 −λ2)
+(a23a35 + a24a45 −a26a56 −a27a57 −· · · −a2na5n)λ3 = a12a15(λ1 −λ2)
+...
+(a23a3,n−1 + · · · + a2,n−2an−2,n−1 −a2nan−1,n)λ3 = a12a1,n−1(λ1 −λ2)
+(a23a3n + a24a4n + · · · + a2,n−1an−1,n)λ3 = a12a1,n(λ1 −λ2).
+(13)
+As the above system is diﬃcult to handle, we restrict to the Stiefel manifold SO(4)/SO(2)
+and look for geodesics X = a34e34 + a12e12 + a13e13 + a14e14 + a23e23 + a24e24. Then the
+above system simpliﬁes to
+
+
+
+
+
+
+
+
+
+
+
+
+
+(a13a23 + a14a24)(λ3 −λ2) = 0
+a34a14λ2 = −a12a23(λ3 −λ1)
+a34a13λ2 = a12a24(λ3 −λ1)
+a34a24λ3 = a13a12(λ2 −λ1)
+a34a23λ3 = −a14a12(λ2 −λ1).
+(14)
+In order to ﬁnd all geodesic vectors in the generalized Wallach space SO(4)/SO(2)
+for a given metric, we should ﬁnd all the non zero real solutions of the system (14).
+Case 1. λ1 = λ2 ̸= λ3. Then system (14) reduces to
+
+
+
+
+
+a13a23 + a14a24 = 0
+a34a14λ1 = −a12a23(λ3 −λ1)
+a34a13λ1 = a12a24(λ3 −λ1).
+(15)
+If a34 = 0 and a12 = 0 then the geodesic vectors are X = a13e13 + a14e14 + a23e23 +
+a24e24 with a13a23 + a14a24 = 0.
+If a34 = 0 and a12 ̸= 0 we get a23 = a24 = 0, so the geodesic vectors are X =
+a12e12 + a13e13 + a14e14.
+If a34 ̸= 0 and a12 = 0 we get a13 = a14 = 0, so the geodesic vectors are X =
+a34e34 + a23e23 + a24e24.
+
+HOMOGENEOUS GEODESICS IN GENERALIZED WALLACH SPACES
+11
+If a34 ̸= 0, a12 ̸= 0 and a23 + a24 = 0 we have a13 = a14, geodesic vectors are
+X = a34e34 + a12e12 + a13e13 + a13e14 + a23e23 −a23e24.
+If a34 ̸= 0, a12 ̸= 0 and a23 + a24 ̸= 0 we have a13 ̸= a14. If a13 = −a14 we have
+a23 = a24, so geodesic vectors are X = a34e34 +a12e12 +a13e13 −a13e14 +a23e23 +a23e24.
+If a13 ̸= −a14 we have a23 ̸= a24, so geodesic vectors are X = a34e34 + a12e12 + a13e13 +
+a14e14 + a23e23 + a24e24.
+Case 2. λ1 = λ3 ̸= λ2. Then system (14) reduces to
+
+
+
+
+
+a13a23 + a14a24 = 0
+a34a24λ1 = a13a12(λ2 −λ1)
+a34a23λ1 = −a12a14(λ2 −λ1).
+(16)
+If a34 = 0 and a12 = 0, geodesic vectors are X = a13e13 + a14e14 + a23e23 + a24e24
+with a13a23 + a14a24 = 0.
+If a34 = 0 and a12 ̸= 0 we get a13 = a14 = 0, geodesic vectors are X = a12e12 +
+a23e23 + a24e24.
+If a34 ̸= 0 and a12 = 0 we get a23 = a24 = 0, geodesic vectors are X = a34e34 +
+a13e13 + a14e14.
+If a34 ̸= 0, a12 ̸= 0 and a23 + a24 = 0 we have a13 = a14, geodesic vectors are
+X = a34e34 + a12e12 + a13e13 + a13e14 + a23e23 −a23e24.
+If a34 ̸= 0, a12 ̸= 0 and a23 + a24 ̸= 0 we have a13 ̸= a14. If a13 = −a14 we have
+a23 = a24, so geodesic vectors are X = a34e34 +a12e12 +a13e13 −a13e14 +a23e23 +a23e24.
+If a13 ̸= −a14 we have a23 ̸= a24, so geodesic vectors are X = a34e34 + a12e12 + a13e13 +
+a14e14 + a23e23 + a24e24.
+Case 3. λ3 = λ2 ̸= λ1. Then system (11) reduces to
+
+
+
+
+
+
+
+
+
+a34a14λ2 = −a12a23(λ2 −λ1)
+a34a13λ2 = a12a24(λ2 −λ1)
+a34a24λ2 = a13a12(λ2 −λ1)
+a34a23λ2 = −a14a12(λ2 −λ1).
+(17)
+If a34 = 0 and a12 = 0, geodesic vectors are X = a13e13 + a14e14 + a23e23 + a24e24.
+If a34 = 0 and a12 ̸= 0 we have a13 = a14 = a23 = a24 = 0, geodesic vectors are
+X = a12e12.
+If a34 ̸= 0 and a12 = 0 we have a13 = a14 = a23 = a24 = 0, geodesic vectors are
+X = a34e34.
+If a34 ̸= 0, a12 ̸= 0 and a23 + a24 = 0 we have a13 = a14, geodesic vectors are
+X = a34e34 + a12e12 + a13e13 + a13e14 + a23e23 −a23e24.
+If a34 ̸= 0 , a12 ̸= 0 and a23 + a24 ̸= 0 we have a13 ̸= a14. If a13 = −a14 we have
+a23 = a24, so geodesic vectors are X = a34e34 +a12e12 +a13e13 −a13e14 +a23e23 +a23e24.
+If a13 ̸= −a14 we have a23 ̸= a24, so geodesic vectors are X = a34e34 + a12e12 + a13e13 +
+a14e14 + a23e23 + a24e24.
+Case 4. λ1, λ2, λ3 are all diﬀerent.
+If a34 = 0 and a12 = 0, geodesic vectors are X = a13e13 + a14e14 + a23e23 + a24e24
+with a13a23 + a14a24 = 0.
+If a34 = 0 and a12 ̸= 0 we have a13 = a14 = a23 = a24 = 0, geodesic vectors are
+X = a12e12.
+If a34 ̸= 0 and a12 = 0 we have a13 = a14 = a23 = a24 = 0, geodesic vectors are
+X = a34e34.
+
+12
+ANDREAS ARVANITOYEORGOS AND YU WANG
+If a34 ̸= 0, a12 ̸= 0 and a23 + a24 = 0 we have a13 = a14, geodesic vectors are
+X = a34e34 + a12e12 + a13e13 + a13e14 + a23e23 −a23e24.
+If a34 ̸= 0 , a12 ̸= 0 and a23 + a24 ̸= 0 we have a13 ̸= a14. If a13 = −a14 we have
+a23 = a24, so geodesic vectors are X = a34e34 +a12e12 +a13e13 −a13e14 +a23e23 +a23e24.
+If a13 ̸= −a14 we have a23 ̸= a24, so geodesic vectors are X = a34e34 + a12e12 + a13e13 +
+a14e14 + a23e23 + a24e24.
+References
+[1] D.V. Alekseevsky and A. Arvanitoyeorgos:
+Riemannian ﬂag manifolds with homogeneous
+geodesics, Trans. Amer. Math. Soc. 359 (2007) 3769–3789.
+[2] D.V. Alekseevsky and Yu. G. Nikonorov: Compact Riemannian manifolds with homogeneous
+geodesics, SIGMA: Symmetry Integrability Geom. Methods Appl. 5(93) (2009) 16 pages.
+[3] A. Arvanitoyeorgos: Homogeneous geodesics in the ﬂag manifold SO(2l+1)/U(l−m)×SO(2m+
+1), Linear Alg. Appl. 428 (2008) 1117–1126.
+[4] Z. Chen, Y. Kang and K. Liang: Invariant Einstein metrics on three-locally-symmetric spaces,
+Commun. Anal. Geom. (to appear) arXiv:1411.2694.
+[5] G. Calvaruso and R.A. Marinosci: Homogeneous geodesics of three-dimensional unimodular Lie
+groups, Mediterr. J. Math. 3 (2006) 467–481.
+[6] Z. Duˇsek: Explicit geodesic graphs on some H-type groups, Rend. Circ. Mat. Palermo Ser. II,
+Suppl. 69 (2002) 77–88.
+[7] Z. Duˇsek and O. Kowalski: Geodesic graphs on the 13-dimensional group of Heisenberg type,
+Math. Nachr. (254-255) (2003) 87–96.
+[8] Z. Duˇsek and O. Kowalski: Light-like homogeneous geodesics and the geodesic lemma for any
+signature, Math. Debrecen. 71 (2007) 245–252.
+[9] Z. Duˇsek, O. Kowalski and S. Nikˇcevi´c: New examples of g.o. spaces in dimension 7, Diﬀerential
+Geom. Appl. 21 (2004) 65–78.
+[10] Z. Duˇsek, O. Kowalski and Z. Vl´aˇsek : Homogeneous geodesics in homogeneous aﬃne manifolds,
+Result. Math. 54 (2009) 273–288.
+[11] C. S. Gordon: Homogeneous manifolds whose geodesics are orbits, in: Topics in Geometry in
+Memory of Joseph D’Atri, Birkh¨a user, Basel, 1996, 155–174.
+[12] V.V. Kajzer: Conjugate points of left-invariant metrics on Lie groups, J. Soviet Math. 34 (1990)
+32–44.
+[13] A. Kaplan: On the geometry of groups of Heisenberg type, Bull. London. Math. Soc. 15 (1983)
+32–44.
+[14] O. Kowalski, S. Nikˇcevi´c and Z. Vl´aˇsek: Homogeneous geodesics in homogeneous Riemannian
+manifolds. Examples, Reihe Mathematik, TU Berlin, No. 665/2000 (9 pages).
+[15] S. Kobayashi and K. Nomizu: Foundations of Diﬀerential Geometry II, Interscience Publisher,
+NewYork, 1969.
+[16] O. Kowalski, F. Pr¨ufer and L. Vanhecke: D’Atri spaces, in: Topics in Geometry, Birkh¨user,
+Boston, 1996, pp.241–284.
+[17] O. Kowalski and J. Szenthe: On the existence of homogeneous geodesics in homogeneous Rie-
+mannian manifolds, Geom. Dedicata 81 (2000) 209–214.
+[18] O. Kowalski and L. Vanhecke: Riemannian manifolds with homogeneous geodesics, Boll. Un. Mat.
+Ital. 5 (1991) 189–246.
+[19] D. Latiﬁ: Homogeneous geodesics in homogeneous Finsler spaces, J. Geom. Phys. 57 (2007) 1411–
+1433.
+[20] A.M. Lomshakov, Yu.G. Nikonorov and E.V. Firsov: Invariant Einstein metrics on three-locally-
+symmetric spaces, Matem. tr. 6(2) (2003), 80–101 (Russian); English translation in: Siberian
+Adv. Math. 14(3) (2004) 43–62.
+[21] R.A. Marinosci: Homogeneous geodesics in a three-dimensional Lie group, Comment. Math. Univ.
+Carolin. 43(2) (2002) 261–270.
+[22] Yu.G. Nikonorov: On a class of homogeneous compact Einstein manifolds, Sibirsk. Mat. Zh. 41(1)
+(2000) 200–205 (Russian); English translation in: Siberian Math. J. 41(1) (2000) 168–172.
+[23] Yu.G. Nikonorov: Classiﬁcation of generalized Wallach spaces, Geom. Dedicata (in press) DOI
+10.1007/s10711-015-0119-z.
+
+HOMOGENEOUS GEODESICS IN GENERALIZED WALLACH SPACES
+13
+[24] S. Philip: Penrose limits of homogeneous spaces, J. Geom. Phys. 56 (2006) 1516–1533.
+[25] J. Szenthe: Sur la connexion naturelle `a torsion nulle, Acta Sci. Math. 38 (1976) 383–398.
+[26] J. Szenthe: Existence of stationary geodesics of left-invariant Lagrangians, J. Phys. A: Math.
+Gen. 34 (2001) 165–175.
+[27] J. Szenthe: Homogeneous geodesics of left-invariant metrics, Univ. Iagel. Acta. Math. 38 (2000)
+99–103.
+[28] J. Szenthe: On the set of homogeneous geodesics of a left-invariant metric, Univ. Iagel. Acta.
+Math. 40 (2002) 171–181.
+[29] H. Tamaru: Riemannian g.o. spaces ﬁbered over irreducible symmetric spaces, Osaka J. Math. 36
+(1999) 835–851.
+[30] M. Wang and W. Ziller: Existence and non-existence of homogeneous Einstein metrics, Invent.
+Math. 84 (1986) 177–194.
+University of Patras, Department of Mathematics, GR-26500 Rion, Greece
+E-mail address: arvanito@math.upatras.gr
+Sichuan university of Science and Engineering, Zigong, 643000, China
+E-mail address: wangyu 813@163.com

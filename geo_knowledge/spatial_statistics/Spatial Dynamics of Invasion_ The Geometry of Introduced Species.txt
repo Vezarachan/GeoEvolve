@@ -1,0 +1,1765 @@
+ 
+1
+Spatial Dynamics of Invasion: The Geometry of Introduced Species  
+Gyorgy Kornissa and Thomas Caracob 
+a Department of Physics, Applied Physics and Astronomy, Rensselaer Polytechnic 
+Institute, Troy, New York 12180, U.S.A., email: korniss@rpi.edu 
+b Department of Biological Sciences, University at Albany, Albany, New York 12222, 
+U.S.A., email: caraco@albany.edu 
+ 
+Abstract 
+Many exotic species combine low probability of establishment at each introduction with rapid 
+population growth once introduction does succeed.  To analyze this phenomenon, we note that 
+invaders often cluster spatially when rare, and consequently an introduced exotic’s population 
+dynamics should depend on locally structured interactions.  Ecological theory for spatially 
+structured invasion relies on deterministic approximations, and determinism does not address the 
+observed uncertainty of the exotic-introduction process.  We take a new approach to the 
+population dynamics of invasion and, by extension, to the general question of invasibility in any 
+spatial ecology.  We apply the physical theory for nucleation of spatial systems to a lattice-based 
+model of competition between plant species, a resident and an invader, and the analysis reaches 
+conclusions that differ qualitatively from the standard ecological theories.  Nucleation theory 
+distinguishes between dynamics of single-cluster and multi-cluster invasion.  Low introduction 
+rates and small system size produce single-cluster dynamics, where success or failure of 
+introduction is inherently stochastic.  Single-cluster invasion occurs only if the cluster reaches a 
+critical size, typically preceded by a number of failed attempts.  For this case, we identify the 
+functional form of the probability distribution of time elapsing until invasion succeeds.  Although 
+multi-cluster invasion for sufficiently large systems exhibits spatial averaging and almost-
+deterministic dynamics of the global densities, an analytical approximation from nucleation 
+theory, known as Avrami’s law, describes our simulation results far better than standard 
+ecological approximations. 
+ 
+Keywords: invasion criteria, nucleation theory, spatial competition  
+
+ 
+2
+1. Introduction 
+The breakdown of biogeographic barriers allows some introduced species to reshape communities 
+(Drake et al., 1989; Hengeveld, 1989; Rosenzweig, 2001) and threaten local biodiversity (Kolar 
+and Lodge, 2002; Pimm, 1987), especially in nature reserves (Usher et al., 1988).  Most 
+introductions fail to initiate invasion (Lonsdale, 1999; Simberloff, 2000).  However, an exotic’s 
+abundance often increases rapidly once introduction does succeed (Christian and Wilson, 1999; 
+Sax and Brown, 2000; Shigesada and Kawasaki, 1997), particularly when an established exotic 
+has an ecological advantage promoting its growth (Callaway and Aschehoug, 2000; Mack et al., 
+2000; Pimentel et al., 2000).   
+ 
+Veltman et al. (1996) analyze 496 documented, intentional introductions of 79 bird 
+species to New Zealand.  The strongest predictor of establishment is repeated introduction.  Most 
+species introduced four or fewer times never became established.  Despite multiple introduction 
+attempts for most species, only 20% of the birds ever became established (Veltman et al., 1996).  
+Repeated failure of introduction, followed by ecological success once established, appears 
+characteristic of both natural dispersal and human-mediated introduction (Sax and Brown, 2000).  
+The seeming inconsistency between repeated failure of the introduction process and an invader’s 
+rapid growth once established motivates our study. 
+ 
+Despite the observed uncertainty of introduction, spatial models for invasion processes 
+typically yield deterministic criteria for growth when rare (Andow et al., 1990; Caraco et al., 
+2002; Chesson, 2000; Kot et al., 1996; cf. Lewis and Pacala, 2000).  An invader’s growth or 
+decline will ordinarily depend on locally structured interactions (Ellner et al., 1998; Wilson, 
+1998), so that chance mechanisms should often govern the population dynamics of rarity (Durrett 
+and Levin, 1994a).  Our results show how introduction rates and the size of the environment can 
+generate random variation in an invader’s success or failure, through effects on the invader’s 
+spatial clustering. 
+Our analysis specifically distinguishes single-cluster growth from multi-cluster growth of a rare 
+exotic competing with a resident plant species through clonal propagation (Harada and Iwasa, 
+1994; Inghe, 1989).  Simulating the model reveals interesting variation in the waiting time for 
+successful introduction and subsequent spread of the exotic.  To characterize our particular results 
+and, more importantly, to offer a new perspective on the population dynamics of invasion, we 
+invoke the physical theory for homogeneous nucleation of spatial systems (Avrami, 1940; 
+Johnson and Mehl, 1939; Kolmogorov, 1937).  Originally formulated to model processes such as 
+crystallization, nucleation theory readily addresses ecological clustering generated by local 
+propagation in viscous populations (Gandhi et al., 1999).  We emphasize that under multi-cluster 
+growth of the exotic species, the dynamics of competition for space, specifically the time-
+dependent decay of the resident’s density, follows a powerful analytic approximation referred to 
+as Avrami’s law (Duiker and Beale, 1990; Ishibashi and Takagi, 1971; Ramos et al., 1999; 
+Rikvold et al., 1994). 
+ 
+2. Spatial model for invader -resident competition 
+Individual plants typically interact more with nearby than with distant individuals (Rees et al., 
+1996; Tilman et al., 1997).  Consequently, an introduction’s success or failure can depend on 
+effects regulated by neighborhood, rather than global, densities (Higgins et al., 1996; Wilson, 
+1998).  We model two clonal species, a resident and an invader, competing for space in a lattice 
+environment.  Each of the L2 lattice sites is either empty or occupied by a single plant; a site 
+represents the minimal space an individual (ramet) requires.  Competition for space is pre-
+emptive; a site already occupied cannot be colonized by either species until the occupant’s 
+mortality opens the site.  Table 1 defines the model’s symbols. 
+
+ 
+3
+The elementary state of any site x belongs to the set σ = {0, i, r}.  The states indicate, 
+respectively, an empty site, occupation by an individual invader, and occupation by an individual 
+of the resident species. 
+First, we describe (0 → i) and (0 → r) transitions.  An empty site may become occupied as a 
+result of introduction from outside the environment, or through local clonal propagation (Cook, 
+1983; Iwasa, 2000).  The invader occupies each empty site via dispersal at constant probabilistic 
+introduction rate βi.  The introduction rate for the resident species is βr.  The introduction process 
+does not depend on an open site’s local neighborhood; introduction corresponds to a spatially 
+uniform, typically weak, background process, modeling long-distance propagule dispersal. 
+ 
+Local clonal propagation depends on neighborhood composition.  A plant occupying a 
+site x may propagate locally if at least one of the δ sites neighboring x is open.  An invader at site 
+x attempts to colonize neighboring sites at total probabilistic rate αi; the propagation rate per 
+neighboring site is αj/δ.  The resident’s total propagation rate is αr, so the rate per site is αr/δ.  
+The chance of successful clonal growth declines with local density.  ηi(x, t) counts invaders 
+neighboring an open site x at time t.  ηr(x, t) counts individuals of the resident species on the same 
+neighborhood; ηi(x, t) + ηr(x, t) ≤ δ. 
+We assume density-independent mortality.  If a site is occupied by an invader, that site becomes 
+open at constant probabilistic rate µi.  The mortality rate for individuals of the resident species is 
+µr. 
+Next we specify the model’s transition rates.  Introduction and local propagation occur 
+independently, so that an open site becomes occupied by an invader, a (0 → i) transition, at total 
+rate βi + ηi(x, t) αi/δ.  An open site becomes occupied by a resident, a (0 → r) transition, at total 
+rate βr + ηr(x, t) αr/δ.  The (i → 0) transition, where invader mortality opens a site, occurs at rate 
+µi; the (r → 0) transition occurs at rate µr.  
+ 
+Throughout, we set βi = βr = β, and µi = µr = µ, so that asymmetry between the invader 
+and resident is due solely to the difference in the local propagation rates αi and αr.  We keep αi > 
+αr, and ask how the invader’s clonal-growth advantage affects the dynamics of invasion as we 
+vary lattice size and the introduction rate.  We keep β much smaller than the other rates, so that 
+neighborhood competition drives the dynamics, but trapping states are avoided during simulation. 
+ 
+3. Mean-field approximation 
+The mean-field approximation offers a clear picture of the basic biological problem, and so 
+guides analysis of the spatial model.  The mean-field model assumes homogeneous mixing, and 
+so ignores effects of spatial clustering on the dynamics. 
+Let ρj represent the global density of sites with state j.  Under the mean-field approximation, 
+(
+)(
+)
+i
+r
+j
+dt
+d
+j
+i
+r
+j
+j
+j
+,
+;
+1
+=
+−
+−
+−
++
+=
+µρ
+ρ
+ρ
+ρ
+α
+β
+ρ
+ 
+   
+ 
+ 
+        (1) 
+To focus on spatial competition, we temporarily suppress immigration by setting 
+0
+=
+β
+ (see 
+Lehman and Tilman, 1997).  Then there are three equilibrium fixed points (ρ*
+r, ρ*
+i); none allows 
+coexistence.  Mutual extinction, (ρ*
+r, ρ*
+i) = (0, 0), is stable when each αj  < µ.  Competitive 
+exclusion of the invader by the resident, where (ρ*
+r, ρ*
+i) = (1 - µ/αr, 0), is stable when αr  > µ and 
+αr  > αi.  Finally, exclusion of the resident species by the exotic, where (ρ*
+r, ρ*
+i)  = (0, 1 - µ/αi), is 
+stable when αi  > µ, and αi  > αr.  We assume αi > αr > µ, so that each species can grow in an 
+empty environment, and the invader has an individual-level advantage.  Given this ordering of 
+parameters, only the last stability criterion can hold.  Therefore, under homogeneous mixing, the 
+exotic is introduced at rate β and the invasion condition, i.e. the condition for the exotic’s 
+advance when rare against the resident at positive equilibrium, is simply αi > αr.  Since the 
+invader has this advantage, it will proceed to exclude the resident (to order β with introduction 
+allowed) under homogeneous mixing.  
+
+ 
+4
+Integrating Eqs. (1) numerically yields time dependent global densities. Figure 1 shows the 
+results for different values of β (β << µ, αr, αi).  Initializing the environment as fully occupied by 
+resident, the system very rapidly relaxes to a phase dominated by the resident species, where the 
+global densities are simply (ρ*
+r, ρ*
+i) = (1 - µ/αr, 0) up to order β.  This fixed point of Eqs. (1) is 
+not stable, but the densities stay very close to these values for some time before the invader’s 
+growth becomes noticeable.  In this sense, we refer to this phase where the resident resists 
+invasion as “meta-stable.”  We define the characteristic time τ, the lifetime of the resident 
+species, as the time until the resident’s density decays to half of its meta-stable value.  As β is 
+decreased, the global densities as functions of time shift to the right (Fig. 1); note that the increase 
+of the lifetime as β decreases is extremely slow, proportional to – log(β). 
+As noted above, approximating the spatial dynamics by mean-field or pair correlation methods 
+(Bolker and Pacala, 1999; Matsuda et al., 1992), yields deterministic criteria for advance when 
+rare; these methods, by construction, cannot address the observed stochastic variation in success 
+or failure of introduction.  Furthermore, for parameter values we use in simulations of the 
+spatially detailed model, the standard approximations fail to describe the dynamics following 
+invasion; see Discussion.  After describing our simulations, we apply nucleation theory to 
+characterize both the uncertainty of the introduction process and the advance of the invader. 
+ 
+4. Simulation results 
+We implemented standard dynamic Monte Carlo (MC) simulations on an L×L lattice with 
+periodic boundaries.  Neighborhood size was δ  = 4.  The time unit was one MC step per site 
+(MCSS), during which L×L sites were picked randomly and updated probabilistically.  This 
+procedure simulates continuous-time dynamics in the large L limit (Durrett and Levin, 1994b; 
+Korniss et al., 1999).  From the mean-field computations, one might not expect the competitively 
+inferior resident to resist invasion and induce slow dynamics, since the lifetime of the resident 
+species increased only logarithmically with decreasing β.  However, simulation of the spatial 
+model revealed slow “meta-stable” decay of the resident.  That is, spatially structured interactions 
+slow the timescale of competitive systems (Hurtt and Pacala, 1995; Lehman and Tilman, 1997). 
+Fixing µ = 0.10, αr = 0.70, and αi = 0.80 (the same values used in the mean-field approximation), 
+we found qualitative variation in the dynamics for introduction rates 10-8 ≤ β ≤ 10-4, and similarly 
+for system sizes 32 ≤ L ≤ 512.  At t = 0 we initialize the environment with all sites occupied by 
+the resident.  After about (typically less than) 10 MCSS the system relaxes to a “meta-stable” 
+configuration dominated by the resident with a small density of empty sites; we designate the 
+meta-stable density of the resident as ρr = rms.  Individuals of the exotic species occasionally 
+occupy empty sites via introduction.  An immigrant invader may die without propagating.  If a 
+site opens up in the neighborhood of a rare invader, the empty site is likely surrounded by more 
+than one resident.  The resident’s greater local density more than compensates for its lower 
+propagation rate per individual, so the resident has the better chance of colonizing the empty site; 
+see Discussion.  Consequently, small clusters of invaders usually shrink and disappear.  
+Introductions fail since preemptive competition imposes a strong constraint on the exotic’s 
+growth.  Introduction succeeds only if the exotic can generate a spatial cluster large enough that it 
+statistically tends to grow at its periphery.  On coarse-grained length scales, nucleation theory 
+suggests that there exists a critical radius for invader clusters; smaller clusters decline in size, 
+while clusters with a radius larger than the critical value will more likely grow than decline 
+(Gandhi et al., 1999).  Simulations confirm this picture, and suggest an interesting distinction 
+between single and multi-cluster invasion.  For β = 10-6, a 128×128 system exhibits single-cluster 
+invasion (Fig 2).  Increasing β to 10-4 produces multi-cluster invasion (Fig. 3).  Holding β 
+constant and increasing the system size L would also generate multi-cluster invasion.  Since the 
+spatial structure of the introduction process exhibits nucleation and growth of invader clusters, we 
+apply nucleation theory as described in the next section. 
+
+ 
+5
+ 
+5. Nucleation theory 
+Nucleation theory’s ecological significance lies in its prediction of population dynamics 
+according to an invader’s spatial-clustering pattern.  Our application of nucleation theory rests on 
+the conceptual similarity between biological invasion and meta-stable decay in physical systems.  
+In particular, our analysis parallels the theory developed by Rikvold et al. (1994), Richards et al. 
+(1995), and Korniss et al. (1999) for magnetization switching in ferromagnetic materials. 
+When the resident species’ density ρr(t) first falls to rms/2, we consider the resident competitively 
+dominated by the exotic (defining competitive dominance in terms of any particular global 
+fraction of sites which the resident occupies does not affect the dynamics).  The non-negative 
+random variable τ will represent the first-passage time of the resident’s density to rms/2, in 
+accordance with earlier definition of the lifetime for the mean-field approximation.  The mean 
+waiting time 〈τ〉 is called the meta-stable lifetime; the expected time elapsing until the resident’s 
+global density is ½ its meta-stable value.  In single-cluster invasion τ sums the random waiting 
+time until successful introduction and a subsequent period of invasive spread.  Nucleation is 
+equivalent to successful introduction; invasive spread begins when a critically sized cluster of 
+invaders first forms.  In multi-cluster invasion, clusters of the critical size continuously form and 
+grow, leading to many invading species’ clusters of various sizes; see snapshots of the 
+environment in Fig. 3.  In this section we identify how the probability distribution of τ differs 
+between single-cluster and multi-cluster invasion, and interpret this difference ecologically. 
+ 
+5.1. Single-cluster invasion 
+In single-cluster invasion, random variation in the time until a cluster exceeds critical size 
+contributes more to the variance of τ than does variation in the period of invasive growth 
+following successful introduction.  Different realizations of the introduction and invasion 
+dynamics (simulations with the same initial configuration of the resident, but using different 
+random numbers) show that the average time for meta-stable decay has little predictive 
+significance for single-cluster dynamics.  In fact, the standard deviation is comparable to the 
+average (Fig. 4a); the ecological implication is that uncertainty of the success or failure of 
+introduction makes single-cluster invasion inherently stochastic. 
+When the typical cluster separation (of a hypothetical infinite system) exceeds the finite 
+environment size L, the spatial dynamics of the latter (finite) system almost always exhibits meta-
+stable escape through nucleation and growth of a single cluster of the superior species (Rikvold et 
+al., 1994).  Ecologically, if the introduction rate or environment size is sufficiently small, the 
+invasion geometry will always involve single-cluster dynamics.  While the introduction of an 
+invader at an empty site is a Poisson process by the construction of our stochastic spatial model, it 
+is not known a priori whether the nucleation of a successful invading cluster (one which has just 
+reached the critical size) will also be Poisson.  However, we shall suppose, as a working 
+assumption, that nucleation of a single invader cluster is a Poisson process as well, and verify this 
+assumption using simulations.  Following this assumption, single-cluster invasion (advance of the 
+first critical cluster) should be described by an exponential distribution of time until successful 
+introduction of the invader.  Consider the cumulative probability distribution of competitive 
+waiting times, i.e., the probability that the resident’s global density has not decayed to rms/2 by 
+time t, Pnot(t)  = P(τ > t).  For single-cluster invasion, analysis by Richards et al. (1995) shows us 
+that 
+
+
+
+
+
+
+>
+
+
+
+
+
+
+
+
+
+
+−
+−
+<
+=
+g
+t
+t
+it
+g
+t
+t
+g
+t
+t
+t
+P
+for
+exp
+for
+1
+)
+(
+not
+  
+ 
+ 
+ 
+        (2) 
+
+ 
+6
+where 〈ti〉 is the mean time until successful introduction of the exotic (mean nucleation time) and 
+tg is the duration of invasive spread; we take the latter as constant for single-cluster invasion, 
+since the growth of a single, supercritical cluster can be treated deterministically.  Note that tg 
+does not depend on β, but only on µ, αi, αr, and system size L.  Given the symmetry of resident 
+decline and invader growth (Fig. 4a), we approximate tg as the time for the supercritical cluster of 
+the invading species to grow and fill half the environment.  For fixed µ, αi, and αr, the 
+characteristic time scale (the mean nucleation time 〈ti〉), depends only on β and the system size L.  
+More precisely, nucleation of a critical cluster is a Poisson process with nucleation rate per unit 
+area I(β).  Thus, for systems in the single-cluster regime 
+1
+2
+)]
+(
+[
+−
+∝
+〉
+〈
+β
+I
+L
+ti
+                           
+ 
+              
+ 
+        (3) 
+in two dimensions (Rikvold et al., 1994).  The distribution of first-passage time τ has a two-
+parameter exponential density (see Bury, 1975) with mean 〈τ〉 = (〈ti〉 + tg), variance 〈ti〉2, and skew 
+2〈ti〉3 > 0. 
+To verify that nucleation of a cluster of critical size is a Poisson process, we simulated 103 (104 
+for some parameter values) independent realizations of introduction and invasion, and constructed 
+the cumulative distribution Pnot(t).  Figure 5, (a) and (b), compares the results with Eq. (2) for 
+fixed β and various L values, and for fixed L and various β values, respectively.  Fitting an 
+exponential to the data (a straight line on log-linear scales), we estimated the mean time to 
+successful introduction 〈ti〉 (i.e., the nucleation time of the first critical cluster) as the inverse of 
+the slope in Fig. 5.  Then one can read the invasive-spread time tg from the figure; from 
+expression (2) tg is equal to the maximal time at which
+)
+(
+not t
+P
+ is unity. 
+We also confirmed the dependence of 〈ti〉 on L, as indicated in Eq. (3), and found that 
+β
+β ∝
+)
+(I
+; 
+the rate of successful introduction is proportional to the introduction rate.  Since the typical 
+separation between invading species’ clusters increases with decreasing β (Richards et al., 1995), 
+the fundamental consequence of these findings is that given an arbitrarily large but finite and 
+fixed system size L, for sufficiently small β the system will exhibit single-cluster growth of the 
+invader with 
+1
+−
+∝
+〉
+〈
+β
+it
+.  Note that this behavior of the time elapsing until successful 
+introduction follows directly follows from the microscopic dynamics for small β .  However, 
+〉
+〈it
+ remains orders of magnitude larger than one would estimate based simply on the system size 
+and the density of open sites, since many exotic clusters fail to grow before introduction 
+succeeds.  Most importantly, the average lifetime for decay of the resident’s density increases 
+rather quickly as β decreases, in stark contrast with the weak logarithmic divergence predicted by 
+the mean-field model (and pair approximation models; see Discussion).  Also note that for small 
+β, 
+〉
+〈
+≈
+〉
+〈
+it
+τ
+, (since 
+g
+i
+t
+t
+>>
+〉
+〈
+), and 〈ti〉 equals to the standard deviation of the exponential 
+lifetime distribution, Eq. (2). 
+When introduction rates or the numbers of habitable sites in an environment are sufficiently 
+small, ecological invasion of a locally propagating species should occur as the growth of a single 
+invader cluster.  The inherent stochasticity of the single-cluster process renders invasion time 
+highly unpredictable.  The standard deviation of the meta-stable lifetime τ is as large as the mean, 
+and standard ecological methods for spatial systems do not address the uncertainty of invasion 
+dynamics.  Nucleation theory, as a first step, provides a functional form characterizing the 
+random waiting time of single-cluster invasion process. 
+ 
+5.2. Multi-cluster invasion 
+In multi-cluster invasion, realizations of introduction and invasion processes are quite different 
+from those of single-cluster growth.  Species’ global densities exhibit only small fluctuations 
+about their time-dependent averages (Fig. 4b; cf. Fig. 4a).  Therefore, the first-passage time of the 
+
+ 
+7
+resident’s density to half its initial value has a standard deviation much smaller than its average 
+〈τ〉.  Nucleation and subsequent expansion of many clusters implies that global density is a sum of 
+random variables, and spatial averaging of local densities within the multi-cluster process reduces 
+the variability of the time-dependent global densities among different realizations of the process.  
+This reduction in variability of the dynamics of the global species’ densities, resulting from 
+averaging local behavior of a large number of clusters, is sometimes termed “self-averaging.” 
+To model decay of the resident’s density under multi-cluster invasion, we again invoke nucleation 
+theory.  Increasing the introduction rate β or system size L2 leads to the nucleation and 
+subsequent growth of many invader clusters (Ramos et al., 1999).  The meta-stable lifetime 
+〉
+〈τ , 
+the resident’s mean first-passage time to rms/2, becomes independent of the size of the 
+environment; the standard deviation is proportional to the inverse of the square root of system 
+size, i.e., 
+L
+/
+1
+.  Further, since global densities reflect spatial averaging of local densities during 
+the nucleation and growth of many invader clusters, the distribution of the first-passage time τ is 
+normal (Richards et al., 1995).  We express the corresponding cumulative probability distribution 
+Pnot(t) as an error function (Fig. 6a); the point where the Pnot(t) functions for different system sizes 
+cross corresponds to the system-size independent meta-stable lifetime for the resident species’ 
+decay (Korniss et al., 1999).  Compared to the single-cluster mode, the mean first-passage time 
+〉
+〈τ  is decreased (and becomes system-size independent in the large-L limit).  Importantly, as the 
+size of the environment invaded increases, the variance and skew of τ go to zero. 
+The preceding observations imply that, for multi-cluster invasion, global densities ρj(t) converge 
+to deterministic functions in large environments.  Hence we tested KJMA theory, so named for its 
+developers: Kolmogorov (1937), Johnson & Mehl (1939) and Avrami (1940).  In particular, we 
+tested Avrami’s law, which predicts the time-dependent global density of the resident species 
+when the superior competitor invades through the nucleation and growth of many clusters.  The 
+Avrami picture of meta-stable decay works accurately until invader clusters begin to coalesce, 
+and the invader becomes the more abundant species; Ramos et al. (1999) offer a visual 
+characterization of multi-cluster dynamics.  According to Avrami’s law the global density of the 
+meta-stable resident species decays as 
+( )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+−
+≈
+3
+2
+ln
+exp
+τ
+ρ
+t
+r
+t
+ms
+r
+          
+ 
+ 
+ 
+         
+        (4) 
+where 〈τ〉 is the asymptotically system-size independent mean lifetime of the resident’s decay.  
+The Appendix presents a derivation of Avrami’s law based on the assumptions of multi-cluster 
+nucleation and applies the general result to our ecological-invasion problem to obtain expression 
+(4).  Figure 6(b) shows convincing agreement between simulation averages and Avrami’s law; 
+deviations are noticeable only for very large times [t3 ≥ 1010 (t ≥ 2154), inset of Fig. 6b] when 
+invader clusters begin to coalesce (Korniss et al., 1999) and percolation effects become important 
+(Gandhi et al., 1999). 
+Nucleation theory also relates the system-size independent lifetime 〈τ〉 of the multi-cluster regime 
+to the inherent nucleation rate per unit area I(β) through 
+[
+]
+3
+/
+1
+)
+(
+−
+∝
+〉
+〈
+β
+τ
+I
+                    
+ 
+                           
+ 
+        (5) 
+[see Eq. (A.6) of the Appendix]; note that this proportionality is quite different than that obtained 
+above for single-cluster dynamics.  Eq. (5) enables us to predict the β-dependence of the lifetime 
+in the multi-cluster regime based on measuring the mean nucleation time in single-cluster 
+invasions; see Eq. (3).  Combining that result with Eq. (5) implies that 
+3
+/
+1
+−
+∝
+〉
+〈
+β
+τ
+ in the multi-
+cluster regime. Thus, for an arbitrary small β, in the limit as 
+∞
+→
+L
+, the lifetime of the resident 
+species’ decline eventually approaches an asymptotic system-size independent value, proportional 
+
+ 
+8
+to
+3
+/
+1
+−
+β
+.  While the global densities become deterministic in the multi cluster regime, the β-
+dependence of the lifetime is very different from the weak logarithmic divergence yielded by the 
+mean-field approximation (pair approximation, not shown, is similar to the mean field).  That is, 
+invader density may vary locally across the environment, but the multi-cluster dynamics will 
+maintain the spatially averaged, i.e. the global, density with little variability about a time-
+dependent mean.  Nevertheless, despite this lack of random variation in the global densities, the 
+multi-cluster dynamics with nearest-neighbor interaction may be poorly predicted by standard 
+approximations to spatial processes.  But Avrami’s law, Eq. (4), accurately predicts the simulated 
+multi-cluster invasion dynamics. 
+ 
+6. Discussion 
+Theory in population biology relies heavily on invasion analyses.  That is, predictions commonly 
+are inferred from conditions promoting the initial increase of a rare type (allele, phenotype, or 
+species) among resident types, usually at dynamic equilibrium (see Ferriere and Gatto, 1995).  
+Invasion criteria formalize conditions for local stability of the rare type’s extinction; when 
+extinction is unstable, invasion succeeds.  Models for spatial population processes may be 
+deterministic or stochastic, but the associated invasion criteria typically are deduced from linear, 
+deterministic approximations to a rare type’s dynamics.  However, most introductions in nature 
+presumably begin with a small number of colonists, implying that a more realistic approach to 
+invasion analysis would model discrete individuals and include a random component in the 
+dynamics of rarity (Caraco et al., 1998; Durrett and Levin, 1994a).  Nucleation theory 
+characterizes stochastic properties of introduction and invasion that must often result from 
+spatially structured interactions and locally clustered growth. 
+Our analysis associates random variation in the spatial dynamics of an introduced species with the 
+contrast between the high probability that a given introduction will fail and the ecological 
+dominance of exotics once introduction succeeds (Kolar and Lodge, 2002; Sax and Brown, 2000).  
+If the exotic’s introduction rate or the system size is small, invasion occurs almost always through 
+a single successful invading cluster.  Before that successful event, invader clusters fail to achieve 
+critical size and decline to extinction.  The ultimate decline of the resident occurs only after a 
+number of stochastic introductions of the exotic species fail; when the exotic invades 
+successfully, it grows as a single super-critical cluster (Rikvold et al., 1994). 
+Multi-cluster invasion has distinct features.  In larger systems, or with higher introduction rates, 
+invasive growth of the exotic begins (almost) as soon as biogeographic barriers break down, and 
+dynamics of the global densities becomes nearly deterministic.  For multi-cluster invasion, 
+nucleation theory approximates the decay of the resident by Avrami’s law (Ramos et al., 1999; 
+Richards et al., 1995).  The global densities become self-averaging with an asymptotically 
+system-size independent mean lifetime 〈τ〉 for the resident. Quantitative or qualitative variation in 
+local interactions, through effects on cluster formation and dissolution (Gandhi et al., 1999; van 
+Baalen and Rand, 1998), influences 〈τ〉 and consequently should exert predictable effects on 
+global dynamics; see the Appendix. 
+Ecological implications of nucleation theory extend beyond the neighborhood-level competition 
+we model.  The two limiting processes we emphasize suggest general significance for spatial 
+ecologies. Consider a hypothetically infinite system (i.e., when we take the limit 
+∞
+→
+L
+ first).  
+Then, for all β much smaller than αi, αr, and µ (so that competition drives the dynamics), the 
+system must be in the multi-cluster regime.  Spatial averaging of local dynamics generates 
+(almost) deterministic behavior of the global densities, and Avrami’s law accurately describes the 
+resident’s decay.  Although the global densities are deterministic functions of time for large 
+systems, recall that their dynamics qualitatively differ from the results of the mean-field 
+
+ 
+9
+approximation (Figs. 7a and b).  Further, the lifetime 〈τ〉 increases as 
+3
+/
+1
+−
+β
+ for decreasing β, 
+much faster than the weak logarithmic increase predicted by the mean-field model (Fig. 7c).   
+We also developed a pair approximation to the spatially detailed model (after Iwasa et al., 1998).  
+Pair approximation incorporates short-range spatial correlations, and so evaluates both global 
+densities and the conditional densities of the states of paired, neighboring sites (Rand, 1999).  The 
+pair approximation marginally improves the estimation of the resident species’ lifetime over the 
+mean-field model; pair approximation might better predict global densities for interaction 
+neighborhoods extending beyond nearest neighbors (e.g., Caraco et al., 2001).   Importantly, both 
+mean-field and pair approximations fail to capture the actual behavior of the time-dependent 
+global densities of the spatial model, well described by nucleation theory and Avrami’s law. 
+Now consider the second limiting process.  For any finite system, there is a sufficiently small β 
+where the typical cluster separation increases beyond the system size, and invasion crosses over 
+to the single-cluster mode.  Below this β, we found that 
+1
+−
+∝
+〉
+〈
+β
+τ
+; this is the 
+0
+→
+β
+ limiting 
+behavior of the meta-stable lifetime for a finite system.  Illustrating this scenario for an L = 128 
+system (Fig 7c), we confirmed that for 
+3
+5
+10
+10
+−
+−
+≤
+≤β
+ the system is in the multi-cluster regime 
+and the β-dependence of the lifetime follows 
+3
+/
+1
+−
+β
+.  At around 
+6
+10−
+≈
+β
+ the crossover occurs, 
+and for 
+6
+10−
+≤
+β
+ the system exhibits single-cluster invasion and indeed approaches the 
+1
+−
+∝
+〉
+〈
+β
+τ
+ behavior (Fig. 7c).  Here the invasion is inherently stochastic, and the mean of the 
+lifetime becomes equal to its standard deviation.  Note that in the large-β region (
+2
+10−
+≥
+β
+) 
+nucleation theory breaks down as invading clusters coalesce almost immediately after 
+introduction.  In fact, the mean-field and pair approximations begin to work much better here as a 
+result of the almost immediate mixing of small clusters. 
+We set βi =βr for simplicity; the difference between species was due solely to different rates of 
+local propagation.  However, equal introduction rates might imply that the competitors’ 
+populations outside the environment are the same size (or equally distant), which is unlikely.  For 
+the initial conditions we consider, however, the dynamics is insensitive to βr  (as long as it 
+remains small), since the system is initially occupied densely by the resident species.  Assigning 
+separate introduction rates to the species, in particular, 
+i
+r
+i
+α
+α
+µ
+β
+,
+,
+<<
+ as previously, but 
+with
+0
+=
+r
+β
+, does not alter the dynamics qualitatively; the ecological distinction between single-
+cluster and multi-cluster invasion processes remains important. 
+ 
+6.1.  Local dynamics 
+Our results, in particular the slow decay of the resident species’ density, depend on the 
+discreteness of space.  Bolker et al. (2000) suggest that lattice-based models overemphasize 
+effects of local clumping on dynamics, but we can regard a lattice site as the minimal amount of 
+space (hence, minimal access to resources) necessary to sustain an individual (ramet).  At some 
+scales, this may imply greater realism for the discrete-space approach (Neuhauser and Pacala, 
+1999).  Of course, our detailed simulation results further depend on choices of parameter values, 
+neighborhood size, and system sizes (Filipe and Maule, 2003; McCauley et al., 1993). 
+ 
+The local dynamics help explain the resistance to invasion.  In the absence of the invader, 
+the resident’s global density will be approximated by ρ*
+r = (1 - µ/αr).  Suppose that an individual 
+of the invasive species is introduced, via dispersal, at an open site y at time t.  Approximating the 
+local state frequencies by global densities (e.g., Duryea et al., 1999), the probability that no site is 
+open (for local propagation) among the neighbors of site y is close to (ρ*
+r)δ.  If no site 
+neighboring the single invader is open, the chance that the immigrant invader dies before a 
+neighboring site opens is just (δ + 1) -1, since each individual has the same exponentially 
+distributed waiting time for mortality.  Larger neighborhoods increase the probability that the 
+
+ 
+10
+immigrant will find a neighboring site open, but do not necessarily increase the chance that the 
+invader will propagate into an open site.  To examine the latter probability, we consider a simple 
+example. 
+ 
+Suppose that neighboring sites (x, y) form an (open, invader) pair.  The open site (x) 
+becomes occupied by the invading species at constant probabilistic rate (β + αi /δ).  The same 
+open site becomes occupied by the resident at rate (β + ηr(x, t) αr/δ ), which depends on the 
+number of resident individuals neighboring site x.  Approximating that number ηr(x, t) with a 
+binomial random variable, the resident species occupies the open site at constant probabilistic rate 
+(β + (αr - µ) (δ - 1)/δ).  Although αi > αr, that resident is more likely to acquire the open site as 
+long as 
+(
+)(
+)
+i
+r
+α
+δ
+µ
+α
+>
+−
+−
+1
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+        (6) 
+This expression holds in our simulations; more generally, the invader is less likely to acquire the 
+open site as neighborhood size δ increases. 
+The preceding emphasizes that it is the discreteness of the introduction process and the 
+preemptive nature of the competition that, in combination, allow the resident species to repel 
+small, rare clusters of invaders, before the resident declines.  Recall that this is the sense in which 
+we refer to the possibly lengthy domination of the environment by the resident species as “meta-
+stable.”  In contrast to Gandhi et al. (1999; see below), we do not assume an underlying bistability 
+(such that either species, when common, tends to repel invasion by the other).  That is, our initial 
+global densities are unstable, and the system eventually reaches the stable stationary state 
+dominated by the competitively superior invader. 
+ 
+6.2.  Nucleation theory in biology 
+Gandhi et al. (1998, 1999) model two species competing for space, and consider how cluster 
+growth/decay can influence time to extinction.  The authors assume a somewhat elaborate locally 
+structured dynamics.  The mortality rate for individuals of each species increases as the total 
+density in the local neighborhood increases.  The birth rate for individuals of either species 
+increases as the relative frequency of conspecifics increase locally.  Finally, individuals may 
+move diffusively (Gandhi et al., 1998). 
+As an initial condition, Gandhi et al. (1998, 1999) distribute large numbers of individuals of each 
+species uniformly across the environment.  Gandhi et al. (1998) assume competitively identical 
+species.  If initial densities differ sufficiently, a mean-field model approximates the time elapsing 
+until the less numerous species reaches extinction.  But when both competitors initially occur at 
+high density, clusters quickly form in each species.  Thereafter, the dynamics are driven by 
+interactions at cluster interfaces, and the expected time to extinction increases beyond the mean-
+field prediction.  Gandhi et al. (1999) conduct a similar analysis with asymmetric species, and 
+they invoke nucleation theory’s concept of a cluster size critical for growth in a competitive 
+environment.  The model’s positive frequency-dependent birth rates likely accentuate the rapid 
+decay of small clusters; smaller clusters have greater perimeter curvature, so that individuals on 
+the perimeter have relatively few conspecific neighbors.  Again, in their models nucleation is 
+driven by an underlying bistability (two stable fixed points in terms of the global densities). 
+Our analysis complements the results in Gandhi et al. (1998, 1999).  Each model addresses 
+competition; we assume clonal propagation, while Gandhi et al. model social interactions where 
+paired conspecifics do better than heterospecific pairs (see Giraldeau and Caraco, 2000).  Our 
+analysis focuses on ecological invasion, a process where one species begins at zero density, enters 
+the environment as rare individuals, and advances through single or multi-cluster growth 
+(depending on parameter values).  Gandhi et al. (1998, 1999) initially disperse each species 
+uniformly.  Both species form multiple clusters, and then the sometimes lengthy process of 
+competitive exclusion begins.  Our model’s biological assumptions differ considerably from the 
+model by Gandhi et al. (1998, 1999), but both analyses point to the importance of cluster 
+
+ 
+11
+geometry as a basis for understanding relationships between individual-based interactions and 
+global dynamics. 
+The term “nucleation” has been applied, metaphorically, in studies of community succession 
+(Franks, 2003; Moody and Mack, 1988) and ecological restoration (Robinson and Handel, 2000).  
+These applications refer to an interspecific facilitation, where a plant of one species modifies 
+local sites in a manner promoting the germination and survival of a second species.  Yarranton 
+and Morrison (1974) describe an interesting example by tracing primary succession in a sand-
+dune community.  Persistent vegetation (oak-pine forest) replaces colonizing grassland during 
+succession.  Persistent species begin as local clusters that expand and eventually coalesce, 
+replacing the colonizing species in the process.  But many of the persistent-species clusters are 
+initiated through seedling establishment under individual junipers (Juniperus virginiana), where 
+microclimate is moderated and soil nutrients are concentrated (Yarranton and Morrison, 1974).  
+Our model assumes equivalent sites, but logical extensions of the theory would examine effects 
+of spatial heterogeneity in site quality and exogenous temporal variation in demographic 
+parameters (Korniss et al., 2001). 
+ 
+Finally, we suggest that nucleation theory offers a quantitative context for addressing a 
+diverse series of fundamental questions in biology.  For example, Herrick et al. (2002) analyze 
+DNA replication by invoking formal equivalence between KJMA theory and their stochastic 
+model for replication kinetics of Xenopus DNA.  Initiation of replication forks along the linear 
+DNA molecule is equivalent to nucleation events, and replication fork velocity is equivalent to 
+the rate of cluster growth.  Herrick et al. (2002) present the first reliable description of temporal 
+organization in a higher eukaryote’s DNA replication; nucleation theory provides the study’s 
+conceptual perspective and so guides the interpretation of data. 
+ 
+Acknowledgements 
+Discussion with M. A. Novotny and Z. Toroczkai is gratefully acknowledged.  We also thank Z. 
+Toroczkai for helping us implement a numerical integrator routine for the mean-field and pair 
+approximations. We appreciate the support of NSF Grant DEB-0342689.  G. K. is also supported 
+by NSF through Grant DMR-0113049 and by the Research Corporation through Grant No. 
+RI0761. 
+
+ 
+12
+References 
+Andow, D.A., Kareiva, P.M., Levin, S.A., Okubo, A., 1990. Spread of invading  
+organisms. Land. Ecol. 4, 177-188. 
+Avrami, M., 1940. Kinetics of phase change. II. Transformation-time relations for  
+random distribution of nuclei. J. Chem. Physics 8, 212-240. 
+Bolker, B., Pacala, S. W., 1999. Spatial moment equations for plant competition:  
+understanding spatial strategies and the advantage of short dispersal. Am. Nat. 153, 575-602. 
+Bolker, B. M., Pacala, S. W., Levin, S. A., 2000. Moment equations for ecological  
+processes in continuous space, in: Dieckmann, U., Law, R., Metz., J. A. J. (Eds.), The Geometry 
+of Ecological Interactions. Cambridge University Press, Cambridge, pp. 388-411. 
+Bury, K. V., 1975. Statistical models in applied science. John Wiley & Sons, New York. 
+Callaway, R. M., Aschehoug, E. T., 2000. Invasive plants versus their new and old  
+neighbors: a mechanism for exotic invasion. Science 290, 521-523. 
+Caraco, T., Duryea, M. C., Gardner, G., Maniatty, W., Szymanski, B. K., 1998. Host  
+spatial heterogeneity and extinction of an SIS epidemic. J. Theor. Biol. 192, 351-361. 
+Caraco, T., Duryea, M. C., Glavanakov, S., Maniatty, W., Szymanski, B. K., 2001. Host  
+spatial heterogeneity and the spread of vector-borne infection. Theor. Pop. Biol. 59, 185-206., 
+doi: 10.1006/tpbi.2000.1517.  
+Caraco, T., Glavanakov, S., Chen, G., Flaherty, J.E., Ohsumi, T.K., Szymanski, B.K.,  
+2002. Stage-structured infection transmission and a spatial epidemic: a model for Lyme disease. 
+Am. Nat. 160, 348-359. 
+Chesson, P., 2000. General theory of competitive coexistence in spatially-varying  
+environments. Theor. Pop. Biol., 58, 211-237., doi: 10.1006.tpbi.2000.1486. 
+Christian, J.M., Wilson, S. D., 1999. Long-term ecosystem impacts of an introduced  
+grass in the northern Great Plains. Ecology 80, 2397-2407. 
+Cook, R. E., 1983. Clonal plant populations. Am. Sci. 71, 244-253. 
+Drake, J. A., Mooney, H. A., di Castri, F., Groves, R. H., Kruger, F. J., Rejmánek, M., 
+Williamson, M. (Eds.), 1988. Biological Invasions, A Global Perspective. John Wiley and Sons, 
+New York. 
+Duiker, H. M., Beale, P. D., 1990. Grain-size effects in ferroelectric switching. Phys.  
+Rev. B 41, 490-495. 
+Durrett, R., Levin, S., 1994a. The importance of being discrete (and spatial). Theor. Pop.  
+Biol. 46, 363-394. 
+Durrett, R., Levin, S., 1994b.  Stochastic spatial models: a user’s guide to ecological  
+applications. Phil. Trans. Roy. Soc., London, Series B 343, 329-350. 
+Duryea, M., Caraco, T., Gardner, G., Maniatty, W., Szymanski, B.K., 1999.  Population  
+dispersion and equilibrium infection frequency in a spatial epidemic.  Physica D 132, 511–519. 
+Ellner, S. P., Sasaki, A., Haraguchi, Y., Matsuda, H., 1998. Speed of invasion in lattice 
+population models: pair-edge approximation. J. Math. Biol. 36, 469-484. 
+Ferriere, R., Gatto, M., 1995. Lyapunov exponents and the mathematics of invasion in  
+oscillatory or chaotic populations. Theor. Pop. Biol. 48, 126-171. 
+Filipe, J. A. N., Maule, M. M., 2003. Analytical methods for predicting the behaviour of 
+population models with general spatial interactions. Math. Biosci. 183, 15-35., doi: 
+10.1016/S0025-5564(02)00224-9. 
+Franks, S. J., 2003. Facilitation in multiple life-history stages: evidence for nucleated  
+succession in coastal dunes. Plant Ecol., 168, 1-11., doi: 10.1023/A:1024426608966. 
+Gandhi, A., Levin, S., Orszag, S., 1998. “Critical slowing down” in time-to-extinction: an 
+example of critical phenomena in ecology.  J. Theor. Biol. 192, 363-376. 
+Gandhi, A., Levin, S., Orszag, S., 1999. Nucleation and relaxation from meta-stability in  
+spatial ecological models. J. Theor. Biol. 200, 121-146. 
+Gialdeau, L.-A., Caraco, T. 2000.  Social foraging theory. Princeton University Press,  
+
+ 
+13
+Princeton. 
+Harada, Y., Iwasa, Y., 1994. Lattice population dynamics for plants with  
+dispersing seeds and vegetative propagation. Res. Pop. Ecol. 36, 237-249. 
+Hengeveld, R., 1989. Dynamics of biological invasions. Chapman and Hall, London. 
+Herrick, J., Jun, S., Bechhoefer, J., Bensimon, A. 2002. Kinetic model of DNA  
+replication in eukaryotic organisms. J. Mol. Biol. 320, 741-750. 
+Higgins, S. L., Richardson, D. M., Cowling, R., 1996. Modeling invasive plant spread:  
+the role of plant-environment interactions and model structure. Ecology 77, 2043-2054. 
+Hurtt, G.C., Pacala, S.W. 1995. The consequences of recruitment limitation: reconciling  
+chance, history and competitive differences between plants. J. Theor. Biol. 176, 1-12. 
+Inghe, O. 1989. Genet and ramet survivorship under different mortality regimes – a  
+cellular automaton model. J. Theor. Biol. 138, 257-270. 
+Ishibashi, Y, Takagi, Y., 1971. Note on ferroelectric domain switching. J. Phys. Soc. Jpn.  
+31, 506-510. 
+Iwasa, Y., 2000. Lattice models and pair approximation in ecology, in: Dieckmann, U.,  
+Law, R., Metz., J. A. J. (Eds.), The Geometry of Ecological Interactions. Cambridge University 
+Press, Cambridge, pp. 227-251. 
+Iwasa, Y., Nakamuru, M., Levin, S. A., 1998. Allelopathy of bacteria in a lattice  
+population: competition between colicin-sensitive and colicin-producing strains. Evol. Ecol. 12, 
+785-802. 
+Johnson, W. A., Mehl, R. F., 1939. Reaction kinetics in processes of nucleation and  
+growth. Trans. Am. Inst. Min. Metallur. Engineer. 135, 416-442. 
+Kolar, C. S., Lodge, D. M., 2002. Ecological predictions and risk assessment for alien  
+fishes in North America. Science 298, 1233-1236. 
+Kolmogorov, A. N., 1937. A statistical theory for the recrystallization of metals. Bull.  
+Acad. Sci., USSR, Physics Ser. 1, 355-359. 
+Korniss, G., Novotny, M. A., Rikvold, P. A., 1999. Parallelization of a dynamic Monte  
+Carlo algorithm: a partially rejection-free conservative approach. J. Comput. Physics 153, 488-
+494. 
+Korniss, G., White, C. J., Rikvold, P. A., Novotny, M. A., 2001. Dynamic phase  
+transition, universality, and finite-size scaling in the two dimensional kinetic Ising model in an 
+oscillating field. Physical Rev. E, 63, 016120., doi: 10.1103/PhysRevE.63.016120. 
+Kot, M., Lewis, M. A., van den Driessche, P., 1996. Dispersal data and the spread of  
+invading organisms. Ecology 77, 2027-2042. 
+Lehman, C.L., Tilman, D. 1997. Competition in spatial habitats, in: Tilman, D., Kareiva,  
+P. (Eds.), Spatial Ecology: The Role of Space in Population Dynamics and Interspecific 
+Interactions, Princeton University Press, Princeton, pp 185-203.   
+Lewis, M. A., Pacala, S. W., 2000. Modeling and analysis of stochastic invasion  
+processes. J. Math. Biol. 41, 387-429. 
+Lonsdale, W. M., 1999. Global patterns of plant invasions and the concept of invasibility. 
+Ecology 80, 1522-1536. 
+Mack, R. N., Simberloff, D., Lonsdale, W. M., Evans, H., Clout, M. Bazzaz, F., 2000.  
+Biotic invasions: causes, epidemiology, global consequences and control. Issuses Ecol. 5, 2-20. 
+Matsuda, H. N., Ogita, A., Sasaki, A., Sato, K., 1992. Statistical mechanics of population:  
+the lattice Lotka-Volterra model. Prog. Theor. Physics 88, 1035-1049. 
+McCauley, E., Wilson, W. G., De Roos, A. M., 1993. Dynamics of age-structured and  
+spatially structured predator-prey interactions: individual-based models, and population-level 
+formulations. Am. Nat.142, 412-442. 
+Moody, M. E., Mack, R. N., 1988. Controlling the spread of plant invasions: the  
+importance of nascent foci. J. Appl. Ecol., 25, 1009-10021. 
+Neuhauser, C., Pacala, S. W., 2000. An explicitly spatial version of the Lotka-Volterra  
+
+ 
+14
+model with interspecific competition. Ann. Appl. Prob. 9, 1226-1259.  
+Pimentel, D., Lach, L., Zuniga, R., Morrison, D., 2000. Environmental and economic  
+costs of nonindigenous species in the United States. Biosci. 50, 53-65. 
+Pimm, S. L., 1987. The snake that ate Guam. Trends Ecol. Evol. 2, 293-295. 
+Ramos, R. A., Rikvold, P. A., Novotny, M. A., 1999.  Test of the Kolmogorov-Johnson- 
+Mehl-Avrami picture of meta-stable decay in a model with microscopic  
+dynamics. Phys. Rev. B 59, 9053-9069. 
+Rand, D. A., 1999. Correlation equations and pair approximations for spatial ecologies,  
+in: McGlade, J. M (Ed.), Advanced Theoretical Ecology: Principles and Applications. Blackwell, 
+Oxford. 
+Rees, M., Grubb, P. J., Kelly, D. K., 1996. Quantifying the impact of competition and  
+spatial heterogeneity on the structure and dynamics of a four-species guild of winter annuals. Am. 
+Nat. 147, 1-32. 
+Richards, H. L., Sides, S. W., Novotny, M. A., Rikvold, P. A., 1995. Magnetization  
+switching in nanoscale ferromagnetic grains: description by a kinetic Ising model. J. Magnet. 
+Mater. 150, 37-50. 
+Rikvold, P. A., Tomita, H., Miyashita, S., Sides, S. W., 1994. Metastable lifetimes in a  
+kinetic Ising model: dependence on field and system size. Phys. Rev. E 49, 5080-5090. 
+Robinson, G.R., Handel, S.N., 2000. Directing spatial patterns of recruitment during an  
+experimental urban woodland reclamation. Ecol. Appl. 10, 174-188. 
+Rosenzweig, M. L., 2001. The four questions: What does the introduction of exotic  
+species do to diversity? Evol. Ecol. Res., 3, 361-367. 
+Sax, D. F., Brown, J. H., 2000. The paradox of invasion. Global Ecol. Biogeo. 9, 361- 
+371.  
+Simberloff, D. 2000. Foreword, in: Elton, C. S., The Ecology of Invasions by Animals  
+and Plants. University of Chicago Press, Chicago, pp. vii – xiv. 
+Shigesada, N, Kawasaki, K., 1997. Biological Invasions: Theory and Practice. Oxford  
+University Press, Oxford. 
+Tilman, D., Lehman, C. L., Kareiva, P., 1997. Population dynamics in spatial habitats, in: 
+Tilman, D., Kareiva, P. (Eds.), Spatial Ecology: The Role of Space in Population Dynamics and 
+Interspecific Interactions, Princeton University Press, Princeton, pp 3-20. 
+Usher, M. B., Kruger, F. J., Macdonald, A. W., Loope, L. L., Brockie, R. E., 1988. The  
+ecology of biological invasions into nature reserves: an introduction. Biol. Conserv. 44, 1-8. 
+van Baalen, M., Rand, D. A., 1998. The unit of selection in viscous populations and the 
+evolution of altruism. J. Theor. Biol. 193, 631-648. 
+Veltman, C. J., Nee, S., Crawley, M. J., 1996. Correlates of introduction success in exotic  
+New Zealand birds. Am. Nat. 147, 542-557. 
+Wilson, W., 1998. Resolving discrepancies between deterministic population models and 
+individual-based simulations. Am. Nat. 151, 116-134. 
+Yarranton, G. A., Morrison, R. G., 1974. Spatial dynamics of a primary succession:  
+nucleation. J. Ecology 62, 417-428. 
+
+ 
+15
+Appendix.  KJMA theory for homogeneous nucleation 
+Here we present a brief derivation of KJMA theory (commonly referred to as Avrami’s law) for 
+an infinite system.  Avrami’s law was originally formulated to describe how solids transform 
+from one state of matter (“phase”) to another as they crystallize. Since then, nucleation theory and 
+Avrami’s law have also been applied successfully to domain switching in ferromagnetic (Ramos 
+et al., 1999; Rikvold et al., 1994) and ferroelectric (Duiker and Beale, 1990; Ishibashi and Takagi, 
+1971) materials.  Our development follows Ishibashi and Takagi (1971).  See Duiker and Beale 
+(1990) for discussion of large, but finite systems, in particular, for consideration of finite-size 
+effects where clusters begin to coalesce.  The appendix first offers a description applicable to 
+spatial systems in general, and then specifies application to the model analyzed in the text. 
+The system is initialized in the meta-stable phase.  In homogeneous nucleation the decay of the 
+meta-stable phase (or “switching” to the final equilibrium phase) occurs through random 
+nucleation and subsequent growth of local clusters.  Consider an arbitrary point Q in the d-
+dimensional, infinite “volume.”  The probability that this point is not in the switched volume by 
+time t, 
+)
+(
+not t
+P
+, equals to the volume fraction of the initial phase, 
+)
+(t
+ϕ
+. 
+Recall that we expect an invading cluster to continue to grow only after its radius reaches a 
+critical length rc.  We assume that nucleation of a successful invading cluster (with initial radius 
+rc) is a Poisson process with constant nucleation rate I per unit volume (i.e., the probability of 
+nucleation per unit volume per unit time is I).  Such a cluster, nucleated at time t′, will cover a 
+volume 
+d
+c
+d
+t
+t
+v
+r
+C
+t
+t
+S
+)]
+(
+[
+)
+,
+(
+′
+−
++
+=
+′
+ 
+ 
+ 
+ 
+ 
+ 
+    (A.1) 
+at later time t, where v, the radial velocity of a growing cluster, is approximated by a constant, 
+and Cd defines the relationship between radius and volume in the d-dimensional volume  (i.e., 
+π
+=
+2
+C
+ and 
+3
+/
+4
+3
+π
+=
+C
+). 
+Now divide the 
+)
+,0
+(
+t  time interval into N infinitesimal intervals (
+)t
+j
+t
+j
+∆
++
+∆
+)1
+(,
+ with 
+N
+t
+t
+/
+=
+∆
+, 
+1
+,
+,2
+,1,0
+−
+=
+N
+j
+K
+.  For infinitesimal ∆t, under the assumption of a Poisson 
+process, the probability that no cluster, nucleated in the infinitesimal interval (
+)t
+j
+t
+j
+∆
++
+∆
+)1
+(,
+, 
+will cover point Q at time t  is 
+t
+t
+j
+t
+IS
+∆
+∆
+−
+)
+,
+(
+1
+.  Thus, the probability that point Q is not swept 
+by any cluster (i.e., Q is not in the switched volume) at time t is given by  
+.]
+)
+,
+(
+1[
+]
+,
+(
+1[
+]
+)
+2,
+(
+1
+][
+)
+,
+(
+1
+][
+)
+0,
+(
+1[
+)
+(
+1
+0
+not
+∏
+−
+=
+∆
+∆
+−
+=
+∆
+−
+∆
+∆
+−
+∆
+∆
+−
+∆
+−
+=
+N
+j
+t
+t
+j
+t
+IS
+t
+N
+t
+IS
+t
+t
+t
+IS
+t
+t
+t
+IS
+t
+t
+IS
+t
+P
+K
+ 
+    (A.2) 
+Taking the logarithm of Eq. (A.2), letting 
+0
+→
+∆t
+, and letting
+∞
+→
+N
+(such that 
+t
+t
+N
+=
+∆
+) 
+yields 
+[
+] .
+)
+(
+)1
+(
+)]
+(
+[
+)1
+(
+)]
+(
+[
+)
+,
+(
+]
+)
+,
+(
+1
+ln[
+)
+(
+ln
+1
+1
+0
+1
+0
+0
+0
+1
+0
++
++
++
+→
+∆
+−
+=
+−
++
++
+−
+=
+′
+−
++
++
+=
+′
+′
+−
++
+−
+=
+′
+′
+−
+
+→
+
+∆
+∆
+−
+=
+∫
+∫
+∑
+d
+c
+d
+c
+d
+t
+d
+c
+d
+t
+d
+c
+d
+t
+t
+N
+j
+not
+r
+vt
+r
+d
+v
+IC
+t
+t
+v
+r
+d
+v
+IC
+td
+t
+t
+v
+r
+IC
+td
+t
+t
+S
+I
+t
+t
+j
+t
+IS
+t
+P
+  (A.3) 
+In our case, as in many applications, the critical radius is much smaller than the typical cluster 
+separation (which equals to the average diameter of the cluster when they begin to coalesce) and 
+can be neglected. Then, for rc = 0, the volume fraction of the meta-stable phase becomes 
+  
+ 
+ 
+
+
+
+
+
+
++
+−
+=
+=
++1
+not
+1
+exp
+)
+(
+)
+(
+d
+d
+d
+t
+d
+v
+IC
+t
+P
+t
+ϕ
+,  
+ 
+ 
+    (A.4) 
+which is the general form of Avrami’s law. 
+
+ 
+16
+For our application, 
+2
+=
+d
+.  The meta-stable phase corresponds to the competitively inferior, 
+resident species with a small density of open sites in the background.  The introduced species 
+advances through nucleation (successful introduction) and subsequent cluster growth.  Thus, for 
+the decay of the resident we find  
+
+
+
+
+
+−
+=
+=
+3
+2
+2
+3
+exp
+)
+(
+)
+(
+t
+v
+IC
+r
+t
+r
+t
+ms
+ms
+r
+ϕ
+ρ
+ , 
+ 
+ 
+ 
+    (A.5) 
+where 
+ms
+r
+ is the meta-stable density of the resident.  Recall that we define the meta-stable 
+lifetime 〈τ〉 as the time until the residents’ density decays to one half of its meta-stable value 
+ms
+r
+, 
+i.e., 
+2
+/
+)
+(
+ms
+r
+r
+=
+〉
+〈τ
+ρ
+.  Then from Eq. (A.5) we obtain 
+3
+1
+2
+2
+)
+2
+ln(
+3
+
+
+
+
+
+
+=
+〉
+〈
+v
+IC
+τ
+, 
+ 
+ 
+ 
+ 
+ 
+    (A.6) 
+which explicitly shows the dependence of the lifetime on the nucleation rate per unit volume I  
+and the radial growth velocity of the invading clusters v .  Using this expression for the lifetime, 
+we can write Eq. (A.5) in the form of Eq. (4) of the text 
+  
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+〉
+〈
+−
+=
+3
+)
+2
+ln(
+exp
+)
+(
+τ
+ρ
+t
+r
+t
+ms
+r
+. 
+ 
+ 
+ 
+    (A.7) 
+From the above derivation, Avrami’s law, Eq. (A.7), is generic when the switching mechanism is 
+governed by homogeneous nucleation.  Parameters of the ecological dynamics (αj, β, µ and δ ) 
+govern the meta-stable lifetime through their impact on the nucleation rate per unit volume I and 
+the radial growth velocity v [Eq. (A.6)], leaving the functional form of the of the time-dependent 
+density unchanged in Eq. (A.7). 
+ 
+
+ 
+17
+Figures 
+ 
+ 
+ 
+ 
+ 
+Fig. 1. Time-dependent global densities obtained by numerically integrating the mean-field equations for 
+4
+10−
+=
+β
+, 
+6
+10−, and 
+8
+10− (from left to right, respectively). 
+70
+.0
+=
+r
+α
+, 
+80
+.0
+=
+i
+α
+, and 
+10
+.0
+=
+µ
+ 
+throughout this paper. Matching pairs of ρr(t) and ρi(t) intersect near a density of  0.425. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ 
+18
+ 
+ 
+ 
+ 
+Fig. 2. Single-cluster invasion mode in lattice Monte Carlo simulations. Times are given in units of Monte 
+Carlo steps per site (MCSS); L = 128 and β = 10-6. White represents empty sites, blue and red correspond to 
+sites occupied by resident and invasive species, respectively.  The waiting time for successful introduction 
+exceeds the time between initiation of invasion and the resident becoming numerically superior. 
+ 
+
+ 
+19
+ 
+ 
+ 
+Fig. 3. Multi-cluster invasion mode in lattice Monte Carlo simulations. Times are given in units of MCSS; 
+L = 128 and β = 10-4. Sites are color coded as in Fig. 2. The first successful introduction occurs rapidly; 
+additional clusters nucleate during invasion. Note that the system size L is the same as in Fig. 1. The 
+temporal sequence of configurations in Fig. 2 and Fig. 3 demonstrates the importance of the interplay of the 
+characteristic length scales: the typical cluster separation and the system size.  In our simulations, critical 
+cluster size is clearly smaller than either underlying length scale. 
+ 
+
+ 
+20
+ 
+ 
+ 
+ 
+Fig. 4. Five independent realizations of the time series of the two species’ global densities during (a) 
+single-cluster invasion mode. Note that matching pairs of ρr(t) and ρi(t) intersect near a density of  0.425. 
+(b) During multi-cluster (self-averaging) invasion mode.  The parameters are the same as those in Fig. 2 
+and Fig. 3 for (a) and (b) respectively, i.e., L = 128 for both, β = 10-6 in (a) and β = 10-4 in (b). 
+ 
+
+ 
+21
+ 
+ 
+ 
+ 
+Fig. 5. Cumulative probability distribution for the lifetime of the resident species (the probability that the 
+resident’s density has not decayed to rms/2 by time t ) in the single-cluster invasion regime for (a) β = 10-6 
+and L=32, 64, 128 (from top to bottom, respectively); (b) for L=128 and β = 10-8, 10-7, 10-6 (from top to 
+bottom, respectively). The log-linear scales indicate an exponential distribution for the nucleation process, 
+equation (9). The lifetime distributions were constructed using 104 independent Monte Carlo runs for β =10-
+6; L=32, 64, 128 and 103 independent runs for L=128; β = 10-8, 10-7. 
+
+ 
+22
+ 
+ 
+ 
+ 
+Fig. 6. (a) Cumulative probability distribution for the lifetime of the resident species (the probability that 
+the resident’s density has not decayed to rms/2 by time t ) in the multi-cluster (self-averaging) invasion with 
+β = 10-4 for system sizes indicated. Error functions, with the recorded averages and standard deviations as 
+parameters, are plotted over the corresponding simulation data. The lifetime distributions were constructed 
+using 104 independent Monte Carlo runs. (b) Time-series of the density of the resident species ρr(t) for a 
+256×256 system (using an ensemble average of 100 independent runs) for the same value of β as in (a).  
+The solid line represents Avrami’s law, Eq. (4), not distinguishable from simulation data on these scales. 
+The inset shows ρr(t) vs t3 on log-linear scales indicating where the deviation from Avrami’s law becomes 
+noticeable. 
+
+ 
+23
+ 
+ 
+ 
+ 
+Fig. 7. Comparison of the mean-field approximation with lattice Monte Carlo (MC) simulation results. (a) 
+Time-dependent global densities for 
+4
+10−
+=
+β
+. Here the system size for MC simulations was 
+256
+=
+L
+, 
+yielding self-averaging multi-cluster invasion. (b) The resident’s global density vs 
+3t  shown on log-normal 
+scales illustrate the validity of nucleation theory and Avrami’s law, and the weakness of the mean-field 
+approximation. (c) Lifetime of the resident in the mean-field approximation and by Monte Carlo (MC) 
+simulations for L=128 as a function of the introduction rate β.  Log-log scales are used to capture the range 
+of β spanning several orders of magnitude and the resulting disparate timescales for the lifetime 〈τ〉 in the 
+MC simulations. Standard error for the MC lifetime data is less than 4% for all data points (and would 
+correspond to error bars less than the symbol size for the average lifetime on the graph). The two straight-
+line segments correspond to the β-dependence of the average lifetime predicted by nucleation theory in the 
+multi-cluster regime (slope –1/3 on log-log plot) and in the single-cluster regime (slope –1 on the log-log 
+plot). The inset shows the same data on linear-log scales to illustrate the linear dependence of the lifetime 
+on log(β) for the mean-field approximation. The straight line is the best linear fit, 
+)
+log(β
+b
+a −
+, to the 
+mean-field model. 
+
+ 
+24
+Table 1 
+List of model symbols, definitions (numerical value or range used in the simulations, 
+where appropriate) 
+ 
+Symbol 
+Definition 
+ 
+L 
+ 
+Lattice length/width (32 ≤ L ≤ 512) 
+σ 
+ 
+Set of lattice site’s elementary states (empty, invader, resident) 
+βi 
+ 
+Invader’s introduction rate (10-8 ≤ βi ≤ 10-2) 
+βr 
+ 
+Resident’s introduction rate (βr = βi = β) 
+δ 
+ 
+Neighborhood size for clonal growth (4) 
+αi 
+ 
+Invader’s clonal propagation rate (0.8) 
+αr 
+ 
+Resident’s clonal propagation rate (0.7) 
+ηi(x, t)  
+Number of invader neighbors around site x at time t 
+ηr(x, t)  
+Number of resident-species neighbors around site x at time t 
+µi 
+ 
+Invader’s mortality rate (0.1) 
+µr 
+ 
+Resident’s mortality rate (µi = µr = µ = 0.1) 
+ρi 
+ 
+Invader’s global density 
+ρr 
+ 
+Resident’s global density 
+rms 
+ 
+Resident’s “metastable” global density 
+<τ> 
+ 
+Resident’s metastable lifetime 
+ti 
+ 
+Waiting time for invader’s nucleation 
+tg 
+ 
+Time for successful invader to grow to competitive dominance 
+
+ 
+25
+I(β) 
+ 
+Nucleation rate per unit area 
+v 
+ 
+Velocity at which cluster radius grows 
+S(t, t’)  
+Volume of cluster at time t formed at time t’ < t 
+rc 
+ 
+Initial radius of nucleating cluster 
+Cd 
+ 
+Dimension-dependent multiplier 
+d 
+ 
+Dimension of volume within which nucleation occurs 
+ 

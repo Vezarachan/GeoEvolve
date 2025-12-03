@@ -1,13 +1,14 @@
 import os
 from typing import Set
+
+from langchain_core.embeddings import Embeddings
 from langchain_core.language_models import BaseChatModel
-from openai import base_url
 
 SUPPORTED_LLM_BACKENDS: Set[str] = {'OpenAI', 'Gemini', 'Anthropic', 'Groq', 'OpenRouter', 'Custom'}
 SUPPORTED_EMBEDDING_BACKENDS: Set[str] = {'OpenAI', 'Gemini', 'OpenRouter'}
 
 
-def get_embeddings(embedding_model: str, source: str = None):
+def get_embeddings(embedding_model: str, source: str = None) -> Embeddings:
     if embedding_model is None:
         embedding_model = 'text-embedding-small'
     if source is None:
@@ -47,7 +48,8 @@ def get_embeddings(embedding_model: str, source: str = None):
         return OpenAIEmbeddings(model=embedding_model[11:],
                                 base_url='https://openrouter.ai/api/v1',
                                 chunk_size=512,
-                                api_key=os.getenv('OPENROUTER_API_KEY'))
+                                api_key=os.getenv('OPENROUTER_API_KEY'),
+                                check_embedding_ctx_length=False)
     else:
         raise ValueError(
             f"Invalid source: {source}. Valid options are 'OpenAI', 'Gemini'"

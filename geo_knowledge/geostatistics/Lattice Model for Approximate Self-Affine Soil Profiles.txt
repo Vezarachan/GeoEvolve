@@ -1,0 +1,442 @@
+arXiv:cond-mat/0110476v1  [cond-mat.stat-mech]  22 Oct 2001
+Lattice Model for Approximate Self-Aﬃne
+Soil Proﬁles
+A.P.F. Atman a,
+J.G. Vivas Miranda b,
+A. Paz Gonzalez b,
+J.G. Moreira a,
+aDepartamento de F´ısica, Instituto de Ciˆencias Exatas, Universidade Federal de
+Minas Gerais, C. P. 702 30123-970, Belo Horizonte, MG - Brazil
+bInstituto Universitario de Xeolox´ıa “Isidro Parga Pondal”, Universidade da
+Coru˜na, La Coru˜na, Spain
+Abstract
+A modeling of the soil structure and surface roughness by means of the concepts
+of the fractal growth is presented. Two parameters are used to control the model:
+the fragmentation dimension, Df, and the maximum mass of the deposited aggre-
+gates, Mmax. The fragmentation dimension is related to the particle size distribution
+through the relation N(r ≥R) ∼RDf , where N(r ≥R) is the accumulative num-
+ber of particles with radius greater than R. The size of the deposited aggregates
+are chose following the power law above, and the morphology of the aggregate is
+random selected using a bond percolation algorithm. The deposition rules are the
+same used in the model of solid-on-solid deposition with surface relaxation. A com-
+parison of the model with real data shows that the Hurst exponent, H, measured
+via semivariogram method and detrended ﬂuctuation analysis, agrees in statistical
+sense with the simulated proﬁles.
+Key words: surface roughness, soil modelling, self-aﬃne proﬁles
+PACS: 05.45.Df, 83.70.Fn, 92.40.Lg
+Email addresses: atman@ﬁsica.ufmg.br (A.P.F. Atman), vivas@mail2.udc.es
+(J.G. Vivas Miranda).
+URL: www.ﬁsica.ufmg.br/ atman (A.P.F. Atman).
+Preprint submitted to Elsevier Preprint
+1 November 2018
+
+1
+Introduction
+The concepts of the fractal geometry have been widely used to describe and
+quantify irregularity in nature, and statistical self-aﬃne properties have re-
+cently been identiﬁed in various Earth’s terrain [1] and proﬁles [2]. Several
+works in soil science incorporates the fractal geometry to describe and model-
+ing soil physical properties, soil physical processes and quantify the soil spatial
+variability [3–6].
+A very important property closely related to the fractal geometry is the soil
+surface roughness, deﬁned as the conﬁguration of the soil microrelief. The soil
+surface roughness exerts great inﬂuence on water inﬁltration, erosion and run-
+oﬀeﬀects. Its quantiﬁcation is important for understanding the soil behavior
+during degradation processes like rainfall erosion or abrupt changes such as
+those induced by tillage [7]. In the last years, a considerable eﬀort was done to
+simulate the soil structure; several models propose the simulation of the parti-
+cle size distributions [4], the soil surface roughness [3,8], the morphology of the
+pore-solid structure [9], etc. The major properties considered in these models
+are the fractal dimension of the soil surface, D, the particle size distribution
+(PSD), the pore size distribution and the surface roughness.
+In this work we present a simple lattice model to simulate the soil structure and
+reproduce the surface soil roughness. We basically use the ideas of the fractal
+growth models [10] to generate an approximate self-aﬃne proﬁle, that exhibit,
+as much as possible, a similitude with the fractal properties of real soils. It is
+approximate in the sense that the scaling properties of these proﬁles are valid
+only in a limited range of scales. Therefore, the model was validated by means
+of a comparison between the fractal dimension estimated for simulated proﬁles
+and for natural soil surfaces. The major improvements in our model are the
+power law distribution of the sizes of the deposited particles or aggregates
+and a random selection in the allowed morphologies of the aggregates. This
+two features, not improved before by any model, are responsible for the soil
+structure in our model. In the section II we present a detailed description of
+the model, showing the particle size distribution and explaining the algorithm
+for the random choice of the morphologies. We also present a brief summary
+of the theory of growth surfaces. In the section III is presented the results
+for several maximum aggregates sizes and diﬀerent fragmentation dimensions.
+Finally, in the section IV we present our conclusions and perspectives.
+2
+
+1
+10
+R (= sqrt(Mmax/π))
+10
+0
+10
+1
+10
+2
+10
+3
+10
+4
+10
+5
+N(r>R)
+Fig. 1. Particle size distribution for a simulated soil with Mmax = 1000 and
+Df = 3.0. The radius of the particles are calculeted via the expression: r2 = M/π,
+that approximates the particles by discs with area M. Note the power law behavior
+for the particles sizes.
+2
+The Model
+The motivation in elaborate this model lies in aptitude to simulate some of
+the majors properties of agricultural soil, like self-aﬃne proﬁles and porous
+medium. The model have to allow the possibility to change some parameters,
+as the aggregate size distribution, and the maximum mass of the aggregates.
+These two parameters try to cover the structural variability found in natural
+soils. The aggregate size distribution is assumed to have power law behavior
+[5,6], and their exponent, Df, is one of the parameters of the model. The other
+parameter, Mmax, is the maximum mass of particles utilized to generate the
+aggregate, which is approximately related with the square of maximum ag-
+gregate radius. In spite of others classical lattice models, where the particles
+generated always have the same morphology, this model simulate the vari-
+ability observed in natural soil, generating aggregates by a bond percolation
+algorithm. All this characteristics have to be integrated in a very simple model
+to allow the simulation of relatively large systems (L = 1000).
+In this way, the major improvement to choose a lattice model is the simplicity
+and the velocity to run the code, what possibilities the simulation of large
+systems with great quantity of deposited particles (hundred millions). This
+massive number of deposited particles are needed in order to avoid the eﬀect
+of the constant attachment of micro random variability, represented by the
+random morphology of the aggregates. Another advantage to work in the
+lattice, is the theoretical background furnished by the fractal growth theory,
+presented by Barab´asi and Stanley [10].
+We consider the soil structure composed by a set of particles and aggregates
+whose radius are power law distributed according to the following relation,
+3
+
+known as Turcotte’s empirical law [5],
+N(r > R) ∼R−Df ,
+(1)
+where N(r > R) is the cumulative number of particles (or aggregates) with
+radius r greater than R and Df is the fragmentation dimension of the particle
+size distribution (PSD). There is some controversy in the literature about the
+allowed range of the values of the Df. Tyler & Wheatcraft [11] argued that
+Df < 3 because, under usual hypothesis (constant density, spherical particles,
+etc), the mass distribution scales with M(r > R) ∼RD ∼R3−Df, where D
+is the fractal dimension of the soil. Thus, considering a fractal distribution,
+only the values Df < 3 have physical meaning. Martin & Taguas [4] present
+several mathematical arguments supporting this conjecture, and show some
+PSD simulations. However, there are several experimental studies, summarized
+by Perfect & Kay [5] where the range of values of Df is 2.6 < Df < 3.5.
+Gimenez et al [12] also aﬃrm that there is not any experimental relation
+between the fractal dimension and the fragmentation dimension. We consider
+that the usual hypothesis of constant density of the particles is not valid
+when the radius of the aggregates grows up, due the presence of pores in the
+structure. Thus, fragmentation dimensions greater than 3 are, in principle,
+allowed.
+According to the USDA classiﬁcation of soil texture [13], the basic particle
+size classiﬁcation is:
+• sand 50 < r < 2000µm
+• silt 2 < r < 50µm
+• clay r < 2µm.
+The real soils can vary widely in the percentile of each range of sizes. The
+study of Nemes et al proposes a standardisation of the classiﬁcation of the
+European soils and shows several experimental data [13]. In the ﬁgure 1, we
+present a typical PSD generated by the algorithm of the model. This PSD is
+constructed considering that the particles are approximately circles; so, there
+is a direct relationship between the mass number and the particle radius, that
+is used to build the PSD.
+The model has two parameters, the fragmentation dimension, Df, and the
+maximum mass of the aggregates, Mmax. To every particle is selected a mass
+number, M; when M > 1, the model choose a random conﬁguration for it;
+this choice is one of the possible bond percolation clusters with a given size.
+In the ﬁgure 2, we show some of the possible aggregate morphologies. These
+two parameters try to cover, in a simple way, the structural variability found
+in natural soils.
+The deposit of each particle follows the model of the solid-on-solid deposition
+with surface relaxation [10]. The initial position for the deposition is random
+4
+
+Fig. 2. A) Possible morphologies for M = 4. In this case, the morphologies are
+the same observed in a popular game called “Tetris”. B) Some morphologies for
+M = 400. Three morphologies are shown. Note the porous structure of the aggre-
+gates, and its random shape. C) Soils proﬁles generated by the model. Above: typical
+deposition in a lattice with L = 200, 20000 particles deposited with Mmax = 100
+and Df = 3.0. Below: the same, with Df = 2.0. Note the variability of the soil
+structure with the fragmentation dimension.
+chose and the particle follows a straight line until touch the soil surface. Then,
+the algorithm simulate a surface relaxation (without rotation) to the particles,
+which only are adhered to the bulk when they reach the site with the local
+minimum energy .
+Considering the theory of growth surfaces, the solid-on-solid deposition be-
+longs to the universality class of the Edwards-Wilkinson equation
+∂h(x, t)
+∂t
+= ν∇2h + η(⃗x, t)
+,
+(2)
+where h(⃗x, t) is the height of the site ⃗x at time t, and η(⃗x, t) represents a ran-
+dom noise, that expresses the ﬂuctuations in the arrive of the particles and had
+the following properties, < η(⃗x, t) >= 0 and < η(⃗x, t) η(⃗x′, t′) > = 2C δd(⃗x−
+⃗x′) δ(t −t′).The δ is the usual Kronecker delta and C is a diﬀusion constant.
+The width of the growth surfaces, w(L, t) then obeys a scaling relation
+w(L, t) ∼Lαf(t/Lz) ,
+(3)
+where f(u) is a scaling function: f(u) ∼uβ for u << 1 and f(u) is a constant
+for u >> 1; α, β and z are the roughness, the growth and the dynamical
+exponents, respectively. They are known as the scaling exponents and are
+5
+
+10
+0
+10
+2
+10
+4
+10
+6
+10
+8
+number of deposited particles
+0
+0
+1
+10
+100
+w(L,t)
+Nmax = 01
+Nmax = 05
+Nmax = 10
+Nmax = 50
+Nmax = 100
+Nmax = 500
+Nmax = 1000
+0.15
+0.25
+0.35
+0.45
+0.55
+slope
+Df = 1.5
+Fig. 3. Roughness of the simulated proﬁles, with several Mmax and Df = 3.0. Note
+the variation of the slope between the two vertical dotted lines, shown in the small
+window. The slope is measured with a rule with ﬁxed length, and varies the initial
+point since the left vertical line to the right.
+related by the scaling law
+z = α
+β
+.
+The EW scaling exponents are known exactly: α = 1/2, z = 2.
+Another equation related to the deposition is the Kardar-Parisi-Zhang equa-
+tion, that has a nonlinear term,
+∂h(x, t)
+∂t
+= ν∇2h + λ/2(∇h)2 + η(⃗x, t)
+.
+(4)
+To this equation the calculeted exponents are α = 1/2, z = 3/2.
+So, we perform simulations to test the inﬂuence of the model parameters Df
+and Mmax in the scaling exponents and fractal dimension of the soil proﬁles,
+and compare the results with the experimental data disposable.
+3
+Results
+We perform simulations in one dimensional lattice with length L = 1000 sites.
+The results for the scaling exponents represent the average value in a set of
+20 samples with the same parameters in each simulation, and diﬀerent depo-
+sition sequence of the random aggregates. The number of particles/aggregates
+6
+
+deposited in each sample is N = 100000000. The behavior of the local width,
+w(L, T), deﬁned by
+w2(L, t) = 1
+L
+L
+X
+i=1
+
+hi(t) −h(t)
+2
+,
+(5)
+with the model parameters are shown in the ﬁgure 3. Note the roughness satu-
+ration at N ∼10000000. The fractal dimension of the ﬁnal proﬁle is estimated
+using the Hurst exponent H. The Hurst exponent is associated to the fractal
+dimension via the relation D = 2 −H. There are several ways to measure H.
+At this work, we use the detrended ﬂuctuation analysis (DFA), improved by
+the ﬁrst time by Moreira et al [15], and the semivariogram method, that uses
+a height-height correlation function.
+The DFA consists in measure the roughness around the mean square straight
+line [15]. The roughness W(L, ǫ, t) at the scale ǫ, is given by
+W(L, ǫ, t) = 1
+L
+L
+X
+i=1
+wi(ǫ, t)
+(6)
+and the local roughness wi(ǫ, t) is deﬁned by
+w2
+i (ǫ, t) =
+1
+2ǫ + 1
+j=i+ǫ
+X
+j=i−ǫ
+{hj(t) −[ai(ǫ)xj + bj(ǫ)]}2
+(7)
+where ai(ǫ) and bi(ǫ) are the linear ﬁtting coeﬃcients to the displacement data
+on the interval [i −ǫ, i + ǫ] centered at the site i. Self aﬃne proﬁles satisfy the
+scaling law
+W(ǫ) ∼ǫH
+(8)
+that is used to measure H. The semivariogram method estimates the spa-
+tial variability, through the calculus of the semivariance as a function of the
+distance between points. This function is can be estimated by:
+γ(ǫ, t) =
+1
+2n(ǫ)
+n(ǫ)
+X
+i=1
+[hi(t) −hi+ǫ(t)]2 ,
+(9)
+where hi(t) the height in the location i at time t, and n(ǫ) represents the
+number of pairs of points which are separated by ǫ. In the case of self-aﬃne
+proﬁles γ exhibit a power law behavior,
+γ(ǫ) ∼ǫ2H ,
+7
+
+1
+10
+100
+1000
+Mmax
+0.30
+0.40
+0.50
+0.60
+0.70
+0.80
+H
+10
+-1
+10
+0
+10
+1
+Df
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+H
+1
+10
+100
+1000
+Mmax
+0.15
+0.25
+0.35
+0.45
+β
+10
+-1
+10
+0
+10
+1
+Df
+0.1
+0.2
+0.3
+0.4
+0.5
+β
+A
+B
+C
+D
+Mmax = 100
+Mmax = 100
+Df = 3.0
+Df = 3.0
+Fig. 4. Summary of the exponent values. A) and C): Behavior of the Hurst expo-
+nent with the model parameters. Note that there is not a remarkable trend to the
+Hurst exponent with any model parameters. The range of experimental values is
+0.3 < H < 0.7. B) and D): Behavior of the growth exponent with the model param-
+eters. Note the dependence of the growth exponent with the average radius size: as
+the radius increase, the growth exponent increases too. The dependence of β with
+the fragmentation dimension is inverse.
+and, in the same manner as in the DFA method, the H exponent can be
+utilized to calculate the fractal dimension.
+The semivariogram method is especially useful in cases where the data are
+not regular spaced, and for this reason, is widely used in estimating fractal
+dimension of soil surfaces [5].
+The range of the H values is shown in the ﬁgure 4A and 4B. In the ﬁgure
+4C and 4D, we show the dependence of the growth exponent with the model
+parameters. We conclude that the increase of the maximum particle mass
+Mmax have similar eﬀects to the decrease of the fragmentation dimension: both
+introduces a nonlinear correlation in the system, expressed by the increase in
+the value of the growth exponent β, changing the universality class of the
+deposition. Nevertheless, the fractal dimension of the surface do not alters
+considerably with the model parameters.
+4
+Conclusions and Perspectives
+In this work, we present a new model to simulate the soil structure and its
+surface roughness. Two parameters are used to control the simulated proﬁles:
+the maximum mass of the particles and the fragmentation dimension. The
+major improvements of this model are: the random conﬁguration allowed to
+the particles or aggregates and the power law distribution of its radius. These
+two features are not present in any model discussed in the literature until to-
+8
+
+day, and permits the reproduction of the variability observed in natural soils.
+The results obtained shows a good agreement for the exponent H calculated
+from the simulations and measured experimentally [7]. We also observe a de-
+pendence of the growth exponent β with the maximum mass allowed to the
+particles: as the Mmax grows, the value of the β exponent grows from the EW
+value (β = 1/4) to the KPZ value (β = 1/3). So, the increase of the averaged
+particle radius corresponds to the introduction of nonlinear correlations into
+the system.
+Next, we expect increase the system size and control better the shape of the
+deposited particles, in order to perform simulations closer to the real soils. We
+also intend simulate the rainfall eﬀect over the simulated structure, to verify
+the dependence of the Hurst exponent with the rain [14].
+This work was sponsored by the brazilian agencies CNPq, FAPEMIG and
+FINEP, and by the spanish agency AECI.
+References
+[1] G. Dietler and Yi.-Ch. Zhang, Physica A 191, 213 (1992).
+[2] M. Matsushita and Sh. Ouchi, Physica D 38, 246 (1989).
+[3] O.I. Yordanov, A. Guissard, Physica A 238, 49-65 (1997).
+[4] M.A. Martin, F. J. Taguas, Proc. R. Soc. Lond. A 454, 1457-1468 (1998).
+[5] E. Perfect, B.D. Kay, Soil & Till. Res. 36, 1-20 (1996).
+[6] D. Gim´enez, E. Perfect, W.J. Rawls, Ya. Pachepsky,
+Engineering Geol. 48,
+161-183 (1997).
+[7] J.G. Vivas Miranda,
+Analysis Fractal del Microrelieve del Suelo
+(Tesis de
+Doctorado, Univ. da Coru˜na, 2000).
+[8] J. Chadoeuf, M Goulard and L. Garcia-Sanchez,
+Microsc. Microanal.
+Microstruct. 7, 557-563 (1996).
+[9] E. Perrier, N. Bird, M. Rieu, Geoderma 88, 137-164 (1998).
+[10] A.-L. Barab´asi e H. E. Stanley, Fractal Concepts in Surface Growth, (Cambridge
+Univ. Press, Cambridge, 1995).
+[11] S.W. Tyler & S.W. Wheatcraft, Soil Sci. Soc. Am. J. 53, 362-369 (1992).
+[12] D. Gim´enez, R.R. Allmaras, D.R. Huggins, E.A. Nater, Geoderma 86, 261-278
+(1998).
+[13] A. Nemes, J.H.M. W¨osten, A. Lilly, J.H. Oude Voshaar Geoderma 90, 187-202
+(1999).
+9
+
+[14] J.G. Vivas Miranda, A. Paz Gonz´alez, Cad. Lab. Xeol. de Laxe 23, 121-136
+(1998).
+[15] J.G. Moreira, J. Kamphorst Leal da Silva, S. Ollifson Kamphorst, J. Phys A:
+Math. Gen. 27, 8079 (1994).
+10

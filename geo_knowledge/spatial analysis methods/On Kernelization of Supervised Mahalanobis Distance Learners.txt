@@ -1,0 +1,1647 @@
+arXiv:0804.1441v3  [cs.LG]  30 Jan 2009
+On Kernelizing Mahalanobis Distance Learning Algorithms
+On Kernelizing Mahalanobis Distance Learning Algorithms
+Ratthachat Chatpatanasiri
+ratthachat.c@student.chula.ac.th
+Teesid Korsrilabutr
+g48tkr@cp.eng.chula.ac.th
+Pasakorn Tangchanachaianan
+pasakorn.t@student.chula.ac.th
+Boonserm Kijsirikul
+boonserm.k@chula.ac.th
+Department of Computer Engineering, Chulalongkorn University, Pathumwan, Bangkok, Thailand.
+Abstract
+This paper focuses on the problem of kernelizing an existing supervised Mahalanobis
+distance learner. The following features are included in the paper. Firstly, three popular
+learners, namely, “neighborhood component analysis”, “large margin nearest neighbors”
+and “discriminant neighborhood embedding”, which do not have kernel versions are ker-
+nelized in order to improve their classiﬁcation performances. Secondly, an alternative ker-
+nelization framework called “KPCA trick” is presented. Implementing a learner in the new
+framework gains several advantages over the standard framework, e.g. no mathematical
+formulas and no reprogramming are required for a kernel implementation, the framework
+avoids troublesome problems such as singularity, etc. Thirdly, while the truths of repre-
+senter theorems are just assumptions in previous papers related to ours, here, representer
+theorems are formally proven. The proofs validate both the kernel trick and the KPCA
+trick in the context of Mahalanobis distance learning.
+Fourthly, unlike previous works
+which always apply brute force methods to select a kernel, we investigate two approaches
+which can be eﬃciently adopted to construct an appropriate kernel for a given dataset.
+Finally, numerical results on various real-world datasets are presented.
+1. Introduction
+Recently, many Mahalanobis distance learners are invented (Chen et al., 2005; Goldberger
+et al., 2005; Weinberger et al., 2006; Yang et al., 2006; Sugiyama, 2006; Yan et al., 2007;
+Zhang et al., 2007; Torresani & Lee, 2007; Xing et al., 2003). These recently proposed
+learners are carefully designed so that they can handle a class of problems where data of
+one class form multi-modality where classical learners such as principal component analysis
+(PCA) and Fisher discriminant analysis (FDA) cannot handle. Therefore, promisingly, the
+new learners usually outperform the classical learners on experiments reported in recent
+papers.
+Nevertheless, since learning a Mahalanobis distance is equivalent to learning a
+linear map, the inability to learn a non-linear transformation is one important limitation of
+all Mahalanobis distance learners.
+As the research in Mahalanobis distance learning has just recently begun, several issues
+are left open such as (1) some eﬃcient learners do not have non-linear extensions, (2)
+the kernel trick (Sch¨olkopf & Smola, 2001), a standard non-linearization method, is not
+fully automatic in the sense that new mathematical formulas have to be derived and new
+programming codes have to be implemented; this is not convenient to non-experts, (3)
+existing algorithms “assume” the truth of the representer theorem (Sch¨olkopf & Smola,
+2001, Chapter 4); however, to our knowledge, there is no formal proof of the theorem in the
+context of Mahalanobis distance learning, and (4) the problem of how to select an eﬃcient
+1
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+kernel function has been left untouched in previous works; currently, the best kernel is
+achieved via a brute-force method such as cross validation.
+In this paper, we highlight the following key contributions:
+• Three popular learners recently proposed in the literatures, namely, neighborhood com-
+ponent analysis (NCA) (Goldberger et al., 2005), large margin nearest neighbors (LMNN)
+(Weinberger et al., 2006) and discriminant neighborhood embedding (DNE) (Zhang et al.,
+2007) are kernelized in order to improve their classiﬁcation performances with respect to
+the kNN algorithm.
+•
+A KPCA trick framework is presented as an alternative choice to the kernel-trick
+framework. In contrast to the kernel trick, the KPCA trick does not require users to derive
+new mathematical formulas. Also, whenever an implementation of an original learner is
+available, users are not required to re-implement the kernel version of the original learner.
+Moreover, the new framework avoids problems such as singularity in eigen-decomposition
+and provides a convenient way to speed up a learner.
+• Two representer theorems in the context of Mahalanobis distance learning are proven.
+Our theorems justify both the kernel-trick and the KPCA-trick frameworks. Moreover, the
+theorems validate kernelized algorithms learning a Mahalanobis distance in any separable
+Hilbert space and also cover kernelized algorithms performing dimensionality reduction.
+• The problem of eﬃcient kernel selection is dealt with. Firstly, we investigate the kernel
+alignment method proposed in previous works (Lanckriet et al., 2004; Zhu et al., 2005) to
+see whether it is appropriate for a kernelized Mahalanobis distance learner or not. Secondly,
+we investigate a simple method which constructs an unweighted combination of base kernels.
+A theoretical result is provided to support this simple approach. Kernel constructions based
+on our two approaches require much shorter running time when comparing to the standard
+cross validation approach.
+• As kNN is already a non-linear classiﬁer, there are some doubts about the usefulness
+of kernelizing Mahalanobis distance learners (Weinberger et al., 2006, pp. 8).
+We pro-
+vide an explanation and conduct extensive experiments on real-world datasets to prove the
+usefulness of the kernelization.
+2. Background
+Let {xi, yi}n
+i=1 denote a training set of n labeled examples with inputs xi ∈RD and cor-
+responding class labels yi ∈{c1, ..., cp}. Any Mahalanobis distance can be represented by
+a symmetric positive semi-deﬁnite (PSD) matrix M ∈SD
++. Here, we denote SD
++ as a space
+of D × D PSD matrices. Given two points xi and xj, and a PSD matrix M, the Maha-
+lanobis distance with respect to M between the two points is deﬁned as ||xi −xj||M =
+p
+(xi −xj)T M(xi −xj). Our goal is to ﬁnd a PSD matrix M∗that minimizes a reasonable
+objective function f(·):
+M∗= arg min
+M∈SD
++
+f(M).
+(1)
+Since the PSD matrix M can be decomposed to AT A, we can equivalently restate our
+problem as learning the best matrix A:
+A∗= arg min
+A∈Rd×Df(A).
+(2)
+2
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+Note that d = D in the standard setting, but for the purpose of dimensionality reduction
+we can learn a low-rank projection by restricting d < D. After learning the best linear map
+A∗, it will be used by kNN to compute the distance between two points in the transformed
+space as (xi −xj)T M∗(xi −xj) = ||A∗xi −A∗xj||2.
+In the following subsections, three popular algorithms, whose objective functions are
+mainly designed for a further use of kNN classiﬁcation, are presented. Despite their ef-
+ﬁciency and popularity, the three algorithms do not have their kernel versions, and thus
+in this paper we are primarily interested in kernelizing these three algorithms in order to
+improve their classiﬁcation performances.
+2.1 Neighborhood Component Analysis (NCA) Algorithm
+The original goal of NCA (Goldberger et al., 2005) is to optimize the leave-one-out (LOO)
+performance on training data. However, as the actual LOO classiﬁcation error of kNN is a
+non-smooth function of the matrix A, Goldberger et al. propose to minimize a stochastic
+variant of the LOO kNN score which is deﬁned as follows:
+f NCA(A) = −
+X
+i
+X
+yj=ci
+pij,
+(3)
+where
+pij =
+exp(−||Axi −Axj||2)
+P
+k̸=i exp(−||Axi −Axk||2),
+pii = 0.
+Optimizing f NCA(·) can be done by applying a gradient based method. One major disad-
+vantage of NCA, however, is that f NCA(·) is not convex, and the gradient based methods
+are thus prone to local optima.
+2.2 Large Margin Nearest Neighbor (LMNN) Algorithm
+In LMNN (Weinberger et al., 2006), the output Mahalanobis distance is optimized with
+the goal that for each point, its k-nearest neighbors always belong to the same class while
+examples from diﬀerent classes are separated by a large margin.
+For each point xi, we deﬁne its k target neighbors as the k other inputs with the same
+label yi that are closest to xi (with respect to the Euclidean distance in the input space).
+We use wij ∈{0, 1} to indicate whether an input xj is a target neighbor of an input xi. For
+convenience, we deﬁne yij ∈{0, 1} to indicate whether or not the labels yi and yj match.
+The objective function of LMNN is as follows:
+f LMNN(M) =
+X
+i,j
+wij||xi −xj||2
+M + c
+X
+i,j,l
+wij(1 −yil)
+
+1 + ||xi −xj||2
+M −||xi −xl||2
+M
+
++ ,
+where [·]+ denotes the standard hinge loss: [z]+ = max(z, 0). The term c > 0 is a positive
+constant typically set by cross validation. The objective function above is convex1 and has
+1. There is a variation on LMNN called “large margin component analysis” (LMCA) (Torresani & Lee,
+2007) which proposes to optimize A instead of M; however, LMCA does not preserve some desirable
+properties, such as convexity, of LMNN, and therefore the algorithm “Kernel LMCA” presented there is
+diﬀerent from “Kernel LMNN” presented in this paper.
+3
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+two competing terms. The ﬁrst term penalizes large distances between each input and its
+target neighbors, while the second term penalizes small distances between each input and
+all other inputs that do not share the same label.
+2.3 Discriminant Neighborhood Embedding (DNE) Algorithm
+The main idea of DNE (Zhang et al., 2007) is quite similar to LMNN. DNE seeks a linear
+transformation such that neighborhood points in the same class are squeezed but those in
+diﬀerent classes are separated as much as possible. However, DNE does not care about the
+notion of margin; in the case of LMNN, we want every point to stay far from points of other
+classes, but for DNE, we want the average distance between two neighborhood points of
+diﬀerent classes to be large. Another diﬀerence is that LMNN can learn a full Mahalanobis
+distance, i.e. a general weighted linear projection, while DNE can learn only an unweighted
+linear projection.
+Similar to LMNN, we deﬁne two sets of k target neighbors for each point xi based on
+the Euclidean distance in the input space. For each xi, let NeigI(i) be the set of k nearest
+neighbors having the same label yi, and let NeigE(i) be the set of k nearest neighbors
+having diﬀerent labels from yi. We deﬁne wij as follows
+wij =
+
+
+
+
+
++1,
+if j ∈NeigI(i) ∨i ∈NeigI(j),
+−1,
+if j ∈NeigE(i) ∨i ∈NeigE(j),
+0,
+otherwise.
+The objective function of DNE is:
+f DNE(A) =
+X
+i,j
+wi,j||Axi −Axj||2.
+which can be reformulated (up to a constant factor) to be
+f DNE(A) = trace(AX(D −W)XT AT ),
+where W is a symmetric matrix with elements wij, D is a diagonal matrix with Dii = P
+j wij
+and X is the matrix of input points (x1, ..., xn). It is a well-known result from spectral graph
+theory (von Luxburg, 2007) that D−W is symmetric but is not necessarily PSD. To solve the
+problem by eigen-decomposition, the constraint AAT = I is added (recall that A ∈Rd×D
+(d ≤D)) so that we have the following optimization problem:
+A∗= arg min
+AAT =I
+trace(AX(D −W)XT AT ).
+(4)
+3. Kernelization
+In this section, we focus on two kernelization frameworks going to non-linearize the three
+algorithms presented in the previous section. First, the standard kernel trick framework
+is presented.
+Next, the KPCA trick framework which is an alternative to the kernel-
+trick framework is presented. Kernelization in this new framework is conveniently done
+with an application of kernel principal component analysis (KPCA). Finally, representer
+4
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+theorems are proven to validate all applications of the two kernelization frameworks in the
+context of Mahalanobis distance learning. Note that in some previous works (Chen et al.,
+2005; Globerson & Roweis, 2006; Yan et al., 2007; Torresani & Lee, 2007), the validity of
+applications of the the kernel trick has not been proven.
+3.1 Historical Background
+After ﬁnishing writing the current paper, we just knew that this name was ﬁrst appeared
+in the paper of Chapelle and Sch¨olkopf (2001) who ﬁrst applied this method to invariant
+support vector machines; moreover, it is appeared to us that the KPCA trick has been
+known to some researchers (private communication to some ECML reviewers). Without
+knowing about this fact, we reinvented the framework and, coincidentally, called it “KPCA
+trick” ourselves. Nevertheless, we will shown in Section 5.1 that, in the context of Maha-
+lanobis distance learning, the KPCA trick non-trivially has many advantages over the kernel
+trick; we believe that this consequence is new and is not a consequence of previous works.
+Also, mathematical tools provided in previous works (Sch¨olkopf & Smola, 2001; Chapelle
+& Sch¨olkopf, 2001) are not enough to prove the validity of the KPCA trick in this context,
+and thus the new validation proof of the KPCA trick is needed (see our Theorem 1).
+3.2 The Kernel-Trick Framework
+Given a PSD kernel function k(·, ·) (Sch¨olkopf & Smola, 2001), we denote φ, φ′ and φi as
+mapped data (in a feature space associated with the kernel) of each example x, x′ and xi,
+respectively. A (squared) Mahalanobis distance under a matrix M in the feature space is
+(φi −φj)T M(φi −φj) = (φi −φj)T AT A(φi −φj).
+(5)
+To be consistent with Subsection 2.3, let AT = (a1, ..., ad). Denote a (possibly inﬁnite-
+dimensional) matrix of the mapped training data Φ = (φ1, ..., φn). The main idea of the
+kernel-trick framework is to parameterize (see representer theorems below)
+AT = ΦUT ,
+(6)
+where UT = (u1, ..., ud). Substituting A in Eq. (5) by using Eq. (6), we have
+(φi −φj)T M(φi −φj) = (ki −kj)T UT U(ki −kj),
+where
+ki = ΦT φi =
+ ⟨φ1, φi⟩, ..., ⟨φn, φi⟩
+T .
+(7)
+Now our formula depends only on an inner-product ⟨φi, φj⟩, and thus the kernel trick can
+be now applied by using the fact that k(xi, xj) = ⟨φi, φj⟩for a PSD kernel function k(·, ·).
+Therefore, the problem of ﬁnding the best Mahalanobis distance in the feature space is now
+reduced to ﬁnding the best linear transformation U of size d × n. Nonetheless, it often
+happens that ﬁnding U is much more troublesome than ﬁnding A in the input space, even
+their optimization problems look similar, as shown in Section 5.1.
+Once we ﬁnd the matrix U, the Mahalanobis distance from a new test point x′ to any
+input point xi in the feature space can be calculated as follows:
+||φ′ −φi||2
+M = (k′ −ki)T UT U(k′ −ki),
+(8)
+5
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+where k′ = (k(x′, x1), ..., k(x′, xn))T . kNN classiﬁcation in the feature space can be per-
+formed based on Eq. (8).
+3.3 The KPCA-Trick Framework
+As we emphasize above, although the kernel trick framework can be applied to non-linearize
+the three learners introduced in Section 2, it often happens that ﬁnding U is much more
+troublesome than ﬁnding A in the input space, even their optimization problems look similar
+(see Section 5.1). In this section, we develop a KPCA trick framework which can be much
+more conveniently applied to kernelize the three learners.
+Denote k(·, ·), φi, φ and φ′ as in Subsection 3.2. The central idea of the KPCA trick is to
+represent each φi and φ′ in a new “ﬁnite”-dimensional space, without any loss of information.
+Within the framework, a new coordinate of each example is computed “explicitly”, and each
+example in the new coordinate is then used as the input of any existing Mahalanobis distance
+learner. As a result, by using the KPCA trick in place of the kernel trick, there is no need
+to derive new mathematical formulas and no need to implement new algorithms.
+To simplify the discussion of KPCA, we assume that {φi} is linearly independent and
+has its center at the origin, i.e. P
+i φi = 0 (otherwise, {φi} can be centered by a simple
+pre-processing step (Shawe-Taylor & Cristianini, 2004, p. 115)). Since we have n total
+examples, the span of {φi} has dimensionality n.
+Here we claim that each example φi
+can be represented as ϕi ∈Rn with respect to a new orthonormal basis {ψi}n
+i=1 such that
+span({ψi}n
+i=1) is the same as span({φi}n
+i=1) without loss of any information. More precisely,
+we deﬁne
+ϕi =
+
+⟨φi, ψ1⟩, . . . , ⟨φi, ψn⟩
+
+= ΨTφi.
+(9)
+where Ψ = (ψ1, ..., ψn). Note that although we may be unable to numerically represent
+each ψi, an inner-product of ⟨φi, ψj⟩can be conveniently computed by KPCA (or kernel
+Gram-Schmidt (Shawe-Taylor & Cristianini, 2004)). Likewise, a new test point φ′ can be
+mapped to ϕ′ = ΨT φ′. Consequently, the mapped data {ϕi} and ϕ′ are ﬁnite-dimensional
+and can be explicitly computed.
+3.3.1 The KPCA-trick Algorithm
+The KPCA-trick algorithm consisting of three simple steps is shown in Figure 1. NCA,
+LMNN, DNE and other learners, including those in other settings (e.g. semi-supervised
+settings), whose kernel versions are previously unknown (Yang et al., 2006; Xing et al.,
+2003; Chatpatanasiri & Kijsirikul, 2008) can all be kernelized by this simple algorithm.
+Therefore, it is much more convenient to kernelize a learner by applying the KPCA-trick
+framework rather than applying the kernel-trick framework. In the algorithm, we denote a
+Mahalanobis distance learner by maha which performs the optimization process shown in
+Eq. 1 (or Eq. 2) and outputs the best Mahalanobis distance M∗(or the best linear map
+A∗).
+3.3.2 Representer Theorems
+Is it valid to represent an inﬁnite-dimensional vector φ by a ﬁnite-dimensional vector ϕ?
+In the context of SVMs (Chapelle & Sch¨olkopf, 2001), this validity of the KPCA trick is
+6
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+Input: 1. training examples: {(x1, y1), ..., (xn, yn)},
+2. new example: x′,
+3. kernel function: k(·, ·)
+4. Mahalanobis distance learning algorithm: maha
+Algorithm:
+(1) Apply kpca(k, {xi}, x′) such that {xi} 7→{ϕi} and x′ 7→ϕ′.
+(2) Apply maha with new inputs {(ϕi, yi)} to achieve M∗or A∗.
+(3) Perform kNN based on the distance
+||ϕi −ϕ′||M∗or ||A∗ϕi −A∗ϕ′||.
+Figure 1: The KPCA-trick algorithm.
+easily achieved by straightforwardly extending a proof of an established representer theorem
+(Sch¨olkopf et al., 2001)2. In the context of Mahalanobis distance learning, however, proofs
+provided in previous works cannot be directly extended.
+Note that, in the SVM cases
+considered in previous works, what is learned is a hyperplane, a linear functional outputting
+a 1-dimensional value. In our case, as shown in Eq. 6, what is learned is a linear map which,
+in general, outputs a countably inﬁnite dimensional vector. Hence, to prove the validity of
+the KPCA trick in our case, we need some mathematical tools which can handle a countably
+inﬁnite dimensionality. Below we give our versions of representer theorems which prove the
+validity of the KPCA trick in the current context.
+By our representer theorems, it is the fact that, given an objective function f(·) (see
+Eq. (1)), the optimal value of f(·) based on the input {φi} is equal to the optimal value of
+f(·) based on the input {ϕi}. Hence, the representation of ϕi can be safely applied. We
+separate the problem of Mahalanobis distance learning into two diﬀerent cases. The ﬁrst
+theorem covers Mahalanobis distance learners (learning a full-rank linear transformation)
+while the second theorem covers dimensionality reduction algorithms (learning a low-rank
+linear transformation).
+Theorem 1. (Full-Rank Representer Theorem) Let { ˜ψi}n
+i=1 be a set of points in a feature
+space X such that span({ ˜ψi}n
+i=1) = span({φi}n
+i=1), and X and Y be separable Hilbert spaces.
+For an objective function f depending only on {⟨Aφi, Aφj⟩}, the optimization
+min
+A
+: f(⟨Aφ1, Aφ1⟩, . . . , ⟨Aφi, Aφj⟩, . . . , ⟨Aφn, Aφn⟩)
+s.t. A : X →Y is a bounded linear map ,
+has the same optimal value as,
+min
+A′∈Rn×n f( ˜ϕT
+1 A′T A′ ˜ϕ1, . . . , ˜ϕT
+i A′T A′ ˜ϕj, . . . , ˜ϕT
+nA′T A′ ˜ϕn),
+where ˜ϕi =
+
+⟨φi, ˜ψ1⟩, . . . , ⟨φi, ˜ψn⟩
+T
+∈Rn.
+2. A representer theorem, along with Mercer theorem, is a key ingredient for validating the kernel trick
+(Sch¨olkopf & Smola, 2001). The origin of the classical representer theorem is dated back to at least
+1970s (Kimeldorf & Wahba, 1971).
+7
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+To our knowledge, mathematical tools provided in the work of Sch¨olkopf and Smola
+(2001, Chapter 4) are not enough to prove Theorem 1. The proof presented here is a non-
+straightforward extension of Sch¨olkopf and Smola’s work. We also note that Theorem 1, as
+well as Theorem 2 shown below, is more general than what we discuss above. They justify
+both the kernel trick (by substituting ˜ψi = φi and hence ˜ϕi = ki) and the KPCA trick (by
+substituting ˜ψi = ψi and hence ˜ϕi = ϕi).
+To start proving Theorem 1, the following lemma is useful.
+Lemma 1. Let X, Y be two Hilbert spaces and Y is separable, i.e. Y has a countable
+orthonormal basis {ei}i∈N. Any bounded linear map A : X →Y can be uniquely decomposed
+as P∞
+i=1⟨·, τi⟩X ei for some {τi}i∈N ⊆X.
+Proof. As A is bounded, the linear functional φ 7→⟨Aφ, ei⟩Y is bounded for every i since,
+by Cauchy-Schwarz inequality, |⟨Aφ, ei⟩Y| ≤||Aφ||||ei|| ≤||A||||φ||. By Riesz representation
+theorem, the map ⟨A·, ei⟩Y can be written as ⟨·, τi⟩X for a unique τi ∈X. Since {ei}i∈N is
+an orthonormal basis of Y, for every φ ∈X, Aφ = P∞
+i=1⟨Aφ, ei⟩Yei = P∞
+i=1⟨φ, τi⟩X ei.
+Proof. (Theorem 1) To avoid complicated notations, we omit subscripts such as X, Y of
+inner products. The proof will consist of two steps. In the ﬁrst step, we will prove the
+theorem by assuming that { ˜ψi}n
+i=1 is an orthonormal set. In the second step, we prove the
+theorem in general cases where { ˜ψi}n
+i=1 is not necessarily orthonormal. The proof of the
+ﬁrst step requires an application of Fubini theorem (Lewkeeratiyutkul, 2006).
+Step 1. Assume that { ˜ψi}n
+i=1 is an orthonormal set. Let {ei}∞
+i=1 be an orthonormal basis
+of Y. For any φ′ ∈X, we have, by Lemma 1, Aφ′ = P∞
+k=1⟨φ′, τk⟩ek. Hence, for each bounded
+linear map A : X →Y, and φ, φ′ ∈span({ ˜ψi}n
+i=1), we have ⟨Aφ, Aφ′⟩= P∞
+k=1⟨φ, τk⟩⟨φ′, τk⟩.
+Note that Each τk can be decomposed as τ ′
+k + τ ⊥
+k such that τ ′
+k lies in span({ ˜ψi}n
+i=1) and
+τ ⊥
+k is orthogonal to the span. These facts make ⟨φ′, τk⟩= ⟨φ′, τ ′
+k⟩for every k. Moreover,
+τ ′
+k = Pn
+j=1 ukj ˜ψj, for some {uk1, ..., ukn} ⊂Rn. Hence, we have
+⟨Aφ, Aφ′⟩=
+∞
+X
+k=1
+⟨φ, τk⟩⟨φ′, τk⟩=
+∞
+X
+k=1
+⟨φ, τ ′
+k⟩⟨φ′, τ ′
+k⟩
+=
+∞
+X
+k=1
+⟨φ,
+n
+X
+i=1
+uki ˜ψi⟩⟨φ′,
+n
+X
+i=1
+uki ˜ψi⟩
+=
+∞
+X
+k=1
+n
+X
+i,j=1
+ukiukj⟨φ, ˜ψi⟩⟨φ′, ˜ψj⟩
+(Fubini theorem: explained below) =
+n
+X
+i,j=1
+ ∞
+X
+k=1
+ukiukj
+!
+⟨φ, ˜ψi⟩⟨φ′, ˜ψj⟩
+=
+n
+X
+i,j=1
+Gij⟨φ, ˜ψi⟩⟨φ′, ˜ψj⟩
+= ˜ϕT G ˜ϕ′ = ˜ϕT A′T A′ ˜ϕ′.
+At the fourth equality, we apply Fubini theorem to swap the two summations. To see that
+Fubini theorem can be applied at the fourth equality, we ﬁrst note that P∞
+k=1 u2
+ki is ﬁnite
+8
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+for each i ∈{1 . . . n} since
+∞
+X
+k=1
+u2
+ki =
+∞
+X
+k=1
+⟨˜ψi,
+n
+X
+j=1
+ukj ˜ψj⟩⟨˜ψi,
+n
+X
+j=1
+ukj ˜ψj⟩= ||A ˜ψi||2 < ∞.
+Applying the above result together with Cauchy-Schwarz inequality and Fubini theorem for
+non-negative summation, we have
+∞
+X
+k=1
+n
+X
+i,j=1
+|ukiukj⟨φ, ˜ψi⟩⟨φ′, ˜ψj⟩| =
+n
+X
+i,j=1
+∞
+X
+k=1
+|ukiukj⟨φ, ˜ψi⟩⟨φ′, ˜ψj⟩|
+=
+n
+X
+i,j=1
+|⟨φ, ˜ψi⟩⟨φ′, ˜ψj⟩|
+ ∞
+X
+k=1
+|ukiukj|
+
+≤
+n
+X
+i,j=1
+|⟨φ, ˜ψi⟩⟨φ′, ˜ψj⟩|
+v
+u
+u
+t
+ ∞
+X
+k=1
+u2
+ki
+ ∞
+X
+k=1
+u2
+kj
+
+< ∞.
+Hence, the summation converges absolutely and thus Fubini theorem can be applied as
+claimed above. Again, using the fact that P∞
+k=1 u2
+ki < ∞, we have that each element of G,
+Gij = P∞
+k=1 ukiukj, is ﬁnite. Furthermore, the matrix G is PSD since each of its elements
+can be regarded as an inner product of two vectors in ℓ2.
+Hence, we ﬁnally have that ⟨Aφi, Aφj⟩= ˜ϕT
+i A′T A′ ˜ϕj, for each 1 ≤i, j ≤n. Hence,
+whenever a map A is given, we can construct A′ such that it results in the same objective
+function value. By reversing the proof, it is easy to see that the converse is also true. The
+ﬁrst step of the proof is ﬁnished.
+Step 2. We now prove the theorem without assuming that { ˜ψi}n
+i=1 is an orthonormal
+set. Let all notations be the same as in Step 1. Let Ψ′ be the matrix ( ˜ψ1, ..., ˜ψn). Deﬁne
+{ψi}n
+i=1 as an orthonormal set such that span({ψi}n
+i=1) = span({ ˜ψi}n
+i=1) and Ψ = (ψ1, ..., ψn)
+and ϕi = ΨTφi. Then, we have that ˜ψi = Ψci for some ci ∈Rn and Ψ′ = ΨC where C =
+(c1, ..., cn). Moreover, since C map from an independent set {ψi} to another independent
+set { ˜ψi}, C is invertible. We then have, for any A′,
+˜ϕT
+i A′T A′ ˜ϕj = φT
+i Ψ′A′T A′Ψ′T φj
+= φT
+i ΨCA′TA′CTΨT φj
+= ϕT
+i CA′T A′CTϕj
+= ϕT
+i BT Bϕj,
+where A′CT = B and A′ = B(CT)−1. Hence, for any B we have the matrix A′ which gives
+˜ϕT
+i A′T A′ ˜ϕj = ϕT
+i BTBϕj. Using the same arguments as in Step 1, we ﬁnish the proof of
+Step 2 and of Theorem 1.
+Theorem 2. (Low-Rank Representer Theorem) Deﬁne { ˜ψi}n
+i=1 and ˜ϕi be as in Theorem 1.
+an objective function f depending only on {⟨Aφi, Aφj⟩}, the optimization
+min
+A
+: f(⟨Aφ1, Aφ1⟩, . . . , ⟨Aφi, Aφj⟩, . . . , ⟨Aφn, Aφn⟩)
+s.t. A : X →Rd is a bounded linear map ,
+9
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+has the same optimal value as,
+min
+A′∈Rd×n f( ˜ϕT
+1 A′T A′ ˜ϕ1, . . . , ˜ϕT
+i A′T A′ ˜ϕj, . . . , ˜ϕT
+nA′T A′ ˜ϕn).
+The proof of Theorem 2 is a generalization of the proofs in previous works (Sch¨olkopf
+& Smola, 2001, Chap. 4).
+Proof. (Theorem 2) Let {ei}d
+i=1 be the canonical basis of Rd, and let φ ∈span{ ˜ψ1, . . . ˜ψn}.
+By Lemma 1, Aφ = Pd
+i=1⟨φ, τi⟩ei for some τ1, . . . , τd ∈X. Each τi can be decomposed as
+τ ′
+i + τ ⊥
+i
+such that τ ′
+i lies in span{ ˜ψ1, . . . , ˜ψn} and τ ⊥
+i
+is orthogonal to the span. These facts
+make ⟨φ, τi⟩= ⟨φ, τ ′
+i⟩for every i. We then have, for some uij ∈R, 1 ≤i ≤d, 1 ≤j ≤n,
+Aφ =
+d
+X
+i=1
+⟨φ,
+n
+X
+j=1
+uij ˜ψj⟩ei
+=
+d
+X
+i=1
+ei
+n
+X
+j=1
+uij⟨φ, ˜ψj⟩=
+
+
+u11
+· · ·
+u1n
+...
+...
+...
+ud1
+· · ·
+udn
+
+
+
+
+⟨φ, ˜ψ1⟩
+...
+⟨φ, ˜ψn⟩
+
+= U ˜ϕ .
+Since every φi is in the span, we conclude that Aφi = U ˜ϕi. Now, one can easily check that
+⟨Aφi, Aφj⟩= ˜ϕT
+i UT U ˜ϕj. Hence, whenever a map A is given, we can construct U such that
+it results in the same objective function value. By reversing the proof, it is easy to see that
+the converse is also true, and thus the theorem is proven (by renaming U to A′).
+Note that the proof of Theorem 2 cannot be directly used for proving Theorem 1 (let
+d = ∞and U ∈R∞×n, and Theorem 2 is still valid. However, to practically be useful, we
+need a ﬁnite-dimensional linear map. Hence, we must show that UT U ∈Rn×n by proving
+that uij < ∞for all i, j).
+3.3.3 Remarks
+1. Note that by Mercer theorem (Sch¨olkopf & Smola, 2001, pp. 37), we can either think of
+each φi ∈ℓ2 or φi ∈RN for some positive integer N, and thus the assumption of Theorem 1
+that X, as well as Y, is separable Hilbert space is then valid. Also, both theorems require
+that the objective function of a learning algorithm must depend only on {⟨Aφi, Aφj⟩}n
+i,j=1
+or equivalently {⟨φi, Mφj⟩}n
+i,j=1. This condition is, actually, not a strict condition since
+learners in literatures have their objective functions in this form (Chen et al., 2005; Gold-
+berger et al., 2005; Globerson & Roweis, 2006; Weinberger et al., 2006; Yang et al., 2006;
+Sugiyama, 2006; Yan et al., 2007; Zhang et al., 2007; Torresani & Lee, 2007).
+2.
+Note that the two theorems stated in this section do not require { ˜ψi} to be an or-
+thonormal set. However, there is an advantage of the KPCA trick which restricts ˜ψi = ψi
+as in Eq. (9); this will be discussed in Sect. 5.1.
+3.
+A running time of each learner strongly depends on the dimensionality of the input
+data. As recommended by Weinberger et al. (2006), it can be helpful to ﬁrst apply a di-
+mensionality reduction algorithm such as PCA before performing a learning process: the
+learning process can be tremendously speed up by retaining only, says, the 200 largest-
+variance principal components of the input data. In the KPCA trick framework illustrated
+10
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+in Figure 1, dimensionality reduction can be performed without any extra work as KPCA
+is already applied at the ﬁrst place.
+4. The stronger version of Theorem 2 can be achieved by inserting a regularizer into the
+objective function of a (kernelized) Mahalanobis distance learner as stated in Theorem 3.
+For compact notations, we use the fact that A is representable by {τi} as shown in Lemma 1.
+Theorem 3. (Strong Representer Theorem) Deﬁne { ˜ψi}n
+i=1 and f be as in Theorem 1. For
+monotonically increasing functions gi, let
+h(τ1, ..., τd, φ1, ..., φn) = f(⟨τ1, φ1⟩, . . . , ⟨τi, φj⟩, . . . , ⟨τn, φd⟩) +
+d
+X
+i=1
+gi(||τi||).
+Any optimal set of linear functionals
+arg min{τi} h(τ1, ..., τd, φ1, ..., φn)
+s.t. ∀i τi : X →R is a bounded linear functional
+must admit the representation of
+τi = Pn
+j=1 uij ˜ψj
+(i = 1, . . . , d).
+The proof of this result is very similar to that of (Sch¨olkopf & Smola, 2001, Theorem
+4.2) so that we omit its details here. In fact, to prove the validation of KDNE, we need this
+strong representer theorem (see the case of KPCA in Sch¨olkopf and Smola (2001, pp.92)).
+To apply Theorem 3 to our framework, we can simply view A = (τ1, ..., τd)T . If each gi
+is the square function, then regularizer becomes Pd
+i=1 ||τi||2 = ||A||HS where || · ||HS is the
+Hilbert-Schmidt (HS) norm of an operator. If each τi is ﬁnite-dimensional, the HS norm
+is reduced to the Frobenius norm || · ||F . Here, we allow the HS norm of a bounded linear
+operator to take a value of ∞. For the kernel trick (by substituting ˜ψi = φi), the result
+above states that any optimal {τi} must be represented by {Φui}. Therefore, using the
+same notation as Subsection 3.2, we have
+d
+X
+i=1
+gi(||τi||) =
+d
+X
+i=1
+||τi||2 =
+d
+X
+i=1
+uT
+i ΦT Φui =
+d
+X
+i=1
+uT
+i Kui = trace
+ UKUT ).
+This regularizer is ﬁrst appeared in the work of Globerson and Roweis (2006). Similarly, for
+the KPCA trick (by substituting ˜ψi = ψi), any optimal {τi} must be represented by {Ψui}
+and, using the fact that ΨTΨ = I, we have Pd
+i=1 ||τi||2 = trace
+ UUT ) = ||U||2
+F .
+By adding the regularizer, trace(UKUT ) or ||U||2
+F , into existing objective functions,
+we have a new class of learners, namely, regularized Mahalanobis distance learners such
+as regularized KNCA (RKNCA), regularized KLMNN (RKLMNN) and regularized KDNE
+(RKDNE). Our framework can be further extended into a problem in semi-supervised set-
+tings by adding more complicated functions of gi(·) such as manifold regularizers, see e.g.
+Chatpatanasiri and Kijsirikul (2008). We plan to investigate eﬀects of using various types
+of regularizers in the near future.
+11
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+4. Selection of a Kernel Function
+The problem of selecting an eﬃcient kernel function is central to all kernel machines. All
+previous works on Mahalanobis distance learners use exhaustive methods such as cross
+validation to select a kernel function. In this section, we investigate a possibility to auto-
+matically construct a kernel which is appropriate for a Mahalanobis distance learner. In the
+ﬁrst part of this section, we consider a popular method called kernel alignment (Lanckriet
+et al., 2004; Zhu et al., 2005) which is able to learn, from a training set, a kernel in the
+form of k(·, ·) = P
+i αiki(·, ·) where k1(·, ·), ..., km(·, ·) are pre-chosen base kernels. In the
+second part of this section, we investigate a simple method which constructs an unweighted
+combination of base kernels, P
+i ki(·, ·) (henceforth refered to as an unweighted kernel). A
+theoretical result is provided to support this simple approach. Kernel constructions based
+on our two approaches require much shorter running time when comparing to the standard
+cross validation approach.
+4.1 Kernel Alignment
+Here, our kernel alignment formulation belongs to the class of quadratic programs (QPs)
+which can be solved more eﬃciently than the formulations proposed by Lanckriet et al.
+(2004) and Zhu et al. (2005) which belong to the class of semideﬁnite programs (SDPs)
+and quadratically constrained quadratic programs (QCQPs), respectively (Boyd & Van-
+denberghe, 2004).
+To use kernel alignment in classiﬁcation problems, the following assumption is central:
+for each couple of examples xi, xj, the ideal kernel k(xi, xj) is Yij (Guermeur et al., 2004)
+where
+Yij =
+(
++1,
+if yi = yj,
+−1
+p−1,
+otherwise,
+and p is the number of classes in the training data.
+Denoting Y as the matrix having
+elements of Yij, we then deﬁne the alignment between the kernel matrix K and the ideal
+kernel matrix Y as follows:
+align(K, Y ) =
+⟨K, Y ⟩F
+||K||F ||Y ||F
+,
+(10)
+where ⟨·, ·⟩F denotes the Frobenius inner-product such that ⟨K, Y ⟩F = trace(KT Y ) and
+|| · ||F is the Frobenius norm induced by the Frobenius inner-product.
+Assume that we have m kernel functions, k1(·, ·), ..., km(·, ·) and K1, ..., Km are their
+corresponding Gram matrices with respect to the training data. In this paper, the kernel
+function obtained from the alignment method is parameterized in the form of k(·, ·) =
+P
+i αiki(·, ·) where αi ≥0.
+Note that the obtained kernel function is guaranteed to be
+positive semideﬁnite. In order to learn the best coeﬃcients α1, ..., αm, we solve the following
+optimization problem:
+{α1, ..., αm} = arg max
+αi≥0 align(K, Y ),
+(11)
+where K = P
+i αiKi.
+Note that as K and Y are PSD, ⟨K, Y ⟩F ≥0.
+Since both the
+numerator and denominator terms in the alignment equation can be arbitrary large, we can
+12
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+simply ﬁx the numerator to 1. We then reformulate the problem as follows:
+arg max
+αi≥0,⟨K,Y ⟩F =1
+align(K, Y ) =
+arg min
+αi≥0,⟨K,Y ⟩F =1
+||K||F ||Y ||F
+=
+arg min
+αi≥0,⟨K,Y ⟩F =1
+||K||2
+F
+=
+arg min
+αi≥0,P
+i αi⟨Ki,Y ⟩F =1
+X
+i,j
+αiαj⟨Ki, Kj⟩F .
+Deﬁning a PSD matrix S whose elements Sij = ⟨Ki, Kj⟩F , a vector b = (⟨K1, Y ⟩F , ..., ⟨Km, Y ⟩F )T
+and a vector α = (α1, ..., αm)T , we then reformulate Eq. (11) as follows:
+α =
+arg min
+αi≥0, αT b=1
+αT Sα.
+(12)
+This optimization problem is a QP and can be eﬃciently solved (Boyd & Vandenberghe,
+2004); hence, we are able to learn the best kernel function k(·, ·) = P
+i αiki(·, ·) eﬃciently.
+Since the magnitudes of the optimal αi are varied due to ||Ki||F , it is convenient to use
+k′
+i(·, ·) = ki(·, ·)/||Ki||F and hence K′
+i = Ki/||Ki||F in the derivation of Eq. (12). We deﬁne
+S′ and b′ similar to S and b except that they are based on K′
+i instead of Ki. Let
+γ =
+arg min
+γi≥0, γT b′=1
+γT S′γ.
+(13)
+It is easy to see that the ﬁnal kernel function k(·, ·) = P
+i γik′
+i(·, ·) achieved from Eq. (13)
+is not changed from the kernel achieved from Eq. (12).
+Note that we can further modify Eq. (12) to enforce sparseness of α and improve a speed
+of an algorithm by minimizing an upper bound of ||K||F instead of minimizing the exact
+quantity so that the optimization formula belongs to the class of linear programs (LPs)
+instead of QPs.
+min
+αi≥0,⟨K,Y ⟩F =1 ||K||F ≤
+min
+αi≥0,⟨K,Y ⟩F =1 ||vec(K)||1
+(14)
+where vec(·) denotes a standard “vec” operator converting a matrix to a vector (Minka,
+1997). By using a standard trick for an absolute-valued objective function (Boyd & Van-
+denberghe, 2004), Eq. (14) can be solved by linear programming.
+Note that the above
+optimization algorithm of minimizing the upper bound of a desired objective function is
+similar to the popular support vector machines where the hinge loss is minimized instead
+of the 0/1 loss.
+4.2 Unweighted Kernels
+In this subsection, we show that a very simple kernel k′(·, ·) = P
+i ki(·, ·) is theoretically
+eﬃcient, no less than a kernel obtained from the alignment method. Denote φk
+i as a mapped
+vector of an original example xi by a map associated with a kernel k(·, ·). The main idea
+of the contents presented in this section is the following simple but useful result.
+Proposition 1. Let {αi} be a set of positive coeﬃcients, αi > 0 for each i, and let
+k1(·, ·), ..., km(·, ·) be base PSD kernels and k(·, ·) = P
+i αiki(·, ·) and k′(·, ·) = P
+i ki(·, ·).
+Then, there exists an invertible linear map B such that B : φk′
+i →φk
+i for each i.
+13
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+Proof. Without loss of generality, we will concern here only the case of m = 2; the cases such
+that m > 2 can be proven by induction. Let Hi ⊕Hj be a direct sum of Hi and Hj where its
+inner product is deﬁned by ⟨·, ·⟩Hi +⟨·, ·⟩Hj and let {φ(j)
+i } ⊂Hj denote a mapped training set
+associated with the jth base kernel. Then we can view φk
+i = (√α1φ(1)
+i , √α2φ(2)
+i ) ∈Hi ⊕Hj
+since
+⟨φk
+i , φk
+j ⟩= k(xi, xj) = α1k1(xi, xj) + α2k2(xi, xj)
+= ⟨√α1φ(1)
+i , √α1φ(1)
+j ⟩+ ⟨√α2φ(2)
+i , √α2φ(2)
+j ⟩
+= ⟨
+√α1φ(1)
+i , √α2φ(2)
+i
+
+,
+√α1φ(1)
+j , √α2φ(2)
+j
+
+⟩.
+Similarly, we can also view φk′
+i = (φ(1)
+i , φ(2)
+i ) ∈Hi ⊕Hj. Let Ij be the identity map in Hj.
+Then,
+B =
+√α1I1
+0
+0
+√α2I2
+
+.
+Since ∞> α1, α2 > 0 and B is bounded (the operator norm of B is max(√α1, √α2)), B is
+invertible.
+Now suppose we apply the kernel k(·, ·) = P
+i αiki(·, ·) obtained from the kernel align-
+ment method to a Mahalanobis distance learner and an optimal transformation A∗is
+returned.
+Let f(·) be an objective function which depends only on an inner product
+⟨Aφi, Aφj⟩(as assumed in Theorems 1 and 2). Since, from Proposition 1, ⟨A∗φk
+i , A∗φk
+j ⟩=
+⟨A∗Bφk′
+i , A∗Bφk′
+j ⟩, we have
+f ∗≡f
+n
+⟨A∗φk
+i , A∗φk
+j ⟩
+o
+= f
+n
+⟨A∗Bφk′
+i , A∗Bφk′
+j ⟩
+o
+.
+Thus, by applying a training set {φk′
+i } to a learner who tries to minimize f(·), a learner will
+return a linear map with the objective value less than or equal to f ∗(because the learner
+can at least return A∗B). Notice that because B is invertible, the value f ∗is in fact optimal.
+Consequently, the following claim can be stated: “there is no need to apply the methods
+which learn {αi}, e.g. the kernel alignment method, at least in theory, because learning
+with a simple kernel k′(·, ·) also results in a linear map having the same optimal objective
+value”. However, in practice, there can be some diﬀerences between using the two kernels
+k(·, ·) and k′(·, ·) due to the following reasons.
+• Existence of a local solution. As some optimization problems are not convex, there
+is no guarantee that a solver is able to discover a global solution within a reasonable time.
+Usually, a learner discovers only a local solution, and hence two learners based on k(·, ·)
+and k′(·, ·) will not give the same solution. KNCA belongs to this case.
+• Non-existence of the unique global solution. In some optimization problems,
+there can be many diﬀerent linear maps having the same optimal values f ∗, and hence there
+is no guarantee that two learners based on k(·, ·) and k′(·, ·) will give the same solution.
+KLMNN is an example of this case.
+• Size constraints. Because of a size constraint such as AAT = I used in KDNE, our
+arguments used in the previous subsection cannot be applied, i.e., given that A∗T A∗= I,
+14
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+there is no guaranteed that (A∗B)(A∗B)T = I. Hence, A∗B may not be an optimal solution
+of a learner based on k′(·, ·).
+• Preprocessing of target neighbors. The behavior of some learners depends on
+their preprocesses.
+For example, before learning takes place, the KLMNN and KDNE
+algorithms have to specify the target neighbors of each point (by specifying a value of wij).
+In a case of using the KPCA trick, this speciﬁcation is based on the Euclidean distance
+with respect to a selected kernel (see Subsection 5.1.2 and Proposition 3). In this case,
+the Euclidean distance with respect to an aligned kernel k(·, ·) (which already used some
+information of a training set) is more appropriate than the Euclidean distance with respect
+to an unweighted kernel k′(·, ·).
+• Zero coeﬃcients. In the above proposition we assume αi > 0 for all i. Often, the
+alignment algorithm return αi = 0 for some i. Deﬁne A∗and f ∗as above. Following the
+same line of the proof of Proposition 1, in the cases that the alignment method gives αi = 0
+for some i, it can be easily shown that a learner with a kernel k′(·, ·) will return a linear
+map with its objective value better than or equal to f ∗.
+Since constructing k′(·, ·) is extremely easy, k′(·, ·) is a very attractive choice to be used
+in kernelized algorithms.
+5. Demonstrations
+In this section, the advantages of the KPCA trick over the kernel trick are demonstrated.
+After that, we conduct extensive experiments to illustrate the performance of kernelized
+algorithms, especially for those applying the kernel construction methods described in the
+previous section.
+5.1 KPCA Trick versus Kernel Trick
+To understand the advantages of the KPCA trick over the kernel trick, it is best to derive a
+kernel trick formula for each algorithm and see what have to be done in order to implement
+a kernelized algorithm applying the kernel trick. In this section, we deﬁne {φi} and Φ as in
+Section 3.2.
+5.1.1 KNCA
+As noted in Sect. 2.1, in order to minimize the objective of NCA and KNCA, we need to
+derive gradient formulas, and the formula of ∂f KNCA/∂A is (Goldberger et al., 2005):
+−2A
+X
+i
+
+pi
+X
+k
+pikφikφT
+ik −
+X
+j∈ci
+pijφijφT
+ij
+
+
+(15)
+where for brevity we denote φij = φi −φj. Nevertheless, since φi may lie in an inﬁnite
+dimensional space, the above formula cannot be always implemented in practice. In order
+to implement the kernel-trick version of KNCA, users need to prove the following proposition
+which is not stated in the original work of Goldberger et al. (2005):
+Proposition 2. ∂f KNCA/∂A can be formulated as V ΦT where V depends on {φi} only in
+the form of ⟨φi, φj⟩= k(xi, xj), and thus we can compute all elements of V .
+15
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+Proof. Deﬁne a matrix Bφ
+i = (0, 0, ..., φ, ..., 0, 0) as a matrix with its ith column is φ and
+zero vectors otherwise. Denote kij = ki −kj. Substitute A = UΦT to Eq. (15) we have
+∂f KNCA
+∂A
+= −2U
+X
+i
+
+pi
+X
+k
+pikkikφT
+ik −
+X
+j∈ci
+pijkijφT
+ij
+
+= −2U
+X
+i
+
+pi
+X
+k
+pik(Bkik
+i
+−Bkik
+k
+) −
+X
+j∈ci
+pij(Bkij
+i
+−Bkij
+j
+)
+
+ΦT
+=
+V ΦT,
+which completes the proof.
+Therefore, at the ith iteration of an optimization step of a gradient optimizer, we needs
+to update the current best linear map as follows:
+A(i) = A(i−1) + ǫ∂f KNCA
+∂A
+= (U(i−1) + ǫV (i−1))ΦT
+= U(i)ΦT ,
+(16)
+where ǫ is a step size. The kernel-trick formulas of KNCA are thus ﬁnally achieved. How-
+ever, we emphasize that the process of proving Proposition 2 and Eq. (16) is not trivial and
+may be tedious and diﬃcult for non-experts as well as practitioners who focus their tasks
+on applications rather than theories. Moreover, since the formula of ∂f KNCA/∂A is sig-
+niﬁcantly diﬀerent from ∂f NCA/∂A, users are required to re-implement KNCA (even they
+already possess an NCA implementation) which is again not at all convenient. In contrast,
+we note that all these diﬃculties are disappeared if the KPCA trick algorithm consisting of
+three simple steps shown in Fig. 1 is applied instead of the kernel trick.
+There is another advantage of using the KPCA trick on KNCA3. By the nature of a
+gradient optimizer, it takes a large amount of time for NCA and KNCA to converge to a
+local solution, and thus a method of speeding up the algorithms is needed. As recommended
+by Weinberger et al. (2006), it can be helpful to ﬁrst apply PCA before performing a learning
+process: the learning process can be tremendously speed up by retaining only, says, the 100
+largest-variance principal components of the input data. In the KPCA trick framework, no
+extra work is required for this speed-up task as KPCA is already applied at the ﬁrst place.
+5.1.2 KLMNN
+Similar to KNCA, the online-available code of LMNN4 employs a gradient based opti-
+mization, and thus new gradient formulas in the feature space has to be derived and new
+implementation has to be done in order to apply the kernel trick. On the other hand, by
+applying the KPCA trick, the original LMNN code can be immediately used.
+There is another advantage of the KPCA trick on LMNN: LMNN requires a speciﬁcation
+of wij which is usually based on the quantity ||xi−xj||. Thus, it makes sense that wij should
+3. We slightly modify the code of Charless Fowlkes: http://www.cs.berkeley.edu/∼fowlkes/software/nca/
+4. http://www.weinbergerweb.net/Downloads/LMNN.html
+16
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+be based on ||φi−φj|| =
+p
+k(xi, xi) + k(xj, xj) −2k(xi, xj) with respect to the feature space
+of KLMNN, and hence, with the kernel trick, users have to modify the original code in order
+to appropriately specify wij. In contrast, by applying the KPCA trick which restricts {ψi}
+to be an orthonormal set as in Eq. (9), we have the following proposition:
+Proposition 3. Let {ψi}n
+i=1 be an orthonormal set such that span({ψi}n
+i=1) = span({φi}n
+i=1)
+and ϕi = (⟨φi, ψ1⟩, . . . , ⟨φi, ψn⟩)T ∈Rn, then ||ϕi−ϕj||2 = ||φi −φj||2 for each 1 ≤i, j ≤n.
+Proof. Since we work on a separable Hilbert space X, we can extend the orthonormal set
+{ψi}n
+i=1 to {ψi}∞
+i=1 such that span({ψi}∞
+i=1) is X and ⟨φi, ψj⟩= 0 for each i = 1, ..., n and
+j > n. Then, by an application of the Parseval identity (Lewkeeratiyutkul, 2006),
+||φi −φj||2 =
+∞
+X
+k=1
+⟨φi −φj, ψk⟩2 =
+n
+X
+k=1
+⟨φi −φj, ψk⟩2
+= ||ϕi −ϕj||2.
+The last equality comes from Eq.(9).
+Therefore, with the KPCA trick, the target neighbors wij of each point is computed
+based on ||ϕi −ϕj|| = ||φi −φj|| without any modiﬁcation of the original code.
+5.1.3 KDNE
+By applying A = UΦT and deﬁning the gram matrix K = ΦTΦ, we have the following
+proposition.
+Proposition 4. The kernel-trick formula of KDNE is the following minimization problem:
+U∗= arg min
+UKUT =I
+trace(UK(D −W)KUT ).
+(17)
+Note that this kernel-trick formula of KDNE involves a generalized eigenvalue problem in-
+stead of a plain eigenvalue problem involved in DNE. As a consequence, we face a singularity
+problem, i.e. if K is not full-rank, the constraint UKUT = I cannot be satisﬁed. Using
+elementary linear algebra, it can be shown that K is not full-rank if and only if {φi} is not
+linearly independent, and this condition is not highly improbable. Sugiyama (2006), Yu
+and Yang (2001), and Yang and Yang (2003) suggest methods to cope with the singularity
+problem in the context of Fisher discriminant analysis which may be applicable to KDNE.
+Sugiyama (2006) recommends to use the constraint U(K +ǫI)UT = I instead of the original
+constraint; however, an appropriate value of ǫ has to be tuned by cross validation which
+is time-consuming. Alternatively, Yu and Yang (2001) and Yang and Yang (2003) propose
+more complicated methods of directly minimizing an objective function in the null space of
+the constraint matrix so that the singularity problem is explicitly avoided.
+We note that a KPCA-trick implementation of KDNE does not have this singularity
+problem as only a plain eigenvalue problem has to be solved. Moreover, as in KLMNN,
+applying the KPCA trick instead of the kernel trick to KDNE avoid the tedious task of
+modifying the original code to appropriately specify wij in the feature space.
+17
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+−1
+−0.5
+0
+0.5
+1
+0
+0.2
+0.4
+0.6
+0.8
+1
+−1
+−0.5
+0
+0.5
+1
+−1
+−0.5
+0
+0.5
+1
+Figure 2: Two synthetic examples where NCA, LMNN and DNE cannot learn any eﬃcient
+Mahalanobis distances for kNN. Note that in each example, data in each class lie
+on a simple non-linear 1-dimensional subspace (which, however, cannot be discov-
+ered by the three learners). In contrast, the kernel versions of the three algorithms
+(using the 2nd-order polynomial kernel) can learn very eﬃcient distances, i.e., the
+non-linear subspaces are discovered by the kernelized algorithms.
+Table 1: The average accuracy with standard deviation of NCA and their kernel versions.
+On the bottom row, the win/draw/lose statistics of each kernelized algorithm
+comparing to its original version is drawn.
+Name
+NCA
+KNCA
+Aligned KNCA
+Unweighted KNCA
+Balance
+0.89 ± 0.03
+0.92 ± 0.01
+0.92 ± 0.01
+0.91 ± 0.03
+Breast Cancer
+0.95 ± 0.01
+0.97 ± 0.01
+0.96 ± 0.01
+0.96 ± 0.02
+Glass
+0.61 ± 0.05
+0.69 ± 0.02
+0.69 ± 0.04
+0.68 ± 0.04
+Ionosphere
+0.83 ± 0.04
+0.94 ± 0.03
+0.92 ± 0.02
+0.90 ± 0.03
+Iris
+0.96 ± 0.03
+0.96 ± 0.01
+0.95 ± 0.03
+0.96 ± 0.02
+Musk2
+0.87 ± 0.02
+0.90 ± 0.01
+0.88 ± 0.02
+0.87 ± 0.02
+Pima
+0.68 ± 0.02
+0.71 ± 0.02
+0.67 ± 0.03
+0.69 ± 0.01
+Satellite
+0.82 ± 0.02
+0.84 ± 0.01
+0.84 ± 0.01
+0.82 ± 0.02
+Yeast
+0.47 ± 0.02
+0.50 ± 0.01
+0.49 ± 0.02
+0.47 ± 0.02
+Win/Draw/Lose
+-
+8/1/0
+7/0/2
+5/4/0
+5.2 Numerical Experiments
+On page 8 of the LMNN paper (Weinberger et al., 2006), Weinberger et al. gave a com-
+ment about KLMNN: ‘as LMNN already yields highly nonlinear decision boundaries in the
+original input space, however, it is not obvious that “kernelizing” the algorithm will lead
+to signiﬁcant further improvement’. Here, before giving experimental results, we explain
+why “kernelizing” the algorithm can lead to signiﬁcant improvements. The main intuition
+behind the kernelization of “Mahalanobis distance learners for the kNN classiﬁcation al-
+gorithm” lies in the fact that non-linear boundaries produced by kNN (with or without
+Mahalanobis distance) is usually helpful for problems with multi-modalities; however, the
+non-linear boundaries of kNN is sometimes not helpful when data of the same class stay on
+a low-dimensional non-linear manifold as shown in Figure 2.
+In this section, we conduct experiments on NCA, LMNN, DNE and their kernel ver-
+sions on nine real-world datasets to show that (1) it is really the case that the kernelized
+algorithms usually outperform their original versions on real-world datasets, and (2) the
+performance of linearly combined kernels achieved by the two methods presented in Sec-
+tion 4 are comparable to kernels which are exhaustively selected, but the kernel alignment
+method requires much shorter running time.
+18
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+Table 2: The average accuracy with standard deviation of LMNN and their kernel versions.
+Name
+LMNN
+KLMNN
+Aligned KLMNN
+Unweighted KLMNN
+Balance
+0.84 ± 0.04
+0.87 ± 0.01
+0.88 ± 0.02
+0.85 ± 0.01
+Breast Cancer
+0.95 ± 0.01
+0.97 ± 0.01
+0.97 ± 0.00
+0.97 ± 0.00
+Glass
+0.63 ± 0.05
+0.69 ± 0.04
+0.69 ± 0.04
+0.66 ± 0.05
+Ionosphere
+0.88 ± 0.02
+0.95 ± 0.02
+0.94 ± 0.02
+0.94 ± 0.02
+Iris
+0.95 ± 0.02
+0.96 ± 0.02
+0.95 ± 0.02
+0.97 ± 0.01
+Musk2
+0.80 ± 0.03
+0.93 ± 0.01
+0.88 ± 0.02
+0.86 ± 0.02
+Pima
+0.68 ± 0.02
+0.71 ± 0.02
+0.72 ± 0.02
+0.67 ± 0.03
+Satellite
+0.81 ± 0.01
+0.85 ± 0.01
+0.84 ± 0.01
+0.83 ± 0.02
+Yeast
+0.47 ± 0.02
+0.48 ± 0.02
+0.54 ± 0.02
+0.50 ± 0.02
+Win/Draw/Lose
+-
+9/0/0
+8/1/0
+8/0/1
+Table 3: The average accuracy with standard deviation of DNE and their kernel versions.
+Name
+DNE
+KDNE
+Aligned KDNE
+Unweighted KDNE
+Balance
+0.79 ± 0.02
+0.90 ± 0.01
+0.83 ± 0.02
+0.85 ± 0.03
+Breast Cancer
+0.96 ± 0.01
+0.97 ± 0.01
+0.96 ± 0.01
+0.96 ± 0.02
+Glass
+0.65 ± 0.04
+0.70 ± 0.03
+0.69 ± 0.04
+0.65 ± 0.03
+Ionosphere
+0.87 ± 0.02
+0.95 ± 0.02
+0.95 ± 0.02
+0.93 ± 0.03
+Iris
+0.95 ± 0.02
+0.97 ± 0.02
+0.96 ± 0.02
+0.96 ± 0.03
+Musk2
+0.89 ± 0.02
+0.91 ± 0.01
+0.89 ± 0.02
+0.84 ± 0.03
+Pima
+0.67 ± 0.02
+0.69 ± 0.02
+0.70 ± 0.03
+0.70 ± 0.02
+Satellite
+0.84 ± 0.01
+0.85 ± 0.01
+0.85 ± 0.01
+0.81 ± 0.02
+Yeast
+0.40 ± 0.05
+0.48 ± 0.01
+0.47 ± 0.04
+0.52 ± 0.02
+Win/Draw/Lose
+-
+9/0/0
+7/2/0
+5/2/2
+To measure the generalization performance of each algorithm, we use the nine real-
+world datasets obtained from the UCI repository (Asuncion & Newman, 2007): Balance,
+Breast Cancer, Glass, Ionosphere, Iris, Musk2, Pima, Satellite and Yeast. Fol-
+lowing previous works, we randomly divide each dataset into training and testing sets. By
+repeating the process 40 times, we have 40 training and testing sets for each dataset. The
+generalization performance of each algorithm is then measured by the average test accuracy
+over the 40 testing sets of each dataset. The number of training data is 200 except for
+Glass and Iris where we use 100 examples because these two datasets contain only 214
+and 150 total examples, respectively.
+Following previous works, we use the 1NN classiﬁer in all experiments.
+In order to
+kernelize the algorithms, three approaches are applied to select appropriate kernels:
+• Cross validation (KNCA, KLMNN and KDNE).
+• Kernel alignment (Aligned KNCA, Aligned KLMNN and Aligned KDNE).
+• Unweighted combination of base kernels (Unweighted KNCA, Unweighted KLMNN
+and Unweighted KDNE).
+For all three methods, we consider scaled RBF base kernels (Sch¨olkopf & Smola, 2001,
+p. 216), k(x, y) = exp(−||x−y||2
+2Dσ2 ) where D is the dimensionality of input data. Twenty
+one based kernels speciﬁed by the following values of σ are considered: 0.01, 0.025, 0.05,
+0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100, 250, 500, 750, 1000. all ker-
+nelized algorithms are implemented by the KPCA trick illustrated in Figure 1. As noted
+19
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10 11 12 13 14 15 16 17 18 19 20 21 22
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+0.55
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+0.9
+0.95
+1
+NUMBER OF BASE KERNELS
+ACCURACY
+ 
+ 
+IRIS
+IONOSPHERE
+BALANCE
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10 11 12 13 14 15 16 17 18 19 20 21 22
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+NUMBER OF BASE KERNELS
+ACCURACY
+ 
+ 
+MUSK2
+SATELLITE
+PIMA INDIANS
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10 11 12 13 14 15 16 17 18 19 20 21 22
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+0.55
+0.6
+0.65
+0.7
+0.75
+0.8
+0.85
+0.9
+0.95
+1
+NUMBER OF BASE KERNELS
+ACCURACY
+ 
+ 
+GLASS
+YEAST
+BREAST CANCER
+Figure 3: This ﬁgure illustrates performance of Unweighted KDNE with diﬀerent num-
+ber of base kernels. It can be observed from the ﬁgure that the generalization
+performance of Unweighted KDNE will be eventually stable as we add more
+and more base kernels.
+in Subsection 4.2, the main problem of using the unweighted kernel to algorithms such as
+KLMNN and KDNE is that the Euclidean distance with respect to the unweighted kernel
+20
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+is not informative and thus should not be used to specify target neighbors of each point.
+Therefore, in cases of KLMNN and KDNE which apply the unweighted kernel, we employ
+the Euclidean distance with respect to the input space to specify target neighbors. We
+slightly modify the original codes of LMNN and DNE to fulﬁll this desired speciﬁcation.
+The experimental results are shown in Tables 1, 2 and 3. From the results, it is clear
+that the kernelized algorithms usually improve the performance of their original algorithms.
+The kernelized algorithms applying cross validation obtain the best performance. They out-
+perform the original methods in 26 out of 27 datasets. The other two kernel versions of
+the three original algorithms also have satisﬁable performance. The kernelized algorithms
+applying kernel alignment outperform the original algorithms in 22 datasets and obtain an
+equal performance in 3 datasets. Only 2 out of 27 datasets where the original algorithms
+outperform the kernel algorithms applying kernel alignment. Similarly, the kernelized al-
+gorithms applying the unweighted kernel outperform the original algorithms in 18 datasets
+and obtain an equal performance in 6 datasets. Only 3 out of 27 datasets where the original
+algorithms outperform the kernel algorithms applying the unweighted kernel.
+We note that although the cross validation method usually gives the best performance,
+the other two kernel construction methods provide comparable results in much shorter
+running time. For each dataset, a run-time overhead of the kernelized algorithms applying
+cross validation is of several hours (on Pentium IV 1.5GHz, Ram 1 GB) while run-time
+overheads of the kernelized algorithms applying aligned kernels and the unweighted kernel
+are about minutes and seconds, respectively, for each dataset. Therefore, in time-limited
+circumstance, it is attractive to apply an aligned kernel or an unweighted kernel.
+Note that the kernel alignment method are not appropriate for a multi-modal dataset
+in which there may be several clusters of data points for each class since, from eq. (10), the
+function align(K, Y ) will attain the maximum value if and only if all points of the same class
+are collapsed into a single point. This may be one reason which explains why cross validated
+kernels give better results than results of aligned kernels in our experiments. Developing
+a new kernel alignment algorithm which suitable for multi-modality is currently an open
+problem.
+Comparing generalization performance induced by aligned kernels and the unweighted
+kernel, algorithms applying aligned kernels perform slightly better than algorithms applying
+the unweighted kernel.
+With little overhead and satisﬁable performance, however, the
+unweighted kernel is still attractive for algorithms, like NCA (in contrast to LMNN and
+DNE), which are not required a speciﬁcation of target neighbors wij.
+Since Euclidean
+distance with respect to the unweighted kernel is usually not appropriate for specifying
+wij, an KPCA-trick application of algorithms like LMNN and DNE may still require some
+re-programming.
+As noted in the previous section, aligned kernels usually does not use all base kernels
+(αi = 0 for some i); in contrast, the unweighted kernel uses all base kernels (αi = 1 for all
+i). Hence, as described in Section 4.2, the feature space corresponding to the unweighted
+kernel usually contains the feature space corresponding to aligned kernels. Therefore, we
+may informally say that the feature space induced by the unweighted kernel is “larger” than
+ones induced by aligned kernels.
+Since a feature space which is too large can lead to overﬁtting, one may wonder whether
+or not using the unweighted kernel leads to overﬁtting. Figure 3 shows that overﬁtting
+21
+
+Chatpatanasiri, Korsrilabutr, Tangchanachaianan & Kijsirikul
+indeed does not occur. For compactness, we show only the results of Unweighted KDNE.
+In the experiments shown in this ﬁgure, base kernels are adding in the following order: 0.01,
+0.025, 0.05, 0.075, 0.1, 0.25, 0.5, 0.75, 1, 2.5, 5, 7.5, 10, 25, 50, 75, 100, 250, 500, 750, 1000.
+It can be observed from the ﬁgure that the generalization performance of Unweighted
+KDNE will be eventually stable as we add more and more base kernels. Also, It can be
+observed that 10 - 14 base kernels are enough to obtain stable performance. It is interesting
+to further investigate an overﬁtting behavior of a learner by applying methods such as a
+bias-variance analysis (James, 2003) and investigate whether it is appropriate or not to
+apply an “adaptive resampling and combining” method (Breiman, 1998) to improve the
+classiﬁcation performance of a supervised mahalanobis distance learner.
+6. Summary
+We have presented general frameworks to kernerlize Mahalanobis distance learners. Three
+recent algorithms are kernelized as examples. Although we have focused only on the super-
+vised settings, the frameworks are clearly applicable to learners in other settings as well,
+e.g. a semi-supervised learner. Two representer theorems which justify both our framework
+and those in previous works are formally proven. The theorems can also be applied to
+Mahalanobis distance learners in unsupervised and semi-supervised settings. Moreover, we
+present two methods which can be eﬃciently used for constructing a good kernel function
+from training data. Although we have concentrated only on Mahalanobis distance learners,
+our kernel construction methods can be indeed applied to all kernel classiﬁers. Numeri-
+cal results over various real-world datasets showed consistent improvements of kernelized
+learners over their original versions.
+Acknowledgements
+This work is supported by Thailand Research Fund. We thank Wicharn Lewkeeratiyutkul
+who taught us the theory of Hilbert space. We also thank Prasertsak Pungprasertying for
+preparing some datasets in the experiments.
+References
+Asuncion, A., & Newman, D. J. (2007). UCI machine learning repository..
+Boyd, S., & Vandenberghe, L. (2004). Convex Optimization.
+Breiman, L. (1998). Arcing classiﬁers. Annals of Statistics, 26, 801–823.
+Chapelle, O., & Sch¨olkopf, B. (2001). Incorporating Invariances in Nonlinear SVMs. NIPS.
+Chatpatanasiri, R., & Kijsirikul, B. (2008). Spectral Methods for Linear and Non-Linear
+Semi-Supervised Dimensionality Reduction. Arxiv preprint arXiv:0804.0924.
+Chen, H.-T., Chang, H.-W., & Liu, T.-L. (2005). Local discriminant embedding and its
+variants. In CVPR, Vol. 2.
+Globerson, A., & Roweis, S. (2006). Metric learning by collapsing classes. NIPS.
+Goldberger, J., Roweis, S., Hinton, G., & Salakhutdinov, R. (2005). Neighbourhood com-
+ponents analysis. NIPS.
+22
+
+On Kernelizing Mahalanobis Distance Learning Algorithms
+Guermeur, Y., Lifchitz, A., & Vert, R. (2004). A kernel for protein secondary structure
+prediction. Kernel Methods in Computational Biology.
+James, G. M. (2003). Variance and bias for general loss functions. Machine Learning, 51,
+115–135.
+Kimeldorf, G., & Wahba, G. (1971). Some Results on Tchebycheﬃan Spline Functions.
+Journal of Mathematical Analysis and Applications, 33, 82–95.
+Lanckriet, G. R. G., Cristianini, N., Bartlett, P., Ghaoui, L. E., & Jordan, M. I. (2004).
+Learning the kernel matrix with semideﬁnite programming. JMLR, 5, 27–72.
+Lewkeeratiyutkul, W. (2006).
+Lecture Notes on Real Analysis I-II. Available online at
+http://pioneer.netserv.chula.ac.th/˜lwicharn/2301622/.
+Minka, T. (1997). Old and new matrix algebra useful for statistics. See www. stat. cmu.
+edu/minka/papers/matrix. html.
+Sch¨olkopf, B., Herbrich, R., & Smola, A. J. (2001). A generalized representer theorem. In
+COLT, pp. 416–426. Springer-Verlag.
+Sch¨olkopf, B., & Smola, A. J. (2001). Learning with Kernels.
+Shawe-Taylor, J., & Cristianini, N. (2004). Kernel Methods for Pattern Analysis. Cambridge
+University Press.
+Sugiyama, M. (2006). Local ﬁsher discriminant analysis for supervised dimensionality re-
+duction. In ICML.
+Torresani, L., & Lee, K. (2007). Large margin components analysis. NIPS.
+von Luxburg, U. (2007). A tutorial on spectral clustering. Statistics and Computing, 17(4),
+395–416.
+Weinberger, K., Blitzer, J., & Saul, L. (2006). Distance metric learning for large margin
+nearest neighbor classiﬁcation. NIPS.
+Xing, E. P., Ng, A. Y., Jordan, M. I., & Russell, S. (2003). Distance metric learning with
+application to clustering with side-information. NIPS.
+Yan, S., Xu, D., Zhang, B., Zhang, H.-J., Yang, Q., & Lin, S. (2007). Graph embedding
+and extensions: A general framework for dimensionality reduction. PAMI, 29(1).
+Yang, J., & Yang, J. Y. (2003). Why can LDA be performed in PCA transformed space?.
+Pattern Recognition, 36, 563–566.
+Yang, L., Jin, R., Sukthankar, R., & Liu, Y. (2006). An eﬃcient algorithm for local distance
+metric learning. In AAAI.
+Yu, H., & Yang, J. (2001).
+A direct LDA algortihm for high-dimensional data - with
+application fo face recoginition. Pattern Recognition, 34, 2067–2070.
+Zhang, W., Xue, X., Sun, Z., Guo, Y.-F., & Lu, H. (2007). Optimal dimensionality of metric
+space for classiﬁcation. In ICML.
+Zhu, X., Kandola, J., Ghahramani, Z., & Laﬀerty, J. (2005). Nonparametric transforms of
+graph kernels for semi-supervised learning. NIPS.
+23

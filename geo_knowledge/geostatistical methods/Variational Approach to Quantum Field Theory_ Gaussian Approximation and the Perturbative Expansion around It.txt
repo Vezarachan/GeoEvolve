@@ -1,0 +1,1293 @@
+arXiv:hep-th/9707234v2  21 Aug 1997
+Variational Approach to Quantum Field Theory: Gaussian
+Approximation and the Perturbative Expansion around Ita
+Jae Hyung Yee
+Department of Physics and Institute for Mathematical Sciences
+Yonsei University, Seoul 120-749, Korea
+E-mail: jhyee@phya.yonsei.ac.kr
+The functional Schr¨odinger picture formulation of quantum ﬁeld theory and the varia-
+tional Gaussian approximation method based on the formulation are brieﬂy reviewed.
+After presenting recent attempts to improve the variational approximation, we intro-
+duce a new systematic method based on the background ﬁeld method, which enables
+one to compute the order-by-order correction terms to the Gaussian approximation of
+the eﬀective action.
+aTo appear in the proceedings of APCTP-ICTP Joint International Conference ’97 on Recent
+Developments in Nonperturbative Quantum Field Theory, May 26-30, 1997, Seoul
+1
+
+1
+Introduction
+The variational approximation method has been proved to be a convenient non-
+perturbative approximation method for both the quantum mechanical and quan-
+tum ﬁeld theoretic systems.
+The method, which was originally developed for a
+non-perturbative evaluation of quantum mechanical energy eigenvalues, has been
+extended to an action principle by Jackiw and Kerman1, which enables one to com-
+pute the eﬀective actions for time-dependent systems and also for quantum ﬁeld the-
+ories. The usefulness of the method for quantum ﬁeld theories, however, is limited
+by the fact that only the Gaussian functional and it’s obvious generalizations can be
+used as trial wave functionals, which is the reason why it is often called the Gaussian
+approximation. Attempts to improve the Gaussian approximation by using more
+general non-Gaussian trial wave functionals have not been as fruitful as expected,
+due to the diﬃculties in solving the variational gap equations2. To overcome such
+limitations the authors of Ref.[3] has developed the so-called post-Gaussian expan-
+sion method, which enables one to compute the order-by-order correction terms to
+the Gaussian eﬀective potentials for the time-independent systems.
+It is the purpose of this note to give a brief review of the variational approxi-
+mation method in quantum ﬁeld theory, and to present a new systematic method
+of perturbative expansion around the Gaussian eﬀective action based on the back-
+ground ﬁeld method, which is also applicable to the time-dependent systems.
+The variational method in quantum mechanics is based on the fact that the
+ground state energy is the minimum of the expectation values of the Hamiltonian
+of the system. This can be written as a variational principle,
+δΨ < Ψ| ˆH( ˆQ, ˆP) −λ|Ψ >= 0,
+(1)
+where ˆH is the Hamiltonian of the system and |Ψ > is an arbitrary state. If one
+starts from a trial wave function with variational parameters, then Eq.(1) provides
+a variational approximation of the energy eigenstates.
+This simple variational method can be generalized to include the information
+on the time-evolution of the system, by choosing the state to satisfy the constraints,
+< Ψ|Ψ > =
+1
+< Ψ| ˆQ|Ψ > = q(t)
+(2)
+< Ψ| ˆP|Ψ > = p(t).
+Minimizing the expectation value of the Hamiltonian with respect to such states,
+δΨ < Ψ| ˆH( ˆQ, ˆP)|Ψ >= 0,
+(3)
+we obtain the eﬀective Hamiltonian,
+Heff(q, p) =< Ψ0| ˆH( ˆQ, ˆP)|Ψ0 >,
+(4)
+where |Ψ0 > is the solution of Eq.(3). This eﬀective Hamiltonian provides many
+useful informations on the quantum system. If one minimizes Heff with respect to
+2
+
+the variations of q(t) and p(t), one obtains the ground state energy eigenvalue of
+the system. If one solves the Hamilton’s equation, on the other hand,
+˙q(t)
+=
+∂Heff
+∂p
+(5)
+˙p(t)
+= −∂Heff
+∂q
+,
+the solution q and p give the quantum mechanical informations on < Ψ0| ˆQ|Ψ0 >
+and < Ψ0| ˆP|Ψ0 >, respectively.
+If we set ˙q = 0 = p in Eq.(2), we obtain the eﬀective potential,
+Veff(q) = Heff(q, p)|p=0.
+(6)
+If one starts from a trial wave function which satisﬁes Eq.(2), then one obtains
+the variational approximation of the eﬀective Hamiltonian or the eﬀective potential.
+This simple argument is in fact a part of the quantum action principle in the
+Schr¨odinger picture called the action principle of Dirac1,4. This formulation can be
+generalized to the case of quantum ﬁeld theory, which is the functional Schr¨odinger
+picture formulation of quantum ﬁeld theory4.
+2
+Functional Schr¨odinger picture representation of quantum ﬁeld the-
+ory and the variational method.
+2.1
+Schr¨odinger picture representation of scalar ﬁeld theory
+The scalar ﬁeld theory is deﬁned by the Lagrangian density,
+L = 1
+2(π ˙φ −φ ˙π) −H[φ, π],
+(7)
+and the equal-time commutation relations
+[φ(x), π(x′)]x0=x′0
+= iδ(⃗x −⃗x′)
+(8)
+[φ(x), φ(x′)]x0=x′0
+=
+0 = [π(x), π(x′)]x0=x′0,
+where H[φ, π] = 1
+2π2 + V (φ) is the Hamiltonian density.
+As in the quantum mechanical case, we choose the basis vectors for the Schr¨odinger
+representation to be the eigenstates of the ﬁeld operator φ(x),
+φ|ϕ(⃗x) >= ϕ(⃗x)|ϕ(⃗x) >,
+(9)
+which satisfy the orthogonality relation and the completeness relation,
+< ϕ|ϕ′ >= δ[ϕ(⃗x) −ϕ′(⃗x′)]
+(10)
+Z
+Dϕ|ϕ >< ϕ| = I.
+3
+
+Then the state of the physical system is represented by the component, Ψ[ϕ, t] =
+< ϕ|Ψ >, of the expansion,
+|Ψ >=
+Z
+Dϕ|ϕ >< ϕ|Ψ >,
+(11)
+and the operators are represented by the matrix elements,
+< ϕ|φ|ϕ′ > = ϕ(⃗x)δ[ϕ −ϕ′]
+(12)
+< ϕ|π|ϕ′ > = −i
+δ
+δϕ(⃗x)δ[ϕ −ϕ′],
+which are obtained from the matrix elements of Eq.(8). The time-evolution of the
+system is then determined by the functional Schr¨odinger equation,
+i d
+dtΨ[ϕ, t] = < ϕ|H[φ, π]|ϕ′ >< ϕ′|Ψ >
+= H[ϕ, −i δ
+δϕ]Ψ[ϕ, t].
+(13)
+This is a simple generalization of the Schr¨odinger picture representation of quantum
+mechanics to the case of the systems with inﬁnite degrees of freedom.
+2.2
+Free Scalar ﬁeld theory
+To obtain physical information in the Schr¨odinger picture formulation one has to
+solve the functional Schr¨odinger equation (13). As an example of solving the equa-
+tion of motion, we consider the free scalar ﬁeld theory described by the Hamiltonian
+density,
+H = 1
+2π2 + 1
+2(∇φ)2 + 1
+2m2φ2.
+(14)
+By using the representation (12), the Hamiltonian of the system can be written as
+H = 1
+2
+Z
+d3x[−
+δ
+δϕ(⃗x)
+δ
+δϕ(⃗x) −ϕ(⃗x)(∇2 −m2)ϕ(⃗x)].
+(15)
+Since the Hamiltonian has no explicit time-dependence, there exist stationary
+states satisfying the energy eigenvalue equation,
+H[ϕ, −i δ
+δϕ]Ψ[ϕ] = EΨ[ϕ],
+(16)
+where E is the energy eigenvalue. Since the Hamiltonian (15) is quadratic in ϕ(⃗x),
+the Gaussian functional
+Ψ[ϕ] = e−1
+2
+R
+d3xd3x′ϕ(⃗x)G(⃗x,⃗x′)ϕ(⃗x′),
+(17)
+is a solution of (16). Substituting (17) into (16), we obtain.
+1
+2[G(⃗x, ⃗x′) −ϕ(⃗x)G2(⃗x, ⃗x′)ϕ(⃗x′) + ϕ(⃗x)(−∇2 + m2)ϕ(⃗x)]Ψ[ϕ] = EΨ[ϕ],
+(18)
+4
+
+where the repeated arguments imply the integration over the variables. For this
+equation to be true for all eigenvalue ϕ(⃗x), the following relations must be satisﬁed,
+E = 1
+2T rG =
+1
+2
+Z
+d3xG(⃗x, ⃗x)
+(19)
+G2(⃗x, ⃗x′) =
+(−∇2 + m2)δ(⃗x −⃗x′).
+Solving the second equation of (19) via Fourier transformation, one ﬁnds the kernel
+of the Gaussian functional (17) is given by
+G−1(⃗x, ⃗x′) =
+1
+(2π)3
+Z
+d3pei⃗p·(⃗x−⃗x′)
+1
+p
+⃗p2 + m2 ,
+(20)
+which is the propagator of the free scalar ﬁeld theory at equal-time. From this the
+eigenvalue E is found to be
+E = 1
+2
+1
+(2π)3
+Z
+d3x
+Z
+d3p
+p
+⃗p2 + m2,
+(21)
+which is the well-known zero-point energy of the free scalar ﬁeld theory.
+We thus ﬁnd that the ground state of the free scalar ﬁeld theory is described
+by the Gaussian wave functional with the kernel given by the inverse propagator at
+equal-time. One can construct all the eigenstates of the Hamiltonian by considering
+the creation and annihilation operators. They are given by the Hermite polynomial
+functionals multiplied by the ground(vacuum) state5.
+For the interacting theory, however, we cannot solve the functional Schr¨odinger
+equation (13) in closed form. One thus has to use an approximation method to
+ﬁnd solutions to the equation of motion. A natural way to evaluate an approximate
+solution to (13) in the Schr¨odinger picture is to use the variational method, which
+is the subject of the next subsection.
+2.3
+Gaussian approximation of φ4 theory
+To illustrate the variational approximation method in quantum ﬁeld theory, we now
+consider the scalar φ4 theory described by the Hamiltonian density,
+H = 1
+2π2 + 1
+2(⃗∇φ)2 + 1
+2µ2φ2 + λ
+4!φ4,
+(22)
+and compute the Gaussian approximation of the eﬀective potential6. To do this we
+take as a trial wave functional the solution of a free ﬁeld theory discussed in the
+last subsection, namely, the Gaussian wave functional,
+Ψ[ϕ, t] = Ne−1
+4 [ϕ(⃗x)−ˆφ]G−1(⃗x,⃗x′;t)[ϕ(⃗x′)−ˆφ]+ i
+¯h ˆπ(⃗x,t)[ϕ(⃗x)−ˆφ]
+(23)
+which satisﬁes the constraints,
+< Ψ | Ψ > =
+1
+< Ψ | φ | Ψ > =
+ˆφ(⃗x, t)
+(24)
+< Ψ | π | Ψ > =
+ˆπ(⃗x, t).
+5
+
+Since the eﬀective potential is the eﬀective Hamiltonian with vanishing mo-
+menta, we set ˆπ equal to zero and consider the space-time independent ˆφ. Then the
+expectation value of the Hamiltonian with respect to the trial state(23) is given by
+< H > =
+Z
+d3x
+
+V (ˆφ) + ¯h[1
+8G−1(⃗x, ⃗x) −1
+2∇2G(⃗x, ⃗x′)|⃗x=⃗x′
++ V (2)(ˆφ)G(⃗x, ⃗x)] + ¯h2
+8 V (4)(ˆφ)(G(⃗x, ⃗x))2
+
+,
+(25)
+where V (ˆφ) = µ2
+2 ˆφ2 + λ
+4! ˆφ4 is the classical potential and V (n)(ˆφ) = ( d
+d ˆφ)nV (ˆφ).
+The variational equation,
+δG < H >= 0,
+(26)
+yields the variational gap equation,
+1
+4G−2(⃗x, ⃗x′) = [−∇2 + V (2)(ˆφ) + ¯h
+2 V (4)(ˆφ)G(⃗x, ⃗x)]δ(⃗x −⃗x′).
+(27)
+Substituting(27) into (25) one obtains the eﬀective potential,
+Veff(ˆφ) = 1
+2µ2 ˆφ2 + λ
+4!
+ˆφ4 + ¯h
+4 G−1(⃗x, ⃗x) −¯h2
+8 G(⃗x, ⃗x)G(⃗x, ⃗x).
+(28)
+The ﬁrst three terms Eq.(28) constitute the one-loop eﬀective potential, and the
+last term contains the higher-loop contribution, which shows the non-perturbative
+nature of the approximation.
+Using the Fourier transformation method we can solve the gap equation(27):
+G(⃗x −⃗x′) =
+Z
+d3p
+(2π)3 ei⃗p·(⃗x−⃗x′)
+1
+p
+⃗p2 + m2 ,
+(29)
+where the eﬀective mass m is deﬁned by
+m2 = µ2 + λ
+2
+ˆφ2 + λ
+2 ¯h
+Z
+d3p
+(2π)3
+1
+p
+⃗p2 + m2 .
+(30)
+Substituting these results into (28) yields the eﬀective potential:
+Veff(ˆφ)
+=
+µ2
+4
+ˆφ2 + λ
+4!
+ˆφ4 −1
+2λ
+
+m2 −µ2 −λ
+2
+ˆφ2
+2
++ m2
+2 I1
+−
+m4
+4 I2(M) + m4
+64π2
+
+ln m2
+M 2 −1
+2
+
+,
+(31)
+where
+m2 = µ2 + λ
+2 I1 + λ
+2
+ˆφ2 −λ
+2 m2I2(M) + λm2
+32π2 ln m2
+M 2 ,
+(32)
+and, I1 and I2(M) are given by
+I1 =
+Z
+d3p
+(2π)3
+1
+2|⃗p|
+,
+I2(M) =
+Z
+d3p
+(2π)3
+ 
+1
+2|⃗p| −
+1
+2
+p
+⃗p2 + µ2
+!
+.
+(33)
+6
+
+The eﬀective potential (31) has two divergences, I1 and I2(M), and thus we
+need to renormalize the theory. The renormalization conditions can be written as
+[6],
+dVeff
+dm2
+
+m0
+= µ2
+R
+λR
+,
+d2Veff
+d(m2)2
+
+m0
+=
+1
+3λR
+,
+(34)
+which, in our case, yields
+µ2
+R
+λR
+=
+µ2
+λ + 1
+2I1
+(35)
+1
+λR
+=
+1
+λ + 1
+2I2(M).
+Substituting (35) into (31), we ﬁnally obtain the renormalized eﬀective potential,
+Veff(ˆφ) = −m4
+2λR
++ m2
+2
+ˆφ2 + µ2
+R
+λR
+m2 + m4
+64π2
+
+ln m2
+M 2 −1
+2
+
+,
+(36)
+where
+m2 = µ2
+R + λR
+2
+ˆφ2 + λR
+32π2 ln m2
+M 2 .
+(37)
+This result is qualitatively equivalent to the large-N approximation (where N is
+the number of the scalar ﬁeld components)7, and shows the non-perturbative nature
+of the approximation. The result (36) can be used to study the quantum nature
+of the theory, such as the symmetry breaking phenomena6. The method can be
+generalized to the case of the ﬁeld theories in curved space8, to the ﬁnite temperature
+quantum ﬁeld theory9, and also to the systems out of thermal equilibrium10.
+2.4
+Fermionic theory
+Finding the Schr¨odinger picture representation of fermion ﬁelds is non-trivial since
+the equal-time anti-commutation relation, in Hermitian representation,
+{ψα(x), ψβ(x′)}x0=x0′ = δαβδ(⃗x −⃗x′),
+(38)
+implies that the ﬁeld operators ψ’s are their own momentum conjugates. In the
+non-Hermitian representation, on the other hand, the anti-commutation relation is
+given by
+{ψα(x), ψ†
+β(x′)}x0=x0′ = δαβδ(⃗x −⃗x′),
+(39)
+but now the eigenstates of ﬁeld operators do not form an orthonormal basis. One
+can show, however, that there exists a one parameter family of equivalent represen-
+tations of fermion ﬁelds4. Floreanini and Jackiw11, in particular, have found that
+the representation,
+ψ =
+1
+√
+2[θ(⃗x) +
+δ
+δθ†(⃗x)]
+(40)
+ψ† =
+1
+√
+2[θ†(⃗x) +
+δ
+δθ(⃗x)],
+7
+
+where θ(⃗x) is a complex Grassmann variable, satisﬁes the anti-commutation relation
+(39).
+Using this representation one can follow the same procedure as in the case of
+the scalar ﬁeld theory to evaluate the Gaussian approximation of the Fermionic ﬁeld
+theories.
+This method has been applied to the cases of (1+1)-dimensional and (2+1)-
+dimensional Gross-Neveu models12, and found that the results are qualitatively
+equivalent to those of the large-N approximation. It has also been applied to the
+(2+1)-dimensional Thirring model, and in this case the Gaussian result has been
+found to be qualitatively better than the large-N approximation13. The Gaussian
+eﬀective potential shows the existence of the symmetry breaking in the theory, while
+the large-N does not. The method has also been found to be eﬀective in determining
+the existence of the bound states in the theory14.
+3
+Beyond Gaussian approximation?
+We have shown that the Gaussian approximation based on the functional Schr¨odinger
+picture formulation is a simple generalization of the quantum mechanical varia-
+tional method, and provides a convenient non-perturbative approximation method
+for various quantum ﬁeld theories including the systems out of thermal equilibrium.
+However, the method has a serious drawback in that, unlike the quantum mechan-
+ical cases, one can compute the expectation value of the quantum ﬁeld theoretic
+Hamiltonian only for the Gaussian wave functional and its simple generalizations.
+If one could develop a systematic method to compute the correction terms to
+this approximation, therefore, the variational method would become a very powerful
+technique in obtaining physical information from quantum ﬁeld theories. In fact
+there have been some attempts in this direction recently.
+One of such attempts, known as the post-Gaussian approximation method or
+the variational perturbation theory3, is based on the observation that the Gaussian
+wave functional
+Ψ0 = e−1
+4 ˜ϕ(⃗x)G−1(⃗x−⃗x′) ˜ϕ(⃗x′)
+,
+˜ϕ = ϕ −ˆφ
+(41)
+is a vacuum state for a free theory with mass given by
+m2 = µ2 + λ
+2
+ˆφ2 + λ
+2
+Z
+d3p
+(2π)3 g(p),
+(42)
+where g(p) is determined by the variational gap equation (29) and (30).
+One can construct all the eigenstates of this free theory:
+Ψn[ ˜ϕ] = Hn[ ˜ϕ]Ψ0[ ˜ϕ]
+,
+n = 0, 1, 2, · · ·
+(43)
+where Hn[ ˜ϕ] is the Hermite polynomial functional. One splits the Hamiltonian as
+H = H0 + HI
+(44)
+where H0 is the free Hamiltonian with the mass m given by Eq.(42) and HI is the
+remaining part of H, and then applies the well known perturbation theory with the
+states (43) taken to be the basis for the perturbation.
+8
+
+The eﬀective potential is the expectation value of the Hamiltonian with the
+constraint
+< Ψ0|φ|Ψ0 >= ˆφ,
+(45)
+where |Ψ0 > is the ground state of the system.
+Taking the eigenstates (43) to be the basis for perturbative expansion, the
+eﬀective potential can be written as
+Veff(ˆφ) = E0(ˆφ) +
+∞
+X
+n=0
+< Ψ0|ΨI
+
+1
+E0 −H0
+HI
+n
+|Ψ0 >,
+(46)
+where the ﬁrst term is the Gaussian eﬀective potential and the second term repre-
+sents the perturbative correction terms3. This method has been used to compute
+the ﬁrst non-trivial contribution to the Gaussian eﬀective potential for the (0+1)-
+dimensional φ4 theory by Jeon15 and the (1+1)- and (2+1)-dimensional φ4 theories
+by Cea and Tedesco3.
+This method provides a conceptually simple procedure to compute the order-
+by-order correction terms to the Gaussian eﬀective potential for time-independent
+systems. For the time-dependent systems such as those out of thermal equilibrium10,
+however, we need a method that can deal with the eﬀective action, which contains
+information on the time-evolution of the system.
+It is the subject of the next
+section to introduce a new systematic expansion method for eﬀective action, which
+was developed by Geon Hyoung Lee16.
+4
+The Background ﬁeld method
+We now introduce a systematic method which enables one to compute the order by
+order correction terms to the Gaussian approximation of the eﬀective action, that
+contains the information on the time-evolution of the system. This new method is
+based on the background ﬁeld method. So we will start to give a brief review on
+the background ﬁeld method17.
+4.1
+Background ﬁeld method
+The generating functional for the connected Green’s functions, W[J], is deﬁned by
+the path integral,
+eiW[J] = N
+Z
+DφeiS[φ]+iJφ,
+(47)
+where S[φ] is the classical action, and the integral convention, Jφ ≡
+R
+dnxJ(x)φ(x)
+in n-dimensional space-time, is used in the exponent. The eﬀective action Γ[φ] is
+then deﬁned by the Legendre transformation,
+Γ[ϕ] = W[J] −Jϕ,
+(48)
+where ϕ(x) is the vacuum expectation value of the ﬁeld operator,
+ϕ(x) =< φ(x) >J=
+δ
+δJ(x)W[J].
+(49)
+9
+
+The background ﬁeld method is one of the most eﬀective ways of computing the
+eﬀective action in the loop expansion, and is obtained by introducing the background
+ﬁeld B(x) to the classical action:
+S[φ] →S[φ + B].
+(50)
+This deﬁnes a new generating functional,
+ei ˜
+W[J,B]
+= N
+Z
+DφeiS[φ+B]+iJφ
+= N
+Z
+Dφ′eiS[φ′]+iJ[φ′−B].
+(51)
+Eg.(51) implies that this new generating functional is related to the old one by
+˜
+W[J, B] = W[J] −JB,
+(52)
+and the vacuum expectation value of the ﬁeld operator in the presence of the back-
+ground ﬁeld is given by,
+˜ϕ = δ ˜W
+δJ = ϕ −B.
+(53)
+Now consider the case when the vacuum expectation value of the ﬁeld operator
+in the presense of the background ﬁeld, ˜ϕ, vanishes:
+δ ˜W
+δJ = ˜ϕ = 0.
+(54)
+This determines the conﬁguration of J which extremizes the generating functional
+˜W[J, B]:
+J = J[B].
+(55)
+Then one can easily show from Eq.(52) that the extremum value of the generating
+functional ˜W becomes the eﬀective action:
+˜W[J, B]| ˜ϕ=0 = W[J(B)] −J(B)B = Γ[B].
+(56)
+The simpler way to compute the eﬀective action Γ[B] is to consider the Legendre
+transformation of ˜
+W[J, B]:
+˜Γ[ ˜ϕ, B] = ˜W[J, B] −J ˜ϕ,
+(57)
+which generates the one ˜ϕ-particle irreducible diagrams in the presence of the back-
+ground ﬁeld. If we set ˜ϕ = 0 in Eq.(57), we ﬁnd that
+˜Γ[ ˜ϕ, B]
+
+˜ϕ=0
+=
+˜W[J(B), B] −J ˜ϕ
+
+˜ϕ=0
+=
+Γ[B].
+(58)
+This implies that the eﬀective action Γ[B] consists of one ˜ϕ-particle irreducible
+bubble diagrams with no external ˜ϕ-lines. Thus one can write the eﬀective action
+as
+eiΓ[B] = ei ˜
+W [J,B]
+˜ϕ=0 = N
+Z
+DφeiS[φ+B]+iJφ
+
+˜ϕ=0
+.
+(59)
+10
+
+To illustrate how the method facilitates the computation of the eﬀective action,
+we now consider the scalar φ4 theory as an example. The Lagrangian density of φ4
+theory can be written as
+L(φ) = −1
+2φ(∂2 + µ2)φ −λ
+4!φ4 ≡−1
+2φ(iD−1)φ −λ
+4!φ4,
+(60)
+where D is the free propagator deﬁned by
+D ≡i(∂2 + µ2)−1.
+(61)
+The shifted Lagrangian is then given by
+L(φ + B) = −i1
+2BD−1B −λ
+4!B4 −i(BD−1 −i λ
+3!B3)φ −1
+2φiK−1φ −λ
+3!Bφ3 −λ
+4!φ4,
+(62)
+where K is the new propagator,
+K = i(∂2 + µ2 + λ
+2 B2)−1,
+(63)
+which includes a part of the interaction eﬀect through the term proportional to
+B2. The generating functional in the presence of the background ﬁeld can then be
+written as,
+ei ˜
+W[J,B] = N det(−K)
+1
+2 e
+1
+2 BD−1B−iλ
+4! B4e(BD−1−iλ
+3! B3)
+δ
+iδJ −iλ
+3! B(
+δ
+iδJ )3−iλ
+4! (
+δ
+iδJ )4e
+1
+2 JKJ.
+(64)
+The eﬀective action for the scalar φ4 theory now becomes
+eiΓ[B] = ei ˜
+W [J,B]
+˜ϕ=0 = Ne
+1
+2 BD−1B−iλ
+4! B4 det(−K)
+1
+2 I0[B],
+(65)
+where
+I0[B] = e(BD−1−iλ
+3! B3)
+δ
+iδJ exp[−iλ
+3! B( δ
+iδJ )3 −iλ
+4! ( δ
+iδJ )4]e
+1
+2 JKJ
+
+˜ϕ=0
+.
+(66)
+The coeﬃcient of I0[B] in Eq.(65) represents the one-loop eﬀective action, and
+I0[B] represents the higher loop contributions to the eﬀective action.
+The ﬁrst
+factor of Eq.(66) constitutes a shift operator, which does not change the extremum
+value of ˜W[J, B]. Thus this factor, which generates the tadpole diagrams, does not
+contribute to the eﬀective action , and we can neglect it . One can therefore write
+I0[B] as
+I0[B] = exp[−iλ
+3! B( δ
+iδJ )3 −iλ
+4! ( δ
+iδJ )4]e
+1
+2 JKJ
+
+˜ϕ=0
+(67)
+which implies that the higher loop contributions to the eﬀective action consist of
+one ˜ϕ-irreducible bubble diagrams with no external ˜ϕ-lines. One can compute the
+higher loop contributions by the Feynman rules:
+11
+
+q
+q
+= K =
+i
+∂2+µ2+ λ
+2 B2
+= −iλB
+= −iλ
+: propagator
+: 3-vertex
+: 4-vertex
+One can easily show that the two-loop contribution to the eﬀective action con-
+sists of two bubble diagrams with no external lines17:
+Γ(2)[B] =
+K
+K
+-i λ
+-i
+-i λ
+λB
+B
+K
+.
+(68)
+Comparing this with the conventional method of computing the eﬀective action,
+one can easily convince oneself that the background ﬁeld method provides a very
+simple and eﬀective way to compute the eﬀective action in the loop expansion.
+4.2
+Expansion around the Gaussian eﬀective action
+The reason why the procedure of computing the eﬀective action in the background
+ﬁeld method is simpliﬁed is that the propagator used in the Feynman rules, Eq.(63),
+includes a part of the interaction eﬀect through the background ﬁeld B(x), and the
+generating functional has been rearranged in such a way that the zeroth order term
+in the expansion, the coeﬃcient of I0[B] in Eq.(65), is the one-loop eﬀective action.
+We now want to proceed one step further and rearrange the eﬀective action
+in such a way that the propagator used in the expansion would include the non-
+perturbative eﬀect and the zeroth order contribution would be the result of the
+non-perturbative approximation, such as the result of the Gaussian approximation.
+Note that the Gaussian approximation consists of the cactus type diagrams
+where an internal line comes out of a point in space-time and goes back to the
+same point, such as the ﬁrst term of Eq.(68). So we need to extract such diagrams
+out of the I0[B] part of the eﬀective action. To do this we examine the functional
+derivatives of the generating functional e
+1
+2 JGJ with respect to J(x) :
+δ
+δJx
+e
+1
+2 JyGyzJz
+= GxyJye
+1
+2 JyGyzJz ≡(GJ)xe
+1
+2 JGJ
+(69)
+δ2
+δJ2x
+e
+1
+2 JyGyzJz
+=
+((GJ)2
+x + Gxx)e
+1
+2 JGJ
+(70)
+12
+
+δ3
+δJ3x
+e
+1
+2 JyGyzJz
+=
+((GJ)3
+x + 3Gxx(GJ)x)e
+1
+2 JGJ
+(71)
+δ4
+δJ4x
+e
+1
+2 JyGyzJz
+=
+((GJ)4
+x + 6Gxx(GJ)2
+x + 3G2
+xx)e
+1
+2 JGJ,
+(72)
+which would appear in the expansion of I0[B]. Note that these derivatives, which
+generates 2-loop and higher order contributions to Γ[B], generate the cactus type
+diagrams as can be seen in Eqs.(71) and (72).
+To extract such diagrams out of I0[B], we deﬁne new functional derivatives so
+that the following relations satisfy:
+( δ3
+δJ3x
+)′e
+1
+2 JGJ
+=
+(GJ)3
+xe
+1
+2 JGJ
+(73)
+( δ4
+δJ4x
+)′e
+1
+2 JGJ
+=
+(GJ)4
+xe
+1
+2 JGJ.
+(74)
+Comparing Eqs.(71)-(72) and Eqs.(73)-(74), we ﬁnd that the primed derivatives
+must be deﬁned by
+( δ3
+δJ3x
+)′
+≡
+δ3
+δJ3x
+−3Gxx
+δ
+δJx
+(75)
+( δ4
+δJ4x
+)′
+≡
+δ4
+δJ3x
+−6Gxx
+δ2
+δJ2x
++ 3G2
+xx.
+(76)
+Note that the primed derivatives operated on the functional e
+1
+2 JGJ do not generate
+the cactus type diagrams that contribute to the Gaussian eﬀective action. This
+implies that by using the primed derivatives one may in fact rewrite I0[B] in such
+a way that all the cactus type diagrams would be included in the zeroth order term
+in the expansion.
+To do this we need to ﬁnd a new Green’s function G such that
+e
+λB
+3! ( δ
+δJ )3−iλ
+4! ( δ
+δJ )4e
+1
+2 JKJ = N ′eA δ
+δJ e
+λB
+3! ( δ3
+δJ3 )′−iλ
+4! ( δ4
+δJ4 )′e
+1
+2 JGJ,
+(77)
+where a normalization constant N ′ and a function A are to be determined. Using
+the deﬁnitions (75) and (76), one easily ﬁnds G, N ′ and A that satisfy Eq.(77):
+N ′
+= det(−G)
+1
+2 det(−G−1 + iλ
+2 Gxx)
+1
+2 e
+iλ
+8 G2
+xx,
+(78)
+A
+=
+λ
+2 BGxx,
+(79)
+G−1
+xy
+= K−1
+xy + iλ
+2 Gxxδxy
+= D−1
+xy −iλ
+2 B2
+xδxy + iλ
+2 Gxxδxy.
+(80)
+Using these results we can write the generating functional in the presence of the
+background ﬁeld as
+ei ˜
+W[J,B]
+=
+det(−G)
+1
+2 e
+1
+2 BD−1B−iλ
+4! B4+ iλ
+8 G2
+xx
+× e(−iBD−1−λ
+3! B3+ λ
+2 BGxx) δ
+δJ e
+λB
+3! ( δ3
+δJ3x
+)′−iλ
+4! ( δ4
+δJ4x
+)′
+e
+1
+2 JGJ.
+(81)
+13
+
+The eﬀective action can thus be written as
+eiΓ[B]
+=
+e
+˜
+W[J,B]
+˜ϕ=0
+= det(−G)
+1
+2 e
+1
+2 BD−1B−iλ
+4! B4+ iλ
+8 G2
+xx I[B],
+(82)
+where
+I[B]
+=
+exp
+
+(−iBD−1 −λ
+3!B3 + λ
+2 BGxx) δ
+δJ
+
+× exp[λB
+3! ( δ3
+δJ3x
+)′ −iλ
+4! ( δ4
+δJ4x
+)′]e
+1
+2 JGJ
+
+˜ϕ=0
+=
+exp[λB
+3! ( δ3
+δJ3x
+)′ −iλ
+4! ( δ4
+δJ4x
+)′]e
+1
+2 JGJ
+
+˜ϕ=0
+.
+(83)
+In Eq.(83) we have used the fact that the shift operator, the tadpole part of the
+ﬁrst line, does not aﬀect the extremum value. Note that Eq.(80), which determines
+the Green’s function Gxy, is exactly the variational gap equation written in the
+Minkowski space notation, and therefore the coeﬃcient of I[B] in Eq.(82) gives rise
+to the Gaussian eﬀective action as we have alluded to above. Since I[B] can be
+expanded as a power series in λ as is done in the conventional background ﬁeld
+method, we have the perturbative expansion of the eﬀective action around the
+Gaussian approximation.
+The structure of I[B] is the same as that of I0[B] in Eq.(67), except that the
+propagator is now replaced by Gxy and the functional derivatives are replaced by
+the primed derivatives. Thus the I[B] contribution to the eﬀective action consists
+of one ˜ϕ-particle irreducible bubble diagrams with no external ˜ϕ-lines, and without
+the cactus type diagrams. The contributions from I[B] can therefore be evaluated
+by the Feynman rules:
+= K =
+i
+∂2+µ2+ λ
+2 B2−λ
+2 Gxx
+= −iλB
+= −iλ
+: propagator
+: 3-vertex
+: 4-vertex
+r
+r
+s
+s
+14
+
+We have thus established the systematic method of computing the order-by-
+order correction terms to the Gaussian eﬀective action.
+One can easily show that the λ2 order contribution of I[B], for example, consists
+of the diagrams,
+I(2)[B] =
+-i
+λ
+-i
+λ
+G
+-i λΒ
+-i λB
+G
+.
+(84)
+Note that the ﬁrst diagram of Eq.(68) is a cactus type diagram and does not appear
+in the expansion of I[B].
+4.3
+Eﬀective potential
+If we consider the space-time independent background ﬁeld in the above formulation,
+we obtain the eﬀective potential deﬁned by
+Veff(B) ≡−Γ[B]
+R
+dnx.
+(85)
+Since Gxy is a function of (x−y) for a constant B, one can solve Eq.(80) by Fourier
+transformation,
+G(x −y) ≡
+Z
+dnp
+(2π)n g(p)eip(x−y).
+(86)
+The Green’s function Gxy in the momentum space can then be written as
+g(p) =
+1
+i(p2 −m2
+G),
+(87)
+where
+m2
+G ≡µ2 + λ
+2 B2 −λ
+2
+Z
+dnp
+(2π)n g(p).
+(88)
+Note that Eq.(87) is the variational gap equation of Gaussian approximation written
+in the Minkowski notation.
+Up to the λ2 order contribution of I[B], the eﬀective potential is therefore given
+by
+Veff(B) = VG + VP ,
+(89)
+where
+VG ≡µ2
+2 B2 + λ
+4!B4 −1
+2λ(m2 −µ2 −λ
+2 B2)2 + iTr log
+√
+−G,
+(90)
+and
+VP ≡iλ2
+12B2G3 −iλ2
+48G4.
+(91)
+VG of (90) is the Gaussian eﬀective potential and VP of (91) is the ﬁrst non-trivial
+contribution from I[B], which is represented by the Feynman diagrams shown in
+15
+
+(84).
+This result is the same as that of Cea and Tedesco3 computed from the
+variational perturbation theory mentioned earlier.
+To illustrate the eﬀectiveness of the perturbative correction method, we now
+consider the (0+1)-dimensional case, which is the quantum mechanical anharmonic
+oscillator. It is convenient to write the Green’s function in Euclidean space which
+is deﬁned by
+p2 = −p2
+E,
+dnp = idnpE.
+(92)
+Then G(x, x) in Eq.(88) can be written as
+Z dp
+2π
+1
+i(p2 −m2) = −
+Z dpE
+2π
+1
+p2
+E + m2 = −1
+√
+2
+1
+√
+m2 ,
+(93)
+and the gap equation becomes
+m2 = µ2 + λ
+2 B2 +
+λ
+4
+√
+m2 .
+(94)
+The eﬀective potential up to the λ2 order of I[B] becomes
+Veff(B) = VG + VP ,
+(95)
+where
+VG = µ2
+2 B2 + λ
+4!B4 −1
+2λ(m2 −µ2 −λ
+2 B2)2 +
+√
+m2
+2
+,
+(96)
+and
+VP = −
+λ2
+144m4 B2 −
+λ2
+1536(
+√
+m2)5 .
+(97)
+We can compare this result with other approximation methods. For the com-
+parison of the eﬀectiveness of various approximation methods it is convenient to
+compare the ground state energy eigenvalue of the anharmonic oscillator, which is
+deﬁned by the minimum value of Veff. The table below shows the errors of various
+approximation methods compared to the numerical results18. This shows that our
+Table 1: Errors of E0(µ2 = 1) compared to the numerical result
+λ
+1-loop
+2-loop
+Gaussian Approx.
+Improved Gaussian
+0.24
+1.4%
+0.05%
+0.006%
+0.0003%
+24
+38%
+56%
+1.1%
+0.37%
+method greatly improves the Gaussian approximation even at the ﬁrst non-trivial
+correction level, for all values of the coupling constant. Note that, for strong cou-
+pling, the Gaussian and the improved Gaussian approximation display much better
+results than the loop expansion methods, which shows the non-perturbative nature
+of the approximation methods.
+16
+
+5
+Conclusion
+We have shown that the functional Schr¨odinger picture formulation of quantum
+ﬁeld theory provides a conceptually simple non-perturbative approximation method,
+namely the Gaussian approximation. It has been proved to be a reliable method to
+obtain non-perturbative informations on the symmetry breaking phenomena, exis-
+tence of bound states and time-evolution of the time-dependent systems with rela-
+tively little computational diﬃculties. The method, however, has a serious drawback
+in that it does not provide a systematic procedure to improve the approximation.
+We have shown that the background ﬁeld method provides a solution to this
+limitation of the variational method. We were able to rearrange the eﬀective action
+in such a way that the zeroth order contribution in the expansion of the eﬀective
+action consists of the Gaussian eﬀective action. This provides a new systematic
+expansion method which enables one to compute the order-by-order correction terms
+to the Gaussian eﬀective action.
+The eﬀective potentials for the (0 + 1), (1 + 1) and (2 + 1) dimensional φ4
+theory computed by the new method agree with those of the variational perturbation
+theory. It has been shown that the perturbative correction greatly improves the
+Gaussian approximation even at the ﬁrst non-trivial correction level. Our method
+can also be applied to the time-dependent systems and can easily be extended to
+the cases of fermionic and gauge ﬁeld theories.
+Although the eﬀective action expanded around the Gaussian approximation for
+the lower-dimensional φ4 theories can easily be shown to be renormalizable, one has
+to study the renormalization procedure systematically for the (3 + 1) dimensional
+case.
+17
+
+Acknowledgements
+This work was supported in part by the Korea Science and Engineering Foundation
+under Grant No.95-0701-04-01-3 and 065-0200-001-2, the Center for Theoretical
+Physics (SNU), and the Basic Science Research Institute Program, Ministy of Ed-
+ucation, under project No. BSRI-96-2425.
+18
+
+References
+1. R. Jackiw and A. Kerman, Phys. Lett. A71, 158 (1979).
+2. L. Polley and D. E. L. Pottinger, eds., Variational calculations in quantum
+ﬁeld theory, World Scientiﬁc, Singapore (1987); L. Polley and U. Ritschel,
+Phys. Lett. B221, 44 (1989); U. Ritschel, Phys. Lett. B227, 251 (1989); Z.
+Phys. 47, 457 (1990); H. Verschelde and M. Coppens, Phys. Lett. B287, 133
+(1992).
+3. A.Okopi´nska, Phys. Rev. D 35, 1835 (1987); Phys. Rev. D 38, 2507 (1988);
+Ann. Phys.(N.Y.) 228, 19 (1993). I. Stancu and P. M. Stevenson, Phys. Rev.
+D 42, 2710 (1990); P. Cea, Phys. Lett. B236, 191 (1990); I. Stancu, Phys.
+Rev. D 43, 1283 (1991); P. Cea and L. Tedesco, Phys. Lett. B335, 423
+(1994);Phys. Rev. D 55, 4967 (1997).
+4. K. Symanzik, Nucl. Phys. B190, 1 (1981); M. L¨uscher, Nucl. Phys. B254,
+52 (1985); J. H. Yee, in Recent Developments in Field Theory, Proc. 10th
+symposium on Theoretical Physics, pp210, ed.
+by J. E. Kim, Min Eum
+Sa, Seoul(1992); R. Jackiw, Diverse Topics in Theoretical and Mathemati-
+cal Physics, World Scientiﬁc, Singapore (1995) and references therein.
+5. D. V. Long and G. M. Shore, Swansea preprint, hep-th/9605004.
+6. F. Cooper and E. Mottola, Phys. Rev. D 36, 3114 (1987); S. -Y. Pi and M.
+Samiullah, Phys. Rev. D 36, 3128 (1987); P. M. Stevenson, Phys. Rev. D 30,
+1714 (1984); Phys. Rev. D 32, 1389 (1985); T. Barnes and G. I. Ghandour,
+Phys. Rev. D 22, 924 (1980).
+7. S. Coleman, R. Jackiw and D. Politzer, Phys. Rev. D 10, 2491 (1974);
+8. S. K. Kim, W. Namgung, K. S. Soh and J. H. Yee, Phys. Rev. D 38, 1853
+(1988); J. Guven, G. Lieberman and C. T. Hill, Phys. Rev. D 39, 438 (1989);
+O. ´Eboli, S. -Y. Pi, and M. Samiullah, Ann. Phys. 193, 102 (1989).
+9. H. -J. Lee, K. Na and J. H. Yee, Phys. Rev. D 51, 3125 (1995).
+10. O. ´Eboli, R. Jackiw and S. -Y. Pi, Phys. Rev. D 37, 3557 (1988).
+11. R. Floreanini and R. Jackiw, Phys. Rev. D 37, 2206 (1988).
+12. S. K. Kim, J. Yang, K. S. Soh and J. H. Yee, Phys. Rev. D 40, 2647 (1989);
+S. K. Kim, K. S. Soh and J. H. Yee, Phys. Rev. D 41, 1345 (1990).
+13. S. Hyun, G. H. Lee and J. H. Yee, Phys. Rev. D 50, 6542 (1994).
+14. S. K. Kim, W. Namgung, K. S. Soh and J. H. Yee, Ann. Phys. 214, 142
+(1992).
+15. K. J. Jeon, Master’s Thesis, Yonsei University (1996).
+16. G. H. Lee, Ph.D. Thesis, Yonsei University (1997); G. H. Lee and J. H. Yee ,
+preprint(1997), hep-th/9707035.
+17. B. S. DeWitt, Phys. Rev. 162, 1195 (1967); G. ’t Hooft, in Acta Universitatis
+Wratislavensis no. 38, 12th Winter School of Theoretical physics in Karpacz;
+Functional and probabilistic methods in quantum ﬁeld theory vol. I (1975);
+L. F. Abbott, Nucl. Phys. B189, 185 (1981); C. Lee, Nucl. Phys. B207,
+157 (1982); in Selected Topics in Theoretical Physics, Proc. Fifth Symposium
+on Theoretical Physics, Kyohak Yunkusa, Seoul (1986); W. Ditrich and M.
+Reuter, Selected Topics in Gauge Theories, Springer-Verlag (1985).
+19
+
+18. P. M. Stevenson, Phys. Rev. D 30, 1712 (1984).
+20

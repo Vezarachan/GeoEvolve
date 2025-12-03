@@ -1,0 +1,1961 @@
+Properties and comparison of some Kriging sub-model aggregation
+methods∗
+François Bachoc
+Nicolas Durrande
+Didier Rullière
+Clément Chevalier
+François Bachoc (), Institut de Mathématiques de Toulouse, Université Paul Sabatier, Toulouse, France
+francois.bachoc@math.univ-toulouse.fr
+Nicolas Durrande, Secondmind, Cambridge, UK
+nicolas@secondmind.ai
+Didier Rullière, Mines Saint-Etienne, UCA, CNRS, UMR 6158 LIMOS, Institut Henri Fayol, Saint-Etienne, France
+didier.rulliere@emse.fr
+Clément Chevalier, Institute of Statistics, University of Neuchâtel, Neuchâtel, Switzerland.
+clement.chevalier@unine.ch
+Abstract
+Kriging is a widely employed technique, in particular for computer experiments, in machine learning or in
+geostatistics. An important challenge for Kriging is the computational burden when the data set is large. This
+article focuses on a class of methods aiming at decreasing this computational cost, consisting in aggregating
+Kriging predictors based on smaller data subsets. It proves that aggregation methods that ignore the covariance
+between sub-models can yield an inconsistent ﬁnal Kriging prediction. In contrast, a theoretical study of the
+nested Kriging method shows additional attractive properties for it: First, this predictor is consistent, second
+it can be interpreted as an exact conditional distribution for a modiﬁed process and third, the conditional
+covariances given the observations can be computed eﬃciently.
+This article also includes a theoretical and
+numerical analysis of how the assignment of the observation points to the sub-models can aﬀect the prediction
+ability of the aggregated model. Finally, the nested Kriging method is extended to measurement errors and to
+universal Kriging.
+Keywords: Gaussian processes, model aggregation, consistency, error bounds, Nested Pointwise Aggregation
+of Experts, NPAE.
+1
+Introduction
+Kriging (Krige (1951), Matheron (1970), see also (Cressie 1993, Stein 2012, Santner et al. 2013)) consists in inferring
+the values of a Gaussian random ﬁeld given observations at a ﬁnite set of observation points. It has become a popular
+method for a large range of applications, such as geostatistics (Matheron 1970), numerical code approximation (Sacks
+et al. 1989, Santner et al. 2013, Bachoc et al. 2016), global optimization (Jones et al. 1998) or machine learning
+(Rasmussen and Williams 2006).
+Let Y be a centered Gaussian process on D ⊂Rd, with covariance function k : D × D →R (ie k(x, x′) =
+Cov [Y (x), Y (x′)]), and let x1, ..., xn ∈D be n points in the input space where Y is observed (exactly).
+The
+assumptions that Y is zero-mean (simple Kriging, corresponding to a known mean) and that it is observed without
+observation noise are common in the literature and they will be used in throughout the paper for conciseness. These
+two assumptions will however be relaxed in Sects. 5.1 and 5.2 to ensure the method under study can be applied in
+more practical case studies.
+Let X be the n × d matrix with row i equal to xit. For any functions f : D →R, g : D × D →R and for any
+matrices A = (a1, . . . , an)t and B = (b1, . . . , bm)t, with ai ∈D for i = 1, ..., n and bi ∈D for i = 1, ..., m, f(A)
+denotes the n×1 real valued vector with components f(ai) and g(A, B) denotes the n×m real valued matrix with
+∗Part of this research was conducted within the frame of the Chair in Applied Mathematics OQUAIDO, which gathers partners in
+technological research (BRGM, CEA, IFPEN, IRSN, Safran, Storengy) and academia (Ecole Centrale de Lyon, Mines Saint-Étienne,
+University of Nice, University of Toulouse and CNRS) around advanced methods for Computer Experiments. The authors F.Bachoc
+and D.Rullière acknowledge support from the regional MATH-AmSud program, grant number 20-MATH-03. The authors are grateful to
+the Editor-in-Chief, an Associate Editor and a referee for their constructive suggestions that lead to an improvement of the manuscript.
+1
+arXiv:1707.05708v2  [math.ST]  26 Feb 2021
+
+components g(ai, bj), i = 1, . . . , n, j = 1, . . . , m. With this notation, the conditional distribution of Y given the
+n × 1 vector of observations Y (X) is Gaussian with mean, covariance and variance:
+
+
+
+
+
+Mfull(x) = E [Y (x)|Y (X)] = k(x, X)k(X, X)−1Y (X) ,
+cfull(x, x′) = Cov [Y (x), Y (x′)|Y (X)] = k(x, x′) −k(x, X)k(X, X)−1k(X, x′) ,
+vfull(x) = cfull(x, x) .
+(1)
+Computing the terms on the right hand side of (1) requires to invert the n×n covariance matrix k(X, X), which
+leads to a O(n2) storage requirement and O(n3) computational complexity. In practice, this posterior distribution
+is hence diﬃcult to compute when the number of observation points exceeds a few thousands. The challenge of
+a large number of observation points for Kriging is for instance acknowledged in Section 5 of Davis and Curriero
+(2019).
+Many methods have been proposed in the literature to approximate the conditional distribution (1), without
+incurring a large computational cost. These methods include low rank approximations (see Stein 2014, and the
+references therein for a review), sparse methods (Hensman and Fusi 2013), covariance tapering (Furrer et al. 2006,
+Kaufman et al. 2008), Gaussian Markov Random Fields (Rue and Held 2005, Datta et al. 2016), and aggregation-
+based approximations (Deisenroth and Ng 2015). This paper focuses on the later approach, which consists of building
+sub-models based on subsets of the data before aggregating their predictions. More precisely, these methods ﬁrst
+construct p sub-models M1, ..., Mp : D →R, where Mi(x) is a predictor of Y (x) built from a subset Xi of size
+ni × d of the observation points in X. The rationale is that when ni is small compared to n, Mi(x) can be obtained
+eﬃciently with a small computational cost. The sub-models M1, ..., Mp are then combined to obtain the aggregated
+predictor MA : D →R. Examples of aggregation techniques for Gaussian processes are (generalized) products of
+experts and (robust) Bayesian committee machines (Hinton 2002, Tresp 2000, Cao and Fleet 2014, Deisenroth and
+Ng 2015, van Stein et al. 2015), as well as the nested Kriging predictor (or Nested Pointwise Aggregation of Experts
+(NPAE)) (Rullière et al. 2018). It must be noted that nested Kriging relies on a particular aggregation of several
+predictors; a review of probability aggregation methods in Geoscience can be found in Allard et al. (2012).
+Aggregation methods can be of particular interest in a geoscience context. As it is well known, the origins of
+Kriging are directly linked to mining and geostatistics (Cressie 1990, Chilès and Desassis 2018), and it is common
+to encounter large datasets in such context. As an example, imagine a measurement (say, radioactivity) at several
+locations on the ground. The measures can be done with simple movable devices at many locations, eventually
+repeated at several times, so that the number of measurements can be important, and each measure may come
+with a measurement error. There is a necessity to handle a large amount of potentially noisy measures, which is
+not possible with classical Kriging techniques, but becomes possible with aggregation techniques such as nested
+Kriging.
+Despite its novelty, the nested Kriging predictor has already been used in several application ﬁelds,
+including earth and geostatistical sciences: see Sun et al. (2019) for the study of air pollution, Bacchi et al. (2020)
+for tsunami analysis and Krityakierne and Baowan (2020) for contaminant source localization in the ground. This
+also emphasizes the importance of aggregation methods in a geostatistical context.
+Benchmarks of diﬀerent spatial interpolation methods are also of importance, in particular when dealing with
+big data. Among recent ones, a general benchmark on some other methods applicable with big data can be found in
+Heaton et al. (2019). It is worth noting that nested Kriging often appears among the two or three best competitors
+(typically among around 12 methods) in the numerical studies that include it into the benchmark (Rullière et al.
+2018, Liu et al. 2018, He et al. 2019, Liu et al. 2020, Van Stein et al. 2020). These good empirical performances
+are supported by the theoretical properties of nested Kriging which guaranty some optimal performances under a
+correct estimation of the underlying hyperparameters and under stationarity.
+This paper provides additional theoretical insights into aggregation methods, with an emphasis on nested Kriging
+(Rullière et al. 2018). A distinction is introduced between aggregation techniques that only rely on the conditional
+variances v1(x), ..., vp(x) of the sub-models (such as products of expert and Bayesian committee machines), and the
+ones, like nested Kriging, where the aggregation accounts for the covariance between the sub-models. As shown in
+Proposition 1, techniques based only on the sub-model variances can lead to inconsistent estimators of Y (x) in the
+inﬁll (ﬁxed-domain) asymptotic setting (Cressie 1993, Stein 2012). On the other hand, Proposition 2 guaranties the
+consistency, again in the inﬁll (ﬁxed-domain) asymptotic setting, of the nested Kriging predictor. In addition, the
+nested Kriging predictor can be interpreted as an exact conditional expectation, for a slightly diﬀerent Gaussian
+process prior.
+Furthermore, the paper introduces two extensions of the nested Kriging methodology which broaden the use
+cases where the approach can be applied. The ﬁrst one is to make nested Kriging amenable to observation noise
+corrupting the measurements (the initial exposition in Rullière et al. (2018) focused on the noiseless setting). The
+second is to generalise the method to universal Kriging, where the Gaussian process prior includes an unknown
+2
+
+mean function that must be estimated. Note that both generalisations result in similar storage or computational
+requirements as the original approach.
+The structure of the article is as follows.
+Section 2 introduces covariance-free aggregation techniques and
+present the non-consistency result. Section 3 summarizes the aggregation method of Rullière et al. (2018), gives
+its consistency property, shows how it can be interpreted as an exact conditional expectation and provides some
+error bounds for the nested Kriging approximation. It also provides a numerical illustration of the consistency and
+inconsistency properties shown in this paper. Section 4 studies the impact of the assignment of the observation
+points to the sub-models. Finally, Sect. 5 provides the extensions to measurement errors and universal Kriging
+and concluding remarks are given in Sect. 6. For the sake of the clarity of the exposition, most of the proofs are
+postponed to the appendix.
+2
+Covariance-free aggregation techniques
+For i = 1, ..., p, let Xi be a ni × d matrix composed of a subset of the lines of X, such that n1 + · · · + np = n
+and X1, ..., Xp constitute a partition of X. For i = 1, ..., p, let Mi(x) = k(x, Xi)k(Xi, Xi)−1Y (Xi) and vi(x) =
+k(x, x) −k(x, Xi)k(Xi, Xi)−1k(Xi, x) be the conditional mean and variance of Y (x) given Y (Xi). This section
+focuses on aggregated predictors that only depend on (predicted) variances
+MA(x) =
+p
+X
+k=1
+αk(v1(x), ..., vp(x), vprior(x))Mk(x),
+(2)
+where vprior(x) = k(x, x) and with αk : [0, ∞)p+1 →R.
+Several aggregation techniques, such as product of
+expert (POE), generalized product of expert (GPOE), Bayesian committee machines (BCM) and robust Bayesian
+committee machines (RBCM), can be written under the form of (2). For POE (Hinton 2002, Deisenroth and Ng
+2015) and GPOE (Cao and Fleet 2014) the weights associated to each sub-model are
+αk(v1, ..., vp, vprior) =
+βk(x) 1
+vk
+Pp
+i=1 βi(x) 1
+vi
+with βi(x) = 1 for POE and βi(x) = (1/2)[log(vprior(x))−log(vi(x))] for GPOE. For BCM (Tresp 2000) and RBCM
+(Deisenroth and Ng 2015) they are
+αk(v1, ..., vp, vprior) =
+βk(x) 1
+vk
+Pp
+i=1 βi(x) 1
+vi + (1 −Pp
+i=1 βi(x))
+1
+vprior
+with βi(x) = 1 for BCM and βi(x) = (1/2)[log(vprior(x)) −log(vi(x))] for RBCM.
+The next proposition shows that aggregations given by (2) can lead to mean square prediction errors that do not
+go to zero as n →∞, when considering triangular arrays of observation points that become dense in a compact set
+D (which is the inﬁll asymptotic setting, Cressie (1993), Stein (2012)). This proposition thus provides a counter-
+example, but does not prove that aggregation procedures given by (2) are inconsistent in general. This inconsistency
+will however be conﬁrmed in some further simple numerical experiments. The property relies on Gaussian processes
+satisfying the no-empty ball (NEB) property, which has been introduced in Vazquez and Bect (2010a).
+Deﬁnition 1. A Gaussian process Y on D has the NEB property if for any x0 ∈D and for any sequence (xi)i≥1
+of points in D, the following two assertions are equivalent.
+1. V [Y (x0)|Y (x1), ..., Y (xn)] goes to 0 as n →∞,
+2. x0 is an adherent point of the sequence (xi)i≥1.
+Proposition 1 (Non-consistency of some covariance-free aggregations). Let D be a compact subset of Rd with
+non-empty interior. Let Y be a Gaussian process on D with mean zero and covariance function k. Assume that k
+is deﬁned on Rd, continuous and satisﬁes k(x, y) > 0 for two distinct points x, y in the interior of D. Assume also
+that Y has the NEB property. For n ∈N and for any triangular array of observation points (xni)1≤i≤n;n∈N, let pn
+be a number of Kriging predictors, X be the n × d matrix with row i equal to xt
+ni, and X1, ..., Xpn be a partition of
+X. For n ∈N let MA,n be deﬁned as in (2) with p replaced by pn. Finally, assume that
+αk(v1(x), ..., vpn(x), vprior(x)) ≤
+a(vk(x), vprior(x))
+Ppn
+l=1 b(vl(x), vprior(x)),
+(3)
+3
+
+where a and b are given deterministic continuous functions from ∆= {(x, y) ∈(0, ∞)2; x ≤y} to [0, ∞), with a
+and b positive on ˚∆= {(x, y) ∈(0, ∞)2; x < y}.
+Then,
+there
+exists
+a
+triangular
+array
+of
+observation
+points
+(xni)1≤i≤n;n∈N
+such
+that
+limn→∞supx∈D mini=1,...,n ||xni −x|| = 0, a triangular array of submatrices X1, ..., Xpn forming a partition of
+X, with pn →n→∞∞and pn/n →n→∞0, and such that
+lim inf
+n→∞
+Z
+D
+E
+h
+(Y (x) −MA,n(x))2i
+dx > 0.
+(4)
+As a consequence, there exists a subset C of D with strictly positive Lebesgue measure so that, for all x0 ∈C,
+E
+h
+(Y (x0) −MA,n(x0))2i
+̸→n→∞0.
+(5)
+It is easy to see that the proposition applies to the POE, GPOE, BCM, RBCM methods introduced above.
+Hence, Proposition 1 constitutes a signiﬁcant theoretical drawback for an important class of aggregation techniques
+in the literature, which are based solely on conditional variances.
+The detailed proof is given in Appendix A. The intuitive explanation is that the aggregation methods for which
+the proposition applies ignore the correlations between the diﬀerent Kriging predictors. Hence, for prediction points
+around which the density of observation points is smaller than on average, too much weight can be given to Kriging
+predictors based on distant observation points. It is worth noting that, in the proof of Proposition 1, the density
+of observation points in the subset of D where the inconsistency occurs is asymptotically negligible compared to
+the average density of observation points. Hence, this proof does not apply to triangular arrays of observation
+points for which the density is uniform (for instance grids of points or uniformly distributed random points). Thus,
+Proposition 1 does not preclude the consistency of the POE, GPOE, BCM, RBCM methods for uniformly dense
+observation points. It should be noted that when doing optimization, or when looking for optimal designs for
+parameter estimation, see Fig. 4 in Zhu and Zhang (2006), one may naturally end up with strongly non-uniform
+densities of observation points, so that unbalanced designs leading to non-consistency are not purely theoretical.
+Remark 1. The NEB property holds for many Gaussian processes deﬁned on D ⊂Rd with zero mean func-
+tion and covariance function k. In particular, assume that k has a positive spectral density (deﬁned by ˆk(ω) =
+R
+Rd k(x) exp(−Jxtω)dx with J2 = −1 and for ω ∈Rd). Assume that there exist 0 ≤A < ∞and 0 ≤T < ∞
+such that 1/ˆk(ω) ≤A(1 + ||ω||t), with ||.|| the Euclidean norm. Then Y has the NEB property (Vazquez and Bect
+2010a;b). These assumptions are satisﬁed by many stationary covariance functions, such as Matérn ones, but a
+notable exception is the Gaussian covariance function (Proposition 1 in Vazquez and Bect 2010b).
+Remark 2. The partitions X1, . . . , Xpn for which the inconsistency occurs in Proposition 1 can typically be repre-
+sentative of outputs of clustering algorithms, in the sense that points in the same group Xi would be close to each
+other. This is further discussed in Remark 6 in Appendix A.
+Remark 3. Proposition 1 does not imply that all the aggregation methods based only on the conditional variances
+are inconsistent. In particular, consider the aggregation consisting in predicting from the subset of observations
+yielding the smallest conditional variance, deﬁned by MA(x) = Mi(x)(x) where i(x) = argminj=1,...,pvj(x). Then,
+the aggregated predictor MA(x) can be seen to be consistent from the proof of Proposition 2 below.
+3
+The nested Kriging prediction
+This section assumes that M1(x), ..., Mp(x) have mean zero and ﬁnite variance, but not necessarily that they can
+be written as Mi(x) = k(x, Xi)k(Xi, Xi)−1Y (Xi). Let M(x) = (M1(x), ..., Mp(x))t be the vector of sub-models,
+KM(x) be the p×p covariance matrix of (M1(x), ..., Mp(x)), and kM(x) be the p×1 vector with component i equal
+to Cov [Mi(x), Y (x)]. The main assumption that will be required hereafter is:
+Assumption 1 (Assumptions on sub-models). For all x ∈D, the random variables Y (x), M1(x), ..., Mp(x) have
+mean zero and ﬁnite variance, and the matrix KM(x) = Cov [M(x), M(x)] is invertible. Furthermore, the following
+assumptions may be considered separately:
+(H1) M is linear in Y (X): for all x ∈D, there exists a deterministic p × n matrix Λ(x) such that M(x) =
+Λ(x)Y (X), i.e. each sub-model is a linear combination of observations Y (X).
+4
+
+(H2) M interpolates Y at X: for any component xk of X there is at least one index ik ∈{1, . . . , p} such that
+Mik(xk) = Y (xk), i.e. any observation is interpolated by at least one sub-model.
+(H3) (M, Y ) is Gaussian: the joint process (M1(x), ..., Mp(x), Y (x))x∈D is multivariate Gaussian.
+These assumptions are not particularly restrictive and they are satisﬁed in the classical situation where the
+sub-models are given by interpolating Kriging models Mi(x) = k(x, Xi)k(Xi, Xi)−1Y (Xi), i ∈{1, . . . , p}. Note
+that the relaxation of (H2) is takled in Section 5 and that several results presented in this section can be extended
+to the case where (H3) is not satisﬁed by using matrix pseudo-inverses.
+In Rullière et al. (2018), the aggregated predictor MA(x) is deﬁned as the best linear predictor of Y (x) from
+M1(x), ..., Mp(x), which implies
+(
+MA(x)
+=
+kM(x)tKM(x)−1M(x) ,
+vA(x)
+=
+E
+
+(Y (x) −MA(x))2
+= k(x, x) −kM(x)tKM(x)−1kM(x) .
+(6)
+Under assumptions (H1), (H2) and (H3), the aggregated predictor MA preserves the linearity, the interpolation
+properties, and the conditional Gaussianity. Furthermore, using (H1) one easily gets the expressions of kM(x) and
+KM(x)
+(
+kM(x)
+=
+Λ(x)k(X, x),
+KM(x)
+=
+Λ(x)k(X, X)Λ(x)t.
+(7)
+The aggregated predictor is straightforward to compute in this case, which occurs for example when the submodels
+M1(x), ..., Mp(x) are simple Kriging predictors.
+Rullière et al. (2018) show that, for n observation points and q prediction points, the complexity of the aggrega-
+tion procedure MA can reach simultaneously O(n) in storage requirement and O(n2q) in computational complexity
+when q = o(n). This computational complexity is larger than the one of covariance-free aggregation procedures
+but much smaller than the standard Kriging complexity (see Sect. 5.1 for more details). This makes possible the
+use of this aggregation method with a large number of observations (up to one million points in Rullière et al.
+(2018)). The calculation of the nested Kriging predictor can also beneﬁt from parallel computing, both for building
+the sub-models and for predicting at diﬀerent prediction points.
+A public implementation using parallel com-
+putation and allowing measurement errors (see Sect. 5.1) and universal Kriging (see Sect. 5.2) is available at
+https://github.com/drulliere/nestedKriging.
+Although this article focuses on the case where the covariance function k of the Gaussian process Y is known,
+the parameters of the covariance function often need to be estimated in practice (Roustant et al. 2012, Abrahamsen
+1997, Stein 2012). In a big data context where the aggregated predictor of (6) is relevant, classical parameter
+estimation methods like maximum likelihood (Stein 2012) or cross validation (Bachoc 2013, Bachoc et al. 2017,
+Zhang and Wang 2010) are too computationally prohibitive to be carried out directly. Rullière et al. (2018) suggest
+to apply cross validation to the aggregated predictor in (6) rather than to the full Kriging predictor in (1), and to
+use stochastic gradient for optimization with respect to the covariance parameters. This results in a procedure that
+is applicable to a large data set. One could also use a smaller subset of a large data set speciﬁcally for covariance
+parameter estimation by classical maximum likelihood or cross validation. Finally, one could also optimize, with
+respect to the covariance parameters, the sum of the logarithms of the likelihoods (or of cross validation scores) from
+each of the subsets X1, Y (X1), . . . , Xn, Y (Xn). This enables to exploit the entire data set for covariance parameter
+estimation, while keeping a manageable computational complexity.
+The rest of the section focuses on the theoretical properties of this particular aggregation method: it contains the
+consistency results under inﬁll asymptotics, reinterprets the nested Kriging approximation as the exact conditional
+expectation for a modiﬁed Gaussian process, and provides bounds on the errors MA(x) −Mfull(x) and vA(x) −
+vfull(x).
+3.1
+Consistency
+The next proposition provides the consistency result in the case where Y is a Gaussian process on D with mean
+zero and Mi(x) = k(x, Xi)k(Xi, Xi)−1Y (Xi), which implies (H1), (H2), (H3). The proof is given in Appendix B.
+Proposition 2 (Consistency). Let D be a compact nonempty subset of Rd. Let Y be a Gaussian process on D with
+mean zero and continuous covariance function k. Let (xni)1≤i≤n,n∈N be a triangular array of observation points so
+that xni ∈D for all 1 ≤i ≤n, n ∈N and so that for all x ∈D, limn→∞mini=1,...,n ||xni −x|| = 0.
+5
+
+For n ∈N, let X = (xn1, ..., xnn)t, let M1(x), ..., Mpn(x) be any collection of pn Kriging predictors based on
+respective design points X1, . . . , Xpn, where Xi is a subset of X, with Mi(x) = k(x, Xi)k(Xi, Xi)−1Y (Xi) for
+i = 1, ..., pn. Assume that each row of X is a row of at least one Xi, 1 ≤i ≤pn. Then, for MA(x) deﬁned as in (6):
+sup
+x∈D
+E
+h
+(Y (x) −MA(x))2i
+→n→∞0.
+(8)
+Proposition 2 shows that, contrary to several aggregation techniques, taking into account the correlations be-
+tween the predictors enables the aggregation method of Rullière et al. (2018) to have a guaranteed consistency.
+Numerical illustration of the consistency results. Propositions 1 and 2 are now illustrated on simple
+examples where the test functions are given by random samples of a centered Gaussian Process Y with Matérn
+3/2 covariance (see Rasmussen and Williams 2006). The observation points x1, . . . , xn ∈[0, 1] are ordered and
+gathered into groups of √n consecutive points to build √n sub-models. These sub-models are then aggregated
+following the various methods presented earlier in order to make predictions MA(xt) at xt = 0.8. The criterion used
+to assess the quality of a prediction is the mean square error: MSE = E
+
+(Y (xt) −MA(xt))2
+. Since the prediction
+methods that are benchmarked all correspond to linear combinations of the observed values, this expectation can
+be computed analytically and there is no need to generate actual samples from the test functions.
+Two diﬀerent settings are considered for the input point distribution and the kernel parameters: (A) a uniform
+distribution and a lengthscale equal to 0.1 (Fig. 1.a) and (B), a beta distribution β(10, 10) and a lengthscale of
+0.2 (Fig. 1.b). In both case the variance of Y is set to one. A small nugget eﬀect (10−9 for A and 10−10 for B)
+is also included in the sub-models to ensure their computations are numerical stable. Finally, the experiments are
+repeated 100 times with diﬀerent input locations x1, . . . , xn.
+The results of the experiments are shown in panels (c) and (d) of Fig. 1. First of all, the non-consistency of the
+methods POE, GPOE, BCM and RBCM is striking: the MSE does not only fail to converge to zero but it actually
+increases when the number of observation points is greater than 5. 103 (Exp. A) or 20. 104 (Exp. B). Note that
+Proposition 1 only shows the existence of a training set where the variance based aggregation methods under study
+are non consistent: it is thus of signiﬁcant practical interest to observe this behavior on these simple examples with
+reasonable settings. On the other hand, the nested Kriging aggregation does converge toward zero as guaranteed
+by Proposition 2.
+3.2
+The Gaussian process perspective
+This section introduces an alternative construction of the aggregated predictor where the prior process Y is replaced
+by another process YA for which MA(x) and vA(x) correspond exactly to the conditional expectation and variance
+of YA(x) given YA(X). As discussed in Quinonero-Candela and Rasmussen (2005), this construction implies that
+the proposed aggregation is not only as an approximation of the full model but also as an exact method for a
+slightly diﬀerent prior (as illustrated in the further commented Fig. 3). This type of decomposition can naturally
+occur in the context of predictive processes or low-rank Kriging models, see Finley et al. (2009), Banerjee et al.
+(2008), Cressie and Johannesson (2008).
+As a consequence, it also provides conditional cross-covariances and
+samples for the aggregated models. In particular, all the methods developed in the literature based on Kriging
+predicted covariances, such as Marrel et al. (2009) for sensitivity analysis and Chevalier and Ginsbourger (2013) for
+optimization, may hence be applied to the aggregated model in Rullière et al. (2018). Recall that (M1, . . . , Mp, Y )t
+is a centered process with ﬁnite variance on the whole input space D. The p × 1 cross-covariance vector is deﬁned
+as
+kM(x, x′) = Cov [M(x), Y (x′)] and the p × p cross-covariance matrix KM(x, x′) = Cov [M(x), M(x′)], for all
+x, x′ ∈D.
+These deﬁnitions result in a minor notation overloading with the deﬁnitions introduced in Sect. 3
+(KM(x, x) = KM(x) and kM(x, x) = kM(x)), but context should be suﬃcient to avoid confusion. The following
+deﬁnition introduces YA which is a Gaussian process for which MA and vA are the conditional mean and variance
+of YA given YA(X):
+Deﬁnition 2 (Aggregated process). YA is deﬁned as YA = MA + ε′
+A where ε′
+A is an independent replicate of
+Y −MA and with MA as in (6).
+As Y = MA + (Y −MA), the diﬀerence between Y and YA is that YA neglects the covariances between MA and
+the residual Y −MA.
+6
+
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+3
+2
+1
+0
+1
+2
+3
+(a) Experiment A settings.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+3
+2
+1
+0
+1
+2
+3
+(b) Experiment B settings.
+100
+2500
+5041
+7396
+10000
+12321
+14884
+10
+9
+10
+7
+10
+5
+10
+3
+10
+1
+101
+POE
+100
+2500
+5041
+7396
+10000
+12321
+14884
+10
+9
+10
+7
+10
+5
+10
+3
+10
+1
+101
+GPOE
+100
+2500
+5041
+7396
+10000
+12321
+14884
+10
+9
+10
+7
+10
+5
+10
+3
+10
+1
+101
+BCM
+100
+2500
+5041
+7396
+10000
+12321
+14884
+10
+9
+10
+7
+10
+5
+10
+3
+10
+1
+101
+RBCM
+100
+2500
+5041
+7396
+10000
+12321
+14884
+10
+9
+10
+7
+10
+5
+10
+3
+10
+1
+101
+Nested
+(c) Experiment A: MSE as a function of the number of observation points n.
+1024
+5041
+10000
+14884
+19881
+29929
+40000
+10
+9
+10
+6
+10
+3
+100
+POE
+1024
+5041
+10000
+14884
+19881
+29929
+40000
+10
+9
+10
+6
+10
+3
+100
+GPOE
+1024
+5041
+10000
+14884
+19881
+29929
+40000
+10
+9
+10
+6
+10
+3
+100
+BCM
+1024
+5041
+10000
+14884
+19881
+29929
+40000
+10
+9
+10
+6
+10
+3
+100
+RBCM
+1024
+5041
+10000
+14884
+19881
+29929
+40000
+10
+9
+10
+6
+10
+3
+100
+Nested
+(d) Experiment B: MSE as a function of the number of observation points n.
+Figure 1: Illustration of the (non)-consistency of the various methods discussed in this paper.
+(a, b): Details
+of the experiment settings: Samples of the test functions and distribution of the input points (histogram in the
+background). The vertical dashed line denotes the test point where MSE is computed. (c, d) Prediction accuracy
+(MSE) versus the number of observation points.
+7
+
+Proposition 3 (Gaussian process perspective). If MA is a deterministic and interpolating function of Y (X),
+i.e. if for any x ∈D there exists a deterministic function gx : Rn →R such that MA(x) = gx(Y (X)) and if
+MA(X) = Y (X), or in particular under linearity and interpolation assumptions (H1) and (H2) then
+(
+MA(x) = E [YA(x)|YA(X)] ,
+vA(x) = V [YA(x)|YA(X)] .
+(9)
+As already stated, given the observations YA(X), the conditional process YA is interesting since its conditional
+mean and variance, at any point x, correspond to the approximated conditional mean and variance of the process
+Y obtained by the nested Kriging technique. It is thus natural to consider sample paths of this conditional process
+YA. In the Gaussian setting, studying the unconditional (prior) distribution of the centred process YA and the
+conditional (posterior) distribution of YA given the observations YA(X) boils down to studying the prior and
+posterior covariances of YA. The covariance kA of the process YA can be calculated and shown to coincide with the
+one of the process Y at several locations, in particular, denoting kA(x, x′) = Cov [YA(x), YA(x′)], one can show that
+for all x ∈D, Y (x) and YA(x) have the same variance: kA(x, x) = k(x, x). Furthermore, under the interpolation
+assumption (H2), kA(X, X) = k(X, X). Figure 2 illustrates the diﬀerence between the covariance functions k and
+kA, using the same settings as in Fig. 3. Each panel of the ﬁgure deserves some speciﬁc comments:
+(a) the absolute diﬀerence between the two covariance functions k and kA is small. Furthermore, the identity
+kA(X, X) = k(X, X) is illustrated : as 0.3 is a component of X, kA(0.3, xk) = k(0.3, xk) for any of the ﬁve
+components xk of X.
+(b) the contour lines for kA are not straight lines, as it is the case for stationary processes. In this example, Y is
+stationary whereas YA is not. However, the latter only departs slightly from the stationary assumption.
+(c) the diﬀerence kA −k vanishes at some places, among which are the places of the bullets points and the
+diagonal which correspond respectively to kA(X, X) = k(X, X) and kA(x, x) = k(x, x). Furthermore, the
+absolute diﬀerences between the two covariances functions are again quite small.
+It also shows that the
+pattern of the diﬀerences is quite complex.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+(a) Covariance functions kA(a, ·)
+(solid lines) and k(a, ·) (dashed
+lines) with a = 0.3 ∈X and a =
+0.85 /∈X.
+0
+20
+40
+60
+80
+100
+0
+20
+40
+60
+80
+100
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+(b) Contour plot of the modiﬁed
+covariance function kA.
+0
+20
+40
+60
+80
+100
+0
+20
+40
+60
+80
+100
+0.045
+0.030
+0.015
+0.000
+0.015
+0.030
+0.045
+(c) Image plot of the diﬀerence be-
+tween covariance functions kA −k.
+Figure 2: Comparisons of the modiﬁed covariance kA and the initial covariance k. The horizontal and vertical dotted
+lines correspond to the locations of the observation points xi for i ∈{1, . . . , 5}. The bullets indicate locations where
+kA(xi, xj) = k(xi, xj).
+The previous considerations may help understanding the diﬀerences between Y and YA, and thus the approxi-
+mation that is made by the nested Kriging technique. Another interest of YA is that one can introduce conditional
+cross-covariances and sample paths. The following proposition shows that conditional (posterior) cross-covariances
+of YA can be easily computed. In particular, it enables the computation of conditional sample paths of YA. The
+proposition also gives some simpliﬁcations that make computations tractable even in the case where the number of
+observations is large.
+8
+
+Proposition 4 (Posterior covariances of YA). Deﬁne the conditional (posterior) cross-covariances of the process
+YA given YA(X) as
+cA(x, x′) = Cov [YA(x), YA(x′)|YA(X)] ,
+(10)
+with x, x′ ∈D. Assume that (M, Y ) is Gaussian, then YA is also Gaussian and the following results hold:
+(i) The posterior covariance function cA writes, for all x, x′ ∈D,
+cA(x, x′) = kA(x, x′) −kA(x, X)kA(X, X)−1kA(X, x′).
+(11)
+(ii) Denote αA(x) = KM(x)−1kM(x). Under linear and interpolation assumptions (H1) and (H2),
+cA(x, x′)
+=
+k(x, x′) −αA(x)tkM(x, x′) −kM(x′, x)αA(x′) + αA(x)tKM(x, x′)αA(x′) ,
+(12)
+(iii) Under linear and interpolation assumptions (H1) and (H2),
+cA(x, x′)
+=
+E [(Y (x) −MA(x)) (Y (x′) −MA(x′))] .
+(13)
+In other words, conditional covariances can be understood as prior covariances between residuals.
+It should be noted that computing cA or generating conditional samples of YA by using Eq. (11) requires
+to inverse the n × n matrix kA(X, X) which is computationally costly for large n. On the contrary, computing
+cA by using Eq. (12) does only require the computation of covariances between predictors and is tractable even
+with large datasets. Consider the prediction problem with n observation points and q prediction points where
+both n and q can be large, with q = o(n). Consider a reasonable dimension d ≤O(q) and a typical number of
+sub-models p = √n. The complexity for obtaining the nested Kriging mean and variance {MA(x), vA(x)} for all
+prediction points is C = O(qn2) in computational complexity and S = O(nq) in storage requirement for the fastest
+implementations (see Rullière et al. 2018). This storage requirement can be reduced to S = O(n) when recalculating
+some quantities. When computing {MA(x), vA(x)} together with output covariances {cA(x, x′)} for all prediction
+points, using Eq. (12), one can show that the reachable computational complexity is unchanged and is C = O(qn2)
+when pq ≤n, or becomes C = O(q2pn) otherwise. The associated storage requirement becomes S = O(nq2). At
+last, in the more general case where O(n1/2) ≤p ≤O(n2/3) and q ≤O(n2/3), one can show that computational
+complexity is C = O(qn2) without computing the covariances cA(x, x′) or C = O(q2p2) when computing these
+covariances.
+This Gaussian Process perspective and Proposition 4 can be combined to deﬁne unconditional and conditional
+sample paths. This is illustrated in Fig. 3 which displays prior and posterior samples of a process YA based on a
+process Y with squared exponential covariance k(x, x′) = exp
+ −12.5(x −x′)2
+. In this example, the test function is
+f(x) = sin(2πx) + x, and the input X = (0.1, 0.3, 0.5, 0.7, 0.9)t is divided into p = 2 subgroups X1 = (0.1, 0.3, 0.5)t
+and X2 = (0.7, 0.9)t.
+Proposition 4 can be used to draw similarities between nested Kriging and low-rank Kriging (see Stein 2014, and
+references therein). In both cases, the predictions can be seen as a tractable approximation of an initial model, but
+they also correspond to an exact posterior for their stated covariance models (which is not stationary, in general,
+see Figure 2). The main diﬀerence between the two methods is that contrarily to low-rank Kriging, nested Kriging
+remains a non-parametric approach. This however comes with an additional computational cost which comes from
+matrix inverse that need to be computed at prediction time.
+Knowing that the predictor MA is a conditional expectation for the process YA can be used to analyze its error
+for predicting Y (x), by studying the diﬀerences between the distributions of Y and YA, in the same vein as in Stein
+(2012) or Putter et al. (2001). The next section provides more details on the prediction errors made by choosing
+YA in place of Y as a prior.
+3.3
+Bounds on aggregation errors
+This section aims at studying the diﬀerences between the aggregated model MA, vA and the full one Mfull, vfull.
+This section focuses on the case where M(x) is linear in Y (X), i.e. there exists a p × n deterministic matrix Λ(x)
+such that M(x) = Λ(x)Y (X). This results in
+(
+MA(x) −Mfull(x)
+=
+−k(x, X)∆(x)Y (X) ,
+vA(x) −vfull(x)
+=
+k(x, X)∆(x)k(X, x) ,
+(14)
+9
+
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+3
+2
+1
+0
+1
+2
+3
+(a) Unconditional samples.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+2
+1
+0
+1
+2
+(b) Conditional samples.
+Figure 3: Illustration of the modiﬁed process YA. (a) Unconditional sample paths from the modiﬁed Gaussian
+process YA, with mean 0 and covariance kA. (b) Conditional sample paths of YA given YA(X) = f(X), with mean
+MA and covariance cA. The thick lines and the blue areas correspond to the means and 95% conﬁdence intervals
+for YA. The dashed red lines are the mean and 95% conﬁdence intervals for the full model with the original prior
+Y .
+where ∆(x) = k(X, X)−1 −Λ(x)t Λ(x)k(X, X)Λ(x)t−1Λ(x), as soon as Λ(x)k(X, X)Λ(x)t is invertible.
+As illustrated in Fig. 2, the covariance functions k and kA are very similar. The following proposition shows
+that the diﬀerence between these covariances can be linked to the aggregation error and can provide a bounds for
+the absolute errors.
+Proposition 5 (Errors using covariance diﬀerences). Under the linear and interpolation assumptions (H1) and (H2),
+the diﬀerences between the full and aggregated models write as diﬀerences between covariance functions:
+(
+E
+
+(MA(x) −Mfull(x))2
+= ∥k(X, x) −kA(X, x)∥2
+K ,
+vA(x) −vfull(x) = ∥k(X, x)∥2
+K −∥kA(X, x)∥2
+K .
+(15)
+The absolute diﬀerences can be bounded:
+(
+|MA(x) −Mfull(x)|
+≤
+∥k(X, x) −kA(X, x)∥K∥Y (X)∥K ,
+|vA(x) −vfull(x)|
+≤
+∥k(X, x)∥2
+K ,
+(16)
+where ∥u∥2
+K = utk(X, X)−1u.
+Assuming that the smallest eigenvalue λmin of k(X, X) is non zero, this norm
+can be bounded by ∥u∥2
+K ≤
+1
+λmin ∥u∥2 where ∥u∥denotes the Euclidean norm.
+Furthermore, since vfull(x) =
+E
+
+(Y (x) −Mfull(x))2
+, then
+0 ≤vA(x) −vfull(x) ≤
+min
+k∈{1,...,p} E
+
+(Y (x) −Mk(x))2
+−vfull(x) .
+(17)
+Note that previous result is provided for a given number n of observations, for a ﬁnite a dimensional n × n
+matrix X. The asymptotic of the bounds as n grows to inﬁnity depends on the design sequence and the nature of
+the asymptotic setting (e.g., expansion domain or ﬁxed domain). It would require further developments that are
+not considered here.
+Proposition 5 implies that the nested Kriging aggregation has two desirable properties that are detailed in
+Remarks 4 and 5 (with proofs in Appendix).
+Remark 4 (Far prediction points). For a given number of observations n and a given design X, if one can choose
+a prediction point x far enough from the observation points in X, in the sense ∥k(X, x)∥≤ϵ for any given ϵ > 0,
+then |MA(x) −Mfull(x)| and |vA(x) −vfull(x)| can be as small as desired.
+One consequence of the previous remark is that when the covariances between the prediction point x and the
+observed ones X become small, both models tend to predict the unconditional distribution of Y (x). This is a natural
+property that is desirable for any aggregation method but it is not always fulﬁlled. For example, aggregating two
+sub-models with POE leads to overconﬁdent models with wrong variance as discussed in Deisenroth and Ng (2015).
+10
+
+0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+0.08
+0.06
+0.04
+0.02
+0.00
+0.02
+0.04
+0.06
+0.08
+(a) diﬀerences between predicted means mA(x) −
+mfull(x).
+0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+0.000
+0.002
+0.004
+0.006
+0.008
+0.010
+(b) diﬀerences between predicted variances vA(x) −
+vfull(x).
+Figure 4: Comparisons of the full and aggregated model. The dashed lines correspond to the bounds given in
+Proposition 5: ±λ−1/2
+min ∥k(X, x) −kA(X, x)∥on panel (a) and bounds of (17) on panel (b).
+The diﬀerence between the full model and the aggregated one of Fig. 3 is illustrated in Fig. 4. Various remarks
+can be made on this ﬁgure. First, the diﬀerence between the aggregated and full model is small, both on the
+predicted mean and variance. Second, the error tends toward 0 when the prediction point x is far away from the
+observations X. This illustrates Proposition 5 in the case where ∥k(X, x)∥is small. Third, it can be seen that the
+bounds on the left panel are relatively tight on this example, and that both the errors and their bounds vanish at
+observation points. At last, the right panel shows vA(x) ≥vfull(x). This is because the estimator MA is expressed
+as successive optimal linear combinations of Y (X), which have a quadratic error necessarily greater or equal than
+Mfull which is the optimal linear combination of Y (X). Panel (b) also illustrates that the bounds given in (17) are
+relatively loose. This means that the nested aggregation is more informative than the most accurate sub-model.
+At last, the following remark gives another very natural optimality property that is however not satisﬁed by
+other aggregation methods such as POE, GPOE, BCM and RBCM (see Sect. 2): if the sub-models contain enough
+information, the aggregated model corresponds to the full one.
+Remark 5 (Fully informative sub-models). Assume (H1) that M(x) is linear in Y (X): M(x) = Λ(x)Y (X) and
+that Λ(x) is a n × n matrix with full rank, then
+(
+MA(x)
+=
+Mfull(x) ,
+vA(x)
+=
+vfull(x) .
+(18)
+Furthermore, if (H3) also holds,
+YA
+law
+= Y
+and thus
+YA|YA(X)
+law
+= Y |Y (X).
+(19)
+In other words, there is no diﬀerence between the full and the approximated models when Λ(x) is invertible.
+Note that there is of course no computational interest in building and merging fully informative sub-models
+since it requires computing and inverting a matrix that has the same size as k(X, X) so there is no complexity gain
+compared to the full model.
+4
+Analysis of the impact of the group choice
+This section studies the impact of the choice of the partition X1, . . . , Xp of a set of n two-by-two distinct observation
+points {x1, . . . , xn}, on the quality of the predictor obtained by aggregating p Gaussian process models based on
+X1, . . . , Xp.
+4.1
+Theoretical results in dimension 1
+This section focuses on the univariate case d = 1 where with the input locations x1, . . . , xn ∈R are ﬁxed and
+distinct points and where Y is a centered Gaussian process with exponential covariance function k deﬁned by
+k(t1, t2) = σ2 exp(−|t1 −t2|/θ),
+t1, t2 ∈R
+(20)
+11
+
+for ﬁxed (σ2, θ) ∈(0, ∞)2. This choice of covariance function makes Y a Markovian GP (Ying 1991), which will
+prove useful to derive theoretical properties on the inﬂuence of clustering. More precisely, the idea is to assess
+whether selecting the groups X1, . . . , Xp based on distances (i.e., placing observation points close to each other
+in the same group) is beneﬁcial for the approximation accuracy or not. In dimension 1, the concept of perfect
+clustering can be deﬁned as follows.
+Deﬁnition 3 (Perfect clustering). A partition X1, . . . , Xp of {x1, . . . , xn}, composed of non-empty groups, is a
+perfect clustering if there does not exist any triplet u, v, w, with u, v ∈Xi and w ∈Xj with i, j ∈{1 . . . , p}, i ̸= j,
+and so that u < w < v.
+The above deﬁnition means that the groups X1, . . . , Xp are constituted of consecutive points.
+A partition
+X1, . . . , Xp is a perfect clustering if and only if it can be reordered as Xi1, . . . , Xip with {i1, . . . , ip} = {1, . . . , p}
+and so that for any u1 ∈Xi1, . . . , up ∈Xip, the ui are ordered u1 < . . . < up.
+The next proposition shows that the nested Kriging predictor coincides with the predictor based on the full
+Gaussian process model, if and only if X1, . . . , Xp is a perfect clustering. It thus provides a theoretical conﬁrmation
+that placing observations points close to each other in the same group is beneﬁcial to the nested Kriging procedure.
+Proposition 6 (Nested Kriging and perfect clustering). Consider an exponential covariance function k in dimen-
+sion d = 1, as in (20). Let Mfull(x) be the full predictor as in (1) and let MA(x) be the nested Kriging predictor
+as in (6), where M1, . . . , Mp are the Gaussian process predictors based on the individual groups X1, . . . , Xp, as in
+Sect. 2, that is assumed to be non-empty. Then, E[(Mfull(x)−MA(x))2] = 0 for all x ∈R if and only if X1, . . . , Xp
+is a perfect clustering.
+Proof. Let (x, v1, . . . , vr) be r + 1 two-by-two distinct real numbers. If x < min(v1, . . . , vr), then the conditional
+expectation of Y (x) given Y (v1), . . . , Y (vr) is equal to exp(−|min(v1, . . . , vr)−x|/θ)Y (min(v1, . . . , vr)) (Ying 1991).
+Similarly, if x > max(v1, . . . , vr), then the conditional expectation of Y (x) given Y (v1), . . . , Y (vr) is equal to
+exp(−|max(v1, . . . , vr) −x|/θ)Y (max(v1, . . . , vr)). If min(v1, . . . , vr) < x < max(v1, . . . , vr), then the conditional
+expectation of Y (x) given Y (v1), . . . , Y (vr) is equal to aY (x<)+bY (x>) where x< and x> are the left-most and right-
+most neighbors of x in {v1, . . . , vr} and where a, b are non-zero real numbers (Bachoc et al. 2017). Finally, because
+the covariance matrix of Y (v1), . . . , Y (vr) is invertible, two linear combinations Pr
+i=1 aiY (vi) and Pr
+i=1 biY (vi) are
+equal almost surely if and only if (a1, . . . , ar) = (b1, . . . , br).
+Assume that X1, . . . , Xp is a perfect clustering and let x ∈R. It is known from Rullière et al. (2018) that
+MA(x) = Mfull(x) almost surely if x ∈{x1, . . . , xn}. Consider now that x ̸∈{x1, . . . , xn}.
+If x < min(x1, . . . , xn), then for i = 1, . . . , p, Mi(x) = exp(−|xji −x|/θ)Y (xji) with xji = min{x; x ∈Xi}. Let
+i∗∈{1, . . . , p} be so that min(x1, . . . , xn) ∈Xi∗. Then Mfull(x) = exp(−|xji∗−x|/θ)Y (xji∗). As a consequence,
+the linear combination λt
+xM(x) minimizing E[(λtM(x) −Y (x))2] over λ ∈Rp is given by λx = ei∗with er the r-th
+base column vector of Rp. This implies that Mfull(x) = MA(x) almost surely. Similarly, if x > max(x1, . . . , xn),
+then Mfull(x) = MA(x) almost surely.
+Consider now that there exists u ∈Xi and v ∈Xj so that u < x < v and (u, v) does not intersect with
+{x1, . . . , xn}. If i = j, then Mi(x) = Mfull(x) almost surely because the left-most and right-most neighbors of
+x are both in Xi.
+Hence, also MA(x) = Mfull(x) almost surely in this case.
+If i ̸= j, then u = max{t; t ∈
+Xi} and v = min{t; t ∈Xj} because X1, . . . , Xp is a perfect clustering.
+Hence, Mi(x) = exp(−|x −u|)Y (u),
+Mj(x) = exp(−|x −v|)Y (v) and Mfull(x) = aY (u) + bY (v) with a, b ∈R. Hence, there exists a linear combination
+λiMi(x)+λjMj(x) that equals Mfull(x) almost surely. As a consequence, the linear combination λt
+xM(x) minimizing
+E[(λtM(x) −Y (x)]2) over λ ∈Rp is given by λx = λiei + λjej. Hence Mfull(x) = MA(x) almost surely. All the
+possible sub-cases have now been treated, which proves the ﬁrst implication of the proposition.
+Assume now that X1, . . . , Xp is not a perfect clustering. Then there exists a triplet u, v, w, with u, v ∈Xi and
+w ∈Xj with i, j = 1 . . . , p, i ̸= j, and so that u < w < v. Without loss of generality it can further be assumed that
+there does not exits z ∈Xi satisfying u < z < v.
+Let x satisﬁes u < x < w and so that (u, x) does not intersect {x1, . . . , xn}. Then Mfull(x) = aY (u) + bY (z)
+with a, b ∈R\{0} and z ∈{x1, . . . , xn}, z ̸= v. Also, Mi(x) = αY (u)+βY (v) with α, β ∈R\{0}. As a consequence,
+there can not exist a linear combination λtM(x) with λ ∈Rp so that λtM(x) = aY (u) + bY (w). Indeed a linear
+combination λtM(x) is a linear combination of Y (x1), . . . , Y (xn) where the coeﬃcients for Y (u) and Y (v) are λiα
+and λiβ, which are either simultaneously zero or simultaneously non-zero. Hence, MA(x) is not equal to Mfull(x)
+almost surely. This concludes the proof.
+The next proposition shows that the aggregation techniques that ignore the covariances between sub-models can
+never recover the full Gaussian process predictor, even in the case of a perfect clustering. This again highlights the
+additional quality guarantees brought by the nested Kriging procedure.
+12
+
+Proposition 7 (Non-perfect other aggregation methods). Consider an exponential covariance function k in di-
+mension d = 1, as in (20). Let p ≥3 and let X1, . . . , Xp be non-empty. Let MA be a covariance-free aggregation
+method deﬁned as in (2), with αk(v1, . . . , vp, v) ∈R \ {0} for v1, . . . , vp, v ∈(0, ∞) and v1 < v, . . . , vp < v. Then,
+for all x ∈R \ X, E[(Mfull(x) −MA(x))2] > 0.
+Proof. Let x ∈R \ X.
+For i = 1, . . . , p, 0 < vi(x) < vprior(x), so that αi(v1(x), . . . , vp(x), vprior(x)) ∈R \
+{0}. Hence, the linear combination MA(x) = Pp
+k=1 αk(v1(x), ..., vp(x), vprior(x))Mk(x) is a linear combination of
+Y (x1), . . . , Y (xn) with at least p non-zero coeﬃcients (since each Mk(x) is a linear combination of one or two elements
+of Y (x1), . . . , Y (xn), all these elements being two-by-two distinct, see the beginning of the proof of Proposition 6).
+Hence, because the covariance matrix of Y (x1), . . . , Y (xn) is invertible, MA(x) can not be equal to Mfull(x) almost
+surely, since Mfull(x) is a linear combination of Y (x1), . . . , Y (xn) with one or two non-zero coeﬃcients.
+The above Proposition applies to the POE, GPOE, BCM and RBCM procedures presented in Sect. 2.
+4.2
+Empirical results
+The aim of this section is to illustrate Proposition 6, and to study the inﬂuence of the allocation of the observation
+points to the sub-models. Two opposite strategies are indeed possible: the ﬁrst one consists in allocating all the
+points in one region of the input space to the same sub-model (which is then accurate in this region but not
+informative elsewhere). The second is to have, for each sub-model, points that are uniformly distributed among the
+set of observations which leads to having a lot of sub-models that are weekly informative. This section illustrates
+the impact of this choice on the nested Kriging MSE.
+The experiment is as follow. A set of 322 = 1024 observation points are distributed on a regular grid in one
+dimension and two methods are considered for creating 32 subsets of points: a k-means clustering and the optimal
+clustering which consists in grouping together sets of 32 consecutive points. These initial grouping of points can
+be used to build sub-models that are experts in their region of the space. In order to study the inﬂuence of the
+quality of the clustering is, the clusters are perturbed by looping over all observations points and for each of them
+the group is swapped with another random observation point with probability p. The value p can then be used as
+a measure of the disorder in the group assignment: for p = 0 the groups are perfect clusters and for p = 1, each
+observation is assigned a group at random.
+Figure 5 (top) shows the MSE of one dimensional nested Kriging models as a function of p, for test functions
+that correspond to samples of Gaussian processes and a test set of 200 uniformly distributed points. The covariance
+functions of the Gaussian processes are either the exponential or the Gaussian (i.e. squared exponential) kernels,
+with unit variance and a lengthscale such that the covariance between two neighbour points is 0.5. As predicted
+by Proposition 6, the error is null for p = 0 (which corresponds to a perfect clustering) when using an exponential
+kernel. Although this is not supported by theoretical guaranties, one can see that the prediction error is also the
+smallest for at p = 0 for a Gaussian kernel. Finally, one can note that the choice of the initial clustering method
+does not have a strong inﬂuence on the MSE. This can probably be explained by the good performance of the
+k-means algorithm in one dimension.
+For the sake of completeness, the experiment is repeated with the same settings as above except for the input
+space dimension that is changed from one to ﬁve, and the locations of the 1024 = 45 input points that are now
+given by the grid {1/8, 3/8, 5/8, 7/8}5. With such settings, the optimal clustering of the observations can be
+obtained analytically with the 32 = 25 cluster centers located at {1/4, 3/4}5. As previously, the models that
+perform the best are obtained with p = 0. Furthermore, the diﬀerence between the two clustering methods is now
+more pronounced and the MSE obtained with k-means is always higher than the one with the optimal clustering.
+These two experiments, together with the theoretical result in dimension one, suggest it is good practice to
+apply a clustering algorithm to decide how to assign the observation points to the sub-models.
+5
+Extensions of the nested Kriging prediction
+This section extends nested Kriging to the cases where the Gaussian process Y is observed with measurement errors,
+and where Y has a parametric mean function. It also provides theoretical guaranties similar to Propositions 1 and
+2 on the (non-)consistency of various aggregation methods in the noisy setting.
+13
+
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+p
+0.2190
+0.2195
+0.2200
+0.2205
+0.2210
+0.2215
+MSE
+grid clustering
+kmeans clustering
+(a) input dimension = 1, exponential kernel
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+p
+0.010
+0.012
+0.014
+0.016
+0.018
+0.020
+MSE
+grid clustering
+kmeans clustering
+(b) input dimension = 1, Gaussian kernel
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+p
+0.395
+0.400
+0.405
+0.410
+MSE
+grid clustering
+kmeans clustering
+(c) input dimension = 5, exponential kernel
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+p
+0.15
+0.16
+0.17
+0.18
+MSE
+grid clustering
+kmeans clustering
+(d) input dimension = 5, Gaussian kernel
+Figure 5: Nested Kriging MSE as a function of how clustered the inputs of the sub-models are. For small values
+of p, sub-models are built on points that tend to form clusters whereas they do not for large values of p. The
+horizontal dashed line corresponds to the optimal MSE, which is obtained with full Kriging model.
+5.1
+Measurement errors
+This section assumes that the vector of observation is given by Y (X) + ξX where the vector of measurement errors
+ξX = (ξ1, . . . , ξn)t has independent components, independent of Y , and where ξi ∼N(0, ηi) for i = 1, . . . , n, with
+the error variances η1 > 0, . . . , ηn > 0.
+Consider a partition X1, . . . , Xp of X, where X1, . . . , Xp have cardinalities
+n1, . . . , np. For i = 1, . . . , p, write ξXi as the subvector of ξX corresponding to the submatrix Xi. Write also
+Di = Cov [ξXi]. Then, for x ∈D, the Kriging sub-model based on the noisy observations of Y (Xi) is
+Mη,i(x) = k(x, Xi)(k(Xi, Xi) + Di)−1(Y (Xi) + ξXi).
+(21)
+Note that Mη,i(x) is the best linear unbiased predictor of Y (x) from Y (Xi) + ξXi. Then, the best linear unbiased
+predictor of Y (x) from Mη,1(x), . . . , Mη,p(x) is
+MA,η(x) = kM,η(x)tKM,η(x)−1Mη(x).
+(22)
+In (22), Mη(x) = (Mη,1(x), . . . , Mη,p(x))t is the vector of sub-models, KM,η(x) is the covariance matrix of Mη(x)
+and kM,η(x) is the p × 1 covariance vector between Mη(x) and Y (x). For i, j = 1, . . . , p, their entries are
+(kM,η(x))i = k(x, Xi)(k(Xi, Xi) + Di)−1k(Xi, x) ,
+(23)
+(KM,η(x))i,j = k(x, Xi)(k(Xi, Xi) + Di)−1k(Xi, Xj)(k(Xj, Xj) + Dj)−1k(Xj, x) .
+(24)
+The mean square error can also be computed analytically
+vA,η(x) = E
+
+(Y (x) −MA,η(x))2
+= k(x, x) −kM,η(x)tKM,η(x)−1kM,η(x).
+(25)
+Equations (22) and (25) follow from the same standard proof as in the case where there are no measurement
+errors, see for instance Rullière et al. (2018). The computational complexity and storage requirement of these
+expressions are the same as their counterpart without measurement errors. In order to analyse more ﬁnely the cost
+of computing MA,η(x) and vA,η(x), the computations is broken down in four steps: (1) computing and storing the
+14
+
+vectors (k(x, Xi)(k(Xi, Xi)+Di)−1)i=1,...,p, (2) computing and storing (Mη,i(x))i=1,...,p, (3) computing and storing
+KM,η(x) and (KM,η(x))−1 and (4) computing MA,η(x) and vA,η(x).
+Assume that X1, . . . , Xp have cardinalities of order n/p for simplicity. Then the computational complexity of
+steps (1-4) are respectively O(p(n/p)3), O(p(n/p)), O(p2(n/p)2 + p3) and O(p(n/p) + p2). The total computational
+cost is thus O(n3/p2 + n2 + p3), which boils down to O(n2) by taking p of order nβ with β ∈[1/2, 2/3] (as opposed
+to O(n3) for the full Kriging predictor). The storage requirement (including intermediary storage) of steps (1) to
+(4) is O((n/p)2 + p(n/p) + p2). This cost becomes minimal for p of order n1/2, reaching O(n) (as opposed to O(n2)
+for the full Kriging predictor).
+The remaining of this section focuses on consistency results when observations are corrupted with noise. Similarly
+to Prop. 2, the following results considers inﬁll asymptotics and a triangular array of observation points.
+Proposition 8 (Suﬃcient condition for nested Kriging consistency with measurement errors). Let D be a ﬁxed
+nonempty subset of Rd. Let Y be a Gaussian process on D with mean zero and continuous covariance function
+k. Let (xni)1≤i≤n,n∈N be a triangular array of observation points such that xni ∈D for all 1 ≤i ≤n, n ∈N.
+For n ∈N, let X = (xn1, . . . , xnn)t and let Y (X) + ξX be observed, where ξX = (ξ1, . . . , ξn)t has independent
+components, with ξi ∼N(0, ηi), where (ηi)i∈N is a bounded sequence. Let also ξX be independent of Y . Let x ∈D
+be ﬁxed. For n ∈N, let Mη,1(x), ..., Mη,pn(x) be deﬁned from (21), for a partition X1, . . . , Xpn of X.
+Assume the following suﬃcient condition: for all ϵ > 0, there exists a sequence (in)n∈N, such that in ∈{1, . . . , pn}
+for n ∈N and such that the number of points in Xin at Euclidean distance less than ϵ from x goes to inﬁnity as
+n →∞.
+Then for MA,η(x) deﬁned as in (22),
+E
+h
+(Y (x) −MA,η(x))2i
+→n→∞0.
+In Proposition 8, the interpretation of the suﬃcient condition for consistency is that, when n is large, at least
+one of the subsets X1, . . . , Xpn contains a large number of observation points close to the prediction point x. If
+the minimal size of the subsets X1, . . . , Xpn goes to inﬁnity, and if these subsets are obtained from a clustering
+algorithm, that is the points in a subset are close to each other, then the suﬃcient condition in Proposition 8
+typically holds. This can be seen as an additional argument in favor of selecting the subsets from a clustering
+algorithm. This is in agreement with Sect. 4, which conclusions also support clustering algorithms.
+A particular case where the condition of Proposition 8 always holds (regardless of how the partition into subsets
+is made) is when the triangular array of observation points is a sequence of randomly sampled points, with a strictly
+positive sampling density, and when the number of subsets is asymptotically smaller than n.
+Lemma 1. Let D be ﬁxed, bounded with non-empty interior. Let x in the interior of D be ﬁxed. Consider a
+triangular array of observation points (xni)1≤i≤n,n∈N that is obtained from a sequence (xi)i∈N, that is xni = xi for
+1 ≤i ≤n, n ∈N. Assume that (xi)i∈N are independently sampled from a distribution with strictly positive density
+g on D. Consider any sequence of partitions (X1, . . . , Xpn)n∈N of x1, . . . , xn. Assume that pn = o(n) as n →∞.
+Then, almost surely with respect to the randomness of (xi)i∈N, the suﬃcient condition of Proposition 8 holds.
+The theoretical setting of Lemma 1 is realistic with respect to situations where the observation points are not
+too irregulalry spaced over D. The setting pn = o(n) is particularly relevant for the nested Kriging predictor, since
+this setting is necessary to obtain a smaller order of computational complexity than the full Kriging predictor.
+The following Proposition shows that there are situations with measurement errors where the nested Kriging
+predictor is consistent whereas other aggregation methods that do not use the covariances between the sub-models
+are inconsistent. These situations are constructed similarly as in Proposition 1. In particular, Proposition 9 applies
+to the extensions of POE, GPOE, BCM and RBCM methods to the case of measurement errors (see the references
+given in Sect. 2).
+Proposition 9 (non-consistency of some covariance-free aggregations with measurement errors). Consider D, Y
+and k satisfying the same conditions as in Proposition 1. Let (ηi)i∈N be a bounded sequence. For any triangular
+array of observation points (xni)1≤i≤n,n∈N, let, for n ∈N, X be the n × d matrix with row i equal to xt
+n,i. Let ξX be
+as in Proposition 8. Then, for any partition X1, . . . , Xpn of X, for i = 1, . . . , pn, let ni be the cardinality of Xi, let
+Mη,i(x) be deﬁned as in (21) and vη,i(x) = k(x, x) −k(x, Xi)(k(Xi, Xi) + Di)−1k(Xi, x), with Di also as in (21).
+Let then MA,η,n(x) be deﬁned as MA,n(x) in Proposition 1, with the same assumption (3), with vi(x) replaced by
+vη,i(x).
+Then there exist a ﬁxed x ∈D, a triangular array of observation points (xni)1≤i≤n,n∈N, and a sequence of
+partitions X1, . . . , Xpn of X, that satisfy the suﬃcient condition of Proposition 8, and such that
+lim inf
+n→∞E
+h
+(MA,η,n(x) −Y (x))2i
+> 0.
+15
+
+5.2
+Universal Kriging
+Consider here the case where the Gaussian process Z deﬁned with a trend, for x ∈D,
+Z(x) =
+m
+X
+i=1
+βihi(x) + Y (x),
+where Y is, as above, a centered Gaussian process on D with mean zero and covariance function k, where the
+functions h1, . . . , hm : D →R are known and where the vector β = (β1, . . . , βm)t is unknown. This is the setting of
+universal Kriging (Chiles and Delﬁner 2009).
+Consider the partition X1, . . . , Xp of X with cardinalities n1, . . . , np. For i = 1, . . . , p, let Hi be the ni × m
+matrix (h1(Xi), . . . , hm(Xi)). Then the best linear unbiased predictor of Z(x) given Z(Xi) is (Sacks et al. 1989)
+MUK,i(x) = h(x)t ˆβi + k(x, Xi)k(Xi, Xi)−1 
+Z(Xi) −Hi ˆβi
+
+,
+with h(x) = (h1(x), . . . , hm(x))t and
+ˆβi =
+ Ht
+i k(Xi, Xi)−1Hi
+−1 Ht
+i k(Xi, Xi)−1Z(Xi) .
+The predictor MUK,i(x) is a linear function of Z(Xi), satisﬁes E[MUK,i(x)] = E[Z(x)] (for all the possible values of
+β in Rm) and has smallest mean square prediction error among all the predictors with these two properties.
+The next proposition provides the linear aggregation of MUK,1(x), . . . , MUK,p(x) that is unbiased and has the
+smallest mean square prediction error. It thus gives an extension of nested Kriging to the universal Kriging case.
+Proposition 10. Let MUK(x) = (MUK,1(x), . . . , MUK,p(x))t. For i = 1, . . . , p let
+wi(x)t = h(x)t  Ht
+i k(Xi, Xi)−1Hi
+−1 Ht
+i k(Xi, Xi)−1 −k(x, Xi)k(Xi, Xi)−1Hi
+ Ht
+i k(Xi, Xi)−1Hi
+−1 Ht
+i k(Xi, Xi)−1
++ k(x, Xi)k(Xi, Xi)−1.
+Let KUK,M(x) be the p × p matrix deﬁned by, for i, j = 1, . . . , p,
+(KUK,M(x))i,j = wi(x)tk(Xi, Xj)wj(x).
+Let kUK,M(x) be the p × 1 vector deﬁned by, for i = 1, . . . , p,
+(kUK,M(x))i = wi(x)tk(Xi, x).
+Let
+ˆmUK,M(x) = (1t
+pKUK,M(x)−11p)−11t
+pKUK,M(x)−1MUK(x),
+with 1p the p × 1 vector with entries equal to one. Let then
+MA,UK(x) = ˆmUK,M(x) + kUK,M(x)tKUK,M(x)−1 (MUK(x) −ˆmUK,M(x)1p) .
+(26)
+Then MA,UK(x) is a linear function of MUK,1(x), . . . , MUK,p(x), satisﬁes E[MA,UK(x)] = E[Z(x)] (for all the
+possible values of β in Rm) and has smallest mean square prediction error among all the predictors with these two
+properties. The vector of aggregation weights is
+αA,UK(x)t =(1t
+pKUK,M(x)−11p)−11t
+pKUK,M(x)−1
+−kUK,M(x)tKUK,M(x)−11p(1t
+pKUK,M(x)−11p)−11t
+pKUK,M(x)−1
++ kUK,M(x)tKUK,M(x)−1.
+Then MA,UK(x) = αA,UK(x)tMUK(x) and the mean square error is given by
+vA,UK(x) = E
+h
+(MA,UK(x) −Z(x))2i
+= k(x, x) + αA,UK(x)tKUK,M(x)αA,UK(x) −2αA,UK(x)tkUK,M(x).
+(27)
+The aggregated predictor MA,UK(x) can be interpreted as a universal Kriging predictor of Z(x), with the
+“observations” MUK,1(x), . . . , MUK,p(x), and with a constant unknown mean.
+This is particularly apparent in
+(26), and can be further understood in the proof of Proposition 10. It is worth noting that the “observations”
+16
+
+MUK,1(x), . . . , MUK,p(x) are already themselves universal Kriging predictors. Hence, it turns out that there are two
+nested steps of universal Kriging predictions when extending the nested Kriging predictor to universal Kriging.
+Computing MA,UK(x) and vA,UK(x) can be done similarly to what has been proposed in Sect.
+5.1.
+More
+precisely, the four computational steps are (1) to compute and store the vectors (wi(x))i=1,...,p, (2) to compute and
+store (MUK,i(x))i=1,...,p, with MUK,i(x) = wi(x)tZ(Xi) for i = 1, . . . , p, (3) to compute and store KUK,M(x) and
+(KUK,M(x))−1 and (4) to compute MA,UK(x) and vA,UK(x).
+To analyze the computational complexity and storage requirement, assume that X1, . . . , Xp have cardinalities
+of order n/p for simplicity. Assume also that m is small compared to n/p and p, which is quite realistic in the
+framework of Kriging with big data, since the number of functions h1, . . . , hm is typically moderate. Then the
+computational cost of step (1) is O(p(n/p)3), the computational cost of step (2) is O(p(n/p)), the computational
+cost of step (3) is O(p2(n/p)2 + p3) and the computational cost of step (4) is O(p(n/p) + p2). As in Sect. 5.1, the
+total computational cost is O(n3/p2 + n2 + p3) and can reach O(n2) by taking p of order nβ with β ∈[1/2, 2/3].
+Also as in Sect. 5.1, the storage cost (including intermediary storage) of steps (1) to (4) is O((n/p)2 + p(n/p) + p2)
+and reaches O(n) by taking p of order n1/2.
+6
+Concluding remarks
+This article proposes a theoretical analysis of several aggregation procedures recently proposed in the literature,
+aiming at combining predictions from Kriging sub-models constructed separately from subsets of a large data set
+of observations. It is shown that aggregating the sub-models based only on their conditional variances can yield
+inconsistent aggregated Kriging predictors. In contrasts, the consistency of the nested Kriging procedure (Rullière
+et al. 2018), which explicitly takes into account the correlations between the sub-model predictors, has been proved.
+The article also shed some light on this procedure, by showing that it provides an exact conditional distribution, for
+a diﬀerent Gaussian process prior, and by obtaining bounds on the diﬀerences with the exact full Kriging model.
+Further results on the the eﬃcient computation of conditional covariances have also been presented, which make
+possible sampling from the posterior distribution. The impact of the observation assignment to the sub-models
+has also been investigated, which resulted in some evidence that it is good practice to build them on clusters of
+observation points. Finally, the procedure of Rullière et al. (2018) has been extended to measurement errors and
+to universal Kriging, while retaining the same computational complexity and storage requirement.
+Some perspectives remain open. It would be beneﬁcial to improve the aggregation methods of Sect. 2, in order to
+guarantee their consistency while keeping their low computational costs. Finally, the interpretation of the predictor
+in Rullière et al. (2018) as an exact conditional expectation could be the basis of further asymptotic studies, as
+discussed in Sect. 3.2.
+References
+Abrahamsen, P. (1997). A review of Gaussian random ﬁelds and correlation functions. Technical report, Norwegian
+Computing Center.
+Allard, D., Comunian, A., and Renard, P. (2012). Probability aggregation methods in geoscience. Mathematical
+Geosciences, 44(5):545–581.
+Bacchi, V., Jomard, H., Scotti, O., Antoshchenkova, E., Bardet, L., Duluc, C.-M., and Hebert, H. (2020). Using
+meta-models for tsunami hazard analysis: An example of application for the French Atlantic coast. Frontiers in
+Earth Science, 8:41.
+Bachoc, F. (2013). Cross validation and maximum likelihood estimations of hyper-parameters of Gaussian processes
+with model mispeciﬁcation. Computational Statistics and Data Analysis, 66:55–69.
+Bachoc, F., Ammar, K., and Martinez, J. (2016). Improvement of code behavior in a design of experiments by
+metamodeling. Nuclear science and engineering, 183(3):387–406.
+Bachoc, F., Lagnoux, A., and Nguyen, T. M. N. (2017). Cross-validation estimation of covariance parameters under
+ﬁxed-domain asymptotics. Journal of Multivariate Analysis, 160:42–67.
+Banerjee, S., Gelfand, A. E., Finley, A. O., and Sang, H. (2008). Gaussian predictive process models for large
+spatial data sets. Journal of the Royal Statistical Society: Series B (Statistical Methodology), 70(4):825–848.
+17
+
+Cao, Y. and Fleet, D. J. (2014). Generalized Product of Experts for Automatic and Principled Fusion of Gaus-
+sian Process Predictions. In Modern Nonparametrics 3: Automating the Learning Pipeline workshop at NIPS,
+Montreal. arXiv preprint arXiv:1410.7827.
+Chevalier, C. and Ginsbourger, D. (2013).
+Fast computation of the multi-points expected improvement with
+applications in batch selection. In Learning and Intelligent Optimization, pages 59–69. Springer.
+Chiles, J.-P. and Delﬁner, P. (2009). Geostatistics: modeling spatial uncertainty, volume 497. John Wiley & Sons.
+Chilès, J.-P. and Desassis, N. (2018).
+Fifty years of Kriging.
+In Handbook of mathematical geosciences, pages
+589–612. Springer, Cham.
+Cressie, N. (1990). The origins of kriging. Mathematical geology, 22(3):239–252.
+Cressie, N. (1993). Statistics for spatial data. J. Wiley.
+Cressie, N. and Johannesson, G. (2008). Fixed rank Kriging for very large spatial data sets. Journal of the Royal
+Statistical Society: Series B (Statistical Methodology), 70(1):209–226.
+Datta, A., Banerjee, S., Finley, A. O., and Gelfand, A. E. (2016). Hierarchical nearest-neighbor Gaussian process
+models for large geostatistical datasets. Journal of the American Statistical Association, 111(514):800–812.
+Davis, B. J. and Curriero, F. C. (2019). Development and evaluation of geostatistical methods for non-Euclidean-
+based spatial covariance matrices. Mathematical Geosciences, 51(6):767–791.
+Deisenroth, M. P. and Ng, J. W. (2015). Distributed Gaussian processes. Proceedings of the 32nd International
+Conference on Machine Learning, Lille, France. JMLR: W&CP volume 37.
+Finley, A. O., Sang, H., Banerjee, S., and Gelfand, A. E. (2009). Improving the performance of predictive process
+modeling for large datasets. Computational statistics & data analysis, 53(8):2873–2884.
+Furrer, R., Genton, M. G., and Nychka, D. (2006). Covariance tapering for interpolation of large spatial datasets.
+Journal of Computational and Graphical Statistics, 15(3):502–523.
+He, J., Qi, J., and Ramamohanarao, K. (2019). Query-aware Bayesian committee machine for scalable Gaussian
+process regression. In Proceedings of the 2019 SIAM International Conference on Data Mining, pages 208–216.
+SIAM.
+Heaton, M. J., Datta, A., Finley, A. O., Furrer, R., Guinness, J., Guhaniyogi, R., Gerber, F., Gramacy, R. B.,
+Hammerling, D., and Katzfuss, M. (2019). A case study competition among methods for analyzing large spatial
+data. Journal of Agricultural, Biological and Environmental Statistics, 24(3):398–425.
+Hensman, J. and Fusi, N. (2013). Gaussian processes for big data. Uncertainty in Artiﬁcial Intelligence, pages
+282–290.
+Hinton, G. E. (2002). Training products of experts by minimizing contrastive divergence. Neural computation,
+14(8):1771–1800.
+Jones, D., Schonlau, M., and Welch, W. (1998). Eﬃcient global optimization of expensive black box functions.
+Journal of Global Optimization, 13:455–492.
+Kaufman, C. G., Schervish, M. J., and Nychka, D. W. (2008). Covariance tapering for likelihood-based estimation
+in large spatial data sets. Journal of the American Statistical Association, 103(484):1545–1555.
+Krige, D. G. (1951). A statistical approach to some basic mine valuation problems on the witwatersrand. Journal
+of the Southern African Institute of Mining and Metallurgy, 52(6):119–139.
+Krityakierne, T. and Baowan, D. (2020). Aggregated GP-based optimization for contaminant source localization.
+Operations Research Perspectives, 7:100151.
+Liu, H., Cai, J., Wang, Y., and Ong, Y.-S. (2018). Generalized robust Bayesian committee machine for large-scale
+Gaussian process regression. arXiv preprint arXiv:1806.00720.
+18
+
+Liu, H., Ong, Y., Shen, X., and Cai, J. (2020). When Gaussian process meets big data: A review of scalable GPs.
+IEEE Transactions on Neural Networks and Learning Systems, pages 1–19.
+Marrel, A., Iooss, B., Laurent, B., and Roustant, O. (2009). Calculations of Sobol indices for the Gaussian process
+metamodel. Reliability Engineering & System Safety, 94(3):742–751.
+Matheron, G. (1970). La Théorie des Variables Régionalisées et ses Applications. Fasicule 5 in Les Cahiers du
+Centre de Morphologie Mathématique de Fontainebleau. Ecole Nationale Supérieure des Mines de Paris.
+Putter, H., Young, G. A., et al. (2001). On the eﬀect of covariance function estimation on the accuracy of Kriging
+predictors. Bernoulli, 7(3):421–438.
+Quinonero-Candela, J. and Rasmussen, C. E. (2005). A unifying view of sparse approximate Gaussian process
+regression. The Journal of Machine Learning Research, 6:1939–1959.
+Rasmussen, C. E. and Williams, C. K. (2006). Gaussian Processes for Machine Learning. MIT Press.
+Roustant, O., Ginsbourger, D., and Deville, Y. (2012). DiceKriging, DiceOptim: Two R packages for the analysis of
+computer experiments by Kriging-based metamodeling and optimization. Journal of Statistical Software, 51(1).
+Rue, H. and Held, L. (2005). Gaussian Markov random ﬁelds, Theory and applications. Chapman & Hall.
+Rullière, D., Durrande, N., Bachoc, F., and Chevalier, C. (2018). Nested Kriging predictions for datasets with a
+large number of observations. Statistics and Computing, 28(4):849–867.
+Sacks, J., Welch, W., Mitchell, T., and Wynn, H. (1989). Design and analysis of computer experiments. Statistical
+Science, 4:409–423.
+Santner, T. J., Williams, B. J., and Notz, W. I. (2013). The design and analysis of computer experiments. Springer
+Science & Business Media.
+Stein, M. L. (2012). Interpolation of spatial data: some theory for Kriging. Springer Science & Business Media.
+Stein, M. L. (2014).
+Limitations on low rank approximations for covariance matrices of spatial data.
+Spatial
+Statistics, 8:1–19.
+Sun, X., Luo, X.-S., Xu, J., Zhao, Z., Chen, Y., Wu, L., Chen, Q., and Zhang, D. (2019). Spatio-temporal variations
+and factors of a provincial pm 2.5 pollution in eastern china during 2013–2017 by geostatistics. Scientiﬁc reports,
+9(1):1–10.
+Tresp, V. (2000). A Bayesian committee machine. Neural Computation, 12(11):2719–2741.
+van Stein, B., Wang, H., Kowalczyk, W., Bäck, T., and Emmerich, M. (2015). Optimally weighted cluster Kriging
+for big data regression. In International Symposium on Intelligent Data Analysis, pages 310–321. Springer.
+Van Stein, B., Wang, H., Kowalczyk, W., Emmerich, M., and Bäck, T. (2020). Cluster-based Kriging approximation
+algorithms for complexity reduction. Applied Intelligence, 50(3):778–791.
+Vazquez, E. and Bect, J. (2010a). Convergence properties of the expected improvement algorithm with ﬁxed mean
+and covariance functions. Journal of Statistical Planning and inference, 140(11):3088–3095.
+Vazquez, E. and Bect, J. (2010b). Pointwise consistency of the Kriging predictor with known mean and covariance
+functions. In mODa 9 (Model-Oriented Data Analysis and Optimum Design) Springer.
+Ying, Z. (1991). Asymptotic properties of a maximum likelihood estimator with data from a Gaussian process.
+Journal of Multivariate Analysis, 36:280–296.
+Zhang, H. and Wang, Y. (2010). Kriging and cross validation for massive spatial data. Environmetrics, 21:290–304.
+Zhu, Z. and Zhang, H. (2006). Spatial sampling design under the inﬁll asymptotic framework. Environmetrics: The
+oﬃcial journal of the International Environmetrics Society, 17(4):323–337.
+19
+
+A
+Proof of Proposition 1
+For v ∈Rm, we let |v| = maxi=1,...,m |vi| and B(v, r) = {w ∈Rm, |v −w| ≤r}.
+Let x0, ¯x ∈D, rx0 > 0 and r¯x > 0 be ﬁxed and satisfy B(x0, rx0) ⊂D, B(¯x, r¯x) ⊂D, B(x0, rx0) ∩B(¯x, r¯x) = ∅
+and k(x0, ¯x) > 0. [The existence is implied by the assumptions of the proposition.] By continuity of k, rx0 > 0 and
+r¯x > 0 can be selected small enough so that, with some ﬁxed ϵ2 > 0 and δ1 > 0, for v ∈B(x0, rx0) and w ∈B(¯x, r¯x),
+|v −w| ≥δ1, k(x0, x0)/2 ≤k(v, v) ≤2k(x0, x0), k(¯x, ¯x)/2 ≤k(w, w) ≤2k(¯x, ¯x) and
+k(v, v) −k(v, w)2
+k(w, w) ≤k(v, v) −ϵ2.
+(28)
+For δ > 0, let
+V (δ) = inf
+n∈N
+inf
+x0,x1,...,xn∈D;
+∀i=1,...,n,|xi−x0|≥δ
+V [Y (x0)|Y (x1), ..., Y (xn)] .
+Then V (δ) > 0 because of the NEB, by continuity of k and by compacity.
+Consider a decreasing sequence δn of non-negative numbers such that δn →n→∞0, and which will be speciﬁed be-
+low. There exists a sequence (un)n∈N ∈DN, composed of pairwise distinct elements, such that limn→∞supx∈D mini=1,...,n |ui−
+x| = 0, and such that for all n,
+inf
+1≤i,j≤n
+i̸=j
+ui,uj∈B(x0,rx0)
+|ui −uj| ≥4δn.
+Such a sequence indeed exists from Lemma 2 below.
+Consider then the sequence (wn)n∈N ∈DN such that for all n, wn = ¯x −(r¯x/(1 + n))e1 with e1 = (1, 0, ..., 0).
+We can assume furthermore that {un}n∈N and {wn}n∈N are disjoint (this holds almost surely with the construction
+of Lemma 2 for (un)).
+Let us now consider two sequences of integers pn and kn with kn →∞and pn →∞to be speciﬁed later.
+Let Cn be the largest natural number m satisfying m(pn −1) < n. Let X = (X1, ..., Xpn) be deﬁned by, for
+i = 1, ..., kn, Xi = (uj)j=(i−1)Cn+1,...,iCn; for i = kn + 1, ..., pn −1, Xi = (wj)j=(i−kn−1)Cn+1,...,(i−kn)Cn; and
+Xpn = (wj)j=(pn−kn−1)Cn+1,...,n−knCn.
+With this construction, note that Xpn is nonempty.
+Furthermore, the
+sequence of vectors X = (X1, ..., Xpn), indexed by n ∈N, deﬁnes a triangular array of observation points satisfying
+the conditions of the proposition.
+Let us discuss the construction of (un)n∈N, (wn)n∈N, kn, Cn and pn more informally. The sequence (un)n∈N
+is dense in D, and X1, . . . , Xkn are composed by the knCn ﬁrst points of this sequence. Then, Xkn+1, . . . , Xpn
+are composed by the n −Cnkn ﬁrst points of the sequence (wn)n∈N, which is concentrated around ¯x. We will
+let kn/pn →0 so that the majority of the groups in X contain points of (wn)n∈N, so that they do not contain
+relevant information on the values of Y on B(x0, rx0) and yield an inconsistency of the aggregated predictor MA,n
+on B(x0, rx0).
+Coming back to the proof, observe that infi∈N infx∈B(x0,rx0) |wi −x| ≥δ1 and let ϵ1 = V (δ1) > 0. Then, we
+have for all n ∈N, for all x ∈B(x0, rx0), and for all k = kn +1, ..., pn, since then Xk is nonempty and only contains
+elements wi ∈B(¯x, r), from (28),
+ϵ1 ≤vk(x) ≤k(x, x) −ϵ2.
+(29)
+Let En = {x ∈B(x0, rx0); mini=1,...,n |x −ui| ≥δn} and let x ∈En. Since x is not a component of X, we have
+vk(x) > 0 for all k. Also vpn(x) < k(x, x) from (29). Hence, MA,n(x) is well-deﬁned.
+For two random variables A and B, we let ||A −B|| = (E
+
+(A −B)2
+)1/2. Let, for x ∈En,
+R(x)
+=
+
+
+kn
+X
+k=1
+αk,n(v1(x), ..., vpn(x), vprior(x))Mk(x)
+
+ .
+Then, from the triangular inequality, and since, from the law of total variance, ||Mk(x)|| ≤||Y (x)|| = vprior(x)1/2
+we have, with V = {k(x, x); x ∈B(x0, r(x0))},
+R(x)
+≤
+Pkn
+k=1 a(vk(x), vprior(x))
+p
+vprior(x)
+Ppn
+l=1 b(vl(x), vprior(x))
+≤
+kn supv∈V,V (δn)≤s2≤v a(s2, v)√v
+(pn −kn) infv∈V,ϵ1≤s2≤v−ϵ2 b(s2, v),
+20
+
+where the last inequality is obtained from (29) and the deﬁnition of δn and V (δ).
+Let now for δ > 0, s(δ) = supv∈V,V (δ)≤s2≤v a(s2, v). Since a is continuous and since V (δ) > 0, we have that
+s(δ) is ﬁnite. Hence, we can choose a sequence δn of positive numbers such that δn →n→∞0 and s(δn) ≤√n (for
+instance, let δn = inf{δ ≥n−1/2; s(δ) ≤n1/2}). Then, we can choose pn = n4/5 and kn = n1/5. Then, for n large
+enough
+kn
+pn −kn
+s(δn) ≤2n−3/5√n →n→∞0.
+Hence, since
+supv∈V
+√v
+infv∈V,ϵ1≤s2≤v−ϵ2 b(s2, v)
+is a ﬁnite constant, as b is positive and continuous on ˚∆, we have that supx∈En R(x) →n→∞0. As a consequence,
+we have from the triangular inequality, for x ∈En
+||Y (x) −MA,n(x)|| ≥||Y (x) −
+pn
+X
+k=kn+1
+αk,n(v1(x), ..., vpn(x), vprior(x))Mk(x)||
+−||
+pn
+X
+k=kn+1
+αk,n(v1(x), ..., vpn(x), vprior(x))Mk(x) −MA,n(x)||
+≥inf
+x∈En
+
+Y (x) −
+pn
+X
+k=kn+1
+αk,n(v1(x), ..., vpn(x), vprior(x))Mk(x)
+
+
+−sup
+x∈En
+R(x).
+Since Xkn+1, ..., Xpn are composed only of elements of {wi}i∈N, we obtain
+lim inf
+n→∞
+inf
+x∈En ||Y (x) −MA,n(x)|| ≥V (δ1) > 0.
+Hence, there exist ﬁxed n0 ∈N and A > 0 so that for n ≥n0, ||Y (x) −MA,n(x)|| ≥A. Hence, we have, for n ≥n0
+Z
+D
+E
+h
+(Y (x) −MA,n(x))2i
+dx ≥
+Z
+En
+E
+h
+(Y (x) −MA,n(x))2i
+≥
+Z
+En
+A2dx.
+Hence, it remains to show that the limit inferior of the volume of En is not zero in order to show (4). Let Nn be
+the integer part of rx0/4δn. Then, the ball B(x0, rx0) contains (2Nn)d disjoint balls of the form B(a, 4δn) with
+a ∈B(x0, rx0). If one of these balls B(a, 4δn) does not intersect with (ui)i=1...,n, then we can associate to it a ball
+of the form B(sa, δn) ⊂B(a, 4δn) ∩En. If one of these balls B(a, 4δn) does intersect with one uj ∈{ui}i=1...,n, then
+we can ﬁnd a ball B(sa, δn/2) ⊂(B(uj, 2δn)\B(uj, δn)) ∩B(a, 4δn) ∩En. Hence, we have found (2Nn)d disjoint
+balls with radius δn/2 in En. Hence En has volume at least 2d((rx0/4δn) −1)dδd
+n which has a strictly positive limit
+inferior. Hence, (4) is proved.
+Finally, if E
+h
+(Y (x0) −MA,n(x0))2i
+→0 as n →∞for almost all x0 ∈D, then
+Z
+D
+max
+
+E
+h
+(Y (x0) −MA,n(x))2i
+, 1
+
+dx →n→∞0
+from the dominated convergence theorem. This is contradictory with the proof of (4). Hence, (5) is proved.
+Lemma 2. There exists a sequence (un)n∈N ∈DN, composed of pairwise distinct elements, such that
+lim
+n→∞sup
+x∈D
+min
+i=1,...,n |ui −x| = 0,
+(30)
+and such that for all n,
+inf
+1≤i,j≤n
+i̸=j
+ui,uj∈B(x0,rx0)
+|ui −uj| ≥4δn.
+(31)
+21
+
+Proof. Such a sequence can be constructed, for instance, by the following random procedure. Let D ⊂B(0, R) for
+R > 0 large enough. Deﬁne u1 ∈D arbitrarily. For n = 1, 2, . . .: (1) if the set Sn = {u ∈B(x0, rx0); mini=1,...,n |u−
+ui| > 4δn+1} is non-empty, sample un+1 from the uniform distribution on Sn. (2) If Sn is empty, sample ˜un+1
+from the uniform distribution on B(0, R)\B(x0, rx0), and set un+1 as the projection of ˜un+1 on D\B(x0, rx0). One
+can see that (31) is satisﬁed by deﬁnition. Furthermore, one can show that (30) holds almost surely. Indeed, let
+x ∈B(x0, rx0) and ϵ > 0, and assume that with non-zero probability B(x, ϵ) ∩{ui}i∈N = ∅. Then, the case (1)
+occurs inﬁnitely often and, for each i for which the case (1) occurs, there is a probability at least ϵd/(2rx0)d that
+ui ∈B(x, ϵ) (when 4δn ≤ϵ/2). This yields a contradiction. Hence, for all x ∈B(x0, rx0) and ϵ > 0, almost surely,
+B(x, ϵ) ∩{ui}i∈N ̸= ∅. We show similarly, for all x ∈D\B(x0, rx0) and ϵ > 0, almost surely, B(x, ϵ) ∩{ui}i∈N ̸= ∅.
+This show that (30) holds almost surely. Hence, a fortiori, there exists a sequence (un)n∈N ∈DN satisfying the
+conditions of the lemma.
+Remark 6. Consider the case d = 1. The proof of Proposition 1 can be modiﬁed so that the partition X1, . . . , Xpn
+also satisﬁes x ≤x′ for any x ∈Xi, x′ ∈Xj, 1 ≤i < j ≤pn. To see this, consider the same X as in this proof. Let
+X1, . . . , Xpn have the same cardinality as in this proof, and let the Cn smallest elements of X be aﬀected to X1, the
+next Cn smallest be aﬀected to X2 and so on. Then, one can show that there are at most kn + 2 groups containing
+elements of (ui)i∈N ∩B(x0, rx0) and at least pn −kn −2 groups containing only elements of B(¯x, r¯x). From these
+observations, (4) and (5) can be proved similarly as in the proof of Proposition 1.
+B
+Proof of Proposition 2
+Because D is compact we have limn→∞supx∈D mini=1,...,n ||xni −x|| = 0. Indeed, if this does not hold, there
+exists ϵ > 0 and a subsequence φ(n) such that supx∈D mini=1,...,φ(n) ||xφ(n)i −x|| ≥2ϵ.
+Hence, there exists a
+sequence, xφ(n) ∈D such that mini=1,...,φ(n) ||xφ(n)i −xφ(n)|| ≥ϵ. Since D is compact, up to extracting a further
+subsequence, we can also assume that xφ(n) →n→∞xlim with xlim ∈D. This implies that for all n large enough,
+mini=1,...,φ(n) ||xφ(n)i −xlim|| ≥ϵ/2, which is in contradiction with the assumptions of the proposition.
+Hence there exists a sequence of positive numbers δn such that δn →n→∞0 and such that for all x ∈D there
+exists a sequence of indices in(x) such that in(x) ∈{1, ..., n} and ||x −xnin(x)|| ≤δn. There also exists a sequence
+of indices jn(x) such that xnin(x) is a component of Xjn(x). With these notations we have, since M1(x),..., Mpn(x),
+MA(x) are linear combinations with minimal square prediction errors,
+sup
+x∈D
+E
+h
+(Y (x) −MA(x))2i
+≤
+sup
+x∈D
+E
+h Y (x) −Mjn(x)(x)
+2i
+≤
+sup
+x∈D
+E
+h Y (x) −E
+
+Y (x)|Y (xnin(x))
+2i
+.
+(32)
+In the rest of the proof we essentially show that, for a dense triangular array of observation points, the Kriging
+predictor that predicts Y (x) based only on the nearest neighbor of x among the observation points has a mean
+square prediction error that goes to zero uniformly in x when k is continuous. We believe that this fact is somehow
+known, but we have not been able to ﬁnd a precise result in the literature. We have from (32),
+sup
+x∈D
+E
+h
+(Y (x) −MA(x))2i
+≤sup
+x∈D
+
+1{k(xnin(x), xnin(x)) = 0}k(x, x) + 1{k(xnin(x), xnin(x)) > 0}
+
+k(x, x) −
+k(x, xnin(x))2
+k(xnin(x), xnin(x))
+
+≤
+sup
+x,t∈D;
+||x−t||≤δn
+
+1{k(t, t) = 0}k(x, x) + 1{k(t, t) > 0}
+
+k(x, x) −k(x, t)2
+k(t, t)
+
+=
+sup
+x,t∈D;
+||x−t||≤δn
+F(x, t).
+Assume now that the above supremum does not go to zero as n →∞. Then there exists ϵ > 0 and two sub-sequences
+xφ(n) and tφ(n) with values in D such that xφ(n) →n→∞xlim and tφ(n) →n→∞xlim, with xlim ∈D and such that
+F(xφ(n), tφ(n)) ≥ϵ. If k(xlim, xlim) = 0 then F(xφ(n), tφ(n)) ≤k(xφ(n), xφ(n)) →n→∞0. If k(xlim, xlim) > 0 then
+for n large enough
+F(xφ(n), tφ(n)) = k(xφ(n), xφ(n)) −k(xφ(n), tφ(n))2
+k(tφ(n), tφ(n))
+22
+
+which goes to zero as n →∞since k is continuous. Hence we have a contradiction, which completes the proof.
+C
+Proofs in Sect. 3.2
+First notice that denoting kA(x, x′) = Cov [YA(x), YA(x′)], we easily get for all x, x′ ∈D,
+kA(x, x′) = k(x, x′) + 2kM(x)tK−1
+M (x)KM(x, x′)K−1
+M (x′)kM(x′)
+−kM(x)tK−1
+M (x)kM(x, x′) −kM(x′)tK−1
+M (x′)kM(x′, x).
+(33)
+A direct consequence of (33) is kA(x, x) = k(x, x), and under the interpolation assumption (H2), since YA(X) =
+Y (X), kA(X, X) = k(X, X).
+Proof of Proposition 3. The interpolation hypothesis MA(X) = Y (X) ensures ε′
+A(X) = 0 so we have
+E [YA(x)|YA(X)] = E [YA(x)|MA(X) + 0]
+= E [MA(x)|MA(X)] + E [ε′
+A(x)|MA(X)]
+= E [gx(Y (X))|Y (X)] + 0
+= MA(x).
+(34)
+The proof that vA is a conditional variance follows the same pattern:
+V [YA(x)|YA(X)] = V [YA(x)|MA(X)]
+= V [MA(x)|MA(X)] + V [ε′
+A(x)]
+= vA(x).
+(35)
+Proof of Proposition 4. Eq. (11) is the classical expression of Gaussian conditional covariances, based on the fact
+that YA is Gaussian.
+Let us now prove Eq. (12).
+For a component xk of the vector of points X, using the
+interpolation assumption, we have MA(xk) = Y (xk) and
+Cov [YA(x), YA(xk)] = Cov [MA(x) + ε′
+A(x), MA(xk)] = Cov [MA(x), Y (xk)] .
+Remark that αA(x) is the p × 1 vector of aggregation weights of diﬀerent sub-models at point x, so that MA(x) =
+αA(x)tM(x) and kA(x, xk) = αA(x)tCov [M(x), Y (xk)]. We thus get
+kA(x, X)
+=
+αA(x)tCov [M(x), Y (X)] .
+(36)
+Under the linearity assumption, there exists a p × n deterministic matrix Λ(x) such that M(x) = Λ(x)Y (X). Thus
+kA(x, X) = αA(x)tΛ(x)k(X, X). As remarked in Sect. 3, because of the interpolation condition, kA(X, X) =
+k(X, X) and
+kA(x, X)kA(X, X)−1kA(X, x′) = αA(x)tΛ(x)k(X, X)Λ(x′)tαA(x′) .
+(37)
+Using KM(x, x′) = Cov [M(x), M(x′)] = Λ(x)k(X, X)Λ(x′)t, we get
+kA(x, X)kA(X, X)−1kA(X, x′) = αA(x)tKM(x, x′)αA(x′) .
+(38)
+At last, starting from Eq. (11) and using both Eqs (33) and (38), we get Eq. (12).
+Finally, the development of E [(Y (x) −MA(x)) (Y (x′) −MA(x′))] leads to the right hand side of Eq. (12) so that
+E [(Y (x) −MA(x)) (Y (x′) −MA(x′))] = cA(x, x′)
+and Eq. (13) holds.
+23
+
+D
+Proofs in Sect. 3.3
+Proof of Proposition 5. Consider ∆(x) as deﬁned in Eq. (14). From Eq. (36), using both the linear and the inter-
+polation assumptions, we get k(x, X)∆(x) = [k(x, X) −kA(x, X)] k(X, X)−1. Injecting this result in Eq. (14), we
+have
+MA(x) −Mfull(x) = [kA(x, X) −k(x, X)]k(X, X)−1Y (X)
+(39)
+and the ﬁrst equality holds. From (14), we also get vA(x)−vfull(x) = k(x, X)k(X, X)−1k(X, x)−kA(x, X)k(X, X)−1kA(X, x)
+and the second equality holds. Note that under the same assumptions, we can also use kA(X, X) = k(X, X) and
+kA(x, x) = k(x, x) and start from MA = kA(x, X)kA(X, X)−1Y (X) and vA(x) = kA(x, x)−kA(x, X)kA(X, X)−1kA(X, x)
+to get the same results.
+Let us now show Eq. (17). The upper bound comes from the fact that MA(x) is the best linear combination
+of Mk(x) for k ∈{1, . . . , p}. The positivity of vA −vfull can be proved similarly: MA(x) is a linear combination
+of Y (xk), k ∈{1, . . . , n}, whereas Mfull(x) is the best linear combination.
+Notice that vA(x) −vfull(x) ≥0
+implies, using Eq. (15), that ∥kA(X, x)∥K ≤∥k(X, x)∥K. Let us show Eq. (16). We get the result starting from
+Eq. (39), applying Cauchy-Schwartz inequality. The bound on vA(x)−vfull(x) directly derives from Eq. (15), using
+∥kA(X, x)∥K ≤∥k(X, x)∥K.
+Finally, the classical inequality between ∥.∥K and ∥.∥derives from the diagonalization of k(X, X), one can notice
+that it depends on n and X, but it does not depend on the prediction point x.
+Proof of Remark 4. Using ∥kA(X, x)∥K ≤∥k(X, x)∥K, using the equivalence of norms and triangular inequality,
+assuming that the smallest eigenvalue λmin of k(X, X) is non zero, bounds (16) in the previous Proposition 5 implies
+that
+(
+|MA(x) −Mfull(x)|
+≤
+2
+λmin ∥k(X, x)∥∥Y (X)∥,
+|vA(x) −vfull(x)|
+≤
+1
+λmin ∥k(X, x)∥2 .
+(40)
+Noticing that the ∥.∥K and λmin do not depend on x (although they depend on X and n), the result holds.
+Proof of Remark 5. As Λ(x) is n × n and invertible, we have
+kM(x)tKM(x)−1M(x) = k(x, X)tΛ(x)t(Λ(x)k(X, X)Λ(x)t)−1Λ(x)Y (x) = Mfull(x),
+and similarly vA(x) = vfull(x). As MA = Mfull, we have YA = Mfull + ε where ε is an independent copy of
+Y −Mfull. Furthermore Y = Mfull + Y −Mfull where Mfull and Y −Mfull are independent, by Gaussianity, so
+YA
+law
+= Y .
+E
+Proofs in Sect. 5
+Proof of Proposition 8. Because MA,η(x) is the best linear predictor of Y (x), for n ∈N, we have
+E
+h
+(Y (x) −MA,η(x))2i
+≤E
+h
+(Y (x) −Mη,in(x))2i
+.
+(41)
+Let ϵ > 0.
+Let Nn be the number of points in Xin that are at Euclidean distance less than ϵ from x.
+By
+assumption, Nn →∞as n →∞. Let us write these points as xnj1, . . . , xnjNn, with corresponding measurement
+errors ξj1, . . . , ξjNn. Since Mη,in(x) is the best linear unbiased predictor of Y (x) from the elements of Y (xnj1) +
+ξj1, . . . , Y (xnjNn) + ξjNn, we have
+E
+h
+(Y (x) −Mη,in(x))2i
+≤E
+
+
+ 
+Y (x) −1
+Nn
+Nn
+X
+a=1
+(Y (xnja) + ξja)
+!2
+.
+(42)
+By independence of Y and ξX, we obtain
+E
+
+
+ 
+Y (x) −1
+Nn
+Nn
+X
+a=1
+(Y (xnja) + ξja)
+!2
+= E
+
+
+ 
+1
+Nn
+Nn
+X
+a=1
+(Y (x) −Y (xnja))
+!2
++ E
+
+
+ 
+1
+Nn
+Nn
+X
+a=1
+ξja
+!2
+
+≤
+
+max
+a=1,...,Nn E
+
+(Y (x) −Y (xnja))2
++
+PNn
+a=1 ηa
+N 2n
+.
+24
+
+The above inequality follows from Cauchy-Schwarz, the fact that Y has mean zero and the independence of
+ξj1, . . . , ξjNn. We then obtain, since (ηa)a∈N is bounded,
+lim sup
+n→∞E
+
+
+ 
+Y (x) −1
+Nn
+Nn
+X
+a=1
+(Y (xnja) + ξja)
+!2
+≤
+sup
+u∈D
+||u−x||≤ϵ
+E
+
+(Y (x) −Y (u))2
+=
+sup
+u∈D
+||u−x||≤ϵ
+(k(x, x) + k(u, u) −2k(x, u)) .
+From (41) and (42), we have, for any ϵ > 0,
+lim sup
+n→∞E
+h
+(Y (x) −MA,η(x))2i
+≤
+sup
+u∈D
+||u−x||≤ϵ
+(k(x, x) + k(u, u) −2k(x, u)) .
+(43)
+The above display goes to zero as ϵ →0 because k is continuous. Hence the lim sup in (43) is zero, which concludes
+the proof.
+Proof of Lemma 1. Let ϵ > 0. For n ∈N, let Nn be the number of points in {x1, . . . , xn} that are at Euclidean
+distance less than ϵ to x. Because x is in the interior of D and because g > 0 on D, we have pϵ = P(||x1−x|| ≤ϵ) > 0.
+Hence from the law of large number, almost surely, for n large enough, Nn ≥(pϵ/2)n. For each n ∈N, the Nn
+points in {x1, . . . , xn} that are at Euclidean distance less than ϵ to x are partitioned into pn classes. Hence, one of
+these classes, say the class Xin, contains a number of points larger or equal to Nn/pn. Since n/pn goes to inﬁnity
+by assumption, we conclude that the number of points in Xin at distance less than ϵ from x goes to inﬁnity, almost
+surely. This concludes the proof.
+Proof of Proposition 9. The proof is based on the same construction of the triangular array of observation points
+and of the sequence of partitions as in the proof of Proposition 1. We take x as x0 in this proof. Only a few
+comments are needed.
+We let V (δ) be as in the proof of Proposition 1 and we remark that for any δ > 0, for any r ∈N, for any
+Gaussian vector (U1, . . . , Ur) independent of Y and for any u0, u1, . . . , ur ∈D with ||ui −u0|| ≥δ for i = 1, . . . , r,
+we have
+V [Y (u0)|Y (u1) + U1, . . . , Y (ur) + Ur] ≥V [Y (u0)|Y (u1), U1, . . . , Y (ur), Ur] = V [Y (u0)|Y (u1), . . . , Y (ur)] ≥V (δ).
+We also remark that the triangular array and sequence of partitions of the proof of Proposition 1 do satisfy the
+condition of Proposition 8. Indeed, the ﬁrst component X1 of the partition, with cardinality Cn →∞, is dense in
+D.
+We remark that for k = kn + 1, . . . , pn (notations of the proof of Proposition 1), for any row of Xk, of the form
+xnb with b ∈{1, . . . , n}, we have vk(x) ≤V [Y (x)|Y (xnb) + ξb] ≤k(x, x) −k(x, xnb)2/(k(xnb, xnb) + ηb). Hence,
+because (ηi)i∈N is bounded, there is a ﬁxed ϵ′
+2 > 0 such that for k = kn + 1, . . . , pn, ϵ1 ≤vk(x) ≤k(x, x) −ϵ′
+2, with
+ϵ1 as in the proof of Proposition 1.
+With these comments, the arguments of the proof of Proposition 1 lead to the conclusion of Proposition 9.
+Proof of Proposition 10. We can see that MUK,i(x) = wi(x)tZ(Xi) for i = 1, . . . , p. Hence, for i, j = 1, . . . , p,
+Cov [MUK,i(x), MUK,j(x)] = wi(x)tCov [Z(Xi), Z(Xj)] wj(x) = wi(x)tk(Xi, Xj)wj(x).
+Hence, Cov [MUK(x)] = KUK,M(x). Furthermore, for i = 1, . . . , p,
+Cov [MUK,i(x), Z(x)] = wi(x)tCov [Z(Xi), Z(x)] = wi(x)tk(Xi, x).
+Hence, Cov [MUK(x), Z(x)] = kUK,M(x). Let
+α(x) =
+argmin
+γ∈Rp
+E[γtMUK(x)]=E[Z(x)]
+for any value of β in Rm
+E
+h γtMUK(x) −Z(x)
+2i
+.
+(44)
+25
+
+Since E[MUK,i(x)] = E[Z(x)] for i = 1, . . . , p and for any value of β ∈Rm, the constraint in (44) can be written as
+γt1pE[Z(x)] = E[Z(x)] that is γt1p = 1. The mean square prediction error in (44) can be written as
+k(x, x) + γtKUK,M(x)γ −2γtkUK,M(x).
+Thus (44) becomes
+α(x) = argmin
+γ∈Rp
+γt1p=1
+ k(x, x) + γtKUK,M(x)γ −2γtkUK,M(x)
+
+.
+We recognize the optimization problem of ordinary Kriging which corresponds to universal Kriging with an
+unknown constant mean function (Sacks et al. 1989, Chiles and Delﬁner 2009). Hence, we have
+α(x)tMUK(x) = ˆmUK,M(x) + kUK,M(x)tKUK,M(x)−1 (MUK(x) −ˆmUK,M(x)1p) ,
+from for instance Sacks et al. (1989), Chiles and Delﬁner (2009). Hence we have α(x)tMUK(x) = MA,UK(x), the
+best linear predictor described in Proposition 10.
+We can see that MA,UK(x) = αA,UK(x)tMUK(x) and that αA,UK(x) = α(x). Then since E[αA,UK(x)tMUK(x)] =
+Z(x), from Cov [MUK(x)] = KUK,M(x) and from Cov [MUK(x), Z(x)] = kUK,M(x), we obtain
+E
+h
+(MA,UK(x) −Z(x))2i
+= k(x, x) + αA,UK(x)tKUK,M(x)αA,UK(x) −2αA,UK(x)tkUK,M(x).
+This concludes the proof.
+26

@@ -1,0 +1,1337 @@
+Mapping the Vanishing and Transformation of Urban Villages in
+China
+Wenyu Zhanga,b, Yao Tongc, Yiqiu Liua, Rui Caoa,∗
+aThrust of Urban Governance and Design, Society Hub, The Hong Kong University of Science and
+Technology (Guangzhou), Guangzhou, China
+bDepartment of Geography, National University of Singapore, Singapore, Singapore
+cSchool of Architecture, Tsinghua University, Beijing, China
+Abstract
+Urban villages (UVs), informal settlements embedded within China’s urban fabric, have
+undergone widespread demolition and redevelopment in recent decades.
+However, there
+remains a lack of systematic evaluation of whether the demolished land has been effec-
+tively reused, raising concerns about the efficacy and sustainability of current redevelop-
+ment practices. To address the gap, this study proposes a deep learning–based framework
+to monitor the spatiotemporal changes of UVs in China. Specifically, semantic segmenta-
+tion of multi-temporal remote sensing imagery is first used to map evolving UV bound-
+aries, and then post-demolition land use is classified into six categories based on the “re-
+mained–demolished–redeveloped” phase: incomplete demolition, vacant land, construction
+sites, buildings, green spaces, and others. Four representative cities from China’s four eco-
+nomic regions were selected as the study areas, i.e., Guangzhou (East), Zhengzhou (Central),
+Xi’an (West), and Harbin (Northeast). The results indicate: 1) UV redevelopment processes
+were frequently prolonged; 2) redevelopment transitions primarily occurred in peripheral
+areas, whereas urban cores remained relatively stable; and 3) three spatiotemporal trans-
+formation pathways, i.e., synchronized redevelopment, delayed redevelopment, and gradual
+optimization, were revealed. This study highlights the fragmented, complex and nonlinear
+nature of UV redevelopment, underscoring the need for tiered and context-sensitive plan-
+ning strategies. By linking spatial dynamics with the context of redevelopment policies, the
+findings offer valuable empirical insights that support more inclusive, efficient, and sustain-
+∗Corresponding author
+Email address: ruicao@hkust-gz.edu.cn (Rui Cao)
+1
+arXiv:2511.13507v1  [cs.CV]  17 Nov 2025
+
+able urban renewal, while also contributing to a broader global understanding of informal
+settlement transformations.
+Keywords:
+Urban village, Informal settlements, Urban renewal, Land use change, Deep
+learning, Remote sensing
+1. Introduction
+With the rapid acceleration of global urbanization, informal settlements have become a
+critical challenge for sustainable urban development. Known internationally as slums (Li
+et al., 2023), favelas (Carvalho and de Carvalho Cabral, 2021), or shantytowns (Li et al.,
+2018), these areas are typically characterized by informal construction, inadequate infras-
+tructure, and unclear legal status (UN-Habitat, 2004). The United Nations’ Sustainable
+Development Goals (SDG) emphasize the need to improve the living conditions of residents
+in such settlements and promote their integration into formal urban systems (UN-Habitat,
+2023). Achieving this requires accurate mapping of their spatial distribution and temporal
+evolution (Breuer et al., 2024).
+In the context of China’s urbanization, informal settlements are primarily represented
+by urban villages (UVs)—rural enclaves embedded within expanding urban built-up areas
+(Liu et al., 2010; Cao et al., 2025). Rooted in the persistence of collective rural land own-
+ership, UVs have long existed outside formal urban planning and governance frameworks,
+resulting in unregulated growth and inadequate public services (Chen et al., 2022; Tu et al.,
+2024). Combined with high population mobility and fragmented socio-spatial structures,
+these conditions have given rise to persistent informality, functional disorder, and height-
+ened social vulnerability (Cao et al., 2025). Despite these challenges, UVs play a critical role
+in providing affordable housing for migrant workers and low-income groups (Jin et al., 2024),
+making their governance crucial for promoting urban equity, social inclusion, and sustainable
+development.
+Since the early 2000s, large-scale UV redevelopment began in China, primarily through
+demolition and real estate-led reconstruction to enhance land value (Wu and Han, 2025).
+Although this model has yielded short-term economic gains and visual improvements, sys-
+tematic evaluations of post-demolition land-use transformation and utilization efficiency re-
+2
+
+main limited. Moreover, concerns over long-term sustainability, equity, and social inclusion
+have sparked growing criticism of this economically driven model (Li et al., 2021; Chen
+et al., 2023). In recent years, as China’s urbanization enters a phase of stock-based renewal,
+UV redevelopment has not only regained policy attention but also expanded into a nation-
+wide agenda 1. New strategies now prioritize livelihood improvement, moderate demolition,
+and context-sensitive interventions to stabilize the housing market and support sustainable
+transformation (Shen et al., 2021; Ye et al., 2024). However, despite the scope and speed of
+these transformations, a fundamental knowledge gap remains: we still know relatively little
+about what happens to UVs after demolition. Are they swiftly rebuilt into new residential
+or public services? Are they left vacant? These post-demolition trajectories critically affect
+housing equity, spatial efficiency, and redevelopment success, yet they are seldom systemat-
+ically monitored or evaluated. This gap poses urgent challenges for both academic research
+and urban governance, underscoring the need for scalable and evidence-based approaches to
+monitoring UV demolition and redevelopment.
+1.1. Related work in mapping and monitoring urban villages
+Advances in geospatial technologies and artificial intelligence (AI) have enabled the study
+of UVs using multi-source spatiotemporal data (Cao et al., 2023; Yue et al., 2025). Compared
+with traditional land surveys, deep learning methods can extract complex spatial features
+from large-scale remote sensing imagery and support dynamic change detection and analy-
+sis across broad spatial and temporal ranges. Despite these promising developments, cur-
+rent research still faces major challenges: 1) difficulties in developing standardized mapping
+methods, 2) limited efforts in long-term and cross-regional monitoring, and 3) insufficient
+understanding of post-demolition transformation and redevelopment outcomes (Cao et al.,
+2025).
+The first challenge lies in the spatial heterogeneity of UVs and the resulting difficulty in
+developing standardized mapping methods. Accurately mapping the spatial extent and tem-
+poral transformation of UVs is foundational to understanding their evolutionary dynamics
+1The State Council of the People’s Republic of China. (2024, November 15). Policy Support for Urban
+Village Redevelopment Expanded. https://www.gov.cn/lianbo/bumen/202411/content_6987166.htm
+3
+
+and supporting effective redevelopment (Cao et al., 2025). Current UV mapping relies heavily
+on very-high-resolution remote sensing (VHR-RS) imagery (e.g., Google Earth, Gaofen-2),
+often with spatial resolutions below 3 meters, and in some cases reaching sub-meter levels
+(Gao et al., 2024; Chen et al., 2021). To reflect heterogeneity and functional characteristics,
+researchers increasingly incorporate socially sensed data, such as street view imagery, points
+of interest (POIs), mobile phone signals, and shared bike trajectories (Chen et al., 2022; Li
+et al., 2025b; Tu et al., 2024). While these data enrich functional understanding, cross-city
+applications remain hindered by high acquisition costs, inconsistent quality, and the absence
+of standardized data fusion protocols. In addition, the vast geographic span of China gives
+rise to significant regional variations in UV morphology (as illustrated in the study area
+example in Figure 2), further complicating efforts to develop a one-size-fits-all identification
+strategy. Against this backdrop, VHR-RS imagery combined with deep learning has become
+a more feasible and unified pathway for scalable and temporally consistent UV monitoring.
+The second challenge stems from the limited spatiotemporal scope of most existing UV
+studies. Early efforts typically focused on static, single-city mapping of UVs using manual or
+rule-based methods. With the increasing availability of VHR-RS imagery and the evolution
+of deep learning models, recent work has moved toward more automated and scalable ap-
+proaches. Convolutional Neural Networks (CNNs) and Transformer architectures now enable
+end-to-end recognition with enhanced precision (Wei et al., 2015; Pan et al., 2020; Fan et al.,
+2022; Zhang et al., 2024). However, the spatial application of these models has largely re-
+mained concentrated in very limited cities with well-developed data infrastructures, such as
+Shenzhen, Guangzhou, and Beijing (Cao et al., 2025). As methodological systems matured
+and data coverage expanded, only recently have studies begun expanding the study area
+(Chai et al., 2024; Fan et al., 2025; Tu et al., 2024; Li et al., 2025a; Lin et al., 2024). Tem-
+porally, UV mapping is also evolving from single-year snapshots toward dynamic multi-year
+monitoring (Huang et al., 2015; Lin et al., 2024). Despite recent advances, existing stud-
+ies remain limited in short-term and city-specific analyses, lacking systematic examination
+across broader spatial and temporal scales.
+The third challenge is the lack of fine-grained assessments of land use transition and rede-
+velopment efficiency following UV demolition. While earlier study has described general pat-
+4
+
+terns of UV transformation at the district level (Wei et al., 2023), few have interpreted land
+reuse pathways or evaluated actual outcomes at a broader scale. Such detailed assessments
+are technically demanding, as demolition and redevelopment often progress asynchronously,
+producing transitional landscapes with blurred boundaries and mixed-use patterns that are
+difficult to classify (Cao et al., 2025). In addition, inconsistencies in the quality of VHR-RS
+imagery—caused by seasonal variability, uneven lighting, and occlusions from shadows or
+clouds—further complicate analysis (Rolf et al., 2024; Wen et al., 2021).
+To address these challenges, a dynamic monitoring framework is needed to capture the full
+transformation cycle, from demolition to redevelopment, while maintaining both semantic
+clarity and temporal adaptability. In response, this study develops a deep learning framework
+using VHR-RS imagery to map UVs over time and monitor their post-redevelopment land-
+use transitions across regions. Specifically, we train deep learning models on baseline imagery
+and apply it to subsequent years to ensure spatial consistency. The resulting change areas are
+further attributed to functional types using POIs and OpenStreetMap (OSM) data. Without
+requiring multi-temporal training or domain adaptation, this framework achieves a balance
+between spatial accuracy and meaningful functional interpretation. It provides a scalable
+and cost-efficient solution for long-term and cross-region monitoring of UV transformation,
+enabling more informed and adaptive urban planning.
+To reflect regional diversity and
+variations in redevelopment practices, four major cities representing China’s four economic
+divisions are selected: Guangzhou (East), Zhengzhou (Central), Xi’an (West), and Harbin
+(Northeast).
+The main contributions of this study can be summarized as follows:
+• We propose a deep learning-based framework for dynamic mapping and spatiotemporal
+monitoring of UVs, enabling scalable, cross-regional, and long-term monitoring of UV
+transformation;
+• To the best of our knowledge, this is the first study to systematically quantify the
+vanishing and transformation of UVs across multiple Chinese mega-cities, mapping
+their spatial restructuring patterns and revealing redevelopment efficiency;
+• Through a comparative analysis, we identify three distinct post-demolition land-use
+5
+
+transformation patterns: synchronized redevelopment, delayed redevelopment, and
+gradual optimization.
+This typology reveals the fragmented and non-linear nature
+of UV transformation, and offers empirical evidence to inform differentiated planning
+strategies and policy-making for informal settlement governance.
+The remainder of this paper is organized as follows. Section 2 introduces the study area
+and data. Section 3 presents the proposed framework for UV spatiotemporal change analysis.
+Section 4 reports and analyzes the results, offering both qualitative and quantitative insights
+into the spatiotemporal dynamics of UVs. Section 5 discusses research limitations and policy
+implications. Section 6 concludes the paper with the main contributions and findings.
+2. Study area and data
+2.1. Study area
+Rapid urban expansion in China has driven the large-scale emergence and evolution
+of UVs, marked by spatial, functional, and social transformations shaped by diverse so-
+cioeconomic and developmental contexts (Li et al., 2025b). Despite common origins, their
+trajectories diverge notably across regions due to varying structures and strategies. This
+study selects Guangzhou, Zhengzhou, Xi’an, and Harbin as the study areas (see Figure 1),
+based on the following criteria: 1) Representativeness: All four cities are rapidly developing
+provincial capitals with pronounced UV issues, spanning across different city tiers, including
+first-tier, new first-tier, and second-tier; 2) Regional coverage: The selected cities represent
+China’s four major economic regions 2, i.e., East (Guangzhou), Central (Zhengzhou), West
+(Xi’an), and Northeast (Harbin); 3) Diversity: The cities include old industrial cities, trans-
+port hub cities, and emerging urban centers shaped by post-reform development, allowing
+for comparison across different urbanization trajectories; 4) Redevelopment stages: The four
+cities vary in their timing, pace, and intensity of UV redevelopment.
+In delineating the study areas, this research focuses on the core built-up zones of each city
+and further refines the boundaries based on administrative divisions and urban development
+2National Bureau of Statistics of China (2011). Major macro-regional economic divisions. https://www.
+stats.gov.cn/zt_18555/zthd/sjtjr/dejtjkfr/tjkp/202302/t20230216_1909741.htm
+6
+
+Figure 1: Study area. Four cities from China’s four economic divisions are selected, including Guangzhou
+(East), Zhengzhou (Central), Xi’an (West), and Harbin (Northeast). The major ring roads are indicated with
+dashed lines, including the Fourth Ring Road in Zhengzhou, the Xi’an Ring Expressway (G3001, national
+expressway code), and the Harbin Ring Expressway (G1001, national expressway code).
+7
+
+Figure 2: Representative urban village types in the study area. (a) High-density area with blurred bound-
+aries and active commerce; (b) Suburban village with clear edges and traditional structure; (c) Compact,
+independent core-area village with dense commercial activity; (d) Loosely organized settlement with semi-
+urban characteristics. The red boundaries of UVs in the remote sensing imagery are delineated manually.
+(Data source: Baidu Map (as of July 2024))
+contexts. Specifically, Guangzhou’s study area includes the four central districts: Liwan,
+Yuexiu, Haizhu, and Tianhe.
+For Zhengzhou, the area within the Fourth Ring Road is
+selected, encompassing Zhongyuan, Erqi, Jinshui, Guancheng Huizu, and Huiji districts.
+Xi’an and Harbin are defined by their respective ring expressways. Xi’an’s study area includes
+the core urban districts of Beilin, Xincheng, Lianhu, Weiyang, Yanta, and parts of Baqiao,
+while Harbin’s area includes Daoli, Nangang, Daowai, and Xiangfang districts. To further
+contextualize spatial heterogeneity, typical UVs are visually examined using remote sensing
+and street view imagery (see Figure 2), revealing notable differences in spatial boundaries,
+surrounding environments, and building forms.
+2.2. Data sources
+This study integrates multi-source data to analyze the spatial distribution of UVs, land
+use change, and assess the spatial impacts of redevelopment. As summarized in Table 1, the
+data sources include VHR-RS imagery, village name, road network, and POI data. VHR-
+RS imagery from Google Earth (approximately 0.5 m resolution) was used for mapping
+UV boundaries and detecting temporal changes. Imagery years were chosen based on two
+criteria: major redevelopment policy milestones (see Section 5.3) and image availability
+8
+
+Table 1: Overview of datasets.
+Data
+Year (City)
+Source
+Remote sensing
+imagery
+2015, 2019, 2023 (Guangzhou)
+Google Earth
+(approximately
+0.5 m
+resolution)
+2009, 2016, 2022 (Zhengzhou)
+2015, 2019, 2023 (Xi’an)
+2010, 2016, 2022 (Harbin)
+Village name
+2023 (Guangzhou, Xi’an)
+Government
+2022 (Zhengzhou, Harbin)
+Road network
+2019, 2023 (Guangzhou, Xi’an)
+OpenStreetMap
+2016, 2022 (Zhengzhou, Harbin)
+POIs
+2019, 2023 (Guangzhou, Xi’an)
+Amap
+2016, 2022 (Zhengzhou, Harbin)
+and quality. Although remote sensing imagery often contains clouds and building shadows,
+we ensured that the selected images were clear overall and that the affected areas did not
+overlap with UVs, thereby minimizing potential quality issues in subsequent analysis. Two
+time-series spans were constructed: 2015, 2019, and 2023 for Guangzhou and Xi’an (8 years);
+2009/2010, 2016, and 2022 for Zhengzhou and Harbin (13 years). We also used the catalog of
+village names, consolidated from local government public information and field research, to
+assist in the labeling of the training data for deep learning models. Road network data from
+OSM, including highways and urban roads, were employed to delineate study boundaries
+and analyze spatial patterns. Socially sensed data such as POIs has proven valuable for
+attributing functional meaning to land-use transitions (Liu and Biljecki, 2022). In this study,
+POI data from Amap (a.k.a. Gaode Maps), covering commercial, residential, educational,
+medical, and transport categories, support functional classification (Tu et al., 2024; Li et al.,
+2025b).
+Based on the POIs attributes, we constructed a redevelopment classification to
+capture land-use transformation outcomes.
+9
+
+Figure 3: The proposed framework for urban village spatiotemporal change analysis, including three major
+steps: (a) urban village data collection and preprocessing, (b) urban village mapping, (c) spatiotemporal
+change analysis.
+3. Methodology
+This section elaborates on the proposed framework for mapping the dynamic spatial ex-
+tent and land use changes of UVs. As illustrated in Figure 3, it includes three steps: 1)
+Data collection and preprocessing.
+This step integrates multi-source datasets to build a
+high-quality annotated dataset for deep learning model training. 2) UV mapping. Deep
+learning–based semantic segmentation models are applied to multi-temporal remote sens-
+ing imagery, with model optimization and morphological post-processing used to enhance
+boundary precision and temporal consistency. 3) Spatiotemporal change analysis. Based
+on the identified UVs, this step recognizes the land-use types of the demolished UV areas,
+categorizes transformation pathways, and employs spatial statistics to reveal UV evolution
+patterns across the study area. The details of each step are elaborated in the following
+subsections.
+3.1. Urban village data collection and preparation
+10
+
+The foundation of the framework lies in the construction of a high-quality labeled dataset
+that can support robust model training and evaluation. This process began with the careful
+selection of imagery years, where policy relevance, image quality, and sample availability
+were jointly considered. For Xi’an and Guangzhou, imagery from 2019 was selected as it
+represented the mid-stage of redevelopment, when UVs remained abundant and morpholog-
+ically distinct. In Zhengzhou, imagery from 2009 captured the early redevelopment stage
+before widespread clearance, while in Harbin, imagery from 2010 provided the earliest reliable
+baseline prior to large-scale demolition.
+Training samples were labeled after the team established a shared understanding of UV
+characteristics across the four cities through studying and discussing their background and
+typical forms. Once the temporal baseline was determined, candidate UVs were first located
+from geocoded government-published name lists with satellite imagery, then refined using
+street view image data, village boundary maps, and user-contributed place names from
+Amap. Cases with blurred boundaries or complex morphologies were resolved through group
+consensus and, when necessary, validated by field checks. Sampling was distributed across
+subregions (east, west, south, north, central) to capture intra-city variation. Final labeling
+was independently performed by two members with cross-checking, followed by a third-
+member review, with each labeler spending approximately 8–10 person-hours per city.
+Given the inherent spatial autocorrelation and temporal dependency of remote sensing
+data (Karasiak et al., 2022), conventional random sampling often inflates accuracy and un-
+derestimates generalization error (Sun et al., 2023; Rolf et al., 2024). To reduce label leakage
+and mitigate overfitting, we adopted geographical blocking and spatial buffering strategies
+(Ploton et al., 2020). Geographical blocking partitions the study area into non-overlapping
+units and assigns entire units exclusively to training or validation, while spatial buffering
+establishes exclusion zone around validation samples and removes nearby training samples,
+thereby ensuring spatial independence between the two sets (Roberts et al., 2017). In ad-
+dition, validation sites were carefully selected to include diverse UV morphologies, such as
+compact clusters embedded in high-rise districts and fringe settlements adjacent to farmland.
+Finally, imagery was preprocessed into 1024×1024 pixel tiles with 512-pixel overlap to
+11
+
+Table 2: Overview of the training and validation datasets, including the number of image tiles and the total
+UV area covered.
+City
+# Training Image
+# Validation Image
+Sampled UV Area (km²)
+Year
+Guangzhou
+524
+131
+9.77
+2019
+Zhengzhou
+630
+153
+11.68
+2009
+Xi’an
+1026
+257
+19.13
+2019
+Harbin
+821
+197
+15.18
+2010
+enhance sample diversity and segmentation smoothness. As presented in Table 2, the labeled
+dataset was divided into training and validation sets with a ratio of 80:20, with a roughly
+balanced ratio of positive to negative pixels (1:1). To provide a clearer sense of scale, the
+total UV area covered by the training and validation samples in each city is also reported.
+3.2. Urban village mapping based on semantic segmentation
+With the dataset prepared, deep learning-based semantic segmentation models can be
+trained to map UVs across urban areas. To improve generalizability and precision, we com-
+pared three semantic segmentation models widely used for UV mapping across-regions: U-
+Net, DeepLab-v3+, and UV-SAM. These models represent different segmentation strategies
+tailored to the unique challenges posed by UVs, such as irregular boundaries, varying scales,
+and heterogeneous forms:
+• U-Net (Ronneberger et al., 2015) adopts a symmetric encoder–decoder architecture
+with skip connections to preserve fine-grained spatial features, making it suitable for
+high-resolution image segmentation tasks;
+• DeepLab-v3+ (Chen et al., 2018) leverages atrous convolution and atrous spatial pyra-
+mid pooling (ASPP) to capture multi-scale contextual information, thereby enhancing
+segmentation robustness in complex environments;
+• UV-SAM (Zhang et al., 2024) integrates the state-of-the-art SegFormer with SAM to
+first produce coarse masks and then refine boundaries via SAM for enhanced accuracy.
+Model training was performed on the labeled dataset, with hyperparameter tuning (e.g.,
+learning rate, batch size, number of epochs) used to optimize convergence and stability.
+12
+
+Training minimized the segmentation loss, while validation performance was assessed using
+standard metrics, including mean Intersection over Union (mIoU), UV-specific IoU (UV-
+IoU), recall (UV-Recall), and precision (UV-Precision). To further evaluate the cross-domain
+generalization capability of each model, we additionally constructed a mixed-city dataset by
+sampling data from the four cities in equal proportions. This dataset was used for both train-
+ing and validation to simulate cross-domain scenarios, and the mean IoU on the validation
+split (Mixed regions-mIoU) served as an indicator of model adaptability across heteroge-
+neous urban environments. As the primary goal was accurate boundary delineation, the
+final model selection was based on performance metrics rather than architectural differences.
+For each city, the best-performing model was applied to multi-temporal imagery to support
+large-scale UV mapping.
+To ensure accurate spatiotemporal change detection analysis, a post-processing pipeline
+was implemented to refine the model outputs. Morphological closing was first applied to fill
+small gaps and enhance boundary continuity, followed by opening operations to eliminate
+noise and smooth object contours (Chen et al., 2022). Next, temporal alignment of UV
+boundaries was conducted by comparing outputs across years with reference maps to main-
+tain geometric consistency and minimize spatial misalignment caused by temporal offsets,
+sensor variation, or model bias. Finally, manual verification was conducted to correct false
+positives and negatives, producing a reliable and consistent UV boundary dataset.
+3.3. Spatiotemporal land use change recognition and analysis
+To investigate the physical transition and functional restructuring pathways of UVs dur-
+ing urban renewal, this study employs a three-stage lifecycle framework comprising Re-
+mained, Demolished, and Redeveloped stages (as shown in Figure 3(c)). Drawing upon the
+“maintain, demolish, and re-purpose" transformation logic proposed by Johnson et al. (2014),
+this study applies a post-classification approach to spatiotemporal change detection, in which
+multi-temporal images are segmented independently and their classification results are com-
+pared at the pixel level to identify changes (Shi et al., 2020). This method incorporates
+UV boundaries confirmed each year, enabling consistent and interpretable tracking of their
+lifecycle transitions across space and time.
+13
+
+The classification primarily relies on UV boundaries extracted from high-resolution re-
+mote sensing imagery captured at three observation periods (T1, T2, and T3). Parcels con-
+sistently identified as UVs throughout all observation years were classified as Remained. In
+contrast, parcels detected in earlier periods (T1 or T2) but absent in the most recent period
+(T3) were categorized as Demolished, with their spatial extents (DBT3) computed as:
+DBT3 = (BT1 ∪BT2) −BT3
+(1)
+where BT1, BT2, BT3 refers to the spatial extent (boundaries) of detected UVs in study year
+T1, T2, T3, respectively. Further, demolished parcels redeveloped into stable urban functions
+by the year T3 are classified as Redeveloped.
+To characterize the nuanced transformations following UV demolition, we further subdi-
+vide the Demolished and Redeveloped stages into six mutually exclusive land-use categories:
+Incomplete demolition, Vacant land, Construction sites, Buildings, Green Spaces, and Oth-
+ers (see Table 3). These land-use categories encompass the entire transformation process
+from transitional to fully functional states, thereby forming an operational and generalizable
+spatiotemporal classification system.
+Specifically, incomplete demolition refers to parcels significantly reduced in size by T3,
+yet not completely cleared. Vacant land and construction sites, typically lacking explicit
+POIs or OSM tags, are identified using spectral and textural features derived from remote
+sensing imagery.
+Vacant land generally displays homogeneous bare surfaces with sparse
+vegetation (Mao et al., 2022), whereas construction sites exhibit irregular reflectance patterns
+accompanied by machinery and temporary structures (Wu et al., 2024a).
+To accurately
+classify these transitional land-use types, we employ a ResNet model (He et al., 2015),
+which is known for its effective extraction of deep image features due to its residual learning
+architecture.
+For redeveloped parcels, semantic assignment is conducted through the integration of
+POIs data and OSM layers. Residential, commercial, or office uses are classified as buildings;
+parks and landscaped areas as green spaces; and roads, plazas, or public infrastructure
+as others.
+Notably, parcels demolished from UVs rarely convert directly into single-use
+categories but often evolve into mixed-use spaces. To ensure accuracy, we implement detailed
+14
+
+spatial clipping for these parcels. In areas with overlapping categories, the classification relies
+on the dominant pixel-based land-use type, supplemented by manual verification to maintain
+spatial exclusivity and semantic consistency.
+Following classification, we quantify the area associated with each land use type and
+develop a transition matrix to examine spatiotemporal dynamics. These metrics reveal how
+clearance and redevelopment processes differ across cities and offer insights into broader
+patterns of land restructuring in post-demolition contexts.
+4. Results and analysis
+4.1. Urban village mapping
+4.1.1. Model performance evaluation
+Table 4 summarizes the segmentation performance of three models across the four cities.
+UV-SAM outperformed its counterparts in Zhengzhou and Harbin, achieving the highest
+mIoU scores of 90.30 and 85.77, respectively. It also recorded superior UV-IoU and UV-
+Precision, reflecting robust delineation of UV boundaries and effective suppression of false
+positives.
+In Xi’an, UV-SAM yielded high precision but slightly lower recall than DeepLab-v3+,
+suggesting reduced sensitivity to fragmented or peripheral UV patterns. In contrast, DeepLab-
+v3+ performed best in Guangzhou, achieving an mIoU of 85.28 and the highest UV-Recall
+(86.01), demonstrating better coverage in densely built environments. U-Net, while showing
+the highest UV-Precision in Harbin (92.00) and Guangzhou (91.14), consistently lagged in
+UV-IoU and recall, indicating its limited ability to capture complete UV extents.
+City-level comparisons further reveal that Zhengzhou exhibited the most balanced per-
+formance across all models, reflecting clear UV boundaries and high-quality training data.
+Harbin also showed strong results, particularly under UV-SAM. Conversely, Xi’an recorded
+the lowest overall accuracy, likely due to image quality, complex urban morphology, or shadow
+interference. In Guangzhou, while recall was high, the model tended to over-predict in dense
+areas, leading to slightly lower precision.
+Notably, models trained on Mixed-Cities datasets consistently underperformed their city-
+specific counterparts, with mIoU scores typically 0.1 to 2.5 points lower. This underscores
+15
+
+current limitations in cross-city generalization and reinforces the necessity of localized train-
+ing strategies when mapping UVs with pronounced morphological diversity (Yu et al., 2025).
+4.1.2. Spatiotemporal dynamics of urban village extent
+Figure 4 illustrates the spatiotemporal dynamics of UV distribution in the study area.
+While all four cities experienced a reduction in total UV area, the pace and magnitude
+of decline varied substantially. In Guangzhou, the UV area decreased only slightly from
+24.59 km² in 2015 to 24.05 km² in 2023. This modest change suggests a gradual and adaptive
+redevelopment strategy that likely aims to minimize disruptions to local communities and
+economic activity. In contrast, Zhengzhou underwent the most substantial transformation.
+The UV area declined from 38.56 km² in 2009 to 6.35 km² in 2016, and further to 1.95 km²
+by 2022. This reduction of over 90 percent within thirteen years indicates a strong emphasis
+on concentrated clearance and extensive spatial restructuring.
+Xi’an and Harbin exhibited distinct temporal patterns. In Xi’an, UV transformation
+progressed slowly in the early stage, with area decreasing from 28.70 km² in 2015 to 27.92 km²
+in 2019. By 2023, however, the area had declined sharply to 14.91 km², representing nearly
+a 50% reduction compared to 2015.
+Harbin, by contrast, experienced more rapid early
+reductions, with UV area shrinking from 32.21 km² in 2010 to 24.79 km² in 2016, followed
+by a slower decrease to 20.06 km² by 2022.
+These results highlight not only the varying pace and extent of UV redevelopment across
+cities, but also prompt a critical question: what types of land use have replaced the demol-
+ished UVs, and to what extent have these areas been reintegrated into the broader urban
+fabric? The following section addresses this issue in detail.
+4.2. Land-use transformation of urban villages
+4.2.1. Overview of land-use changes after urban village demolition
+Demolished and incomplete demolition parcels of UVs were identified through spatial
+differencing of multi-temporal UV boundaries. Redeveloped categories, including buildings,
+green spaces, and others, were determined through the overlay of POIs and OSM data.
+Vacant land and construction sites, as transitional types, were classified using a ResNet18
+16
+
+Figure 4: Spatiotemporal distribution of urban villages in the four cities.
+The results are derived from
+post-processed multi-temporal segmentation. Urban villages are denoted in red, while demolished sites are
+marked with hatching, overlaid on urban administrative boundaries (gray). The total UV area and the
+corresponding demolished area relative to the prior year are indicated below each map.
+17
+
+model trained on 250 manually labeled image patches, achieving F1-scores of 0.94 and 0.88,
+respectively.
+At the city scale, as shown in Figure 5(a), redevelopment trajectories of UVs demon-
+strate strong spatial heterogeneity. In cities with a longer observation window (2009–2022),
+Zhengzhou features high-intensity redevelopment, though many parcels remain underuti-
+lized; Harbin also implemented substantial redevelopment, but its northeastern outskirts
+still contain large vacant zones, indicating delayed spatial stabilization. In contrast, cities
+with shorter timeframes (2015–2023) present distinct strategies: Xi’an concentrated rede-
+velopment along the second and third ring roads, with a high proportion of construction
+land, reflecting synchronized demolition and rebuilding. In contrast, Guangzhou pursued
+small-scale, dispersed redevelopment within the urban core, reflecting an incremental and
+adaptive renewal strategy. Notably, across all four cities, many of the demolished UV sites
+coincide spatially with newly constructed road networks, indicating that clearance activi-
+ties have contributed to the expansion of transport infrastructure and the reconfiguration of
+urban spatial structures, thereby improving inter-neighborhood connectivity.
+Figure 5(b–j) present representative cases of current land uses on previously demolished
+UV sites across the study cities, tracing their respective transformation pathways. Most
+cases exhibit a sequential progression—from incomplete demolition, through vacancy or con-
+struction phases, to eventual redevelopment.
+However, the pace, allocation, and spatial
+configuration of these transformations vary considerably among cities, shaped by differences
+in governance capacity, planning orientation, and market dynamics. In the early stage, some
+sites remain in a state of incomplete demolition. For instance, the Jujiazhuang site in Xi’an
+(Figure 5.b) showed signs of incomplete demolition as early as 2019, yet remained substan-
+tial building remnants by 2023, indicating stalled redevelopment. Fully demolished sites
+generally fall into two transitional categories: vacant and construction sites. Zhangzhai Vil-
+lage in Zhengzhou (Figure 5.c) remained vacant between 2016 and 2022, suggesting delayed
+follow-up investment; in contrast, Xishitou Village in Guangzhou (Figure 5.d) entered the
+construction phase promptly, reflecting a clear development path and high implementation
+efficiency.
+Several sites have been fully transformed into developed urban functions. In Harbin and
+18
+
+Figure 5: Spatial distribution and typical examples of different land use types after demolition of urban
+villages.
+(a) Spatial distribution of land use transitions from demolished UVs, categorized by type and
+overlaid with road networks. (b-j) Representative cases of different transformation types across years.
+19
+
+Xi’an, the Jinse Chengbang Community and Qujiang No. 16 Primary School (Figure 5.e,
+5.f) exemplify conversion into residential and educational spaces. Harbin’s Dongzhi Park
+and Zhengzhou’s Guangjing Green Slope (Figure 5.g, 5.h) highlight the ecological direction
+of land redevelopment. Infrastructural redevelopment is illustrated by the Nongye Elevated
+Road in Zhengzhou and a public parking facility in Xi’an (Figure 5.i, 5.j).
+4.2.2. Quantitative analysis of urban village transformation
+To analyze post-demolition transformations of UVs, we generated land use transition
+maps at the sub-district (Jiedao) level across the four cities (Figure 6). Combining Sankey
+diagrams with 3D bar visualizations, the results reveal notable divergences in redevelopment
+tempo, spatial response, and functional transition pathways.
+20
+
+Table 3: Classification system of the post-redevelopment land use of UVs.
+Transformation
+Phase
+Land Use Type
+Description
+Identification Method
+Remained
+Urban Villages
+UVs continuously identified
+across T1, T2, and T3
+Identified by temporal con-
+sistency of UV boundaries
+Demolished
+Incomplete
+Demoli-
+tion
+UVs with significantly re-
+duced area by T3, indicating
+ongoing but incomplete de-
+molition
+Defined by geometric reduc-
+tion across years (see Equa-
+tion 1)
+Vacant Land
+Cleared land with no re-
+development,
+showing ex-
+posed soil and low vegeta-
+tion
+Classified
+using
+ResNet
+model
+Construction Sites
+Areas under active redevel-
+opment with tower cranes,
+steel structures, and tempo-
+rary facilities
+Classified
+using
+ResNet
+model
+Redeveloped
+Buildings
+Redeveloped buildings used
+for residential, commercial,
+or office purposes
+Assigned based on POIs and
+OSM overlays
+Green Spaces
+Public open space,
+land-
+scaped parks, or ecological
+green land
+Assigned based on POIs and
+OSM overlays
+Others
+Other built-up land, such as
+roads, plazas, public service
+facilities, parking areas, or
+stadiums, etc.
+Assigned based on POIs and
+OSM overlays
+21
+
+Table 4: UV identification performances across datasets and methods. The best results are highlighted in
+bold.
+Dataset
+Method
+mIoU
+UV-IoU
+UV-Recall
+UV-Precision
+Mixed Cities-mIoU
+Guangzhou
+U-Net
+84.76
+76.55
+82.71
+91.14
+83.14
+DeepLab-v3+
+85.28
+77.54
+86.01
+88.73
+84.03
+UV-SAM
+71.11
+71.17
+70.20
+82.95
+71.01
+Zhengzhou
+U-Net
+88.16
+82.99
+91.09
+90.32
+86.26
+DeepLab-v3+
+88.37
+83.33
+91.98
+89.87
+86.51
+UV-SAM
+90.30
+83.96
+90.23
+90.92
+88.34
+Xi’an
+U-Net
+83.03
+72.00
+78.32
+89.93
+81.52
+DeepLab-v3+
+82.86
+71.92
+80.71
+86.84
+82.34
+UV-SAM
+84.07
+73.80
+79.29
+87.02
+83.97
+Harbin
+U-Net
+84.81
+77.97
+83.65
+92.00
+83.30
+DeepLabv3+
+82.55
+76.25
+86.57
+90.24
+81.59
+UV-SAM
+85.77
+79.31
+83.91
+86.36
+83.28
+22
+
+Figure 6: Maps and Sankey diagrams of land use changes following the demolition of urban villages. The 3D bar charts visualize land-use transfor-
+mations at the sub-district level, with bar height representing the area of land use change. The location of each bar corresponds to the centroid of the
+respective sub-district. Note that each city adopts a different vertical scale, as indicated in the legends. Thick black lines in the base maps denote
+major urban ring roads. The Sankey diagrams on the right illustrate the temporal flow of land use transitions, where the initial value corresponds to
+the total urban village area in the baseline year (T1).
+23
+
+Redevelopment Pace. Zhengzhou and Harbin underwent early large-scale demolition,
+reducing the share of UV area to 5.06% and 62.27%, respectively. However, persistently
+high vacancy rates (25.76%, 17.75%) suggest a significant gap between clearance and rede-
+velopment. Xi’an exhibited stronger coupling between demolition and construction, with
+the proportion of UVs dropping to 51.95% and over 20% of land transitioning to building or
+construction use. In contrast, Guangzhou maintained relatively stable share of UV area and
+vacancy rates below 1%, reflecting a restrained, low-intensity approach.
+Spatial Patterns. All cities followed a common pattern of core stability and peripheral
+transformation. Most changes occurred beyond the third ring road. Zhengzhou and Harbin
+developed extensive vacant and construction zones along the urban fringe—indicative of
+inefficient development belts. Xi’an showed coordinated redevelopment along transporta-
+tion corridors, while Guangzhou’s changes were more scattered and localized, with minimal
+disruption to the existing urban fabric.
+Functional Transitions. Cities also diverged in land-use priorities. Xi’an prioritized
+construction, with limited ecological or service-oriented reallocation. Zhengzhou remained
+33.77% of the land for building, while allocating 5.43% to green spaces and 12.52% to other
+infrastructure; 16.26% remained under construction. Harbin increased ecological space but
+showed limited construction momentum. Guangzhou preserved its original land-use pattern,
+indicating the mildest transformation.
+The analysis results and visualizations underscore that UV redevelopment is a prolonged
+and often fragmented process, with few cleared areas achieving stable land use even after
+four to six years—highlighting the delayed spatial stabilization following demolition. This
+pattern reflects the nonlinear and asynchronous nature of UV transformation, where dif-
+ferences in redevelopment pace, spatial configuration, and functional restructuring reveal
+varying capacities for resource absorption, market activation, and policy execution. Particu-
+larly under large-scale demolition scenarios, spatial clearance frequently outpaces land reuse,
+posing challenges for long-term planning efficiency and urban equity.
+24
+
+5. Discussion
+This study was motivated by the lack of systematic and scalable tools to monitor the
+vanishing and transformation of UVs amid China’s shift toward more sustainable and inclu-
+sive urban development. By leveraging multi-temporal satellite imagery and deep learning
+techniques, we developed a framework to identify, quantify, and compare UV redevelopment
+across four mega-cities. This section discusses the methodological reliability, spatial and
+functional transition patterns, and broader policy implications, and proposes directions for
+more socially responsive urban renewal.
+5.1. Accuracy and reliability of the dynamic urban village mapping results
+The generalizability and adaptability of deep learning models remain critical challenges in
+the detection of informal settlements, especially within complex urban environments. This
+study conducted empirical evaluations across four major Chinese mega-cities representing
+different economic regions and urban contexts. Among the three segmentation models tested,
+UV-SAM exhibited superior performance in most cases, although its accuracy was relatively
+lower in Guangzhou. This suggests that current algorithms still face limitations in adapting
+to heterogeneous UV morphologies and spatial textures (Yu et al., 2025).
+Another significant challenge lies in distinguishing UVs from historical and cultural dis-
+tricts, which often share similar spatial characteristics such as high density, low-rise struc-
+tures, and irregular morphology. Figure 7 shows a typical example from the Lianhu Historical
+and Cultural District in Xi’an. Previous studies have noted that models sometimes misclas-
+sify these areas as UVs, and attributed such errors to the limited quality of satellite imagery
+(Zhang et al., 2024). To avoid such misidentification, we excluded all officially designated
+heritage zones based on local government planning boundaries 3 and extensive field verifica-
+tion. This refinement significantly enhanced the semantic consistency and policy relevance
+3Official sources for government-designated heritage boundaries in Guangzhou (https://zfcxjst.gd.
+gov.cn/zwzt/pzts/bhcc/gzjl/content/post_4182807.html), Zhengzhou (https://public.zhengzhou.
+gov.cn/D1102X/234264.jhtml), Xi’an (https://www.shaanxi.gov.cn/zfxxgk/fdzdgknr/zcwj/nszfwj/
+szh/202208/t20220808_2241979_wap.html), and Harbin (http://hlj.people.com.cn/n2/2023/1109/
+c220005-40634116.html).
+25
+
+Figure 7: Example of a government-designated historical and cultural conservation district in Xi’an. (a)
+entrance signage indicating the protected status. The Chinese characters means Lianhu Historical and Cul-
+tural District, Xi’an; (b) a typical alleyway reflecting dense and low-rise urban morphology; (c) satellite
+imagery highlighting the district boundaries (in yellow); and (d) a close-up view revealing compact housing
+structures with irregular layouts. Such districts often resemble urban villages in morphology, posing chal-
+lenges for automatic classification models. (Data source: Street view photographs by the author, June 2024;
+satellite imagery from Google Earth, 2023.)
+of our results. The findings highlight that improving classification accuracy requires not
+only algorithmic refinement, but also a nuanced understanding of the planning semantics
+embedded in local spatial governance.
+Furthermore, although our model did not detect
+large-scale UV demolition in Guangzhou, this should not be interpreted as a lack of urban
+renewal activities. As a national pioneer in incremental regeneration, Guangzhou has pri-
+oritized micro-scale improvements and community-level upgrading over wholesale clearance
+(Liu et al., 2025). These subtle transformations are often difficult to capture through con-
+ventional satellite imagery, indicating the need for future research to integrate additional
+features, such as building height, roof material, and street-level visual data, to better detect
+and interpret fine-grained urban changes.
+To analyze post-demolition redevelopment, we developed a land-use classification schema
+grounded in the degree of utilization rather than conventional functional zoning (Cao et al.,
+2020). Instead of assigning plots to fixed categories such as residential or commercial, we de-
+lineated three progressive stages—remained, demolished, and redeveloped—further divided
+into six subtypes: incomplete demolition, vacant land, construction site, building, green
+26
+
+spaces, and others. This typology enables a more dynamic, process-oriented understanding
+of UV transformation and reflects both physical and functional changes over time.
+Despite its advantages, this classification approach is subject to several uncertainties.
+First, semantic interpretation of land-use types is affected by the cultural and institutional
+contexts of different cities—what appears to be a vacant lot in Xi’an may, in fact, be under
+archaeological protection rather than representing inefficient land use. Second, the classifica-
+tion model relies heavily on publicly available datasets and visual interpretation, which may
+not always reflect real-time land-use transitions. Ambiguities frequently arise in transitional
+zones, such as those between green spaces and construction, or temporary structures and
+permanent buildings, increasing the interpretive burden and classification instability.
+5.2. From vanishing to transformation: a critical phase
+5.2.1. Vanishing: displacement, housing loss, and urban inequality
+The vanishing of UVs is not merely a matter of physical erasure—it is the quiet unraveling
+of deeply rooted communities that once sheltered the city’s most mobile, yet most vulnerable,
+residents. For decades, UVs have provided essential housing for low-income and migrant
+populations in Chinese cities. However, despite their crucial social function, they have often
+been stigmatized due to the complex social issues they are seen to represent (Jin et al., 2024).
+Under the framework of SDG 11, many cities have launched UV redevelopment initia-
+tives. Yet “vanishing” goes beyond demolition, it marks a rupture in housing provision and
+institutional support. Without adequate resettlement and policy safeguards, such clearance
+risks amplifying spatial injustice and social exclusion. In cities like Zhengzhou, redevelop-
+ment has proceeded swiftly and at scale. As detailed in Section 4.2, mass demolitions were
+completed rapidly, yet functional replacements lagged significantly, leaving one-quarter of
+cleared sites vacant. These “urban scars” reflect both inefficient land use and the emergence
+of new social and safety risks (Garvin et al., 2013).
+More critically, the loss of UVs undermines affordable housing stock and disrupts migrant
+residents’ social networks (Lin et al., 2025; Li et al., 2021). Displaced populations are often
+pushed to more peripheral or equally unstable settlements, perpetuating cycles of forced
+relocation and insecure tenure (Ye et al., 2020; Tian et al., 2020). For example, according
+27
+
+to Zhang (2015), Zhengzhou’s demolition of UVs affected approximately 700,000 migrant
+workers. However, the combination of soaring housing prices, a shortage of public rental
+housing, and an increasingly tight rental market forced many migrants to relocate frequently
+4. Some rural migrants were ultimately pushed out of the city altogether. This undermines
+both social equity and labor accessibility. To further capture how these processes were per-
+ceived at the public level, we employed the official Weibo AI Search service 5 to analyze
+discussions on UV demolition in Zhengzhou (details can be found in Supplementary Ap-
+pendix A.1). As one of China’s largest social media platforms with broad penetration across
+user groups, Weibo provides a reliable source for gauging public sentiment (Shi et al., 2022),
+and the AI Search service systematically retrieves and aggregates relevant posts. The results
+indicate that public discourse primarily centered on three themes: (1) the disappearance of
+low-rent housing following the intensive wave of demolitions around 2016; (2) long delays
+in the delivery of resettlement housing, which increased household financial burdens; and
+(3) the recent implementation of “housing voucher resettlement” schemes and the allocation
+of national redevelopment funds, which have sparked debates over insufficient compensa-
+tion, limited housing choices, and extended resettlement cycles. These voices reflect the
+profound impacts of UV demolition on residents’ lives. They also highlight blind spots in
+post-demolition processes, particularly the overlooked spaces that shape resettlement expe-
+riences.
+One critical overlooked aspect concerns the dynamics of informal resettlement sites that
+emerge following UV clearance. These areas, often excluded from formal planning frame-
+works, accommodate displaced migrant tenants and other non-owner residents who previ-
+ously relied on UVs for affordable housing. As they are typically formed outside official relo-
+cation schemes, such spaces play a pivotal role in shaping the lived experiences and spatial
+trajectories of vulnerable populations. Mapping and monitoring these “hidden geographies”
+could offer critical insights for promoting equitable urban development and addressing the
+blind spots of post-demolition resettlement (Gao et al., 2018).
+4Fang.com’s investigative report on Zhengzhou urban village redevelopment (2016). https://fdc.fang.
+com/news/2016-02-18/19684920.htm
+5Weibo AI Search (powered by large language model DeepSeek R1) https://s.weibo.com/aisearch
+28
+
+5.2.2. Transformation: delayed redevelopment and green resilience potential
+The transformation of UVs reflects broader shifts in urban dynamics rather than mere
+technical or logistical challenges. Historically, UVs emerged as a byproduct of China’s rapid
+urban expansion (Cao et al., 2025), bridging gaps between formal planning and actual urban
+growth. However, as many Chinese cities now confront slowing growth or even population
+decline (Zou et al., 2025), the underlying logic driving redevelopment is shifting.
+This transition is particularly evident in cities such as Harbin and Zhengzhou. As dis-
+cussed in Section 4.2.2, although large-scale demolitions have been completed, many cleared
+sites remain either vacant or delayed in prolonged construction processes. In Harbin, va-
+cant land constituted 47% of all cleared UV parcels by 2022—the highest proportion among
+the four cities. This situation reflects broader structural constraints in Northeast China,
+where economic decline and demographic shrinkage have undermined both fiscal capacity
+and market confidence (Tong et al., 2021). In Zhengzhou, aggressive clearance campaigns
+were implemented early, yet limited follow-up planning and weak institutional coordination
+have resulted in widespread underutilization. These cases challenge the conventional as-
+sumption that demolition will naturally lead to timely redevelopment. UVs are increasingly
+suspended between the retreat of expansion-driven planning and the unrealized vision of
+renewal.
+Despite these challenges, the transformation of UVs holds significant spatial potential.
+While some parcels are repurposed for housing, transportation, or utilities, integrating green
+spaces provides a cost-effective and flexible strategy for climate resilience (Zhang et al.,
+2025). Green infrastructure has been shown to mitigate urban heat island effects, improve
+microclimates, and support public health and adaptive capacity (Wu et al., 2024b; Jin and
+Li, 2024). In this study, we classified green spaces as a separate category to quantify its
+proportion among transformed sites. Our findings suggest that several cities are proactively
+expanding ecological networks, signaling a more resilient approach to spatial redevelopment.
+Importantly, many UV areas coincide with zones of heightened climate vulnerability
+(Elmarakby and Elkadi, 2024; Chen et al., 2025). A comparison between identified UVs in
+Xi’an and the mapped distribution of urban heat island intensity and climate inequality (Xu
+et al., 2024) reveals substantial spatial overlap. In addition, inadequate drainage and poor
+29
+
+Figure 8: Timeline of national and local urban village redevelopment policies in China (2002–2024). Full
+policy document references are listed in Supplementary Appendix A.2 by sequence number.
+waste management have made these areas highly susceptible to flooding (Sakijege et al.,
+2012; Chen et al., 2025; Balderas Torres et al., 2020).
+In cases of in-situ upgrading or
+incremental renewal, as opposed to wholesale demolition, strengthening basic infrastructure
+remains essential. Targeted improvements in drainage, green cover, and public space can
+significantly strengthen these communities’ capacity to cope with extreme weather events.
+5.3. Governance evolution and implementation gaps
+As highlighted earlier, UV redevelopment in China is deeply shaped by national and
+local policies that coordinate spatial planning, population resettlement, and infrastructure
+provision. Policy orientations not only guide implementation strategies but also shape the
+governance logics and spatial outcomes across different cities. This section traces the evolu-
+tion of key policies from 2002 to 2024 (as shown in Figure 8), highlighting a trajectory from
+land-driven restructuring toward more holistic approaches emphasizing sustainable urban
+renewal and territorial governance over the two decade’s rapid urbanization in China.
+At the national level, the inclusion of UVs in the official shantytown redevelopment agenda
+30
+
+in 2013 marked a turning point, elevating their governance to a priority issue. Since 2021,
+the policy direction shifted from large-scale demolition and reconstruction to urban renewal.
+This new approach emphasizes preservation, improvement, and organic transformation. In
+2023 and beyond, the central government further clarified the spatial scope and distribution
+of UVs. It also expanded the renovation target to more than 300 prefecture-level cities,
+marking a new phase of area-wide UV governance.
+At the city level, the policy shifts of UV redevelopment varied considerably across cities,
+and their implementation trajectories vary considerably. Guangzhou was among the earliest
+cities to prioritize the urban renewal of UVs, upgrading the “Three-Old” redevelopment
+strategy (targeting old towns, villages, and factories) to urban renewal in 2015. Between
+2015 and 2023, the spatial patterns of Guangzhou’s UVs remained relatively stable. In 2024,
+the city enacted the Regulations on UVs Renovation, institutionalizing its micro-renewal
+strategy through a formal legal framework. In contrast, Zhengzhou pursued a high-intensity
+clearance model.
+In 2016, Zhengzhou announced plans for the large-scale demolition of
+approximately 350 UVs, but by 2022 had shifted toward an urban renewal governance model
+emphasizing the improvement of remaining villages.
+Between 2009 and 2016, the urban
+village area in Zhengzhou declined sharply, followed by a continued decrease from 2016 to
+2022. However, as shown in Sections 4 and 5.2.2, this approach resulted in substantial tracts
+of idle land and delayed functional replacement, undermining resettlement effectiveness. In
+2018, Xi’an set the goal of eliminating all UVs within its expressway ring by 2020, and in 2021
+introduced urban renewal regulations. Between 2019 and 2023, the total area of UVs in Xi’an
+declined substantially. Owing to its distinctive historical legacy as an old industrial base,
+Harbin initiated shantytown redevelopment relatively early. In 2016, it announced plans
+to basically complete the redevelopment of shantytowns, UVs, and dilapidated housing by
+2020, and in 2021 launched targeted renewal projects for key areas. Between 2010 and 2016,
+Harbin’s UVs decreased significantly, with the pace of reduction slowing between 2016 and
+2022.
+Despite continued progress across cities, several implementation challenges remain. First,
+ambitious demolition targets often exceed the actual governance and fiscal capacity of local
+authorities, resulting in stalled or partial completion.
+Second, an overemphasis on land
+31
+
+consolidation, fiscal returns, and development indicators tends to marginalize the needs of
+low-income residents, migrant workers, and other vulnerable groups.
+Current strategies
+often lack differentiated responses in resettlement, housing affordability, and community
+continuity, resulting in growing socio-spatial fragmentation and eroding urban inclusivity.
+5.4. Research limitations and future directions
+This study has several limitations that warrant further improvement. Technically, three
+key challenges remain. First, although the deep learning framework performs well in UV
+boundary mapping, it lacks end-to-end automation, which increases the difficulty in scaling
+the method to broader space and time. Second, while remote sensing captures large-scale
+morphological changes, it fails to reflect fine-grained functional attributes and governance
+details. Integrating additional data sources such as street view imagery could enhance spatial
+resolution and contextual accuracy. Third, no segmentation model proved universally effec-
+tive due to significant morphological variation between northern and southern cities. Scaling
+to national-level monitoring is hindered by high computational demands and extended infer-
+ence times. These issues may introduce errors in UV boundary mapping and post-demolition
+land use classification, yet still offer meaningful insights into broader spatial transformation
+trends. Additionally, the limited availability of VHR-RS imagery prevented full temporal
+alignment across the four study areas, which constrained the consistency of cross-city com-
+parisons. Nonetheless, this constraint also enabled the study to incorporate both long-term
+(13 years) and short-term (8 years) observation windows, offering complementary temporal
+perspectives.
+Despite these limitations, the proposed framework also has potential applications in other
+national contexts with informal settlements such as slums or favelas. While Chinese UVs dif-
+fer in morphology and institutional context, informal settlements worldwide often share key
+physical features in remote sensing imagery, including high density, small roof sizes, irregular
+layouts, and sharp contrasts with surrounding formal areas (Kamalipour and Dovey, 2019).
+Building on these shared characteristics, our technical pipeline integrates multi-temporal
+VHR-RS imagery, OSM and POI data, semantic segmentation models, and post-classification
+land-use analysis, which together offer a relatively low-cost and adaptable approach. In addi-
+32
+
+tion, the lifecycle perspective of “remained, demolished, and redeveloped” provides a broadly
+applicable analytical lens to understand both the vanishing and transformation of informal
+settlements. Admittedly, cross-national applications still face challenges such as variations
+in data availability, differences in the semantic interpretation of land-use transitions, and
+divergent governance contexts. Addressing these challenges requires incorporating locally
+specific data sources, calibrating classification schemes to reflect cultural and functional nu-
+ances, and fostering collaborations with local researchers and practitioners (Kohli et al.,
+2016; Rafieian and Kianfar, 2023). Future research should therefore empirically test and
+refine the framework in diverse Global South contexts to evaluate its robustness, scalability,
+and policy relevance for informal settlement governance.
+From a governance perspective, future efforts should center on three key shifts: systematic
+policy evolution, a deeper understanding of transformation drivers, and tiered intervention
+mechanisms in the Chinese context. Amidst slowing real estate growth (Wang and Tian,
+2024), transitioning from indiscriminate demolition toward socially regenerative approaches
+is imperative. This paradigm shift necessitates balancing spatial optimization with socioeco-
+nomic equity while leveraging urban re-planning opportunities to address demographic shifts
+and climate pressures. A comprehensive understanding of transformation drivers, including
+policy, economic, social, and demographic factors (Gao et al., 2023; Rafieian and Kianfar,
+2023), is essential for designing effective and context-sensitive governance strategies. Future
+work should incorporate quantitative approaches to assess the relative influence of these
+factors across different spatial and institutional contexts. To support targeted action, we
+advocate establishing a tiered classification system based on locational attributes, functional
+typology, cultural significance, and resident demographics to categorize informal settlements
+into demolition-redevelopment, micro-regeneration, and preservation-enhancement. This ap-
+proach clarifies intervention priorities and sequencing, thereby improving policy precision
+and resource allocation.
+These coordinated technical and governance advancements ultimately aim to achieve dual
+objectives: optimizing spatial structures while stabilizing social foundations, thus steering
+urban renewal toward high-quality, sustainable, and human-centered development.
+33
+
+6. Conclusion
+Amidst global efforts to improve informal settlements under the United Nations’ SDG
+11 and China’s renewed emphasis on UV renovation, this study offers a critical and cross-
+regional reflection on UV redevelopment practices in China. It provides valuable insights
+into the transformation patterns and associated land-use changes.
+Specifically, by integrating high-resolution remote sensing imagery with deep learning–based
+segmentation models, we systematically mapped the disappearance and redevelopment of
+UVs nearly fifteen years across four representative cities in China’s major economic regions,
+i.e., Guangzhou (East), Zhengzhou (Central), Xi’an (West), and Harbin (Northeast). The
+analysis identifies three predominant land-use transition pathways following demolition: syn-
+chronized redevelopment, delayed redevelopment, and gradual optimization. Each pattern
+reflects differing spatial strategies and governance capacities. These findings underscore the
+mismatch between demolition cycles and actual land redevelopment, which can lead to spatial
+inefficiencies and increase the risk of social displacement. Furthermore, we have established
+a scalable and transferable framework for monitoring the dynamics of urban informal settle-
+ments through multi-source geospatial data. It also provides planning insights that support
+context-sensitive strategies to balance spatial restructuring with social equity, especially in
+the context of slowing urban expansion and rising demands for sustainable reconstruction.
+Future research can incorporate multi-perspective datasets with higher spatial and tem-
+poral resolution to explore the socioeconomic and environmental impacts of UV redevelop-
+ment. A tiered governance approach can help enhance the effectiveness, resilience, and equity
+of urban renewal. Collectively, these contributions not only inform policy development in
+China but also offer globally relevant knowledge for managing the redevelopment of informal
+settlements.
+Acknowledgments
+This work is supported by the Guangzhou-HKUST(GZ) Joint Funding Program (No.
+2025A03J3639), the Guangdong Provincial Project (No. 2023QN10H717), and the HKUST(GZ)
+Undergraduate Research Program (No. UP2024U027).
+34
+
+Declaration of generative AI and AI-assisted technologies in the writing process
+During the preparation of this work the authors used ChatGPT for language polishing.
+After using this tool, the authors reviewed and edited the content as needed and take full
+responsibility for the content of the publication.
+References
+Balderas Torres, A., Lazaro Vargas, P., Paavola, J., 2020. The systemic and governmental
+agendas in presidential attention to climate change in Mexico 1994–2018. Nature Com-
+munications 11, 455. doi:https://doi.org/10.1038/s41467-019-14048-7.
+Breuer, J.H., Friesen, J., Taubenböck, H., Wurm, M., Pelz, P.F., 2024. The unseen popula-
+tion: Do we underestimate slum dwellers in cities of the global south? Habitat Interna-
+tional 148, 103056. doi:https://doi.org/10.1016/j.habitatint.2024.103056.
+Cao, R., Gao, Q.L., Qiu, G., 2023. Responsible Urban Intelligence: Towards a Research
+Agenda, in: Spatial Data Science Symposium 2023 Short Paper Proceedings. doi:https:
+//doi.org/10.48550/arXiv.2208.04727.
+Cao, R., Tu, W., Chen, D., Zhang, W., 2025. Mapping urban villages in china: Progress
+and challenges. Computers, Environment and Urban Systems 119, 102282. doi:https:
+//doi.org/10.1016/j.compenvurbsys.2025.102282.
+Cao, R., Tu, W., Yang, C., Li, Q., Liu, J., Zhu, J., Zhang, Q., Li, Q., Qiu, G., 2020. Deep
+learning-based remote and social sensing data fusion for urban region function recognition.
+ISPRS Journal of Photogrammetry and Remote Sensing 163, 82–97. doi:https://doi.
+org/10.1016/j.isprsjprs.2020.02.014.
+Carvalho, C., de Carvalho Cabral, D., 2021. Beyond the favelas: an analysis of intraurban
+poverty patterns in brazil. The Professional Geographer 73, 269–281. doi:https://doi.
+org/10.1080/00330124.2020.1844571.
+Chai, Z., Liu, M., Shi, Q., Zhang, Y., Zuo, M., He, D., 2024. Fine-Grained Urban Village
+Extraction by Mask Transformer From High-Resolution Satellite Images in Pearl River
+35
+
+Delta. IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing
+17, 13657–13668. doi:https://doi.org/10.1109/JSTARS.2024.3434487.
+Chen, D., Tu, W., Cao, R., Zhang, Y., He, B., Wang, C., Shi, T., Li, Q., 2022. A hi-
+erarchical approach for fine-grained urban villages recognition fusing remote and social
+sensing data. International Journal of Applied Earth Observation and Geoinformation
+106, 102661. doi:https://doi.org/10.1016/j.jag.2021.102661.
+Chen, L., Lu, C., Yuan, F., Jiang, Z., Wang, L., Zhang, D., Luo, R., Fan, X., Wang, C., 2021.
+UVLens: Urban Village Boundary Identification and Population Estimation Leveraging
+Open Government Data, in: Proceedings of the ACM on Interactive, Mobile, Wearable
+and Ubiquitous Technologies, pp. 57:1–57:26. doi:https://doi.org/10.1145/3463495.
+Chen, L.C., Zhu, Y., Papandreou, G., Schroff, F., Adam, H., 2018. Encoder-decoder with
+atrous separable convolution for semantic image segmentation. URL: https://arxiv.
+org/abs/1802.02611, arXiv:1802.02611.
+Chen, S., Lin, J., Wu, T., Yuan, Z., Cao, W., 2025.
+Assessing flood and waterlogging
+vulnerability and community governance in urban villages in the context of climate change:
+A case study of 89 urban villages in Shanghai. Sustainable Cities and Society 126, 106377.
+doi:https://doi.org/10.1016/j.scs.2025.106377.
+Chen, W., Ye, C., Liu, Y., 2023.
+From the arrival cities to affordable cities in China:
+Seeing through the practices of rural migrants’ participation in Guangzhou’s urban vil-
+lage regeneration. Habitat International 138, 102872. doi:https://doi.org/10.1016/j.
+habitatint.2023.102872.
+Elmarakby, E., Elkadi, H., 2024. Prioritising urban heat island mitigation interventions:
+Mapping a heat risk index. Science of The Total Environment 948, 174927. doi:https:
+//doi.org/10.1016/j.scitotenv.2024.174927.
+Fan, R., Li, F., Han, W., Yan, J., Li, J., Wang, L., 2022. Fine-Scale Urban Informal Settle-
+ments Mapping by Fusing Remote Sensing Images and Building Data via a Transformer-
+36
+
+Based Multimodal Fusion Network. IEEE Transactions on Geoscience and Remote Sensing
+60, 1–16. doi:https://doi.org/10.1109/TGRS.2022.3204345.
+Fan, R., Niu, H., Xu, Z., Chen, J., Feng, R., Wang, L., 2025. Refined Urban Informal Set-
+tlements’ Mapping at Agglomeration Scale With the Guidance of Background Knowledge
+From Easy-Accessed Crowdsourced Geospatial Data. IEEE Transactions on Geoscience
+and Remote Sensing 63, 1–16. doi:https://doi.org/10.1109/TGRS.2025.3527564.
+Gao, Q.L., Li, Q.Q., Yue, Y., Zhuang, Y., Chen, Z.P., Kong, H., 2018. Exploring changes
+in the spatial distribution of the low-to-moderate income group using transit smart card
+data. Computers, Environment and Urban Systems 72, 68–77. doi:https://doi.org/10.
+1016/j.compenvurbsys.2018.02.006.
+Gao, X., Yan, H., Lu, X., Wang, X., Wang, R., 2024. A Novel Approach to Urban Village
+Extraction and Generalization from Digital Line Graphics Using the Computational Ge-
+ometric Method and the Modified Hausdorff Distance. ISPRS International Journal of
+Geo-Information 13, 198. doi:https://doi.org/10.3390/ijgi13060198.
+Gao, Y., Tian, L., Ling, Y., Li, Z., Yan, Y., 2023. From welfarism to entrepreneurialism:
+Impacts of the “shanty-area renovation” scheme on housing prices in china. Habitat Inter-
+national 138, 102875. doi:https://doi.org/10.1016/j.habitatint.2023.102875.
+Garvin, E., Branas, C., Keddem, S., Sellman, J., Cannuscio, C., 2013. More Than Just An
+Eyesore: Local Insights And Solutions on Vacant Land And Urban Health. Journal of
+Urban Health 90, 412–426. doi:https://doi.org/10.1007/s11524-012-9782-7.
+He, K., Zhang, X., Ren, S., Sun, J., 2015. Deep Residual Learning for Image Recognition.
+doi:https://doi.org/10.48550/arXiv.1512.03385.
+Huang, X., Liu, H., Zhang, L., 2015.
+Spatiotemporal Detection and Analysis of Urban
+Villages in Mega City Regions of China Using High-Resolution Remotely Sensed Imagery.
+IEEE Transactions on Geoscience and Remote Sensing 53, 3639–3657. doi:https://doi.
+org/10.1109/TGRS.2014.2380779.
+37
+
+Jin, R., Li, X., 2024. Decoding vibrant neighborhoods: Disparities between formal neighbor-
+hoods and urban villages in eye-level perceptions and physical environment. Sustainable
+Cities and Society 101, 105122. doi:https://doi.org/10.1016/j.scs.2023.105122.
+Jin, R., Xu, Y., Li, X., 2024. Destigmatizing urban villages by examining their attractiveness:
+Quantification evidence from Shenzhen. Habitat International 150, 103120. doi:https:
+//doi.org/10.1016/j.habitatint.2024.103120.
+Johnson, M.P., Hollander, J., Hallulli, A., 2014. Maintain, demolish, re-purpose: Policy
+design for vacant land management using decision models. Cities 40, 151–162. doi:https:
+//doi.org/10.1016/j.cities.2013.05.005.
+Kamalipour, H., Dovey, K., 2019. Mapping the visibility of informal settlements. Habitat
+International 85, 63–75. doi:https://doi.org/10.1016/j.habitatint.2019.01.002.
+Karasiak, N., Dejoux, J.F., Monteil, C., Sheeren, D., 2022.
+Spatial dependence be-
+tween training and test sets:
+another pitfall of classification accuracy assessment in
+remote sensing.
+Machine Learning 111, 2715–2740.
+doi:https://doi.org/10.1007/
+s10994-021-05972-1.
+Kohli, D., Stein, A., Sliuzas, R., 2016. Uncertainty analysis for image interpretations of
+urban slums. Computers, Environment and Urban Systems 60, 37–49. doi:https://doi.
+org/10.1016/j.compenvurbsys.2016.07.010.
+Li, C., Yu, L., Oloo, F., Chimimba, E.G., Kambombe, O., Asamoah, M., Opoku, P.D., Og-
+weno, V.W., Fawcett, D., Hong, J., Deng, X., Gong, P., Wright, J., 2023. Slum and urban
+deprivation in compacted and peri-urban neighborhoods in sub-saharan africa. Sustainable
+Cities and Society 99, 104863. doi:https://doi.org/10.1016/j.scs.2023.104863.
+Li, J., Sun, S., Li, J., 2021.
+The dawn of vulnerable groups: The inclusive reconstruc-
+tion mode and strategies for urban villages in China. Habitat International 110, 102347.
+doi:https://doi.org/10.1016/j.habitatint.2021.102347.
+Li, L., Chen, B., Zou, X., Xing, J., Tao, P., 2025a.
+Uv-mamba: A dcn-enhanced state
+space model for urban village boundary identification in high-resolution remote sensing
+38
+
+images, in: ICASSP 2025 - 2025 IEEE International Conference on Acoustics, Speech
+and Signal Processing (ICASSP), pp. 1–5. doi:https://doi.org/10.1109/ICASSP49660.
+2025.10888896.
+Li, T., Feng, Q., Niu, B., Chen, B., Yan, F., Gong, J., Liu, J., 2025b. Mapping urban
+villages based on point-of-interest data and a deep learning approach. Cities 156, 105549.
+doi:https://doi.org/10.1016/j.cities.2024.105549.
+Li, X., Kleinhans, R., van Ham, M., 2018. Shantytown redevelopment projects: State-led
+redevelopment of declining neighbourhoods under market transition in shenyang, china.
+Cities 73, 106–116. doi:https://doi.org/10.1016/j.cities.2017.10.016.
+Lin, L., Zhou, J., Zhu, Y., 2025. Go with the flow: Residential mobility of internal migrants
+during intensive urban renewal in China. Cities 162, 105953. doi:https://doi.org/10.
+1016/j.cities.2025.105953.
+Lin, Y., Zhang, X., Liu, Y., Han, Z., Liao, Q., Li, Y., 2024.
+Long-term Detection and
+Monitory of Chinese Urban Village Using Satellite Imagery, in:
+Proceedings of the
+Thirty-ThirdInternational Joint Conference on Artificial Intelligence, International Joint
+Conferences on Artificial Intelligence Organization, Jeju, South Korea. pp. 7349–7357.
+doi:https://doi.org/10.24963/ijcai.2024/813.
+Liu, P., Biljecki, F., 2022. A review of spatially-explicit GeoAI applications in Urban Ge-
+ography. International Journal of Applied Earth Observation and Geoinformation 112,
+102936. doi:https://doi.org/10.1016/j.jag.2022.102936.
+Liu, P., Yuan, Q., Xue, Y., 2025. Institutional change logic of governance of left-behind
+households in the urban village reconstruction in guangzhou. Journal of Natural Resources
+40, 249–266. doi:10.31497/zrzyxb.20250116. (in Chinese).
+Liu, Y., He, S., Wu, F., Webster, C., 2010. Urban villages under China’s rapid urbanization:
+Unregulated assets and transitional neighbourhoods. Habitat International 34, 135–144.
+doi:https://doi.org/10.1016/j.habitatint.2009.08.003.
+39
+
+Mao, L., Zheng, Z., Meng, X., Zhou, Y., Zhao, P., Yang, Z., Long, Y., 2022.
+Large-
+scale automatic identification of urban vacant land using semantic segmentation of
+high-resolution remote sensing images.
+Landscape and Urban Planning 222, 104384.
+doi:https://doi.org/10.1016/j.landurbplan.2022.104384.
+Pan, Z., Xu, J., Guo, Y., Hu, Y., Wang, G., 2020. Deep Learning Segmentation and Clas-
+sification for Urban Village Using a Worldview Satellite Image Based on U-Net. Remote
+Sensing 12, 1574. doi:https://doi.org/10.3390/rs12101574.
+Ploton, P., Mortier, F., Réjou-Méchain, M., Barbier, N., Picard, N., Rossi, V., Dormann, C.,
+Cornu, G., Viennois, G., Bayol, N., et al., 2020. Spatial validation reveals poor predictive
+performance of large-scale ecological mapping models. Nature communications 11, 4540.
+doi:https://doi.org/10.1038/s41467-020-18321-y.
+Rafieian, M., Kianfar, A., 2023. Gaps in urban planning: A systematic review of policy-
+making in the informality of urban space. Habitat International 142, 102962. doi:https:
+//doi.org/10.1016/j.habitatint.2023.102962.
+Roberts, D.R., Bahn, V., Ciuti, S., Boyce, M.S., Elith, J., Guillera-Arroita, G., Hauenstein,
+S., Lahoz-Monfort, J.J., Schröder, B., Thuiller, W., et al., 2017. Cross-validation strategies
+for data with temporal, spatial, hierarchical, or phylogenetic structure. Ecography 40,
+913–929. doi:https://doi.org/10.1111/ecog.02881.
+Rolf, E., Klemmer, K., Robinson, C., Kerner, H., 2024. Mission Critical – Satellite Data is
+a Distinct Modality in Machine Learning. doi:https://doi.org/10.48550/arXiv.2402.
+01444.
+Ronneberger, O., Fischer, P., Brox, T., 2015.
+U-net:
+Convolutional networks for
+biomedical image segmentation, in:
+Medical image computing and computer-assisted
+intervention–MICCAI 2015: 18th international conference, Munich, Germany, October
+5-9, 2015, proceedings, part III 18, Springer. pp. 234–241.
+doi:https://doi.org/10.
+1007/978-3-319-24574-4_28.
+40
+
+Sakijege, T., Lupala, J., Sheuya, S., 2012. Flooding, flood risks and coping strategies in
+urban informal residential areas : the case of Keko Machungwa, Dar es Salaam, Tanzania
+: original research. Jamba : Journal of Disaster Risk Studies 4, 1–10. doi:https://doi.
+org/10.4102/jamba.v4i1.46.
+Shen, T., Yao, X., Wen, F., 2021. The urban regeneration engine model: An analytical
+framework and case study of the renewal of old communities.
+Land Use Policy 108,
+105571. doi:https://doi.org/10.1016/j.landusepol.2021.105571.
+Shi, W., Zhang, M., Zhang, R., Chen, S., Zhan, Z., 2020.
+Change detection based on
+artificial intelligence: State-of-the-art and challenges. Remote Sensing 12, 1688. doi:https:
+//doi.org/10.3390/rs12101688.
+Shi, W.Z., Zeng, F., Zhang, A., Tong, C., Shen, X., Liu, Z., Shi, Z., 2022. Online pub-
+lic opinion during the first epidemic wave of covid-19 in china based on weibo data.
+Humanities and Social Sciences Communications 9.
+doi:https://doi.org/10.1057/
+s41599-022-01181-w.
+Sun, K., Hu, Y., Lakhanpal, G., Zhou, R.Z., 2023. Spatial cross-validation for geoai, in:
+Handbook of geospatial artificial intelligence. CRC Press, pp. 201–214.
+Tian, L., Yao, Z., Fan, C., Zhou, L., 2020.
+A systems approach to enabling affordable
+housing for migrants through upgrading chengzhongcun: a case of xiamen. Cities 105,
+102186. doi:https://doi.org/10.1016/j.cities.2018.11.017.
+Tong, Y., Liu, W., Li, C., Zhang, J., Ma, Z., 2021. Understanding patterns and multilevel
+influencing factors of small town shrinkage in Northeast China. Sustainable Cities and
+Society 68, 102811. doi:https://doi.org/10.1016/j.scs.2021.102811.
+Tu, W., Chen, D., Cao, R., Xia, J., Zhang, Y., Li, Q., 2024. Towards SDG 11: Large-
+scale geographic and demographic characterisation of informal settlements fusing remote
+sensing, POI, and open geo-data. ISPRS Journal of Photogrammetry and Remote Sensing
+217, 199–215. doi:https://doi.org/10.1016/j.isprsjprs.2024.08.014.
+41
+
+UN-Habitat, W., 2023.
+Rescuing sdg 11 for a resilient urban planet URL: https://
+unhabitat.org/rescuing-sdg-11-for-a-resilient-urban-planet.
+UN-Habitat,
+2004.
+The
+Challenge
+of
+Slums:
+Global
+Report
+on
+Human
+Settlements
+2003.
+URL:
+https://unhabitat.org/
+the-challenge-of-slums-global-report-on-human-settlements-2003.
+Wang, Y., Tian, L., 2024. Research on the empowerment of social forces for urban village
+renovation in mega cities: From the perspective of spatial governance. Planners 40, 11–17.
+URL: http://www.planners.com.cn/magazine/article/3998.html. (in Chinese).
+Wei, C., Blaschke, T., Taubenböck, H., 2015. Monitoring of “urban villages” in Shenzhen,
+China from high-resolution GF-1 and TerraSAR-X data, in: SAR Image Analysis, Model-
+ing, and Techniques XV, SPIE. pp. 183–190. doi:https://doi.org/10.1117/12.2194877.
+Wei, H., Cao, Y., Qi, W., 2023. The Vanishing and Renewal Landscape of Urban Villages
+Using High-Resolution Remote Sensing: The Case of Haidian District in Beijing. Remote
+Sensing 15, 1835. doi:https://doi.org/10.3390/rs15071835.
+Wen, D., Huang, X., Bovolo, F., Li, J., Ke, X., Zhang, A., Benediktsson, J.A., 2021. Change
+detection from very-high-spatial-resolution optical remote sensing images: Methods, appli-
+cations, and future directions. IEEE Geoscience and Remote Sensing Magazine 9, 68–101.
+doi:https://doi.org/10.1109/MGRS.2021.3063465.
+Wu, T., Sha, T., Yao, X., Hu, J., Ma, Y., Zhang, J., 2024a. Improvement of the YOLO
+Series for Detecting Tower Cranes Based on High-Resolution Remote Sensing Imagery.
+Journal of Geovisualization and Spatial Analysis 9, 8. doi:https://doi.org/10.1007/
+s41651-024-00208-x.
+Wu, Y., Han, F., 2025. Ripples create waves: Assessing the catalytic effects of neighborhood
+micro-regeneration by integrating interpretable machine learning and econometrics. Cities
+161, 105860. doi:https://doi.org/10.1016/j.cities.2025.105860.
+Wu, Z., Zhou, Y., Ren, Y., 2024b. Green space-building integration for Urban Heat Island
+42
+
+mitigation: Insights from Beijing’s fifth ring road district. Sustainable Cities and Society
+116, 105917. doi:https://doi.org/10.1016/j.scs.2024.105917.
+Xu, D., Wang, Y., Zhou, D., Wang, Y., Zhang, Q., Yang, Y., 2024. Influences of urban
+spatial factors on surface urban heat island effect and its spatial heterogeneity: A case
+study of Xi’an. Building and Environment 248, 111072. doi:https://doi.org/10.1016/
+j.buildenv.2023.111072.
+Ye, Y., Tong, D., Li, J., Tian, L., Wang, M., Chen, H., Feng, C., Tian, G., Wang, S.,
+Zhao, W., Li, Z., 2024.
+Modernization with chinese characteristics and urban village
+renovation. City Planning Review 48, 47–52. URL: https://qikan.cqvip.com/Qikan/
+Article/Detail?id=7113657971. (in Chinese).
+Ye, Y., Xu, M., Tian, L., Gao, L., Liu, W., Chen, Y., Wang, J., Wang, S., Yin, Z., 2020.
+Informal development and governance of cities.
+City Planning Review 44, 44–49.
+(in
+Chinese).
+Yu, J., Tu, W., Chen, X., Li, M., Chen, D., Cao, R., Li, Q., 2025.
+Exploring geo-
+transferability of deep neural network by developing comprehensive metrics. Geo-spatial
+Information Science , 1–19doi:https://doi.org/10.1080/10095020.2025.2505551.
+Yue, Y., Yan, G., Lan, T., Cao, R., Gao, Q., Gao, W., Huang, B., Huang, G., Huang, Z.,
+Kan, Z., et al., 2025. Shaping future sustainable cities with ai-powered urban informatics:
+Toward human-ai symbiosis. Computational Urban Science 5, 1–7. doi:https://doi.org/
+10.1007/s43762-025-00190-0.
+Zhang, L., 2015.
+Migrant works in zhengzhou will be displaced due to the demolition
+of nine urban villages. URL: https://news.cnr.cn/native/gd/20151103/t20151103_
+520372114.shtml.
+Zhang, L., Cai, Z., Huang, H., Lu, Z., Zhai, W., Qin, H., Liu, Z., Tang, Y., 2025. Exploring
+the characteristics of “demolition for green” and its impact on urban thermal environ-
+ments: An empirical study of beijing, china. Sustainable Cities and Society 130, 106576.
+doi:https://doi.org/10.1016/j.scs.2025.106576.
+43
+
+Zhang, X., Liu, Y., Lin, Y., Liao, Q., Li, Y., 2024. UV-SAM: Adapting Segment Anything
+Model for Urban Village Identification.
+doi:https://doi.org/10.48550/arXiv.2401.
+08083, arXiv:2401.08083.
+Zou, Y., Zhu, X., Pu, C., 2025. Four decades of population expansion and shrinkage across
+Chinese cities. Environment and Planning B: Urban Analytics and City Science 52, 1271–
+1274. doi:https://doi.org/10.1177/23998083241309154.
+44

@@ -1,0 +1,1953 @@
+1 
+ 
+ 
+A Fractal Perspective on Scale in Geography 
+ 
+Bin Jiang and S. Anders Brandt 
+ 
+Faculty of Engineering and Sustainable Development, Division of GIScience 
+University of Gävle, SE-801 76 Gävle, Sweden 
+Email: bin.jiang@hig.se, sab@hig.se 
+ 
+(Draft: September 2015, Revision: June 2016) 
+ 
+ 
+ 
+Abstract 
+Scale is a fundamental concept that has attracted persistent attention in geography literature over the 
+past several decades. However, it creates enormous confusion and frustration, particularly in the 
+context of geographic information science, because of scale-related issues such as image resolution, 
+and the modifiable areal unit problem (MAUP). This paper argues that the confusion and frustration 
+arise from traditional Euclidean geometric thinking, with which locations, directions, and sizes are 
+considered absolute, and it is now time to revise this conventional thinking. Hence, we review fractal 
+geometry, together with its underlying way of thinking, and compare it to Euclidean geometry. Under 
+the paradigm of Euclidean geometry, everything is measurable, no matter how big or small. However, 
+most geographic features, due to their fractal nature, are essentially unmeasurable or their sizes 
+depend on scale. For example, the length of a coastline, the area of a lake, and the slope of a 
+topographic surface are all scale-dependent. Seen from the perspective of fractal geometry, many 
+scale issues, such as the MAUP, are inevitable. They appear unsolvable, but can be dealt with. To 
+effectively deal with scale-related issues, we present topological and scaling analyses illustrated by 
+street-related concepts such as natural streets, street blocks, and natural cities. We further contend that 
+one of the two spatial properties, spatial heterogeneity is de facto the fractal nature of geographic 
+features, and it should be considered to the first effect among the two, because it is global and 
+universal across all scales, which among the practitioners of geography should receive more attention.  
+ 
+Keywords: Scaling, spatial heterogeneity, conundrum of length, MAUP, topological analysis 
+ 
+ 
+1. Introduction 
+Scale is an important, fundamental concept in geography, yet it has multiple definitions or meanings, 
+some of which seem to be contradictory. Among the various definitions (Lam 2004), map scale is the 
+most commonly used, referring to the ratio of distance on a map to the corresponding distance on the 
+ground. Scale is also closely related to map generalization for selectively representing things on the 
+Earth’s surface on a map and it can refer to the pixel size of an image, i.e. resolution. An image with 
+small pixels has high resolution, while one with big pixels has low resolution. In this regard, scale is 
+synonymous with the level of detail of an image, which is closely related to the notions of scaling up 
+and down (Wu et al. 2006, Kim and Barros 2002) for translating statistical inference and reasoning 
+from one scale to another. Scale is also commonly used to refer to the scope or extent of a study area. 
+A large scale of study area (such as a country), if mapped, implies a small-scale map, whereas a small 
+scale of study area (such as a city), if mapped, implies a large scale map. Obviously, confusion and 
+frustration arise from multiple, seemingly contradictory meanings, and how to translate statistical 
+inferences across scales. On the other hand, the confusion and frustration make scale even more 
+interesting and challenging. In addition to the quantitatively defined scales, there are other 
+qualitatively defined scales, such as micro-, meso- and macro-scales, and local, regional, and global 
+scales. 
+ 
+The concept of scale has generated extensive literature over the past two decades (e.g., Sheppard and 
+McMaster 2004), along with emerging geospatial technologies including geographic information 
+
+2 
+ 
+science and remote sensing (e.g., Tate and Atkinson 2001, Weng 2014). Between 1997 and 2014, 
+Goodchild and his colleagues produced eight publications with scale in the titles, including two books 
+(Quattrochi and Goodchild 1997, Zhang et al. 2014). There are of course numerous other writings in 
+the literature where scale and scale related issues such as the modifiable areal unit problem (MAUP) 
+have been of persistent interest and challenge in geography and in geographic information science in 
+particular. However, previous discussions are usually constrained to Euclidean geometry because all 
+the meanings of scale in geography are about sizes in a ratio, or an absolute value related to 
+geographic features or their representations. As a consequence, the major concern surrounding scale is 
+how it affects geospatial data collection and analysis results with respect to accuracy and reliability. 
+This is understandable because maps are initially produced for depicting and measuring things on the 
+Earth’s surface. Unfortunately, most geographic features are not measurable, or the measurement is 
+scale-dependent because of their fractal nature (Goodchild and Mark 1987, Batty and Longley 1994, 
+Frankhauser 1994, Chen 2011b). For example, the length of a coastline, the area of a lake, and the 
+slope for a topographic surface are all scale-dependent, so they should not be considered absolute. 
+Unfortunately, to a large extent our fundamental thinking on scale issues so far has been based on 
+Euclidean geometry. 
+ 
+Scale in fractal geometry (Mandelbrot 1982), as well as in biology and physics (Bonner 2006, Jungers 
+1984, Bak 1996), is primarily defined in a manner in which a series of scales are related to each other 
+in a scaling hierarchy. For example, a coastline is a set of recursively defined bends, forming the 
+scaling hierarchy of far more small bends than large ones (Jiang et al. 2013). Therefore, a new 
+definition of fractal could explicitly be based on the notion of far more small things than large ones 
+(Jiang and Yin 2014, Jiang 2015a), in analogy with Christaller’s (1933) central place theory (cf. Chen, 
+2011a) where there are many small villages but few large cities. Another definition of scale is simply 
+the measuring scale, ranging from smallest to largest, to measure both Euclidean and fractal shapes. 
+This measuring scale, from an individual rather than a series point of view, is equivalent to image 
+resolution or map scale. This measuring scale makes many geographers believe fractal geometry can 
+be a useful technique for dealing with scale issues. However, this view of fractal geometry is dubious. 
+Fractal geometry is not just a technique but could also offer a new paradigm or new worldview that 
+enables us to see surrounding things differently. Fractal geometry is a science of scale because it 
+involves the universal scaling pattern across all scales from smallest to largest. On the contrary, 
+geography dominated by traditional Euclidean geometry focuses on a few scales for measuring 
+individual sizes. 
+ 
+This paper aims to advocate fractal thinking as a way to effectively deal with scale issues in 
+geography and geospatial analysis. We think that mainstream views on scale of practitioners in 
+geography, as briefly reviewed above, are not in line with the same concept in other sciences such as 
+physics, biology and mathematics. In spite of the fact that fractal geometry has been intensively 
+studied in geography (Goodchild and Mark 1987, Frankhauser 1994, Batty and Longley 1994, Chen 
+2011b), the fundamental way of thinking of most geographers while dealing with scale issues is still 
+Euclidean. This situation still exists more than forty years after fractal geometry was established. On 
+the other hand, this situation is understandable, because, with the development of geospatial 
+technology, measurement with high accuracy and precision has been a major concern. To measure 
+things, we need Euclidean geometry, whereas to develop new insights into structure and dynamics of 
+geographic features, we need fractal geometry.  
+ 
+Section 2 introduces fractal geometry, in particular the underlying way of thinking, and put it in 
+comparison with the Euclidean counterparts. Based on fractal geometry or fractal thinking, Section 3 
+presents several fallacies or scale related issues in geography, such as the conundrum of length and 
+MAUP. To avoid these scale related issues, Section 4 illustrates street-based topological and scaling 
+analyses that enable us to see the underlying scaling patterns. Finally Section 5 discusses two spatial 
+properties that are closely related to the notion of scale, and summaries our major points towards the 
+fractal perspective on scale. 
+ 
+ 
+
+ 
+2. Fract
+Euclidea
+with the
+snowflak
+ones. In 
+two geom
+ 
+2.1 Koc
+The Koc
+1904. If
+middle t
+iteration
+of divisi
+recursiv
+forever, 
+similarit
+smaller 
+64/27, …
+meaning
+1/27, …
+also a se
+the curv
+recursiv
+16 + 64)
+head is t
+get head
+segment
+segment
+segment
+  
+(Note
+color cu
+same as
+through
+or
+ 
+tal geometry
+an geometry 
+eir locations, 
+kes and coas
+this section,
+metries, and 
+h curve vers
+ch curve is o
+f we have a 
+third by two 
+n 1 (or gener
+ion and repla
+ely, a curve 
+leading to 
+ty or scaling
+and smaller 
+…), eventua
+gs of scale i
+) is a series. 
+eries. It is es
+ve of 64 seg
+e perspective
+). If the head
+the green cu
+d 2 and then
+ts of 1/3; th
+ts of 1/27; a
+ts of 1/27, an
+Figure
+e: The black 
+urves are in 
+s the black cu
+h which all th
+r fractal geom
+visualiza
+y and the un
+is all about 
+directions, a
+stlines, with 
+, a line segm
+the two diff
+sus line segm
+ne of the firs
+line segmen
+sides of an 
+rator). For ea
+acement is r
+of 64 segme
+what is com
+g ratio of 1/3
+(1/3, 1/9, 1
+ally having a
+in fractal geo
+The second 
+ssential to ta
+gments as a 
+e, while the 
+d/tail breaks 
+urve (head 1 
+n 3. In other 
+e green curv
+and the blue
+nd 64 segmen
+e 1: (Color o
+curves are se
+a recursive v
+urve at iterat
+he subsequen
+metric perspe
+ation tool for 
+nderlying wa
+regular shap
+and sizes, wh
+the underly
+ment and the K
+ferent underly
+ment 
+st fractals, in
+nt of one uni
+equilateral tr
+ach of the fo
+epeated, lead
+nts at iteratio
+mmonly kno
+3. What is in
+1/27, …), the
+an infinite l
+ometry can 
+is that any cu
+ke a recursiv
+whole, the b
+blue curve d
+classification
+in Figure 1)
+words, the o
+ve contains 
+ curve conta
+nts of 1/81. 
+nline) Gener
+een in a non-
+view or fracta
+tion 3, but th
+nt heads show
+ective is base
+data with a h
+3 
+ay of thinkin
+pes, such as l
+hereas fractal
+ying scaling 
+Koch curve a
+ying ways of
+nvented by th
+it (or initiato
+riangle, the p
+our segments
+ding to a cur
+on 3 (Figure 
+own as the K
+nteresting is
+e resulting c
+length. From
+be seen. Th
+urve contain
+ve perspectiv
+black curve 
+denotes a recu
+n method (Ji
+). By recursi
+orange curve
+one segmen
+ains one seg
+ration and de
+-recursive vi
+al geometric
+he blue one is
+wn in color a
+ed on head/ta
+heavy-tailed
+ng 
+line segment
+l geometry d
+property of 
+are used as w
+f thinking. 
+he Swedish m
+or), divide it 
+process resul
+s, which is ca
+rve of 16 seg
+1). Theoreti
+Koch curve,
+s that as the 
+curve becom
+m the examp
+he first is tha
+ning far more
+ve to clearly
+at iteration 
+ursive versio
+iang 2013) is
+vely applyin
+e contains on
+nt of one uni
+gment of one
+ecomposition
+ew or Euclid
+c view. For ex
+s seen from t
+are embedde
+ail breaks – a
+distribution 
+s, rectangles
+eals with irre
+far more sm
+working exam
+mathematicia
+into three th
+lts in a curve
+alled generat
+gments at ite
+cally, the sam
+, which is s
+scale (or th
+mes longer an
+ple of the K
+at the measu
+e short segme
+see the seco
+3 in Figure 
+on with 85 se
+s applied on 
+ng head/tail b
+ne segment o
+it, four segm
+e unit, four 
+n of the Koch
+dean geometr
+xample, the b
+he fractal ge
+d in the blue
+a classificatio
+(Jiang 2013
+s and circles,
+egular shape
+mall things th
+mples to illu
+an Helge von
+hirds and rep
+e of four seg
+tor, the same
+eration 2, an
+me process c
+self-similar, 
+he line segm
+nd longer (4
+Koch curve, 
+uring scale (
+ents than lon
+ond meaning
+e 1 represent
+egments (i.e.
+the 85 segm
+breaks on he
+of one unit, 
+ments of 1/3
+segments of
+ 
+h curve 
+ric view, wh
+blue curve lo
+eometric pers
+e one. This re
+on scheme a
+, 2015a).)  
+ together 
+es such as 
+han large 
+strate the 
+n Koch in 
+place the 
+gments at 
+e process 
+nd further 
+can go on 
+with the 
+ment) gets 
+4/3, 16/9, 
+the two 
+(1/3, 1/9, 
+ng ones is 
+g. Taking 
+ts a non-
+., 1 + 4 + 
+ments, the 
+ead 1, we 
+and four 
+3, and 16 
+f 1/3, 16 
+ile the 
+ooks the 
+spective, 
+ecursive 
+and 
+
+4 
+ 
+In the course of generating the Koch curve, the initial segment of one unit is a simple regular shape. 
+The Koch curve, on the other hand, looks complex, although the generation involves the simple 
+repetition of division and replacement. First, the Koch curve is irregular and much more complex than 
+the initial segment. Second, the Koch curve has an infinite length. Under the Euclidean geometry 
+framework, anything is measurable, no matter how big or small. Why the Koch curve has an infinite 
+length puzzled mathematicians for more than 100 years, until Mandelbrot (1967) solved the mystery. 
+Geographic features such as coastlines bear the same property of the Koch curve. The length of a 
+coastline is unmeasurable, or specifically, it is scale-dependent. In this way, the Koch curve and a 
+coastline are essentially the same in terms of scale dependence. However, a coastline belongs to a 
+statistical fractal with a limited scaling range, while the Koch curve is a strict fractal with an infinite 
+scaling range. Therefore, fractal geometry offers a new worldview for viewing surrounding things 
+such as trees, coastlines, and mountains.  
+ 
+2.2 Fractal and Euclidean thinking 
+Besides that Euclidean geometry considers regular simple shapes, and fractal geometry irregular 
+complex shapes, there are more profound facets in how the two geometries differ (Mandelbrot and 
+Hudson 2004) (Table 1). Euclidean geometry focuses on pieces or parts, while fractal geometry 
+focuses on the whole. Euclidean geometry looks at individuals, while fractal geometry looks at 
+patterns. This holistic or pattern view of fractal geometry implies a recursive view of seeing 
+surrounding things. The Koch curve at iteration 3 (Figure 1) is just a Euclidean shape that consists of 
+64 segments of all the same scale of 1/27. Seen from the recursive or fractal geometric perspective, it 
+becomes a fractal shape, involving 85 segments of four different scales with far more short scales than 
+long ones. 
+ 
+Table 1: Comparison of Euclidean and fractal thinking 
+ 
+Euclidean thinking 
+Fractal thinking 
+Regular shapes 
+Irregular shapes 
+Simple 
+Complex 
+Individuals 
+Pattern 
+Parts 
+Whole 
+Non‐recursive 
+Recursive 
+Measurement ( = scale) 
+Scaling ( = scale free) 
+ 
+Hence, fractal geometry offers a way of seeing our surrounding geography differently. Euclidean 
+geometry mainly measures shapes (Euclidean shapes), directions, and sizes. Fractal geometry aims to 
+see underlying scaling. Simply put, Euclidean geometry is used for one particular scale or a few scales, 
+while fractal geometry aims for scale-free or scaling that involves all scales. The term scale-free is 
+synonymous with scaling, literally meaning no characteristic mean for all sizes. This difference is 
+very much like that between Gaussian and Paretian thinking (Jiang 2015b), which refer to more or 
+less similar things (with a characteristic mean), and far more small things than large ones (without a 
+characteristic mean, or scale-free), respectively. For example, a tree is better characterized by all sizes 
+of its branches, or how the branches (scales) form a scaling hierarchy of far more small branches than 
+large ones, rather than only by its height. It is fair to say that both Euclidean and fractal geometries 
+aim to characterize things, but with different means; the former through measurement (at one scale), 
+and the latter through scaling (across all scales). However, without individual Euclidean shapes, there 
+would be no fractal pattern. It is scale that bridges individual Euclidean shapes and a fractal pattern. 
+Without scale, there would be no fractal geometry. Scale plays the same important role in geography 
+as in fractal geometry as a science of scale. 
+ 
+Fractal geometry is not just limited to patterns. It can also be applied to a set. For example, the set of 
+numbers, 1, 1/2, 1/3, 1/4, …, 1/1000, constitutes a fractal because there are far more small numbers 
+than large ones within the set, based on the definition of fractal using head/tail breaks classification 
+method (Jiang and Yin 2014, Jiang 2015a). The 1,000 numbers are created by following Zipf’s Law 
+
+ 
+(Zipf 19
+a great e
+pattern. 
+thinking
+pattern o
+ 
+ 
+3. Fallac
+Geograp
+Batty an
+for the p
+Because
+absolute
+for a to
+coastline
+lack of a
+people o
+fallacies
+results a
+ 
+3.1 Coa
+The leng
+the meas
+coastline
+of length
+long tim
+measure
+fractal n
+length an
+ 
+(Note
+slope o
+c). Th
+26.9, an
+d), th
+ 
+949); the first
+extent a frac
+Therefore, 
+g (McKelvey
+of far more s
+cies of scale 
+phic features
+nd Longley 1
+purpose of m
+e of this assu
+e. This is a co
+pographic su
+e. The same 
+a tangent lin
+often treat t
+s commonly 
+across scales.
+st length, isl
+gth of a line
+surement dep
+e length tend
+h, also comm
+me. Geograp
+e geographic 
+nature of ge
+nd further de
+Figure 2
+: The length 
+of the surface
+e five slope 
+nd 26.9–40.9
+he slopes loo
+t number is 
+ctal pattern i
+at the funda
+y and Andria
+small things t
+in geograph
+s, both natur
+994, Chen 2
+measurement
+umption, geog
+ommon falla
+urface is co
+is true for a 
+ne or plane i
+these measu
+seen in geog
+. 
+land area, a
+ear geograph
+pends on ma
+ds to increase
+monly known
+hers attempt
+features on 
+eographic fea
+eveloped frac
+2: (Color onl
+of the coastl
+e change with
+classes betw
+ degrees. De
+ok very differ
+1, the second
+is more a st
+amental base
+ani 2005, Jia
+than large on
+hy 
+ral and manm
+2011b, Jiang 
+, we have to
+graphic featu
+cy in geogra
+mputable. H
+topographic 
+mplies that c
+urements as 
+graphy on the
+and surface s
+ic feature su
+ap scale or im
+e exponentia
+n as paradox
+ted to solve
+maps. Howe
+atures. Mand
+ctal geometry
+line) Illustrat
+line changes 
+h boxes and 
+ween blue and
+erived for the
+rent with diff
+higher
+5 
+d is just 1/2, 
+tatistical patt
+e, fractal th
+ang 2015b) b
+nes. 
+made, are fr
+2015a), altho
+o assume geo
+ures are cons
+aphy. In addi
+However, a t
+surface devo
+curve length
+something 
+e sizes of geo
+slope 
+uch as a coas
+mage resoluti
+ally at the sa
+x of length (
+e this proble
+ever, the pro
+delbrot (198
+y.  
+tion of how m
+ with yardsti
+digital eleva
+d red are resp
+e same area b
+ferent resolu
+r-resolution D
+the third nu
+tern that mee
+hinking is no
+because both
+ractal in nat
+ough within 
+ographic feat
+sidered meas
+tion, it is com
+tangent cann
+oid of tangen
+hs and surfac
+absolute. In
+ographic feat
+stline is not 
+ion. As map 
+me pace (Ri
+Steinhaus 19
+m (Perkal 1
+oblem is esse
+82) eventual
+measurement
+icks (Panel a
+ation model (
+pectively, 0–
+but with diffe
+utions, such a
+DEMs.) 
+mber is 1/3, 
+ets the scalin
+ot much diff
+h are concer
+ure (Goodch
+a limited sca
+tures as Eucl
+surable, or th
+mmonly con
+not be define
+nt planes (M
+ce slopes are
+n this sectio
+tures and on 
+measurable. 
+scale expone
+chardson 19
+983) puzzled
+966, Nystue
+entially unsol
+ly uncovere
+t changes wi
+a), the area of
+DEM) resolu
+6.8, 6.8–12.4
+erent resoluti
+as more areas
+and so on. H
+ng law than
+fferent from 
+rned with th
+hild and Ma
+aling range. H
+lidean or non
+he measurem
+nsidered that 
+ed at any po
+Mandelbrot 19
+e not measur
+on, we prese
+ translating s
+ To be more
+entially incre
+61). This co
+d scientists fo
+en 1966) in 
+lvable becau
+ed the conun
+ 
+ith scales 
+f the island a
+utions (Pane
+4, 12.4–18.7
+ions of DEM
+s of high slop
+Hence, to 
+n a visual 
+Paretian 
+e scaling 
+ark 1987, 
+However, 
+n-fractal. 
+ment to be 
+the slope 
+oint of a 
+982). The 
+rable, yet 
+ent some 
+statistical 
+e precise, 
+eases, the 
+nundrum 
+or a very 
+order to 
+use of the 
+ndrum of 
+and the 
+ls b and 
+, 18.7–
+Ms (Panel 
+pes in 
+
+ 
+Althoug
+expresse
+exponen
+measurin
+hand and
+common
+us to pre
+across d
+range in
+ 
+The kind
+and lake
+raster ce
+boundar
+asympto
+transform
+areas ca
+and kern
+Panel (c
+theory, 
+different
+surfaces
+light det
+is more 
+between
+resolutio
+depende
+This beh
+this, a se
+where th
+For the f
+and mor
+consider
+ 
+Fig
+ 
+3.2 The 
+Geograp
+containe
+constitut
+cities an
+gh the conun
+ed as such: A
+ntially; see P
+ng yardstick 
+d the change
+nly shown in
+edict the len
+different scal
+n which the si
+d of scale pr
+es. The area 
+ell is marked
+ry. Hence, a
+otically conv
+mable from 
+n have a sim
+nel-density e
+c) in Figure 
+the calcula
+tiable, or w
+s are fractal. 
+tection and r
+or less iden
+n the DEMs.
+on DEM ha
+ent; second, w
+havior can th
+eries of slope
+he total area 
+finest resolut
+re evenly di
+red, the slope
+gure 3: (Colo
+MAUP 
+phic spaces a
+ed in large o
+te the first ad
+nd towns. A p
+ndrum of len
+As measurin
+Panel (a) in 
+k decreases. T
+e of the lengt
+n Richardson
+gth of a coa
+les of maps. 
+imple linear 
+roblem with
+of an island 
+d and its are
+as the imag
+verges to the 
+one scale to
+milar effect o
+stimation ba
+2 further il
+ation of slop
+ith tangent 
+In the figur
+anging from
+ntical (Pane
+ The highes
+s a range o
+with decreas
+hus be direct
+e maps (rang
+of each slop
+tion (or scale
+stributed are
+e-value distri
+or online) Ill
+are usually o
+ones, i.e. far
+dministrative
+problem aris
+ngth is unso
+ng scales dec
+Figure 2, w
+The change o
+th on the oth
+n’s plot (Rich
+stline at diff
+However, s
+relationship
+a coastline 
+depends on 
+a included a
+ge resolution
+true area va
+o another wi
+n some seco
+ased on a set 
+lustrates tha
+pe is based
+planes. How
+re, the differ
+m different fli
+l d in Figur
+t resolution 
+f 5.3 – 22.6
+sing resolutio
+tly linked to 
+ging from 1 t
+pe class is pl
+e), the slope-
+ea-slope curv
+ibution beco
+lustration of 
+organized hie
+r more smal
+e level, follo
+ses when put
+6 
+olvable, it c
+crease expon
+where the len
+of scales (eit
+her meet a lin
+hardson 1961
+ferent scales 
+such a transf
+holds. 
+also applies
+map scale o
+as soon as an
+n increases,
+alue. Because
+ithin the sca
+ond-order me
+of distance p
+ 
+at surface slo
+d on the as
+wever, this a
+rent slope ma
+ight heights.
+re 2), the de
+DEM has a 
+6 degrees. T
+on, the slope
+the fractal n
+to 4 m resol
+lotted agains
+-value distrib
+ve), whereas
+ome less hete
+how scale ch
+ 
+erarchically 
+ll units than
+owed by thou
+tting measure
+an be effect
+nentially, the
+ngth of the B
+ther map sca
+near relation
+1). This simp
+of maps, or 
+formation is 
+s to areal geo
+or image reso
+ny land (or c
+, the size o
+e of its fract
+aling range. T
+easurements,
+parameters. 
+ope depends
+ssumption t
+assumption
+aps are show
+While the el
+erived slope
+range of 0 
+This infers th
+e values tend
+nature of terr
+ution) for an
+st the 1-degr
+bution is the 
+s if only the
+erogeneous. 
+hange can be
+in a nested 
+n large ones.
+usands of cou
+ements into 
+tively dealt 
+e length of 
+British coast
+le or measur
+ship at logar
+ple statistical
+to transform
+only possib
+ographic fea
+olution. In Pa
+country bord
+of the UK 
+tal nature, th
+The scale-de
+ such as den
+s on the reso
+that the top
+is not true 
+wn, represent
+levation rang
+e range is co
+– 40.9 degre
+hat: first, slo
+d to converge
+rain surfaces
+n area are sho
+ree wide slop
+most hetero
+ coarsest res
+e related to ch
+manner in w
+ For examp
+unties, and fu
+different are
+with. It can
+a coastline i
+tline increase
+ring scale) on
+rithm scales, 
+l relationship
+m the coastlin
+ble within th
+atures such a
+anel (b) (Fig
+der line) is w
+decreases a
+he size of an 
+ependent len
+nsity defined 
+olution of D
+pographic su
+because top
+nting DEMs 
+ge for the fou
+onsiderably 
+ees, while th
+ope values a
+e to one sing
+. To further 
+own as a 3D
+pe classes (F
+ogeneous (i.e
+solution (or 
+hange of slop
+which small 
+ple, the 50 U
+further by ma
+eal units for s
+n also be 
+increases 
+es as the 
+n the one 
+which is 
+p enables 
+ne length 
+e scaling 
+as islands 
+gure 2), a 
+within its 
+and then 
+island is 
+ngths and 
+on areas 
+DEMs. In 
+urface is 
+pographic 
+based on 
+ur DEMs 
+different 
+he lowest 
+are scale 
+gle value. 
+illustrate 
+D-surface, 
+Figure 3). 
+. a flatter 
+scale) is 
+ 
+pes 
+units are 
+US states 
+any more 
+statistical 
+
+ 
+analysis
+MAUP p
+and aver
+into larg
+the issue
+in almo
+includin
+how the
+concerne
+This is b
+level to 
+ecologic
+ 
+In theory
+from an
+scale and
+The rate
+zoning e
+effect i
+manipul
+reverse 
+learn ho
+extents (
+flawed, 
+ 
+(Note: T
+For exa
+30 + 4
+ 
+The MA
+are put i
+cannot 
+reliabilit
+each gro
+might b
+groups a
+weeks is
+consecut
+, i.e., the ana
+phenomenon
+rage income,
+ge areal units
+e systematica
+ost every bo
+ng books on 
+e MAUP ha
+ed with how
+because the c
+ an individu
+cal fallacy (R
+y, statistical 
+n aggregated 
+d zoning effe
+e varies from
+effect). The m
+s gerryman
+lating distric
+initial electio
+ow analysis re
+(larger or sm
+especially ac
+Figure 
+The original 
+ample, the fo
+0)/(200 + 10
+AUP also app
+into different
+directly be 
+ty and if the
+oup are likel
+be possible i
+are very hete
+s much hard
+tive hours. 
+alysis results
+n was first d
+, and found t
+s. The term M
+ally, and sin
+ok on spati
+scales (Wu 
+as drawn th
+ to translate 
+crux of the M
+ual level, or
+Robinson 195
+inference an
+scale to an 
+ects of the M
+m one level to
+most accurat
+dering, whi
+cts to create
+on results du
+esults obtain
+maller) of stu
+cross scales o
+4: Illustratio
+data are show
+our percentag
+00 + 500 + 40
+(20 +
+plies to other
+t groups acc
+translated i
+e groups are 
+y to be hom
+in practice. H
+erogeneous. F
+der than betw
+vary from o
+discovered by
+that the corre
+MAUP was l
+ce then the M
+al analysis 
+et al. 2006,
+he attention 
+statistical re
+MAUP lies in
+r from large
+50, King 199
+nd reasoning
+individual o
+MAUP, using
+o another (the
+te indicator i
+ich establish
+e advantage
+ue to the zon
+ned at one sca
+udy areas. H
+of a large gap
+on of the MA
+wn in panels
+ges in the sha
+00), 13% = (
++ 50 + 30 + 2
+r kinds of da
+ording to pe
+into individu
+very homog
+mogeneous, tr
+However, su
+For example
+ween two co
+7 
+one level of u
+y Gehlke an
+elation coeffi
+later coined b
+MAUP has c
+(e.g., Wong
+, Lock and M
+of especial
+sults across d
+n the translati
+e to small 
+97).  
+g cannot be s
+one. For the
+g an example
+e scale effec
+is with the sm
+hes an adva
+eous voting 
+ning effect. I
+ale would ap
+However, suc
+p in the hiera
+AUP using un
+s (a, d), while
+aded cells are
+20 + 10 + 50
+20)/(200 + 3
+ata. Take the
+erformance in
+uals. It mig
+geneous. If th
+ranslation of
+uch a transla
+e, predicting
+onsecutive da
+unit to anothe
+d Biehl (193
+icient increas
+by Openshaw
+created a larg
+g 2004, Foth
+Molyneaux 2
+lly archaeol
+different sca
+ion of statisti
+aggregated 
+simply transl
+sake of sim
+e of simple st
+t), and from 
+mallest unit.
+antage for 
+areas. Gerr
+It is certainl
+pply to other 
+ch a translati
+archy by eith
+nemploymen
+e the derived
+e as follows:
+0 + 60)/(200 
+00 + 100 + 2
+e example of
+n different co
+ght be possi
+he units are 
+f statistical re
+ation across 
+weather con
+ays, which i
+er. This is ca
+34) when the
+ses when the
+w and Taylor
+ge body of l
+heringham a
+2006). These
+ogists and l
+les, namely s
+ical inferenc
+levels, comm
+ated from on
+mplicity, Figu
+tatistic of the
+one configur
+A typical ex
+a particular
+rymandering
+y of general
+scales of ge
+on across sc
+her scaling up
+nt rate as an e
+d percentages
+10% = 20/2
++ 100 + 300
+200).) 
+f a large num
+ourses, wher
+ible only by
+small enoug
+esults from g
+scales is ha
+nditions betw
+is even hard
+alled the MA
+ey studied cr
+e data was ag
+r (1979), wh
+literature and
+and Rogerso
+e books dem
+landscape e
+scaling up an
+ce from an ag
+monly know
+ne level to an
+ure 4 illustra
+e unemploym
+uration to ano
+xample of th
+r political p
+g could dram
+l scientific in
+eospatial data
+cales is deem
+p or down.  
+ 
+example 
+s in panels (b
+200, 8% = (20
+0 + 500), and
+mber of stud
+re the group 
+y sacrificing
+gh, and indiv
+groups to ind
+ardly possib
+ween two con
+der than betw
+AUP. This 
+rime rate 
+ggregated 
+o studied 
+d appears 
+n 2009), 
+monstrate 
+ecologists 
+nd down. 
+ggregated 
+wn as an 
+nother or 
+ates both 
+ment rate. 
+other (the 
+he zoning 
+party by 
+matically 
+nterest to 
+a or other 
+med to be 
+b, c, e, f). 
+0 + 10 + 
+d 15% = 
+ents who 
+behavior 
+g certain 
+viduals in 
+dividuals 
+ble if the 
+nsecutive 
+ween two 
+
+ 
+A comm
+no indiv
+particula
+or down
+For exam
+to the ch
+inferenc
+is indivi
+more ob
+MAUP 
+presents
+ 
+4. Topo
+Euclidea
+uncertain
+thinking
+analysis
+underlyi
+with far
+through 
+scale eff
+ 
+4.1 Natu
+Euclidea
+this view
+individu
+oriented
+computi
+underlyi
+degree o
+details o
+ 
+(Note: T
+segment
+There ar
+(or city b
+into the
+connecti
+constitut
+topologi
+ 
+mon problem
+vidual-based
+ar scale in w
+n, is impossib
+mple, for a c
+hange in sca
+ce only to tha
+idually based
+bjectively de
+is to conduc
+s topological 
+logical and 
+an geometri
+nties, or sca
+g from geom
+. Topologic
+ing scaling p
+r more smal
+some street-
+fects. 
+ural streets 
+an geometry 
+wpoint has 
+ual street seg
+d in terms of
+ing routes an
+ing structure
+of connectivi
+of segments a
+Figure 5: (
+The seven n
+ts, while the
+re far more l
+blocks) than
+ seven node
+ivity. The 25
+te the fictit
+ically far the 
+m is that in so
+d data, and 
+hich data is c
+ble unless th
+curve length,
+ale at logarit
+at particular 
+d and units c
+efined (see S
+ct frame-ind
+and scaling 
+scaling anal
+ic thinking 
+ale effects in
+metric detail
+al thinking 
+pattern of fa
+ll branches t
+-related conc
+has critical 
+not always 
+gments or ju
+f junction lo
+nd distances,
+e. There are 
+ity; in other w
+and junctions
+(Color online
+natural stree
+ one natural
+less-connecte
+ large ones. 
+es and six l
+5 city blocks
+tious country
+blocks are f
+ome research
+all data are 
+collected. Tr
+here is a relat
+ there exists
+thmic scales
+scale. The ad
+can be objec
+ection 4). T
+ependent spa
+analyses to e
+lyses to deal
+aimed for 
+n general. T
+ls to topolo
+concentrates
+ar more less
+than big bra
+cepts to elab
+limitations i
+been well r
+unctions. Thi
+ocations and
+, the geomet
+similar segm
+words, a bor
+s to the topol
+e) Illustration
+ts, indicated
+l city is crea
+ed streets tha
+In Panel (c),
+links of the 
+ and the fou
+y as a who
+from the coun
+8 
+h areas such 
+in aggrega
+ranslation of 
+tionship betw
+ such a relat
+s is constant
+dvent of big 
+ctively derive
+Therefore, a g
+atial analysi
+effectively d
+l with scale i
+measuring 
+To effectivel
+ogical relatio
+s on relation
+-connected t
+anches in a 
+borate on top
+in developin
+received. Fo
+is graph rep
+d distances o
+tric represen
+ments in term
+ring structure
+logical struct
+n of concepts
+d by numbe
+ated from the
+an well-conn
+, the seven st
+connectivity
+ur large stree
+ole. The nu
+ntry’s border
+as demograp
+ated formats.
+f the results in
+ween statisti
+tionship, i.e.,
+. If there is 
+data has cha
+ed. One exam
+good solutio
+is (Tobler 19
+eal with scal
+issues 
+things wou
+y deal with 
+onships, and
+nships of th
+things than 
+tree or a riv
+pological and
+ng analytical 
+or example, 
+presentation 
+of street seg
+tation offers
+ms of length
+e. Therefore,
+ture of indiv
+s of natural s
+ers in Panel 
+e 25 city blo
+nected ones, 
+treets and the
+y graph; the
+t blocks (or 
+umbers show
+r, or the bord
+phy and ecol
+. Statistical 
+nto other sca
+cal inference
+, the ratio of 
+no such a re
+anged the situ
+mple of this 
+on to effectiv
+989). Theref
+le issues. 
+uld inevitab
+scale issues
+d from mea
+hings and en
+well-connect
+ver network
+d scaling ana
+insights into
+a street net
+of street net
+ments. Desp
+little analyt
+h or similar j
+, let us shift 
+idual streets.
+streets and a n
+(a), are cre
+ocks, which 
+and far mor
+eir six interse
+e dot sizes s
+field blocks 
+wn in the b
+der number.) 
+logy, there i
+results appl
+ales, either sc
+es and scale 
+f the change 
+relationship, 
+tuation, in wh
+ is how citie
+vely dealing 
+fore, the nex
+bly result in
+s, we must 
+asurement to
+nables us to
+cted ones, in
+k. We exemp
+alyses that ar
+o geospatial 
+twork is a 
+tworks is Eu
+pite its usefu
+tical insights
+junctions in 
+from the geo
+. 
+  
+natural city 
+eated from 
+are red in P
+re small stre
+ections are c
+show the de
+in gray) in P
+blocks indic
+ 
+s usually 
+ly to the 
+caling up 
+changes. 
+in length 
+keep the 
+hich data 
+es can be 
+with the 
+xt section 
+n errors, 
+shift our 
+o scaling 
+o see the 
+n analogy 
+plify this 
+re free of 
+data, but 
+graph of 
+uclidean-
+ulness in 
+s into the 
+terms of 
+ometrical 
+19 street 
+Panel (b). 
+et blocks 
+converted 
+egrees of 
+Panel (b) 
+cate how 
+
+9 
+ 
+So called ‘natural streets’ are created from adjacent street segments with good continuity or with the 
+least deflection angles or with the same names (Jiang et al. 2008, Jiang and Claramunt 2004). These 
+streets are naturally defined and can be a basic unit for spatial analysis through a graph representation, 
+or a connectivity graph, in which the nodes and links represent individual natural streets and their 
+intersections (see Panels (a, c) in Figure 5). This topological representation provides an interesting 
+structure, involving all kinds of streets in terms of both length and degree of connectivity. In other 
+words, interconnected streets behave as fractal when seen from the topological perspective, as there 
+are far more less-connected streets than well-connected ones. Thus, natural streets can be a more 
+meaningful unit than arbitrarily imposed areal units. Natural streets, or their topological 
+representations, suffer less from scale effect because geometric details such as accuracy and precision 
+play a less important role. What matters is relationship. The topological view enables us to see the 
+underlying scaling pattern, where we can assign point-based data into individual natural streets, rather 
+than to any modifiable areal units for spatial analysis. 
+ 
+4.2 Street blocks and natural cities 
+Street blocks also demonstrate the scaling property of far more small things than large ones. The street 
+blocks refer to the minimum rings or cycles, each of which consists of a set of adjacent street 
+segments. Obviously, a country’s street network usually comprises a large amount of street blocks 
+(Jiang and Liu 2012). The street blocks are the smallest unit and are defined from the bottom up, 
+rather than imposed from the top down by authorities. The street blocks are smaller than any 
+administratively or legally imposed geographic units. They can be automatically extracted from all 
+kinds of streets, including pedestrian and cycling paths. It is understandable that the street or city 
+blocks defined by authorities are just a subset of the automatically extracted street blocks. For 
+example, the number of London census output areas, which is the smallest census unit in the UK, is 
+just half that of the street blocks that can be extracted from the OpenStreetMap databases. 
+ 
+Topological analysis of the street blocks begins with defining the border number, which is the 
+topological distance far from the outermost border of a country. The border is not a real country 
+border, but consists of the outermost street segments of the street network. Those blocks adjacent to 
+the border have border number one, and those adjacent to the blocks of border number one have 
+border number two, and so on (see Panel (b) in Figure 5). All the blocks are assigned a border number, 
+indicating how far they are from the outermost border. Interestingly, the block(s) with the highest 
+border number constitutes the topological center of the country (Panel (b) in Figure 5). In the same 
+way, we can take all city blocks as a whole to define the topological center as the city center. The 
+topological center differs from the geometric center, or the central business district that is commonly 
+the city center. 
+ 
+The scaling property of far more small blocks than large ones enables us to define the notion of 
+natural cities emerging from a large amount of heterogeneous street blocks. All the street blocks are 
+inter-related to form a whole. The whole can be broken into the head for those above the mean, and 
+the tail for those below the mean, as shown in the head/tail breaks classification method described in 
+Jiang (2013). Those small street blocks in the tail constitute individual patches called natural cities. 
+See Panel (b) in Figure 5 for an example of a natural city. Natural cities are defined from the bottom 
+up. A large amount of street blocks collectively decides a mean value as a cut off for the city border. 
+The head/tail breaks can recursively continue to derive patches within individual natural cities. In 
+other words, all city blocks within a natural city are considered a whole, and those below the mean 
+value in the tail (high-density clusters) are considered hotspots of the natural city. It is essentially the 
+fractal nature of street structure, or the scaling property of far more small blocks than large ones, that 
+make the natural cities definable. We can assign point-based data into city blocks, or natural cities, 
+rather than any modifiable areal units for spatial analysis. 
+ 
+In summary, as many modifiable areal units are imposed by authorities or images from the top down, 
+such as administrate boundaries, census units, and image pixels, it is inevitable that these units or 
+boundaries are somehow subjective. They were defined mainly during the small-data era for the 
+purpose of administration and management, but are still used in the big-data era. However, objectively 
+
+10 
+ 
+defined units such as natural streets, street blocks, and natural cities should therefore be better 
+alternatives for scientific purposes, and they reflect the new ways of thinking about data analytics in 
+this big data era.  
+ 
+ 
+5. Discussion and summary 
+The concept of scale is closely related to spatial heterogeneity, one of the two fundamental spatial 
+properties. The other property is spatial dependence, or auto-correlation, which has been formulated 
+as the first law of geography: Everything is related to everything else, but near things are more 
+related than distant things (Tobler 1970). The Tobler’s law implies that near and related things are 
+more or less similar. Therefore, spatial variation for near and related things is mild rather than wild in 
+terms of Mandelbrot and Hudson (2004). However, spatial heterogeneity is about far more small 
+things than large ones, or with wild rather than mild variation. The two spatial properties are closely 
+related and can be rephrased as such. There are far more small things than large ones in geographic 
+space – spatial heterogeneity, but near and related things are more or less similar – spatial dependence. 
+In this regard, spatial heterogeneity appears to be the first-order effect being global, while spatial 
+dependence is the second-order effect being local. Therefore spatial heterogeneity provides a larger 
+picture across all scales ranging from smallest to largest, while spatial dependence is a more local 
+pattern.  
+ 
+As a fundamental concept in geography, scale has been a major concern for geospatial data collection 
+and analysis, not only in geography and geographic information science, but also in ecology and 
+archaeology. Although Goodchild and Mark (1987, p. 265) concluded that “fractals should be 
+regarded as a significant change in conventional ways of thinking about spatial forms and as 
+providing new and important norms and standards of spatial phenomena rather than empirically 
+verifiable models”, this paper suggests fractal geometry thinking finally should become a new 
+paradigm, rather than a technique recognized in the current geographic literature. To effectively tackle 
+scale issues in geospatial analysis for better understanding geographic forms and processes, this 
+fractal or recursive perspective is essential. Many people tend to think that a cartographic curve is just 
+a collection of line segments – Euclidean way of thinking, but actually it consists of far more small 
+bends than large ones – fractal way of thinking. After comparing various definitions of scale in 
+geography and cartography, as well as in fractal geometry, we note that the definitions of scale in 
+geography are very much constrained by Euclidean geometry, for measuring geographic features 
+rather than for illustrating the underlying scaling pattern. Most geographic features are inevitably 
+fractal, so their sizes are unmeasurable or scale-dependent. We must be aware of scale effects in 
+measuring geographic features, and that their sizes change as the measuring scale changes. The 
+measurement is a relative indicator, rather than something absolute.  
+ 
+Not only their sizes, but also statistical inferences on geographic features are scale dependent. 
+Statistical reasoning cannot be translated across scales, or from an aggregate scale to individual ones. 
+Given these circumstances, we must adopt fractal thinking for geospatial analysis involving all scales 
+rather than a single scale or a few scales. We must examine if there are far more small things than 
+large ones, rather than measuring individual sizes. We must also determine if, or how, the locations 
+are related, rather than measuring absolute locations. However, unlike their sizes, statistical inferences 
+on geographic features have not been found to hold a simple relationship with scales within a scaling 
+range. This certainly warrants further research in the future. 
+ 
+Acknowledgment 
+XXXXXX 
+ 
+ 
+References: 
+Bak P. (1996), How Nature Works: The science of self-organized criticality, Springer-Verlag: New 
+York. 
+
+11 
+ 
+Batty M. and Longley P. (1994), Fractal Cities: A geometry of form and function, Academic Press: 
+London. 
+Bonner J. T. (2006), Why Size matters: From bacteria to blue whales, Princeton University Press: 
+Princeton, New Jersey. 
+Chen, Y. (2011a), Fractal systems of central places based on intermittency of space-filling, Chaos, 
+Solitons & Fractals, 44(8), 619–632. doi: 10.1016/j.chaos.2011.05.016 
+Chen Y. (2011b), Modeling fractal structure of city-size distributions using correlation functions, 
+PLOS ONE, 6(9): e24791. doi:10.1371/journal.pone.0024791 
+Christaller, W. (1933), Central Places in Southern Germany (trans. C. W. Baskin, 1966). 
+Englewood Cliffs, NJ: Prentice Hall. 
+Fotheringham A. S. and Rogerson P. A. (editors, 2009), The SAGE Handbook of Spatial Analysis, 
+SAGE Publications Ltd: London. 
+Frankhauser P. (1994), La fractalit´e des structures urbaines [The fractals of urban structure], 
+Economica: Paris. 
+Gehlke C. E., and Biehl H. (1934), Certain effects of grouping upon the size of the correlation 
+coefficient in census tract material, Journal of American Statistical Association (Supplement), 
+29, 169-170. 
+Goodchild M. F. and Mark D. M. (1987), The fractal nature of geographic phenomena, Annals of the 
+Association of American Geographers, 77(2), 265-278. 
+Jiang B. (2013), Head/tail breaks: A new classification scheme for data with a heavy-tailed 
+distribution, The Professional Geographer, 65(3), 482 – 494. 
+Jiang B. (2015a), Head/tail breaks for visualization of city structure and dynamics, Cities, 43, 69-77. 
+Reprinted in Capineri C. and Huang H. (editors, 2016), European Handbook on 
+Crowdsourced Geographic Information, Ubiquity Press: London. 
+Jiang B. (2015b), Geospatial analysis requires a different way of thinking: The problem of spatial 
+heterogeneity, GeoJournal, 80(1), 1-13. 
+Jiang B. and Claramunt C. (2004), Topological analysis of urban street networks, Environment and 
+Planning B: Planning and Design, 31(1), 151-162. 
+Jiang B. and Liu X. (2012), Scaling of geographic space from the perspective of city and field blocks 
+and using volunteered geographic information, International Journal of Geographical 
+Information Science, 26(2), 215-229. Reprinted in Akerkar R. (2013, editor), Big Data 
+Computing, Taylor & Francis: London. 
+Jiang B. and Yin J. (2014), Ht-index for quantifying the fractal or scaling structure of geographic 
+features, Annals of the Association of American Geographers, 104(3), 530–541. 
+Jiang B., Liu X. and Jia T. (2013), Scaling of geographic space as a universal rule for map 
+generalization, Annals of the Association of American Geographers, 103(4), 844 – 855. 
+Jiang B., Zhao S., and Yin J. (2008), Self-organized natural roads for predicting traffic flow: a 
+sensitivity study, Journal of Statistical Mechanics: Theory and Experiment, July, P07008. 
+Jungers W. L. (1984), Size and Scaling in Primate Biology, Springer: Berlin. 
+Kim G. and Barros A. P. (2002), Downscaling of remotely sensed soil moisture with a modified 
+fractal interpolation method using contraction mapping and ancillary data, Remote Sensing of 
+Environment, 83(3), 400-413. 
+King G. (1997), A Solution to the Ecological Inference Problem: Reconstructing individual Behavior 
+from Aggregate Data, Princeton University Press: Princeton. 
+Lam N. S. N. (2004), Fractals and scale in environmental assessment and monitoring, In: Sheppard E. 
+and McMaster R. B. (editors, 2004), Scale and Geographic Inquiry, Blackwell Publishing: 
+Oxford, 23–40. 
+Lock G. and Molyneaux B. L. (2006), Confronting Scale in Archaeology: Issues of Theory and 
+Practice, Springer: Berlin. 
+Mandelbrot B. (1967), How long is the coast of Britain? Statistical self-similarity and fractional 
+dimension, Science, 156 (3775), 636–638.  
+Mandelbrot B. (1982), The Fractal Geometry of Nature, W. H. Freeman and Co.: New York. 
+Mandelbrot B. B. and Hudson R. L. (2004), The (Mis)Behavior of Markets: A fractal view of risk, ruin 
+and reward, Basic Books: New York. 
+
+12 
+ 
+McKelvey B. and Andriani (2005), Why Gaussian statistics are mostly wrong for strategic 
+organization, Strategic Organization, 3(2), 219-228. 
+Nystuen J.D. (1966), Effects of boundary shape and the concept of local convexity, Discussion Paper 
+10, Michigan Inter-University Community of Mathematical Geographers, Department of 
+Geography, University of Michigan: Ann Arbor, MI. 
+Openshaw S. and Taylor P. (1979), A million or so correlation coefficients: three experiments on the 
+modifiable area unit problem, In: N. Wrigley (editor, 1979), Statistical Applications in the 
+Spatial Sciences, Pion: London, 127‐144. 
+Perkal J. (1966), On the length of empirical curves, Discussion Paper No. 10, Ann Arbor, Mf: 13 
+Michigan inter-University Community of Mathematical Geographers, translated by W. 
+Jackowski from Julian Perkal, 1958, Dtugosci Krzywych Empirycznych, Zastoswania 
+Matematyki, HL 3-4: 258-283. 
+Quattrochi D. A. and Goodchild M. F. (editors, 1997), Scale in Remote Sensing and GIS, Lewis 
+Publishers: Boca Raton. 
+Richardson L. F. (1961), The problem of contiguity: An appendix to statistic of deadly quarrels, 
+General systems: Yearbook of the Society for the Advancement of General Systems Theory, 
+Society for General Systems Research: Ann Arbor, Mich., 6(139), 139–187. 
+Robinson W. S. (1950), Ecological correlation and the behavior of individuals, American Sociological 
+Review, 15, 351-357. 
+Sheppard E. and McMaster R. B. (editors, 2004), Scale and Geographic Inquiry, Blackwell 
+Publishing: Oxford.  
+Steinhaus H. (1983), Mathematical Snapshots, 3rd edition, Oxford University Press: London. 
+Tate N. and Atkinson P. M. (editors, 2001), Modelling Scale in Geographical Information Science, 
+Wiley: Chichester, UK. 
+Tobler W. R. (1970), A computer movie simulating urban growth in the Detroit region, Economic 
+Geography, 46(2), 234-240. 
+Tobler W. R. (1989), Frame independent spatial analysis, In: M. F. Goodchild and S. Gopal (editors, 
+1989), Accuracy of Spatial Databases, Taylor and Francis: London, 115–122. 
+Weng Q. (editor, 2014), Scale Issues in Remote Sensing, Wiley: New Jersey. 
+Wong D. W. S. (2004), The modifiable areal unit problem (MAUP), in: Janelle D. G., Warf B. and 
+Hansen K. (editors), WorldMinds: Geographical Perspective on 100 Problems, Springer: 
+Berlin, 571-575.  
+Wu J., Jones K. B., Li H., and Loucks O. L. (editors, 2006), Scaling and Uncertainty Analysis in 
+Ecology: Methods and Applications, Springer: Berlin.  
+Zhang J., Atkinson P., and Goodchild M. F. (2014), Scale in Spatial Information and Analysis, CRC 
+Press: Boca Raton. 
+Zipf G. K. (1949), Human Behaviour and the Principles of Least Effort, Addison Wesley: Cambridge, 
+MA. 
+ 

@@ -1,0 +1,916 @@
+DMS, AE, DAA: methods and applications of adaptive time series model
+selection, ensemble, and financial evaluation
+Date: 5 July 2022, Most Recent Version: Click Here
+PARLEY RUOGU YANG, University of Cambridge, UK
+RYAN LUCAS, Massachusetts Institute of Technology, USA
+Fig. 1. The Yield Curve (left) and VIX Curve (right) alongside the price of the S&P 500 index (centre) during the pandemic-induced market contraction of 2020.
+Inversions in these curves preceded the collapse of the index
+Abstract
+We introduce three adaptive time series learning methods, called Dynamic
+Model Selection (DMS), Adaptive Ensemble (AE), and Dynamic Asset Alloca-
+tion (DAA). The methods respectively handle model selection, ensembling,
+and contextual evaluation in financial time series. Empirically, we use the
+methods to forecast the returns of four key indices in the US market, incor-
+porating information from the VIX and Yield curves. We present financial
+applications of the learning results, including fully-automated portfolios and
+dynamic hedging strategies. The strategies strongly outperform long-only
+benchmarks over our testing period, spanning from Q4 2015 to the end of
+2021. The key outputs of the learning methods are interpreted during the
+2020 market crash.
+Key words: Time series, model selection, model evaluation, cross-asset
+strategy, market crash, VIX
+Acknowledgement: We thank Piotr Fryzlewicz for offering feedbacks on
+the drafts, Camilla Schelpe for discussions during the work, and the Oxford
+SMLFin Seminar for giving us the opportunity to discuss an earlier version
+of this work.
+Software: Computing implementations are done in Python, and are available
+at https://github.com/parleyyang/DMS-AE-DAA.
+1
+INTRODUCTION
+It is not wise to apply generically-developed machine learning meth-
+ods in a time series environment. This is because of the unique na-
+ture of time series, where observations are not i.i.d., but rather have
+an ordered dependence structure and potential change-points. The
+distribution of time series data at a certain time 𝑡may differ mas-
+sively from some time far in the past. By adapting to past forecasting
+errors in a time series context, Dynamic Model Selection (DMS) and
+Adaptive Ensemble (AE) take a rolling view of model selection and
+ensembling respectively. This differs from typical cross-validation
+procedures, which attempt to find a single best model for testing,
+rather than provide ongoing selections.
+The DMS and AE approaches still face two problems: how to tune
+the hyperparameters over time? And how to compare models that
+Authors’ addresses: Parley Ruogu Yang, University of Cambridge, UK, ry266@cam.ac.uk;
+Ryan Lucas, Massachusetts Institute of Technology, USA.
+forecast different variables or horizons? For instance, some assets
+may be easier to forecast than others and shorter forecast horizons
+may induce lower errors than longer ones. This motivates the third
+algorithm, Dynamic Asset Allocation (DAA), which is a dynamic
+evaluation mechanism based on Sharpe Ratio (SR). In this paper, we
+apply all three algorithms to create automated portfolio strategies
+and demonstrate their strong performance against benchmarks in
+both return and risk metrics. We also demonstrate the interpretabil-
+ity of our methods by obtaining the relevant information produced
+by the algorithms, and further in conjunction with the market crash
+in 2020.
+1.1
+Literature Review and Empirical Motivation
+There are three branches of literature that the current study engages
+with. The first is on the methodological side and relates to model se-
+lection, where attention to time-variability is crucial. Time-varying
+functional forms have been addressed in deep learning, for instance,
+by extending traditional feedforward neural networks to LSTMs
+[14], which are more suited to financial time series [19]. Time series
+econometricians refer to this problem as "time-varying parameters"
+[3, 13]. The field of change-point detection is also relevant, as it deals
+with shifts in the underlying distribution of a time series [1, 10].
+Adaptive time series methods are another set of attempts at time
+series model selection, as [23, 24] demonstrate the possibility for
+lag operators and window selection based on the loss induced by
+the past forecasts. The DMS and AE methods directly relate to the
+model selection and ensembling in a time series environment: the
+loss functions and sample evaluation methods account for the usual
+concerns of stability and interpretability while being engineered
+specifically for time series.
+The second branch is related to empirical risk minimization in the
+statistical learning literature. In particular, robust statistics and fore-
+casting theory [10–12, 15] play a role and motivate many potential
+loss functions for AE and DMS. In addition to that, domain-specific
+evaluation metrics in a change-point or contaminated environment
+may differ hugely from traditional metrics such as Mean Squared
+arXiv:2110.11156v3  [stat.AP]  5 Jul 2022
+
+2
+•
+Parley Ruogu Yang and Ryan Lucas
+Error (MSE), and may be more robust instead. To this point, recent
+literature demonstrates how financial metrics can be useful as a
+contextual evaluation for various statistical or machine learning
+models [2, 4, 16, 20]. Discussions on Sharpe Ratio (SR) as a statis-
+tical measurement can be further traced to [17, 18]. Crucially, SR
+serves not only as a tool for portfolio evaluation in finance, but
+also as an evaluation metric for financial time series. This moti-
+vates DAA to be introduced as a tool for dynamic and contextual
+evaluation in financial time series. Combining the algorithms prac-
+tically extends to the concept of automation, such as the proposal of
+‘Automated Statistician’ [21]. In this paper, we extend our method
+into a potential ‘Automated Portfolio Manager’, where the machine
+learning aspect of the risk-minimisation process could be translated
+to user-algorithm interaction in financial practice.
+The final branch of literature concerns the empirical findings
+from the Yield Curve, VIX Curve, and financial markets. There is a
+large body of existing literature linking the Yield Curve to future
+economic growth and many other important macroeconomic vari-
+ables [5, 7], especially prior to the downturn of the economy. [23],
+for example, finds empirical success in forecasting US GDP Growth
+using the Yield Curve. Likewise, the VIX Curve has become widely
+recognised amongst the practitioner community as an important
+signal for the future state of the stock market [8, 9, 22]. Still, despite
+numerous studies suggesting the existence of a relationship, a de-
+tailed forecasting study has yet to be conducted; neither has a study
+been done using non-traditional evaluation metrics and statistical
+learning techniques. As an empirical observation, Figure 1 shows
+the state of these relationships on 24 Feb 2020, demonstrating that
+inversions of both curves can signal a downturn in the stock market.
+We further this analysis and provide a case study on the 2020 market
+crash.
+1.2
+Key Problems and Contributions
+We state the following two problems we aim to tackle.
+• Problem 1: In time series, like many other types of data, a com-
+mon problem we face is how to select a set of models or combine
+them. However, classic techniques such as cross-validation would
+rely on certain notions of stability or stationarity in the distribu-
+tion, whereas in time series, abrupt regime switches frequently
+occur and disrupt the robustness of such a selection.
+The problem is hence: what loss function and sample evaluation
+method should be used to select the best parametric time series
+model, and how to ensemble different models over time?
+• Problem 2: For a portfolio manager, a common problem is how to
+compare and select from competing models and trading strategies
+subject to investment constraints. With the common evaluation
+metrics such as MSE, we are restricted to compare predictive
+models within the same variable and same forecast horizon: at
+time 𝑡, let 𝑘1,𝑘2 > 0 while 𝑘1 ≠𝑘2, if we forecast 𝑌at time 𝑡+𝑘1
+conditional on present (𝑌𝑡+𝑘1 |𝑡), the distribution of itself could be
+quite different from the distribution of 𝑌at time 𝑡+ 𝑘2 (𝑌𝑡+𝑘2 |𝑡)
+or another variable 𝑍at another time.
+The problem becomes: how to compare and select from models
+with different variables and forecasting horizons? Further, how
+to automate such a process subject to investment constraints and
+can this outperform the market?
+Our key contributions in response to the above are as follows.
+We propose two algorithms (DMS and AE) to respond to problem 1,
+which serve as general procedures to select and combine models in
+time series. We designed loss functions that are tailored to time series
+data and forecasting. In particular, they weigh more heavily recent
+forecasting errors, providing a more up-to-date evaluation. For mod-
+els with a larger forecasting horizon, we also consider higher-order
+forecasting information, such as the loss associated with forecasts
+made on the intervening horizons.
+As a response to problem 2, we propose an evaluation procedure
+(DAA) to select the outperforming forecasts, for the purpose of
+their induced financial performance — the use of SR allows that to
+draw together different assets and compare across different forecast
+horizons. Similar to the idea of an ‘automated statistician’ in the
+recent literature, it is tempting to ask whether it is possible to have
+an ‘automated portfolio manager’ selecting the top models amongst
+different variables and forecasting horizons — DAA is a step forward
+toward that agenda. More empirically, we address problem 2 by
+using the aforementioned algorithms to select and invest in different
+assets, with a number of variations such as capital constraints and
+hedging. The latter also offers an up-to-date demonstration of the
+usage of VIX as a hedging tool for speculation, which contributes
+to the broader literature on portfolio management.
+1.3
+Plan of This Paper
+We present the main algorithms in section 2, followed by empirical
+financial results of the algorithms in sections 3 and 4. We also show
+how the algorithms’ outputs can be interpreted by examining the
+environment of 2020 market crash in section 5. Conclusions and
+future plans are then made in section 6.
+2
+PROPOSED METHODOLOGY
+We consider the problem of selecting from a set of parametric time
+series models, denoted here by 𝐻. For example, 𝐻may contain
+AR models up to certain lags, and also various models including
+other explanatory variables. For each model ℎ∈𝐻, we have various
+estimation techniques, e.g. MLE or Yule-Walker Method with various
+window sizes (𝑤) which control the sample size of the parametric
+estimation. We denote such a technique as Ξℎ,𝑖, where 𝑖∈𝐼(ℎ)
+serves as an index.
+2.1
+Dynamic Model Selection
+We first introduce the case of finding (ℎ∗, Ξ∗
+ℎ,𝑖), the optimal model
+and estimation technique pairing. We refer to this algorithm as
+Dynamic Model Selection (DMS), and annotate the selected model
+as ℎ𝐷𝑀𝑆∈𝐻. The key here is to select the model at time 𝑡and
+adapt the forecast to the selected one. In particular, we use global
+loss function ℓto facilitate the evaluation of the ‘goodness’ of the
+model, therefore returning ^𝑦𝑡+𝑘|𝑡(ℎ𝐷𝑀𝑆).
+Our approach is designed to find the model(s) with the lowest
+loss, which is closely related to out-of-sample forecasting error.
+We do so by considering various local loss functions and sample
+evaluation methods (what can be thought of as the global loss func-
+tion). Though this may be analogous to empirical risk minimization,
+which is commonly implemented, we propose a variety of loss func-
+tions aiming to achieve a more accurate model selection by robust
+
+DMS, AE, DAA: methods and applications of adaptive time series model selection, ensemble, and financial evaluation
+•
+3
+Algorithm 1: DMS
+Input: Data, desired forecasting index set 𝑇, and hyperparameters (ℓ, 𝐻, {Ξℎ,𝑖}𝑖∈𝐼(ℎ),ℎ∈𝐻, 𝑣)
+Output: Forecasts {^𝑦𝑡+𝑘|𝑡(ℎ𝐷𝑀𝑆
+𝑡
+)}𝑡∈𝑇with the associated models {ℎ𝐷𝑀𝑆
+𝑡
+}𝑡∈𝑇
+(1) For 𝑡∈𝑇, repeat:
+(a) Evaluate ℓgiven the information required. Then find ℎ∗∈𝐻and Ξ∗
+ℎ,𝑖which minimises the loss.
+(b) Obtain and store ^𝑦𝑡+𝑘|𝑡(ℎ𝐷𝑀𝑆
+𝑡
+) := ^𝑦𝑡+𝑘|𝑡(ℎ∗, Ξ∗
+ℎ,𝑖) as the forecast
+Algorithm 2: AE
+Input: Data, desired forecasting index set 𝑇, and hyperparameters (ℓ, 𝐻, {Ξℎ,𝑖}𝑖∈𝐼(ℎ),ℎ∈𝐻, 𝑣0, 𝑣1)
+Output: Forecasts {^𝑦𝑡+𝑘|𝑡(ℎ𝐴𝐸
+𝑡
+)}𝑡∈𝑇with the associated models {ℎ𝐴𝐸
+𝑡
+}𝑡∈𝑇
+(1) Enumerate ∪{(ℎ, Ξℎ,𝑖) : 𝑖∈𝐼(ℎ),ℎ∈𝐻} to [𝑀]. For 𝑡∈𝑇, repeat:
+(a) For 𝜏∈{𝑡−𝑣0 + 1, ...,𝑡}, repeat:
+(i) Evaluate ℓgiven the information required. Then find ℎ∗∈𝐻and Ξ∗
+ℎ,𝑖which minimises the loss.
+(ii) Allocate a weight of 𝑣−1
+0
+to the minimiser.
+(b) Collect the weight 𝛿𝑡and align the forecast vector ^𝑦𝑀
+𝑡+𝑘|𝑡
+(c) Obtain and store ^𝑦𝑡+𝑘|𝑡(ℎ𝐴𝐸
+𝑡
+) = ⟨𝛿𝑡, ^𝑦𝑀
+𝑡+𝑘|𝑡⟩as the forecast
+evaluation on past forecasts. To do this, we evaluate the loss of each
+model over a recent tranche of data. Consider a 𝑣-sized window up
+to time 𝑡, {𝑦𝜏}𝑡
+𝜏=𝑡−𝑣+1, and a given pair (ℎ, Ξℎ,𝑖). We have access
+to ^𝑦𝜏|𝜏−˜𝑘(ℎ, Ξℎ,𝑖) for all 𝜏∈{𝑡−𝑣−𝑘+ 1, ...,𝑡−1,𝑡} and ˜𝑘∈[𝑘].
+Now, define a formulation of ℓas below:
+ℓsingle-valued(ℎ, Ξℎ,𝑖; 𝜆, 𝑝) :=
+𝑡∑︁
+𝜏=𝑡−𝑣+1
+𝜆𝑡−𝜏|^𝑦𝜏|𝜏−𝑘−𝑦𝜏|𝑝
+(1)
+Equation 1 specifies a global loss function by summing over the
+local loss functions in a window 𝑣. The associated hyperparameters
+are 𝜆∈(0, 1] and 𝑝∈(0, ∞). The larger the 𝜆, the more focused the
+loss is towards the recent history, and vice versa. While 𝑣is clearly
+a hyperparameter as well, it is not being investigated in this paper,
+as 𝜆𝑡−𝜏discounts the history in a way that controls the effective
+contribution of the far history to the loss. For general intuition, take
+𝜆= 1 and 𝑝∈{1, 2}, then Equation 1 is simply an MAE or MSE
+over the period.
+We next consider a loss function that is more suited to models
+with a longer forecast horizon, shown in Equation 2, where 1𝑘:=
+(1, 1, ..., 1, 1) ∈R𝑘and ^𝒚𝜏+𝑘|𝜏:= (^𝑦𝜏+𝑘|𝜏+𝑘−1, ^𝑦𝜏+𝑘|𝜏+𝑘−2, ..., ^𝑦𝜏+𝑘|𝜏) ∈
+R𝑘.
+ℓmulti-valued(ℎ, Ξℎ,𝑖; 𝜆, 𝑝) :=
+𝑡∑︁
+𝜏=𝑡−𝑣+1
+𝜆𝑡−𝜏||^𝒚𝜏|𝜏−𝑘−𝑦𝜏1𝑘||𝑝
+𝑝
+(2)
+The novelty behind Equation 2 is as follows. For 𝑘≥2, the term that
+differs from Equation 1 is ^𝒚𝜏|𝜏−𝑘−𝑦𝜏1𝑘. This is a vector containing
+information in a higher dimension than just the scalar ^𝑦𝜏|𝜏−𝑘−𝑦𝜏.
+For instance, the loss within Equation 2 contains ^𝑦𝜏|𝜏−1 −𝑦𝜏due to
+the vector form and the norm taken — this is not part of Equation 1.
+We note that ^𝑦𝜏|𝜏−1 uses information up to 𝜏−1, which is more
+recent than the one used by ^𝑦𝜏|𝜏−𝑘, hence facing less noise and
+more contemporary information on the performance of model and
+estimation techniques.
+Following the above configuration of the loss function, we find
+the pair which minimises the loss:
+(ℎ∗, Ξ∗
+ℎ,𝑖) :=
+arg min
+(ℎ,Ξℎ,𝑖) ∈∪{(ℎ,Ξℎ,𝑖):𝑖∈𝐼(ℎ),ℎ∈𝐻}
+ℓ(ℎ, Ξℎ,𝑖)
+(3)
+DMS then adapts to the selected model for forecasting: ^𝑦𝑡+𝑘|𝑡(ℎ𝐷𝑀𝑆
+𝑡
+) =
+^𝑦𝑡+𝑘|𝑡(ℎ∗, Ξ∗
+ℎ,𝑖). For a general algorithm for computing implemen-
+tation, see algorithm 1.
+2.2
+Adaptive Ensemble
+We next introduce the case of ensembling models according to their
+loss over a recent window of data. We call this Adaptive Ensemble
+(AE). The ensembling weight takes the form of a convex combina-
+tion from 𝐻, in particular, the weight lies in a simplex 𝐻𝐴𝐸= Δ(𝑀)
+where 𝑀:= | ∪{(ℎ, Ξℎ,𝑖) : 𝑖∈𝐼(ℎ),ℎ∈𝐻}|, which is the total
+number of estimation techniques across all models. (There are vari-
+ous ways for ensembling models, some more closely related to time
+series, such as the Particle filters methods [6]. Here, we propose
+to form the weights in an additive sub-sampling scheme without
+Bayesian inference.)
+Algorithmically, we first enumerate the set ∪{(ℎ, Ξℎ,𝑖) : 𝑖∈
+𝐼(ℎ),ℎ∈𝐻} into [𝑀] and align the associated forecasts to a M
+dimensional vector ^𝑦𝑀
+𝑡+𝑘|𝑡. For an element called ensemble weight
+𝛿𝑡∈Δ(𝑀), the AE adapts to the selected weight by the inner prod-
+uct: ^𝑦𝑡+𝑘|𝑡(ℎ𝐴𝐸) = ⟨𝛿𝑡, ^𝑦𝑁
+𝑡+𝑘|𝑡⟩. It remains to introduce the method
+of determining the weight: we subsample the data points in the
+window 𝑣as follows. Consider a smaller window 𝑣0, and for each
+time 𝜏∈{𝑡−𝑣0 + 1, ...,𝑡−1,𝑡}, look back a window of 𝑣1, where
+𝑣1 = 𝑣−𝑣0. Find the best model in the 𝑣1 window up to each time
+𝜏. That is, for each 𝜏, we proceed with the optimisation as per Equa-
+tion 3. Allocate an equal weight of 𝑣−1
+0
+to the model selected. This
+then produces 𝛿𝑡∈Δ(𝑀) as desired. See algorithm 2 for a general
+algorithm.
+2.3
+Trading strategies and evaluation metrics
+As was reviewed in section 1.1, MSE is unfit for the purpose of
+
+4
+•
+Parley Ruogu Yang and Ryan Lucas
+Algorithm 3: Dynamic Asset Allocation (DAA)
+Input: Quarters {𝑞𝑗}𝐽
+𝑗=1, SR of associated strategies 𝑆𝑘,𝐴
+𝑗
+(ℎ) for each 𝑗∈[𝐽],𝑘∈[𝐾],ℎ∈𝐻𝐴,𝐴∈A, Capped or Uncapped
+Output: Selected 𝑁strategy for each quarter.
+(1) For each quarter 𝑗∈[𝐽]:
+If Uncapped:
+(a) Collect S𝑗:= {𝑆𝑘,𝐴
+𝑗
+(ℎ) : 𝑘∈[𝐾],ℎ∈𝐻𝐴,𝐴∈A}. Rank and select the top 𝑁candidates from S𝑗.
+(b) Run the selected strategies for the next quarter, then average the holding weights across all selected strategies.
+Else (Capped):
+(a) For each 𝐴∈A:
+(i) Collect S𝐴
+𝑗:= {𝑆𝑘,𝐴
+𝑗
+(ℎ) : 𝑘∈[𝐾],ℎ∈𝐻𝐴} Rank and select the top 𝐾candidates from S𝐴
+𝑗.
+(ii) Run the selected strategies for the next quarter, then average the holding weights across all selected strategies.
+(b) Average all strategies over all assets.
+(2) Return the selected strategies.
+evaluating forecasts in the context of financial time series. Here,
+we consider the following financial evaluation metrics from an
+induced trading strategy. These metrics form the backbone of the
+DAA method we propose in section 2.4.
+Denote {1, 2, ...,𝑇} as the index of testing data, and as the fre-
+quency of data is daily, each index corresponds to one trading day.
+Recall 𝑘is fixed as a forecast horizon. Let ^𝑦𝐴
+𝜏|𝜏−𝑘be the 𝑘-step ahead
+forecast made on the return of asset 𝐴at time 𝜏−𝑘. At time 𝑡, we
+hold 𝑤𝐴
+𝑡of asset 𝐴as per Equation 4.
+𝑤𝐴
+𝑡:= 1
+2 + 1
+2𝑘
+𝑘−1
+∑︁
+𝑗=0
+(1[^𝑦𝐴
+𝑡+𝑘−𝑗|𝑡−𝑗> 0] −1[^𝑦𝐴
+𝑡+𝑘−𝑗|𝑡−𝑗< 0])
+(4)
+It is important to observe Equation 4 as an effective restriction to
+long-only holdings. Alternative trading strategies use long-short
+signals, which implies solely trading on the direction of the model’s
+prediction. This is a limitation of the current study, since the 1
+2
+harmonises the performance by endowing us with a base case of
+half of the baseline. However, it also eases the debate towards costs
+of shorting, as shorting an asset may not be always feasible and
+can be costly, especially for VIX. Certainly, the notion of ‘short
+the market’ may be achieved by long VIX, and we investigate this
+further in the form of cross asset strategy in section 4.
+Let 𝑃𝐴
+𝑡be the price of asset 𝐴at time 𝑡. Consider the notion of
+profit or loss at time t+1 as 𝜋𝐴
+𝑡+1 := 𝑤𝐴
+𝑡× 𝑃𝐴
+𝑡+1−𝑃𝐴
+𝑡
+𝑃𝐴
+𝑡
+. Denote 𝑚𝐴𝜋and
+𝑠𝐴𝜋as, respectively, the mean and standard deviation of {𝜋𝐴𝜏}𝑇
+𝜏=2.
+The annualised return (𝐴𝑁𝑅) then follows the accounting of profits
+or loss, defined as 𝐴𝑁𝑅= 252𝑚𝐴𝜋and the annualised Sharpe Ratio
+(𝑆𝑅) is defined as 𝑆𝑅=
+√
+252𝑚𝐴𝜋(𝑠𝐴𝜋)−1. Another performance mea-
+sure for risk is known as Maximum Drawdown (MDD), defined as
+𝑀𝐷𝐷= min
+𝑡∈[𝑇]
+ 
+𝜋𝑡+1
+max
+𝜏∈[𝑡] (𝜋𝜏+1) −1
+!
+.
+2.4
+Dynamic Asset Allocation
+In time series, we test the predictive models via a ‘dynamic evalua-
+tion’ regime, wherein some previous batches of observations would
+be used for finding the top performers, followed by the next batch
+of observations for testing. Now, in the context of financial time se-
+ries, such an evaluation can be attributed to financial metrics rather
+than MSE. In what follows, we present an algorithm for using SR
+Fig. 2. DAA as a rolling process for validation and testing
+to decide, on a quarterly basis, what hyperparameter (this includes
+different algorithms, loss functions, forecast horizons, and assets) to
+choose. This algorithm is also a step towards an automated portfolio
+manager, which aims to achieve outperforming financial results
+while satisfying investment constraints.
+To introduce the notation, let {1, 2, ..., 𝐾} be the forecast horizons
+produced, and let A be the set of all assets. The aim is then to
+produce an averaged holding of 𝑁:= 𝐾× |A| strategies, from the
+strategies induced by a collection of models, noted 𝐻𝐴for asset 𝐴∈
+A. (As a note to avoid confusion: the set 𝐻𝐴includes all strategies
+associated with all hyperparameters and all forecast horizons for
+asset 𝐴.) Now, consider quarter-evaluation dates {𝑞𝑗}𝐽
+𝑗=1, then for
+each strategy and asset, we are able to access its historical SR (here,
+we set this as the recent 252 days, corresponding to one trading
+year), noted 𝑆𝑘,𝐴
+𝑗
+(ℎ).
+The last input to consider is whether a choice of cap is employed
+— this is entirely user-dependent as this relates to the demand from
+the end-user, in the financial context, the portfolio manager or
+investor. Choosing the strategy to be capped would mean that the
+portfolio would be restricted to a certain percentage for each asset’s
+exposure (here, we assume an equal-cap is enforced, so having a
+capped strategy implies capping the maximum holding of every
+asset to a weight of |A|−1), else we consider the strategy to be
+
+DMS, AE, DAA: methods and applications of adaptive time series model selection, ensemble, and financial evaluation
+•
+5
+uncapped, where no bounds on the exposure of a certain asset would
+be enforced. Both strategies have merits and supporting intuitions,
+being more generally known as dynamically weighted or equally
+weighted strategies in portfolio finance. As a remark on the case of
+a single asset, i.e. |A| = 1: the DAA, no matter capped or uncapped,
+reduces to a simpler decision amongst models and forecast horizons.
+The full algorithm is provided in algorithm 3 and a graphical illus-
+tration of the process is provided in Figure 2. Notice that the use of
+SR has a significant advantage compared to MSE in terms of variable
+selection: that not only could comparison be made across models,
+but also across different forecasting variables. This is otherwise not
+achievable. In essence, at time 𝑡, if we forecast 𝑌at time 𝑡+ 𝑘, the
+distribution of such variable could be quite different from the distri-
+bution of another variable 𝑍at time 𝑡+𝑘. Now, the use of Equation 4
+and associated Sharpe Ratio moderates the values of forecasts, and
+finally enables a more robust evaluation for model performance,
+across different variables (𝐴∈A) and forecast horizons (𝑘∈[𝐾]).
+3
+FINANCIAL RESULTS
+3.1
+Data, Models, and Implementations
+For the empirical investigation, we use the following data, all on a
+daily basis:
+• Assets: SP500 index, CBOE VIX index, NASDAQ100 index (NAS100),
+and DJIA30 index. These are obtained as daily close levels from
+Yahoo Finance.
+• Yield Curve (US treasury rates): constant maturity of 1, 3, 6, 12,
+24, 36, 60, 84, 120, 240, and 360 months. These are obtained from
+Federal Reserve Bank of St. Louis’ online database.
+• VIX Curve: VIX Index and 1 to 7 months of maturity futures of
+VIX contracts are obtained as daily close levels from CBOE.
+The full sample ranges from the start of year 2013 to the end of year
+2021.
+As a data processing technique commonly used in the relevant
+empirical literature, we consider the logged difference of asset price
+to be return, that is, for a given asset 𝐴, the 𝑘-days ahead return is
+defined as
+𝑟𝐴
+𝑡:(𝑡+𝑘) := log(𝑝𝐴
+𝑡+𝑘) −log(𝑝𝐴
+𝑡)
+where 𝑝𝐴
+𝑡denotes the price of asset 𝐴at time 𝑡. In the models, we
+use the notation𝑦𝑡to represent 𝑟𝐴
+(𝑡−𝑘):𝑡. As for yield and VIX curves,
+we consider the ‘slopes’, noted 𝑠𝑡at time 𝑡, to be estimated by
+𝑝𝑡,𝑗= 𝛼𝑡+ 𝑠𝑡𝑚𝑡,𝑗+ 𝜀𝑡,𝑗, 𝜀𝑡,𝑗∼𝑁(0, 𝜎2
+𝑗) ∀𝑗∈[𝐽],𝑡
+where 𝑝𝑡,𝑗indicates the price of the future (or interest rate) with
+maturity 𝑚𝑡,𝑗. For VIX, 𝐽= 8 and for Yield Curve, 𝐽= 11. This is a
+common method of estimating the slope of a term structure, as is
+pointed out in section 1.1. To populate meaningful models into the
+model space 𝐻, we consider the following three classes using the
+data we have:
+• Class 1: AR(p) models on returns 𝑦𝑡= 𝛼+Í𝑝
+𝑗=1 𝜙𝑗𝑦𝑡−𝑗+𝜀𝑡where
+𝑝∈{0, 1, ..., 5}. Note 𝐴𝑅(0) is a constant model.
+• Class 2: lagged linear regression with slope or spread from Yield
+or VIX curves 𝑦𝑡= 𝛼+ 𝛽𝑠𝑡−𝑘+ 𝜀𝑡
+• Class 3: lagged linear regression with a pair of short-long rates
+𝑦𝑡= 𝛼+ 𝛽1short𝑡−𝑘+ 𝛽2long𝑡−𝑘+ 𝜀𝑡where short and long refer
+to short-term and long-term rates: in VIX, short-term refers to
+maturities up to and including 3 months, with the rest being long-
+term; and in Yield Curve, short-term refers to maturities up to
+and including 24 months, with the rest being long-term.
+All models are equipped with 5 different window sizes for esti-
+mation: 22, 44, 63, 126, and 252, representing a look-back win-
+dow of 1, 2, 3, 6, and 12 months respectively. Estimation meth-
+ods for AR models (those in Class 1) are via Yule Walker, and
+for explanatory models (those in Class 2 and 3) are via OLS. For
+DMS and AE implementation, hyperparameters are taken as fol-
+lows: 𝐾= 5, 𝑣0 = 𝑣1 = 50, 𝑣= 100 for choices of maximum
+forecast steps and window sizes respectively, and 𝑝∈{1, 1.5, 2},
+𝜆∈{0.8, 0.85, 0.9, 0.95, 0.96, 0.97, 0.98, 0.99, 1} for configurations
+of the loss functions.
+3.2
+Overall Evaluation
+As an overall evaluation, we implement trading strategies induced
+by both AE/DMS and fixed models. We consider trading all four
+market indices: SP500, VIX, NAS100, and DJIA30. We use the first
+full year of validation data from Q3 2014, to select the optimal
+hyperparameters and model specifications. In Figure 3, we provide
+the cumulative profit associated with both strategies over the testing
+period, spanning from the start of Q4 2015 to the end of 2021. As a
+comparison, we also provide a benchmark that holds a constant of
+0.5 and weights equally between the four indices. These results are
+presented in both individual returns (lower) and averaged (upper).
+The AE/DMS induced forecasts strongly outperform the ones by
+fixed models, in terms of cumulative profit in the testing period,
+being up 60% where the fixed models are approximately break-even.
+The AE/DMS also outperforms the equally-weighted benchmark,
+albeit having a more tumultuous rise. This can also be observed
+in Table 1, where AE/DMS outperforms in terms of ANR and SR,
+but underperforms the benchmark in terms of MDD. By observing
+the performance of individual asset’s results, we see the AE/DMS
+outperforms the fixed models in 3 out of the 4 assets, while outper-
+forming the benchmark in all four cases.
+Strategy
+SR
+MDD
+ANR
+AE/DMS
+0.558
+-23.40%
+9.92%
+Fixed models
+-0.012
+-34.93%
+-0.24%
+Benchmark
+0.427
+-10.20%
+5.36%
+Table 1. Performance metrics on all four indices (upper panel of Figure 3)
+3.3
+Towards an Automated Portfolio Manager: Dynamic
+Asset Allocation
+We proceed to present the results obtained by selecting different
+learning-induced strategies over time, as was prescribed in section
+2.4. Here, we focus on the three equity indices, and return to discuss
+how VIX can be used within in a dynamic hedging framework in
+section 4. As part of the DAA setup, we consider both a capped and
+an uncapped regime (as detailed in section 2.4, the capped regime
+implies that each index weighting cannot exceed a certain threshold,
+while uncapped does not impose this restriction). We also include a
+benchmark, which uses an equal weight in the three equity indices.
+The financial results are presented in the upper panel of Figure 4.
+It is clear that all three strategies perform similarly until 2020, at
+
+6
+•
+Parley Ruogu Yang and Ryan Lucas
+Fig. 3. Cumulative return of AE/DMS, Fixed models (noted FM in the graph)
+and Benchmark under trading schemes that consider four indices (upper)
+and each asset separately (lower)
+which point the uncapped DAA outperforms the benchmark in
+terms of cumulative profit, while the capped DAA underperforms.
+This may be traced to the weights of the uncapped allocation, shown
+in the lower panel of Figure 4. In particular, the uncapped allocation
+keeps a high weighting in the NAS100 during and after the 2020
+market crash. Ultimately, the uncapped allocation shows a stronger
+recovery and greater cumulative profit than both the capped alloca-
+tion and the benchmark, owing to the strong performance of the
+underlying NAS100 index.
+The summarised statistics are presented in Table 2: both the un-
+capped and capped allocations obtain a lower Sharpe ratio and MDD
+than the equally-weighted benchmark. Hence, while varying the
+weight on each asset (the uncapped DAA does this significantly as
+per the lower panel of Figure 4) may be more profitable than weight-
+ing equally, it does not appear to improve risk-adjusted return or
+other downside metrics as a whole. This corroborates standard diver-
+sification arguments, wherein increasing the number of securities
+reduces the variance of the portfolio. In Table 2, this is presented by
+a higher ANR and lower MDD, compared to the others.
+Strategy
+SR
+MDD
+ANR
+Capped
+0.639
+-16.04%
+7.68%
+Uncapped
+0.679
+-16.87%
+9.49%
+Benchmark
+0.874
+-14.85%
+8.32%
+Table 2. Performance metrics for DAA compared with benchmark (Figure 4)
+4
+EXTENSION TO CROSS-ASSET STRATEGY
+A passive hedge, such as a fixed portion of the VIX, inherently
+lowers the return of a portfolio. This can be observed in Figure 3,
+where a constant 1/4 holding of VIX causes the benchmark to un-
+derperform in terms of ANR and SR. At the same time, hedging
+serves an important purpose in limiting an investor’s downside.
+Fig. 4. Upper: cumulative return over time; Lower: portion allocated to each
+asset over time in the uncapped regime
+Fig. 5. Cross-asset strategies compared to DAA and benchmarks for SP500
+(upper) and NAS100 (lower). The shaded area is Q1 and Q2 2020, which are
+further discussed in section 5
+Asset
+Strategy
+SR
+MDD
+ANR
+SP500
+CAS 𝑘∗= 3𝑘
+0.611
+-14.80%
+14.15%
+CAS 𝑘∗= 6𝑘
+0.970
+-14.08%
+11.51%
+DAA with no VIX
+0.700
+-23.13%
+10.17%
+Benchmark (Long Only)
+0.807
+-16.00%
+7.40%
+Benchmark (Always hedged)
+0.368
+-13.87%
+6.23%
+NAS100
+CAS 𝑘∗= 3𝑘
+0.907
+-12.05%
+21.00%
+CAS 𝑘∗= 6𝑘
+1.303
+-9.29%
+17.85%
+DAA with no VIX
+0.822
+-18.20%
+14.42%
+Benchmark (Long Only)
+1.009
+-11.46%
+10.88%
+Benchmark (Always hedged)
+0.588
+-11.43%
+9.71%
+Table 3. Performance metrics of Cross-asset strategies (CAS), regular DAA
+and benchmarks
+Indeed, Table 1 also shows that an investor would face a drawdown
+of at most 10.20% over the lifetime of this portfolio. This apparent
+trade-off is consistent with the general conception of hedging in
+a passive context: during a market upturn, a hedge can cause a
+so-called ’return-drag’, while in a down-market it can directly offset
+losses.
+This begs the question as to whether we can construct a dynamic
+hedging strategy to avoid return drag while maintaining downside
+protection. To this end, we consider a set of cross-asset strategies
+(CAS) for an investor hedging SP500 or NAS100 using the VIX. We
+
+DMS, AE, DAA: methods and applications of adaptive time series model selection, ensemble, and financial evaluation
+•
+7
+proceed with the introduction of the case of SP500, while the case
+of NAS100 is exactly the same in methodology.
+Here, we hold the SP500 as normal, longing an extra 1
+2𝑘unit for
+every stage of rise (1[^𝑦𝑆
+𝑡+𝑘−𝑗|𝑡−𝑗> 0]) predicted, as per Equation 5.
+𝑤𝑆
+𝑡:= 1
+2 + 1
+2𝑘
+𝑘−1
+∑︁
+𝑗=0
+(1[^𝑦𝑆
+𝑡+𝑘−𝑗|𝑡−𝑗> 0])
+(5)
+𝑤𝑉
+𝑡:= 1
+𝑘∗
+𝑘−1
+∑︁
+𝑗=0
+(1[^𝑦𝑆
+𝑡+𝑘−𝑗|𝑡−𝑗> 0])
+(6)
+However, when we predict a rise in the SP500, we also long the
+VIX as a method of hedging our added exposure, as per Equation 6.
+The extent to which we hedge is itself a parameter, 𝑘∗, which takes
+either 3𝑘or 6𝑘depending on an investor’s risk tolerance. 3𝑘implies
+hedging the entire portfolio, fitting for a risk-averse investor, while
+6𝑘hedges just the speculative long.
+In addition to the desired strategies and long-only benchmark,
+we also add a benchmark which, on top of holding a constant of 1
+2
+of the asset, holds an additional 1
+6 of VIX. We call this the ‘always
+hedged’ case.
+The cumulative return are plotted in Figure 5 for both assets.
+Detailed performance metrics are presented in Table 3. CAS achieves
+a reduction in MDD while still maintaining a strong ANR and SR.
+The CAS using 𝑘∗= 6𝑘in NAS100 outperforms the benchmark
+on every metric, striking the desired balance between return and
+downside protection. Clearly, using DAA to dynamically hedge
+the exposure gives an improvement of risk-adjusted return to the
+portfolio: CAS tactically holds VIX and maintain a competent risk
+exposure (as demonstrated by Figure 5 and MDD in Table 3) while
+achieving higher return (ANR as high as 21% could be achieved),
+hence the high SR at the end, with the NAS100 case achieving a SR
+of 1.303.
+5
+CASE STUDY & INTERPRETATION: 2020 MARKET
+CRASH
+In this section, we demonstrate the usage of the algorithms to inter-
+pret historical events. The 2020 market crash induced huge volatility
+and contaminated data, which makes itself as a challenging interpre-
+tation task. In forecasting analytics, we select the hyperparameter
+ex-post as we aim for analysing the composition of the forecasts
+from DMS and AE, whereas in the financial performance part, we
+select hyperparameter ex-ante using the automated DAA decision
+(because DAA is using pre-Q1 2020 information for Q1 2020 and
+pre-Q2 2020 information for Q2 2020).
+5.1
+Forecasting Analytics
+We draw attention to Figure 6. On the left, we follow the develop-
+ment of NAS100 stock returns with 𝑘= 2, in which the market
+crashed and re-bounded in March 2020. The model shown here is a
+DMS model with 𝑝= 0.85, 𝜆= 1.5 and multi-valued norm. On the
+right, we follow the returns of the VIX index, also with 𝑘= 3. For
+this, the model is an AE model with 𝑝= 1, 𝜆= 1 and single-valued
+norm (this is exactly the formulation of a rolling MAE). On the
+lower panels, we show the specifications of the underlying chosen
+model(s). For NAS100, DMS has a preference for model group 3
+during the height of the crash. Similarly for VIX, the AE model
+Fig. 6. Interpretation panel for selected specifications (left: NAS100 with
+𝑘= 2 and DMS, right: VIX with 𝑘= 3 and AE). The top row reports the
+actual returns (blue) versus forecasts (red), the second row reports the
+induced cumulative profit (red) versus long only (blue), the third row reports
+the choice of window size (DMS) or weights on the window size (AE), the
+fourth row reports the choice (DMS) or weights (AE) on model group, and
+the fifth row reports the induced holding weights from the strategies
+maintains a high weight in model group 3 during this period. Both
+models favour incorporating explanatory variables from the VIX and
+Yield curves during this period, which aligns with the perception of
+the curves as leading market timing indicators.
+For window size, the smallest window (𝑤= 22) is chosen con-
+sistently by the DMS model throughout the most volatile period.
+This supports the argument that, during a major regime switch,
+data far in the past can be less relevant to the current evaluation.
+Hence models incorporating small samples of contemporary data
+can perform better than those considering large but contaminated
+samples. When the series stabilises, larger windows (𝑤= 126 or 252)
+are preferred. Here, larger window sizes ensure greater stability in
+parameter estimation, since the time series at this point is broadly
+reflective of the history. This underscores the problem with standard
+cross validation when being applied to financial time series, as it
+assumes that the time series distribution would remain unchanged
+between periods. DMS gets around this problem by providing time-
+varying cross validation. This allows DMS, for instance, to have a
+general preference for large window sizes but also to select models
+with smaller window sizes when larger ones are contaminated.
+5.2
+Financial Performance of Cross Asset Strategies
+For financial performance of DAA, we zoom in the results we had
+on CAS in section 4. As plotted in Figure 7, a high return can be
+observed in the strategies, while the drawdown is maintained to be
+more robust as its consistent VIX holdings (shown at the bottom)
+serve as a good hedge. This, together with section 4, proves the
+
+8
+•
+Parley Ruogu Yang and Ryan Lucas
+Fig. 7. Cross-asset strategies compared to benchmark for SP500 (left) and
+NAS100 (right). The upper plots cumulative return and the lower plots the
+weights of VIX holdings
+empirical value of our methods, that they outperform the market in
+both risks and return, even at the market crash.
+6
+CONCLUSION AND FUTURE RESEARCH AGENDA
+We have proposed a generalised framework and algorithms for time
+series model selection, ensemble, and financial evaluation. The DMS
+and AE methods require a specification of a model set in terms of
+functional forms and training methods for parametric estimation
+and forecasting. Once equipped, they provide time-varying selection
+and leverage higher-order time series information than typical cross-
+validation procedures.
+While various forms of loss functions and hyperparameters were
+studied in this paper, the algorithm leaves many choices open. The
+local loss function, for instance, could inherit from robust statistics
+such as Huber loss; and the global loss could include further tech-
+niques of change point detections [1, 10]. Alternative specifications
+of hyperparameters (𝑝and 𝜆) may also further improve the sample
+evaluation, as was encouraged by [11–13].
+Further, we present DAA, which can automatically select from
+competing strategies. This framework has an edge against typical
+evaluation metrics, such as MSE, which are incomparable for differ-
+ent choices of the forecasting target. We show that the framework is
+a step towards an automated portfolio manager, since it can achieve
+strong returns while obeying typical investment constraints and
+being interpretable by the end-user. In addition, we extend DAA
+to cross-asset strategies, where we dynamically hedge against or-
+dinary strategies using VIX. These obtain outstanding financial
+performance.
+We notice that the trading of VIX could be ambiguous: it is more
+common to trade the close-to-expiration VIX contracts instead of
+the index, as the latter incurs continuous adjustment costs due to
+its original formulation [22]. A future agenda would be to use these
+algorithms and seek optimal financial decisions such as the roll-over
+of contracts.
+Lastly, interpretability behind the algorithms can be achieved,
+as the components of the forecasts can always be retrieved and
+such statistics can be used for empirical investigations and under-
+standings of the algorithm. We have demonstrated an example by
+interpreting the model choices during the 2020 market crash, along-
+side the robust financial results.
+From a basic set of parametric models and forecasts, DMS and AE
+respectively enable model selection and combination over time. DAA
+further selects the hyperparameters and makes decisions across
+assets and forecasting horizons of all the models. These all-in-three
+algorithms enable further extension towards automation in financial
+time series and machine learning.
+REFERENCES
+[1] Rafal Baranowski, Yining Chen, and Piotr Fryzlewicz. 2019. Narrowest-over-
+threshold detection of multiple change points and change-point-like features.
+Journal of the Royal Statistical Society: Series B (Statistical Methodology) 81, 3
+(2019), 649–672. https://doi.org/10.1111/rssb.12322
+[2] Stefanos Bennett, Mihai Cucuringu, and Gesine Reinert. 2022. Lead-lag detection
+and network clustering for multivariate time series with an application to the US
+equity market. (2022). https://doi.org/10.48550/ARXIV.2201.08283
+[3] Philippe Goulet Coulombe. 2021. Time-Varying Parameters as Ridge Regressions.
+https://doi.org/10.48550/ARXIV.2009.00401
+[4] Oliver M. Crook, Mihai Cucuringu, Tim Hurst, Carola-Bibiane Schönlieb, Matthew
+Thorpe, and Konstantinos C. Zygalakis. 2020. A Linear Transportation 𝐿𝑃Dis-
+tance for Pattern Recognition. (2020). arXiv:arXiv:2009.11262
+[5] Pierangelo De Pace. 2013. Gross Domestic Product Growth Predictions through
+the Yield Spread: Time-Variation and Structural Breaks. International Journal of
+Finance & Economics 18, 1 (2013), 1–24. https://doi.org/10.1002/ijfe.453
+[6] P.M. Djuric, J.H. Kotecha, Jianqui Zhang, Yufei Huang, T. Ghirmai, M.F. Bugallo,
+and J. Miguez. 2003. Particle filtering. IEEE Signal Processing Magazine 20, 5 (2003),
+19–38. https://doi.org/10.1109/MSP.2003.1236770
+[7] Arturo Estrella and Frederic S Mishkin. 1996. The yield curve as a predictor of US
+recessions. Current issues in economics and finance 2, 7 (1996).
+[8] Athanasios Fassas. 2012. The Relationship between VIX Futures Term Structure
+and S&P500 Returns. Review of Futures Markets 20 (2012), 299. https://doi.org/10.
+2139/ssrn.2841384
+[9] Athanasios P. Fassas and Nikolas Hourvouliades. 2019. VIX Futures as a Market
+Timing Indicator. Journal of Risk and Financial Management 12, 3 (2019).
+[10] Paul Fearnhead and Guillem Rigaill. 2019. Changepoint Detection in the Presence
+of Outliers. J. Amer. Statist. Assoc. 114, 525 (2019), 169–183. https://doi.org/10.
+1080/01621459.2017.1385466
+[11] Clive WJ Granger. 1999. Outline of forecast theory using generalized cost func-
+tions. Spanish Economic Review 1, 2 (1999), 161–173.
+[12] Clive WJ Granger. 2002. Some comments on risk. Journal of Applied Econometrics
+17, 5 (2002), 447–456.
+[13] Andrew C Harvey. 2013. Dynamic models for Volatility and Heavy Tails. Cambridge
+University Press.
+[14] Sepp Hochreiter and Jurgen Schmidhuber. 1997. Long Short-term Memory. Neural
+computation (1997), 1735–80. https://doi.org/10.1162/neco.1997.9.8.1735
+[15] P. J. Huber and E.M. Ronchetti. 2009. Robust Statistics. John Wiley & Sons.
+[16] Lin Li. 2021. An Automated Portfolio Trading System with Feature Preprocessing
+and Recurrent Reinforcement Learning (ICAIF ’21). Association for Computing
+Machinery, New York, NY, USA, Article 11, 8 pages.
+https://doi.org/10.1145/
+3490354.3494376
+[17] Andrew W. Lo. 2002. The Statistics of Sharpe Ratios. Financial Analysts Journal
+58, 4 (2002), 36–52.
+[18] John Douglas JD Opdyke. 2007. Comparing Sharpe ratios: so where are the
+p-values? Journal of Asset Management 8, 5 (2007), 308–336.
+[19] Justin Sirignano and Rama Cont. 2019. Universal features of price formation in
+financial markets: perspectives from deep learning. Quantitative Finance 19, 9
+(2019), 1449–1459. https://doi.org/10.1080/14697688.2019.1622295
+[20] Srijan Sood, Zhen Zeng, Naftali Cohen, Tucker Balch, and Manuela Veloso. 2021.
+Visual Time Series Forecasting: An Image-Driven Approach (ICAIF ’21). Associ-
+ation for Computing Machinery, New York, NY, USA. https://doi.org/10.1145/
+3490354.3494387
+[21] Christian Steinruecken, Emma Smith, David Janz, James Lloyd, and Zoubin
+Ghahramani. 2019. The Automatic Statistician. In Automated Machine Learning,
+Frank Hutter, Lars Kotthoff, and Joaquin Vanschoren (Eds.). Springer.
+https:
+//doi.org/10.1007/978-3-030-05318-5_9
+[22] Robert E Whaley. 2009. Understanding the VIX. The Journal of Portfolio Manage-
+ment 35, 3 (2009), 98–105.
+[23] Parley Ruogu Yang. 2020. Using the yield curve to forecast economic growth.
+Journal of Forecasting 39, 7 (2020), 1057–1080. https://doi.org/10.1002/for.2676
+[24] Parley Ruogu Yang. 2021. Forecasting high-frequency financial time series: an
+adaptive learning approach with the order book data. (2021). arXiv:2103.00264

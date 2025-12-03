@@ -1,0 +1,1598 @@
+Spatial Conformal Inference through Localized Quantile Regression
+Hanyang Jiang, Yao Xie
+Dec 2023
+Abstract
+Reliable uncertainty quantification at unobserved spatial locations, particularly for complex
+and heterogeneous datasets, is a key challenge in spatial statistics. Traditional methods like
+Kriging rely on assumptions such as normality, which often fail in large-scale datasets, leading
+to unreliable intervals. Machine learning methods focus on point predictions but lack robust
+uncertainty quantification. Conformal prediction provides distribution-free prediction intervals
+but often assumes i.i.d. data, which is unrealistic for spatial settings. We propose Localized
+Spatial Conformal Prediction (LSCP), designed specifically for spatial data. LSCP uses localized
+quantile regression and avoids i.i.d. assumptions, instead relying on stationarity and spatial
+mixing, with finite-sample and asymptotic conditional coverage guarantees. Experiments on
+synthetic and real-world data show that LSCP achieves accurate coverage with tighter, more
+consistent prediction intervals than existing methods.
+1
+Introduction
+Quantifying uncertainty at unobserved spatial locations has been a longstanding challenge in spatial
+statistics, particularly in practical applications such as weather forecasting (Siddique et al., 2022)
+and mobile signal coverage estimation (Jiang et al., 2024). Traditional methods like Kriging rely on
+strong parametric assumptions, including normality and stationarity, to model spatial relationships
+and quantify uncertainty (Cressie, 2015). However, the failure of these assumptions in the complex
+spatial datasets (Heaton et al., 2019) results in unreliable uncertainty quantification. The issue is
+especially pronounced when constructing prediction intervals, as deviations from stationarity or
+Gaussianity can critically undermine their validity (Fuglstad et al., 2015).
+While many methods have been developed to handle heterogeneity (Gelfand et al., 2005; Duan
+et al., 2007), these approaches are often computationally expensive and cannot scale effectively
+for massive datasets. Furthermore, fully modeling the underlying process is not always necessary,
+particularly when the goal is to produce reliable prediction intervals. Recently, machine learning
+approaches have offered alternative strategies for spatial prediction (Hengl et al., 2018; Chen
+et al., 2020), though they tend to focus on point predictions and often lack rigorous uncertainty
+quantification.
+Conformal prediction, introduced by (Vovk et al., 2005), provides a powerful, distribution-
+free approach to uncertainty quantification. Its ability to generate valid prediction sets without
+assumption on the underlying data distribution and the prediction model has gained widespread
+popularity in both machine learning and statistics (Lei & Wasserman, 2014; Angelopoulos et al.,
+2023). By leveraging only the exchangeability of data, conformal prediction ensures valid coverage
+at any significance level, making it highly attractive for scenarios where a black-box model is used,
+or traditional parametric assumptions may fail.
+1
+arXiv:2412.01098v2  [stat.ML]  16 Feb 2025
+
+However, in many real-world datasets—such as time-series data—the assumption of exchange-
+ability does not hold. To address this, recent work has extended conformal prediction to handle
+non-exchangeable data. For instance, (Tibshirani et al., 2019) introduced weighted quantiles to
+maintain valid coverage in the presence of distributional shifts between training and test sets by
+leveraging the likelihood ratio between distributions. More recently, (Barber et al., 2023) tackled
+the challenge of distribution shifts by bounding the coverage gap using the total variation distance,
+although the issue of optimizing these weights remains open. For time-series data, further improve-
+ments have been made in tightening prediction intervals and building theoretical guarantees, as
+demonstrated by (Xu & Xie, 2023; Xu et al., 2024).
+In this paper, we extend conformal prediction to spatial data, where the assumption of ex-
+changeability rarely holds. While time-series data can be viewed as a special case of spatial data
+defined in a one-dimensional time domain, spatial data is inherently multidimensional and poses
+unique challenges. For example, while time indices are typically discrete and naturally ordered,
+spatial locations are continuous and lack intrinsic ordering. Despite the prevalence of spatial data
+in real-world applications, there has been limited work on conformal prediction methods tailored
+to this context. To address this gap, we propose Localized Spatial Conformal Prediction (LSCP),
+a novel conformal prediction method that employs localized quantile regression for constructing
+prediction intervals. Our method and theoretical framework can also be extended to spatio-temporal
+settings, broadening its applicability. Here is a revised version of the summary:
+• Localized Spatial Conformal Prediction (LSCP): We introduce LSCP, a conformal prediction
+algorithm specifically designed for spatial data, which utilizes localized quantile regression to
+construct prediction intervals.
+• Theoretical guarantees: We establish a finite-sample bound for the coverage gap and provide
+asymptotic convergence guarantees for LSCP, without requiring the exchangeability of the
+data.
+• Numerical Evaluation: We extensively evaluate LSCP against state-of-the-art conformal
+prediction methods using both synthetic and real-world datasets.
+The results highlight
+LSCP’s ability to achieve tighter prediction intervals with valid coverage and more consistent
+performance across the spatial domain.
+1.1
+Literature
+Conformal prediction beyond exchangeability.
+Traditional conformal prediction relies on the as-
+sumption of i.i.d. or exchangeability, which is often difficult to satisfy in real-world datasets. Recent
+research has focused on extending methods and theoretical frameworks to non-exchangeable data
+to broaden applicability. A prominent approach is weighted conformal prediction, which assigns
+greater importance to samples deemed more ”reliable.” The work from (Tibshirani et al., 2019)
+explored the covariate shift scenario, where the distribution of features X differs between calibration
+and test data, while the conditional distribution Y |X remains unchanged. They demonstrated
+that weighting samples by the ratio of the distributions restores exchangeability. Building on this,
+(Barber et al., 2023) proposed a general weighted conformal framework and provided an analysis
+of the coverage gap in the general non-exchangeable setting, offering insights into the relationship
+between the weights and the coverage gap.
+Conformal prediction for time series.
+One key application of conformal prediction in non-exchangeable
+settings is time-series data. Some studies (Gibbs & Candes, 2021; Zaffran et al., 2022) have focused
+2
+
+on adaptively adjusting the significance level α over time to achieve valid coverage. Another
+work (Angelopoulos et al., 2024), built upon the idea of control theory, prospectively model the
+non-conformity scores in an online setting. Another line of research (Tibshirani et al., 2019; Xu
+et al., 2024) follows the concept of weighted conformal prediction by assigning higher weights to
+more recent data points. The choice of the weights plays a critical role in determining the empirical
+performance of the method. However, as noted by (Barber et al., 2023), no universally optimal
+weighting strategy has been found, leaving room for further exploration and optimization in this area.
+Without exchangeability in the time series setting, the finite-sample guarantee does not necessarily
+hold, and asymptotic coverage can be achieved instead with certain additional assumptions.
+Conformal prediction for spatial data.
+The spatial setting represents a broader and more complex
+domain compared to time-series data, yet research on conformal prediction for spatial contexts
+remains limited. A recent study by (Mao et al., 2024) introduced a spatial conformal prediction
+method under the infill sampling framework, where data density increases within a bounded region.
+The key finding is that for spatial data, the exact or asymptotic exchangeability holds in certain
+settings. The algorithm falls within the category of weighted conformal prediction, employing
+kernel functions such as the radial basis function (RBF) kernel as weights. Similarly, (Guan, 2023)
+proposed a general localized framework for conformal prediction. While not explicitly designed
+for spatial data, their method also advocates using kernel functions for weighting, highlighting its
+potential relevance in spatial applications.
+2
+Problem setup
+In this paper, we consider a spatial setting with observations {Z(si)}n
+i=1, where Z(s) = (X(si), Y (si))
+represents a random field observed at a finite set of spatial locations si. Here, Y (s) ∈R denotes
+the response variable, and X(s) ∈Rp is the associated feature vector. The feature vector X(s) can
+include any relevant information that is useful for predicting Y (s), such as spatial location s. Unlike
+the time series setting, where observations are indexed by fixed times t, the spatial setting considers
+the locations s as random variables sampled from a distribution g(s), while allowing for potential
+dependency within the random field Z(s).
+In the context of conformal prediction, the objective is to construct a prediction region
+ˆCn(X(sn+1)) for an unobserved response Y (sn+1) given a known feature vector X(sn+1). For
+a user-specified confidence level α, we aim to ensure that the probability of Y (sn+1) falling within
+the prediction region exceeds 1−α. This notion of coverage can be interpreted in two ways: marginal
+coverage and conditional coverage. Marginal coverage is defined as
+P(Y (sn+1) ∈ˆCn(X(sn+1))) ≥1 −α,
+whereas conditional coverage requires that
+P(Y (sn+1) ∈ˆCn(X(sn+1)) | X(sn+1)) ≥1 −α.
+Conditional coverage is a stronger condition than marginal coverage as it requires valid coverage for
+different X(s). However, as shown by (Foygel Barber et al., 2021), achieving conditional coverage
+universally is impossible without making additional assumptions about the data distribution. In
+traditional conformal prediction settings, where data points are assumed to be i.i.d. or exchangeable,
+only marginal coverage is typically guaranteed. Besides valid coverage, constructing a prediction
+region that is as narrow as possible is desirable to improve the empirical performance of conformal
+prediction. The whole space is an example of a trivial prediction set, but it is too large to be useful
+and informative.
+3
+
+Exchangeability
+(𝜀1, ⋯, 𝜀𝑛) = (𝜀𝜎1 , ⋯, 𝜀𝜎𝑛)
+𝑑
+(𝜀(𝑠1), ⋯, 𝜀(𝑠𝑛)) = (𝜀(𝑠1 + 𝛿), ⋯, 𝜀(𝑠𝑛+ 𝛿)), ∀𝛿
+Spatial Stationarity
+𝑑
+Figure 1: Difference between exchangeability and spatial stationarity.
+3
+Method
+3.1
+Background: Conformal prediction
+conformal prediction is a widely used technique for constructing prediction intervals with finite-
+sample guarantees under minimal assumptions. The method is designed to provide a prediction
+interval for a response variable Yn+1 associated with a new feature vector Xn+1, given a predictive
+model ˆf and a set of observations {(Xi, Yi)}n
+i=1. The data is divided into two disjoint sets: a training
+set used to fit the model ˆf, and a calibration set used to calculate non-conformity scores, which
+quantify the uncertainty of the model at each point. A common choice for non-conformity score is
+ˆεi = |Yi −ˆf(Xi)|, which measures how well the model prediction aligns with the observed response.
+There is no restriction on the choice of the non-conformity score.
+To construct a prediction interval for Yn+1, the empirical quantile of the non-conformity scores
+ˆQn from the calibration set is used as the estimate. Specifically, for a user-specified confidence level
+1 −α, the prediction interval is defined as
+ˆCn(Xn+1) =
+h
+ˆf(Xn+1) −ˆQn(1 −α), ˆf(Xn+1) + ˆQn(1 −α)
+i
+.
+The empirical quantile can be written explicitly as
+ˆQn(p) = inf{e ∈R :
+n
+X
+i=1
+1
+n1{ˆε(si) ≤e} ≤p}.
+Utilizing the exchangeability of the data, the method provides a prediction interval with valid
+marginal coverage, ensuring that Yn+1 falls within the interval with probability at least 1 −α.
+Besides the strong theoretical guarantee, conformal prediction is appealing due to its flexibility in
+the prediction model, as it has no assumptions about the underlying distribution of Y or the form
+of the model ˆf.
+Classical geostatistical methods like Gaussian Process (GP) assume that any finite set of
+observations has a joint Gaussian distribution. Given data, it provides both mean prediction and
+uncertainty estimates for unseen points, making it suitable for regression tasks where probabilistic
+predictions are desirable. In contrast to conformal prediction, which constructs prediction intervals
+by assessing model residuals without assumptions on data distribution, GPs rely on a Gaussian
+prior and explicit covariance structure. While conformal prediction provides finite-sample coverage
+guarantees under minimal assumptions, GPs often lose coverage when data does not satisfy the
+Gaussian assumption. Furthermore, it is computationally expensive to learn a GP model, which
+makes it difficult for GP to utilize as much data as possible. This also weakens the performance of
+GP. On the contrary, conformal prediction is computationally efficient and can be used with any
+prediction model.
+4
+
+3.2
+Proposed method: Local spatial conformal prediction (LSCP)
+In spatial settings, data often exhibit significant dependence across locations, and taking the spatial
+dependence into account can improve the accuracy of prediction intervals. To account for this, it is
+advantageous to base predictions on nearby data points, as spatially proximate observations are
+likely to share similar distributions and therefore provide more reliable information. The recent
+study by (Barber et al., 2023) highlights the importance of weighting calibration data differently,
+depending on their relevance to the target prediction point.
+To construct the prediction interval, we first split the dataset into a training set and a cal-
+ibration set.
+The training set is used to train the prediction model ˆf, while the calibration
+set decides the width of the interval.
+We assume the calibration set consists of observations
+(X(s1), Y (s1)), . . . , (X(sn), Y (sn)). For a new observation (X(sn+1), Y (sn+1)), the aim is to con-
+struct a prediction interval by selecting a neighborhood of data from the calibration data. Here we
+use N(sn+1) to represent all the indices i so that si is in the neighborhood of sn+1. The neighborhood
+can be determined via various criteria, and a common approach is to include all nearby points
+located within a specified distance threshold. In the paper, we use k-nearest neighbor for simplicity.
+Given the trained model ˆf, the non-conformity scores are defined as ˆε(si) = Y (si) −ˆf(X(si)).
+We then define the conditional cumulative distribution function (CDF) for the non-conformity scores
+based on the selected neighbors, denoted by
+F(e|{ˆε(si)}i∈N(sn+1)) = P(ˆε(sn+1) ≤e|{ˆε(si)}i∈N(sn+1)).
+The conditional quantile Qn(p) is defined as
+Qn(p) = inf{e ∈R : F(e|{ˆε(si)}i∈N(sn+1)) ≥p}.
+The empirical quantile places an equal weight on all the points, which may not fully capture
+the dependence structure. Instead, we apply a quantile regression estimator bQn on the residuals
+{ˆε(si)}i∈N(sn+1).
+The estimator, bQn(α), predicts the α-quantile of the residual ˆε(sn+1) given
+the values of its neighbors. For computational efficiency, we use Quantile Random Forests from
+(Meinshausen & Ridgeway, 2006), although other quantile regression techniques could also be applied.
+The resulting prediction interval is:
+ˆCn(X(sn+1)) = [ ˆf(X(sn+1)) + bQn(β∗), ˆf(X(sn+1)) + bQn(1 −α + β∗)],
+where β∗= argminβ∈[0,α]( bQn(1 −α + β) −bQn(β)). Here β is optimized to find the tightest interval.
+To formalize this approach, let ˜X(si) = (ˆε(sj))j∈N(si) and ˜Y (si) = ˆε(si). The quantile regression,
+which learns the conditional quantile of F( ˜Y (sn+1)| ˜X(sn+1)), computes:
+bQn(p) = inf{e ∈R :
+X
+i∈N(sn+1)
+ωi1{ ˜Y (si) ≤e} ≤p},
+where the weights ωi are learned through quantile regression.
+3.3
+Comparison with related methods
+3.3.1
+Global Spatial Conformal Prediction
+Global Spatial Conformal Prediction (GSCP), introduced in (Mao et al., 2024), applies equal
+weighting to all non-conformity scores across the calibration dataset, where the non-conformity
+score is defined as
+ˆε(si) =
+
+Yi −ˆf(si, X(si))
+ˆσ(si, X(si))
+ .
+5
+
+sparse
+dense
+Ƹ𝜀(𝑠2)
+Ƹ𝜀(𝑠4)
+Ƹ𝜀(𝑠1)
+Ƹ𝜀(𝑠5)
+Ƹ𝜀(𝑠3)
+𝜔1
+𝜔2
+𝜔3
+𝜔4
+𝜔5
+Ƹ𝜀(𝑠)
+neighboring points
+test point
+Figure 2: Illustration of Localized Spatial Conformal Prediction (LSCP). Left: k-nearest neighbors
+with weights predict test points and quantify uncertainty. Right: Neighborhoods adapt to dense
+and sparse regions. Red points mark test locations, dashed circles show 5-nearest neighbors, and
+darker grey indicates lower uncertainty. LSCP uses neighbors to construct prediction intervals.
+Algorithm 1 Spatial Conformal Prediction
+Require: Dataset {(x(si), y(si))}n
+i=1, prediction algorithm A, significance level α
+Ensure: Prediction intervals { bCn (x(sn+1))}
+1: Split the dataset into training data and calibration data.
+2: Train the prediction model ˆf with the training data using the prediction algorithm A.
+3: Select the neighborhood of sn+1 in the calibration data, denoted as N(sn+1).
+4: Compute the non-conformity scores ˆε(si) = Y (si) −ˆf(X(si)) for all data in the calibration set.
+5: Set ˜Y (si) = ˆε(si) and
+6: ˜X(si) = (ˆε(sj1), . . . , ˆε(sj|N(si)|)), where sj ∈N(si).
+7: Fit quantile regression bQn with all pairs ( ˜X(si), ˜Y (si)) in the calibration data.
+8: Obtain the prediction interval ˆCn(X(sn+1)).
+The estimated quantile at any point is given by
+ˆQn(p) = inf{e ∈R : 1
+n
+n
+X
+i=1
+1{ˆε(si) ≤e} ≤p}.
+(1)
+The method can be viewed as an extension of split conformal prediction. Its primary advantage
+is the strong theoretical guarantee, achieved with minimal assumptions. When the spatial locations
+are sampled i.i.d. from a common distribution Fε(s), the data becomes exchangeable because
+switching the order does not change the joint probability. The marginal coverage automatically
+holds in this situation.
+However, in real-world applications, the performance of global conformal methods like GSCP may
+be limited because data distributions can vary across locations. Unfortunately, the exchangeability
+does not hold for localized methods. Since GSCP lacks adaptivity to different locations, it tends
+to construct intervals that may be overly conservative to meet the marginal coverage requirement,
+leading to overcoverage in some regions.
+6
+
+3.3.2
+Smoothed Local Spatial CP
+Smoothed Local Spatial Conformal Prediction (SLSCP) (Mao et al., 2024) improves upon previous
+GSCP by utilizing only nearby data to construct prediction intervals. The non-conformity scores
+are defined as in Equation 1, but the quantile is estimated locally:
+ˆQn(p) = inf{e ∈R :
+X
+i∈N(sn+1)
+ωi1{ ˜Y (si) ≤e} ≤p}.
+(2)
+A key difference between our method and SLSCP is in the choice of weights ωi.
+In SLSCP,
+ωi ∝k(∥si −sn+1∥), where k is a kernel function that depends solely on the distance between spatial
+locations. In contrast, our method learns ωi through quantile regression based on features ˜X(s).
+This feature vector can contain additional information beyond spatial distance, allowing the learned
+weights to be more expressive and adaptive than a given kernel function. The numerical results in
+Section 5 demonstrate that our method significantly outperforms SLSCP in experiments.
+Another key distinction lies in the theoretical foundations. Conditional on the location sn+1, the
+asymptotic coverage of SLSCP depends on an infill sampling assumption, where data points become
+infinitely dense around sn+1, requiring infinitely close data. Additionally, SLSCP assumes the data
+process to be a composition of an L2-continuous spatial process and a locally i.i.d. noise process
+ε(s). Under these assumptions, the process can be shown to be locally asymptotically exchangeable,
+achieving asymptotic coverage as data points accumulate around the test location.
+In contrast, our method establishes a finite-sample bound for the conditional coverage gap of
+LSCP, which guarantees asymptotic coverage. A key distinction is that our result conditions on
+the feature X(sn+1), rather than solely on the location sn+1, making it more general and broadly
+applicable. We assume an additive data model with a stationary, spatially mixing error process
+rather than an i.i.d. process. Spatial mixing implies that dependence between data points diminishes
+with increasing distance. Instead of requiring infinitely close neighbors, we assume that the average
+dependence decreases as more neighbors are included. The assumption is reasonable in that, given
+a fixed dataset, selecting more neighbors for prediction increases the neighborhood size, leading to a
+natural decay in correlation as more distant neighbors are included. Furthermore, our setting can be
+extended to spatio-temporal settings, which are commonly encountered in real-world applications.
+In contrast, SLSCP cannot generalize to time-series data or similar scenarios, as the time index
+cannot become infinitely dense, as required by the infill sampling assumption.
+3.3.3
+Localized Conformal Prediction
+Localized Conformal Prediction (LCP), introduced in (Guan, 2023), provides a general framework
+for localized conformal prediction rather than the spatial setting only. The method combines GSCP
+and SLSCP in quantile estimation:
+ˆQn(p) = inf{e ∈R :
+n
+X
+i=1
+ωi1{ ˜Y (si) ≤e} ≤p}.
+(3)
+Similar to GSCP, LCP uses all calibration data for prediction, but like SLSCP, it applies weights
+to each data point. The weights are defined as ωi ∝k(X(si), X(sn+1)), where k is a user-specified
+kernel function measuring similarity between features. The choice allows for more flexibility than the
+location-based weights in SLSCP, as feature-based weights can capture more detailed information.
+However, LCP still relies on user-specified weights, meaning the chosen kernel function might not
+fully capture the dependence structure in the data.
+7
+
+Table 1: Comparison of assumptions and algorithms of three related localized conformal prediction
+methods.
+LSCP (Ours)
+SLSCP (Mao et al., 2024)
+LCP (Guan, 2023)
+Algorithm
+localized weighted quantile
+localized weighted quantile
+global weighted quantile
+Weights
+learned by quantile regression
+parametric kernel for location s
+parametric kernel for feature X(s)
+Distributional
+assumption
+stationary and spatial mixing
+noise ε(s)
+locally i.i.d. noise ε(s)
+globally i.i.d. data (X(s), Y (s))
+Data model
+additive noise
+continuous mapping from L2-continuous
+spatial and noise processes
+no assumption
+In terms of theoretical assumptions, LCP assumes that the data {(Xi, Yi)}n
+i=1 are i.i.d., which
+ensures finite-sample marginal coverage. The assumption is stronger than all the other methods,
+which hinders the generality of the result.
+4
+Theoretical results
+4.1
+Setting
+Suppose the data is denoted by {Z(si)}n
+i=1, where Z(s) = (X(s), Y (s)), s ∈Rd denotes the spatial
+location, X(s) ∈Rd is the feature vector and Y (s) ∈R represents the univariate response. We
+assume that Y (s) is generated from a true model with unknown additive noise:
+Y (s) = f(X(s)) + ε(s),
+where f is an unknown function and ε(s) represents the noise process, whose marginal distribution
+is not necessarily Gaussian. Given a pre-trained prediction model ˆf, we can compute the non-
+conformity scores
+ˆε(s) = Y (s) −ˆf(X(s)).
+The estimated conditional distribution function bF(ε|x) is defined as
+bF(ε|x) =
+n
+X
+i=1
+wt(x)1(ˆε(si) ≤ε).
+Besides, we define the weighted empirical CDF as
+eF(ε|x) =
+n
+X
+i=1
+wt(x)1(ε(si) ≤ε).
+4.2
+Preliminary
+Stochastic Design: Random observation location.
+The key distinction between time series and
+spatial data lies in the indexing of observations. For time series data, observations are indexed by
+a fixed, ordered sequence of time points, denoted as (Xt, Yt). This inherent ordering imposes a
+natural temporal structure, preventing data points from being exchangeable. In contrast, spatial
+data are indexed by locations that can be irregularly distributed across space, with each data point
+in a random field represented as (X(s), Y (s)), where s denotes a spatial location. In stochastic
+design, the spatial locations s are considered random, following some underlying distribution. If
+8
+
+we further assume that the locations of both calibration and test data are independently sampled
+from the same underlying distribution, then exchangeability holds naturally. In this case, marginal
+coverage is guaranteed for global conformal prediction that constructs prediction region with the
+whole calibration dataset, as established in (Mao et al., 2024). However, this does not apply in
+time series contexts due to the fixed temporal order, making it impossible to freely exchange data
+points. In a spatial setting, local conformal methods violate this exchangeability assumption because
+they apply different weights or restrictions based on proximity. As a result, while global conformal
+methods achieve exchangeability and marginal coverage, local conformal methods require additional
+conditions to maintain validity. Interestingly, we can consider time series as a special case of spatial
+data by restricting the spatial domain to a single dimension and treating time as a scalar spatial
+index. In this case, each time point can be thought of as a distinct “location” on a one-dimensional
+grid, with the locations ordered sequentially. This perspective highlights that time series analysis is
+a subset of spatial analysis, albeit with the added constraint of temporal ordering.
+Spatial mixing.
+Next, we define the strong mixing co-efficient for random field Z(·). Let FZ(T) =
+σ⟨Z(s) : s ∈T⟩be the σ-field generated by the variables {Z(s) : s ∈T}, T ⊂Rd. For any two subsets
+T1 and T2 of Rd, let ˜α (T1, T2) = sup {|P(A ∩B) −PAPB| : A ∈FZ (T1) ,
+B ∈FZ (T2)}, and let
+d (T1, T2) = inf {|x −s| : x ∈T1,
+s ∈T2}. For d = 1, we define the strong mixing co-efficient as
+α(a; b) = sup{˜α((x −b, x], [y, y + b)) : −∞< x + a < y < ∞},
+a > 0, b > 0.
+Thus, α(a; ∞) corresponds to the standard strong mixing co-efficient commonly used in the time
+series case. To define the strong mixing co-efficient for d ≥2, let Rk(b) ≡
+n
+∪k
+i=1Di : Pk
+i=1 |Di| ≤b
+o
+be the collection of all disjoint unions of k cubes D1, . . . , Dk in Rd, k ≥1, b > 0. Following the
+definition in (Lahiri, 2003), the strong-mixing coefficient for the r.f. Z(·) for d ≥2 is defined as
+α(a; b) = sup {˜α (T1, T2) : d (T1, T2) ≥a, T1, T2 ∈R3(b)} .
+To simplify the exposition, we further assume that there exists a nonincreasing function α1(·)
+with lima→∞α1(a) = 0 and a nondecreasing function g(·) such that the strong-mixing coefficients
+α(a, b) satisfies the inequality
+α(a, b) ≤α1(a)g(b),
+a > 0, b > 0,
+(4)
+where the function g(·) is bounded for d = 1 but may be unbounded for d ≥2. Without loss of
+generality, we may assume that α1(·) is left continuous and g(·) is right continuous (otherwise,
+replace α1(a) by α1(a−) ≥α1(a) and g(b) by g(b+) ≥g(b)). We shall specify exact conditions on
+the rate of decay of α1(·) and the growth rate of g(·) in the statements of the results below.
+4.3
+Assumptions
+With the data (X(s1), Y (s1)), · · · , (X(sn), Y (sn)), we would like to construct a prediction region for
+Y (sn+1) where only the feature X(sn+1) is known. Define ωn(X(si)) to be the normalized weight
+over samples s1, · · · , sn so that Pn
+i=1 ωn(X(si)) = 1. The weight function can be some function
+that measures the similarity between X(s) and X(sn+1).
+Assumption 4.1 (Weight decay). There exists γ > 0 so that the normalized weights satisfy
+ωn(X(si)) = o(n−1+γ
+2 ),
+(5)
+for all i; meaning that Mn = max1≤i≤n ωn(X(si)) = o(n−1+γ
+2 ).
+9
+
+The requirement assumes that the normalized weights decay at a rate faster than n−1
+2 . As we
+can see, ωn = 1
+n is a special case that satisfies this condition. The condition is also weaker than the
+requirement of ωn = O( 1
+n) in a related study (Xu et al., 2024). Besides, the assumption can also be
+inferred from that of SLSCP (Mao et al., 2024) where a GBF kernel with infinitely close data leads
+to uniform weights.
+Assumption 4.2 (Estimation quality). There exists a sequence {δn}n≥1 such that
+n
+X
+i=1
+∥ˆε(si) −ε(si)∥2 ≤δ2
+n
+Mn
+,
+∥ˆε(sn+1) −ε(sn+1)∥≤δn.
+(6)
+The assumption requires that the average prediction error be bounded by a term δ2
+n, which is a
+weaker requirement than the similar condition for bounding the average prediction error in (Xu &
+Xie, 2021). The reason lies in that Mn is allowed to decay at a slower rate than 1
+n. Notably, our
+result of the coverage gap does not require δn to converge to zero. However, there are many cases
+where δn does indeed approach zero. For instance, extensive research has investigated the prediction
+error of neural networks. Under certain regularization conditions on f, (Barron, 1994) shows that
+δn = O
+
+1
+√n
+
+.
+Assumption 4.3 (Stationary and spatial mixing). The random field ε(s) is stationary and strongly
+mixing with coefficient α. The strong mixing coefficient can be bounded by α(a, b) ≤α1(a)g(b), where
+α1 is a nonincreasing function with lima→∞α1(a) = 0. We assume Ed∼gnα1(d)2 ≤M
+n2 where gn(d)
+is distribution of the distance between two sample points si and sj (1 ≤i, j ≤n). Besides, Fε(x)
+(the CDF of the true non-conformity score) is assumed to be Lipschitz continuous with constant
+Ln+1 > 0.
+The requirement assumes that the true error ε(s) is spatially stationary and strongly mixing,
+a condition weaker than the i.i.d. assumption used in (Mao et al., 2024) for spatial conformal
+prediction. Under this assumption, the original random field {X(s), Y (s)} can still exhibit complex
+dependencies and be highly non-stationary. Here b is a constant in the definition of spatial mixing,
+which can be any specified positive integer. The assumption further requires that the expectation of
+the mixing coefficient α1(d) decays at a certain rate. The decay is reasonable in that a bigger n
+implies sampling from a larger area, thereby increasing the average distance between calibration
+points. The assumption is analogous to a common condition in time series analysis, which requires
+the sum of strong mixing coefficients to be bounded. To sum up, this assumption indicates that
+dependence between data points diminishes as distance increases.
+4.4
+Coverage guarantee
+With the assumptions, we can show that the distance between the empirical CDF of the residuals
+ˆ
+ε(s) and the noise ε(s) can actually be bounded through Lemma 4.4
+Lemma 4.4 (Distance between the empirical CDF of ε and ˆε). Under Assumption 4.1 and 4.2,
+sup
+x | bFn+1(y) −eFn+1(y)| ≤(Ln+1 + 1)δn + 2 sup
+y | eFn+1(y) −Fε(y)|.
+(7)
+Besides, we can also prove that the empirical CDF of the noise ε(s) converges to its CDF with a
+high probability.
+10
+
+Lemma 4.5 (Convergence of empirical CDF of ε). Under Assumptions 4.1-4.3, with probability
+higher than 1 −(2 + M + 2
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3 ,
+sup
+y
+ eFn+1(y) −Fϵ(y)
+ ≤Mnn
+1+γ
+2 ,
+(8)
+where eFn+1(y) = Pn
+i=1 ωn(X(si))1(ϵ(si) ≤y).
+Our main theorem is the following: Using the previous lemma, we establish the asymptotic
+convergence of conditional coverage.
+Theorem 4.6 (Conditional coverage guarantee). Under Assumption 4.1-4.3, for any α ∈(0, 1) and
+sample size T, we have
+P
+
+Y (sn+1) ∈bCt−1 (X(sn+1)) | X(sn+1)
+
+−(1 −α)
+
+≤4Ln+1δn + 6Mnn
+1+γ
+2
++ (4 + 2M + 4
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3 .
+(9)
+We can establish the same result for marginal coverage with the tower law property.
+Corollary 4.7 (Marginal Coverage). Under Assumption 4.1-4.3, for any α ∈(0, 1) and sample size
+T, we have
+P
+
+Y (sn+1) ∈bCt−1 (X(sn+1))
+
+−(1 −α)
+
+≤4Ln+1δn + 6Mnn
+1+γ
+2
++ (4 + 2M + 4
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3 .
+(10)
+From Inequality 9, we can see that the order of the coverage bound is controlled by Mnn
+1+γ
+2
+and
+n−2γ
+3 (log2 n + 2)
+4
+3 . The first term is equal to n
+γ−1
+2
+in the special case of Mn = 1
+n and the second
+term diminishes when n is large enough because n is of higher order than log2 n. As long as the
+estimation gap δn goes to zero when n gets larger, the asymptotic conditional coverage can be
+inferred from the main theorem.
+5
+Experiments
+In this section, we compare our proposed LSCP method against four baseline approaches. The first
+method, EnbPI (Xu & Xie, 2021), is designed for time series data and applies equal weight to the
+most recent observations. The second method, GSCP (Mao et al., 2024), uses the entire dataset
+for prediction, applying equal weights to all data points. The third method, SLSCP (Mao et al.,
+2024), leverages k-nearest neighbors for uncertainty quantification, assigning different weights to
+each point based on the spatial distance between the test data and the calibration data. The fourth
+method, LCP (Guan, 2023), utilizes all data points for prediction, weighting them according to the
+similarity between the features of test data and calibration data. Both SLSCP and LCP use the
+Gaussian kernel as a similarity measure.
+We randomly split the dataset into three subsets: 40% for training, 40% for calibration, and
+20% for testing. For each method and dataset, the number of neighbors and the Gaussian kernel
+bandwidth are selected through 5-fold cross-validation.
+11
+
+Scenario 1
+(a) Coverage
+(b) Width
+Scenario 2
+(c) Coverage
+(d) Width
+Scenario 3
+(e) Coverage
+(f) Width
+New Mexico
+(g) Coverage
+(h) Width
+Georgia
+(i) Coverage
+(j) Width
+Figure 3: The violin plots on the left show the distribution of coverage across different areas, while
+the plots on the right show the distribution of width. Each row represents a different scenario or
+location.
+12
+
+Scenario 1
+Scenario 2
+Scenario 3
+(a) Residual
+(b) LSCP
+(c) EnbPI
+(d) SLSCP
+(e) LCP
+Figure 4: The heatmaps illustrate the width of the prediction intervals for each method across
+the three scenarios. The width heatmap of LSCP closely matches the true residual heatmap,
+demonstrating its ability to capture fine details accurately.
+5.1
+Synthetic data experiments
+We begin by comparing LSCP with baseline methods across several simulated scenarios. For
+simplicity, we assume that the locations s are uniformly sampled from the unit grid [0, 1] × [0, 1].
+The mean-zero stationary Gaussian process X(s) is defined using a Mat´ern covariance function with
+variance σ2 = 1, range ϕ = 0.1, and smoothness κ = 0.7. The scenarios are as follows:
+1. Y (s) = X(s) + ϵ(s).
+2. Y (s) = X(s)|ϵ(s)|.
+3. Y (s) = X(s) + sin(∥s∥2)ϵ(s).
+These scenarios incorporate nonlinear and non-stationary settings that extend beyond the
+assumptions of our theoretical framework. Nevertheless, the empirical results demonstrate that
+LSCP consistently outperforms other methods across all scenarios.
+In Table 2, LSCP achieves the target coverage of 90% across all cases while maintaining
+significantly narrower prediction intervals. Figure 4 visualizes the interval width over the spatial
+domain for each scenario and the true residuals. GSCP is omitted from these plots as it produces
+uniform interval widths across space. A larger interval width indicates higher model uncertainty.
+The results show that LSCP adapts more locally, whereas the other methods exhibit smoother, more
+uniform patterns. Both EnbPI and SLSCP rely on k-nearest neighbors for constructing prediction
+intervals, differing primarily in their weighting schemes.
+To evaluate the methods, we divide the grid into 10×10 areas and compute coverage and average
+interval width for each, as shown in Figure 3. Both LSCP and GSCP achieve average coverage
+13
+
+Table 2: Simulation: The table presents a comparison of the coverage and prediction interval width
+for five methods across three scenarios. Target coverage is 90%.
+Method
+S1 Coverage
+S1 Width
+S2 Coverage
+S2 Width
+S3 Coverage
+S3 Width
+LSCP
+92%
+1.44
+90.4%
+0.64
+91.3%
+0.97
+EnbPI
+88.5%
+1.83
+89.2%
+0.75
+86.2%
+1.12
+GSCP
+89.4%
+1.92
+89.7%
+0.77
+89.6%
+1.30
+SLSCP
+90.6%
+1.64
+88.2%
+0.73
+89.1%
+1.07
+LCP
+89.6%
+1.92
+94.1%
+0.78
+91.8%
+1.43
+Table 3: Real data: The table presents a comparison of the coverage and prediction interval width
+for five methods on mobile signal data. The target coverage is 90%.
+Method
+NM Coverage
+NM Width
+GA coverage
+GA width
+LSCP
+92.6%
+211.3
+90.6%
+130.8
+EnbPI
+88.4%
+272.2
+88.6%
+166.3
+GSCP
+90.1%
+295.9
+89.2%
+167.3
+SLSCP
+89.8%
+276.8
+89.6%
+167.8
+LCP
+89.7%
+266.4
+89.3%
+166.7
+above the target 90%, with LSCP exhibiting the most stable and consistent distribution. LSCP also
+attains the smallest interval width and the highest consistency. LCP performs similarly to GSCP, as
+both utilize the entire calibration dataset, and as kernel bandwidth increases, LCP weights converge
+to GSCP’s uniform weights. Overall, LSCP produces tighter valid regions with superior consistency.
+5.2
+Real data experiments
+In the real-data experiments, we utilize mobile network measurement data from the Ookla public
+dataset, which records user-reported statewide mobile internet performance. Our analysis focuses on
+datasets from New Mexico and Georgia. The data is unevenly distributed across urban and suburban
+areas. We employ kernel regression as the prediction method ˆf and compare the performance
+of conformal methods. The New Mexico dataset contains 24,983 observations, while the Georgia
+dataset includes 28,587 data points.
+As shown in Table 3, our proposed LSCP method outperforms competing methods by achieving
+significantly narrower prediction intervals while maintaining better coverage. Similar to the synthetic
+experiments, we divide each state into 10 × 10 grids and compute coverage and interval width for
+the test data within each grid. The violin plots in Figure 3 illustrate the grid-level distribution of
+these metrics, highlighting spatial performance. Unlike the table, which reports averages over all
+test points, the plots emphasize spatial consistency, showing higher coverage in urban areas due to
+denser data.
+The results demonstrate that LSCP consistently achieves high coverage with narrow, uniform
+intervals, outperforming alternative methods.
+The violin plots confirm LSCP’s stability and
+uniformity across the spatial domain, underscoring its robustness to non-uniform data distributions.
+These findings align with our synthetic study, further validating LSCP’s effectiveness in diverse and
+complex settings.
+14
+
+6
+Conclusion
+This paper introduces the Localized Spatial Conformal Prediction (LSCP) method, which addresses
+key limitations in spatial and spatio-temporal prediction for non-exchangeable data. Traditional
+methods, such as Kriging, often depend on strong parametric assumptions that may not hold in
+complex real-world scenarios, including heterogeneous or large-scale spatial datasets. While machine
+learning techniques offer flexibility and predictive power, they typically lack robust uncertainty
+quantification, which is critical for applications requiring reliable decision-making.
+Our results show that LSCP significantly outperforms existing methods, including GSCP, SLSCP,
+and EnbPI, by achieving more accurate coverage and narrower prediction intervals. This advantage
+is particularly pronounced in scenarios with non-stationary and non-Gaussian data, where LSCP’s
+flexibility enables it to effectively handle such complexities. Moreover, LSCP’s theoretical framework
+supports extension to spatio-temporal settings where exchangeability is unlikely to hold.
+In synthetic experiments, LSCP consistently meets the target coverage with narrower intervals,
+even in cases beyond its assumptions, demonstrating robustness across diverse scenarios. Real-world
+experiments further validate LSCP’s utility, showing that it generates detailed uncertainty maps
+with tighter intervals than baseline methods. These features underscore LSCP’s potential as a
+reliable and scalable tool for spatial uncertainty quantification, offering both theoretical guarantees
+and practical performance benefits.
+References
+Angelopoulos, A., Candes, E., and Tibshirani, R. J. Conformal pid control for time series prediction.
+Advances in neural information processing systems, 36, 2024.
+Angelopoulos, A. N., Bates, S., et al. Conformal prediction: A gentle introduction. Foundations
+and Trends® in Machine Learning, 16(4):494–591, 2023.
+Barber, R. F., Candes, E. J., Ramdas, A., and Tibshirani, R. J. Conformal prediction beyond
+exchangeability. The Annals of Statistics, 51(2):816–845, 2023.
+Barron, A. R. Approximation and estimation bounds for artificial neural networks. Machine learning,
+14:115–133, 1994.
+Chen, W., Li, Y., Reich, B. J., and Sun, Y. Deepkriging: Spatially dependent deep neural networks
+for spatial prediction. arXiv preprint arXiv:2007.11972, 2020.
+Cressie, N. Statistics for spatial data. John Wiley & Sons, 2015.
+Duan, J. A., Guindani, M., and Gelfand, A. E.
+Generalized spatial dirichlet process models.
+Biometrika, 94(4):809–825, 2007.
+Foygel Barber, R., Candes, E. J., Ramdas, A., and Tibshirani, R. J. The limits of distribution-free
+conditional predictive inference. Information and Inference: A Journal of the IMA, 10(2):455–482,
+2021.
+Fuglstad, G.-A., Simpson, D., Lindgren, F., and Rue, H. Does non-stationary spatial data always
+require non-stationary random fields? Spatial Statistics, 14:505–531, 2015.
+Gelfand, A. E., Kottas, A., and MacEachern, S. N. Bayesian nonparametric spatial modeling with
+dirichlet process mixing. Journal of the American Statistical Association, 100(471):1021–1035,
+2005.
+15
+
+Gibbs, I. and Candes, E. Adaptive conformal inference under distribution shift. Advances in Neural
+Information Processing Systems, 34:1660–1672, 2021.
+Guan, L. Localized conformal prediction: A generalized inference framework for conformal prediction.
+Biometrika, 110(1):33–50, 2023.
+Heaton, M. J., Datta, A., Finley, A. O., Furrer, R., Guinness, J., Guhaniyogi, R., Gerber, F.,
+Gramacy, R. B., Hammerling, D., Katzfuss, M., et al. A case study competition among methods
+for analyzing large spatial data. Journal of Agricultural, Biological and Environmental Statistics,
+24:398–425, 2019.
+Hengl, T., Nussbaum, M., Wright, M. N., Heuvelink, G. B., and Gr¨aler, B. Random forest as a
+generic framework for predictive modeling of spatial and spatio-temporal variables. PeerJ, 6:
+e5518, 2018.
+Jiang, H., Belding, E., Zegure, E., and Xie, Y. Learning cellular network connection quality with
+conformal. arXiv preprint arXiv:2407.10976, 2024.
+Lahiri, S. N. Central limit theorems for weighted sums of a spatial process under a class of stochastic
+and fixed designs. Sankhy¯a: The Indian Journal of Statistics, pp. 356–388, 2003.
+Lei, J. and Wasserman, L. Distribution-free prediction bands for non-parametric regression. Journal
+of the Royal Statistical Society Series B: Statistical Methodology, 76(1):71–96, 2014.
+Mao, H., Martin, R., and Reich, B. J. Valid model-free spatial prediction. Journal of the American
+Statistical Association, 119(546):904–914, 2024.
+Meinshausen, N. and Ridgeway, G. Quantile regression forests. Journal of machine learning research,
+7(6), 2006.
+Rio, E. et al. Asymptotic theory of weakly dependent random processes, volume 80. Springer, 2017.
+Siddique, T., Mahmud, M. S., Keesee, A. M., Ngwira, C. M., and Connor, H. A survey of uncertainty
+quantification in machine learning for space weather prediction. Geosciences, 12(1):27, 2022.
+Tibshirani, R. J., Foygel Barber, R., Candes, E., and Ramdas, A. Conformal prediction under
+covariate shift. Advances in neural information processing systems, 32, 2019.
+Vovk, V., Gammerman, A., and Shafer, G. Algorithmic learning in a random world, volume 29.
+Springer, 2005.
+Xu, C. and Xie, Y.
+Conformal prediction interval for dynamic time-series.
+In International
+Conference on Machine Learning, pp. 11559–11569. PMLR, 2021.
+Xu, C. and Xie, Y. Sequential predictive conformal inference for time series. In International
+Conference on Machine Learning, pp. 38707–38727. PMLR, 2023.
+Xu, C., Jiang, H., and Xie, Y. Conformal prediction for multi-dimensional time series by ellipsoidal
+sets. arXiv preprint arXiv:2403.03850, 2024.
+Zaffran, M., F´eron, O., Goude, Y., Josse, J., and Dieuleveut, A. Adaptive conformal predictions for
+time series. In International Conference on Machine Learning, pp. 25834–25866. PMLR, 2022.
+16
+
+A
+Proofs
+In our spatial conformal prediction method, the weight function is defined as ωn. The weighted
+empirical distribution for the true noise ε is
+˜Fn+1(y) =
+n
+X
+i=1
+ωn(X(si))1(ε(si) ≤y).
+(1)
+Here ωn is the normalized weight. Besides, we also define the weighted empirical distribution for
+the residual ˆε as
+bFn+1(y) =
+n
+X
+i=1
+ωn(X(si))1(ˆε(si) ≤y).
+(2)
+We assume an additive true model which is commonly used in literature like (Xu & Xie, 2021):
+Y (s) = f(X(s)) + ε(s).
+(3)
+Considering that the residual is ˆε(s) = Y (s) −ˆf(X(s)), it follows
+ε(s) = ˆf(X(s)) −f(X(s)),
+(4)
+which is the prediction error.
+The following Lemma bounds the distance between the weighted empirical distribution for the
+residual and true error.
+Lemma A.1. Under Assumption 4.2 and 4.1,
+sup
+x | bFn+1(y) −eFn+1(y)| ≤(Ln+1 + 1)δn + 2 sup
+y | eFn+1(y) −Fε(y)|.
+(5)
+Proof. Using Assumption 4.2, we have that
+n
+X
+i=1
+ωn(X(si))|ε(si) −ˆε(si)| ≤Mn
+n
+X
+i=1
+|ε(si) −ˆε(si)| ≤δ2
+n.
+(6)
+Let S = {t : |ε(si) −ˆε(si)| ≥δn}. Then
+δn
+X
+i∈S
+ωn(X(si)) ≤
+n
+X
+i=1
+ωn(X(si))|ε(si) −ˆε(si)| ≤δ2
+n.
+(7)
+So P
+i∈S ωn(X(si)) ≤δn. Then
+| bFn+1(y) −eFn+1(y)| ≤
+n
+X
+i=1
+ωn(X(si))|1{ˆε(si) ≤y} −1{ε(si) ≤y}|
+≤
+n
+X
+i=1
+ωn(X(si)) +
+X
+i/∈S
+ωn(X(si))|1{ˆε(si) ≤y} −1{ε(si) ≤y}|
+(i)
+≤
+n
+X
+i=1
+ωn(X(si)) +
+X
+i/∈S
+ωn(X(si))1{|ε(si) −y| ≤δn}
+≤
+n
+X
+i=1
+ωn(X(si)) +
+n
+X
+i=1
+ωn(X(si))1{|ε(si) −y| ≤δn}
+17
+
+≤δn + P(|ε(sn+1) −y| ≤δn)+
+sup
+y
+
+n
+X
+i=1
+ωn(X(si))1{|ε(si) −y| ≤δn} −P(|ε(sn+1) −y| ≤δn)
+
+= δn + [Fε(y + δn) −Fε(y −δn)] + sup
+y
+[ eFn+1(y + δn) −eFn+1(y −δn)]
+−[Fε(y + δn) −Fε(y −δn)]
+
+(ii)
+≤(Ln+1 + 1)δn + 2 sup
+y | eFn+1(y) −Fε(y)|,
+where (i) is because |1{a ≤y} −1{b ≤y}| ≤1{|b −y| ≤|a −b|} for a, b ∈R and (ii) is because
+the Lipschitz continuity of Fε(y).
+Lemma A.2. Under assumption 4.1-4.3, with probability higher than 1 −Mn−2γ
+3 (log2 n+2)
+4
+3 ,
+E
+
+sup
+y | ˜Fn+1(y) −Fε(y)|2
+
+≤(2 + log2 n)2
+n
+(1 + 2
+√
+Mg(b) + n
+γ
+3 (log2 n + 2)−2
+3 ),
+(8)
+where α = .
+Proof. Define Zn+1(y) = ˜Fn+1(y)−Fε(y). Besides, we also define Zn+1(A) = Pn
+i=1 ωn(X(si))1(X(si) ∈
+A) −Fε(ε ∈A), where A can be any region. Let N be some positive integer to be chosen later. We
+first represent the CDF Fε(x) in base 2:
+Fε(x) =
+N
+X
+i=1
+bi(x)2−i + rN(x),
+(9)
+where rN(x) ∈[0, 2−N) and bi = 0 or 1.
+For l ∈{1, 2, · · · , N}, define
+Bl(x) =
+l
+X
+i=1
+bi(x)2−i.
+(10)
+We can define the points xi where Fε(xi) = Bi(x). We have that
+Fε(x) −Fε(xi) =
+N
+X
+i=l+1
+ai(x)2−i + rN(x) ≤2−l.
+(11)
+As a result, we can partition Zn+1(x) into the following sum:
+Zn+1(F −1
+ε
+(x)) = Zn+1(F −1
+ε
+(B1(x))) +
+N−1
+X
+i=1
+(Zn+1(F −1
+ε
+(Bi+1(x))) −Zn+1(F −1
+ε
+(Bi(x))))
++ (Zn+1(F −1
+ε
+(y)) −Zn+1(F −1
+ε
+(BN(x)))).
+(12)
+In order to bound Zn+1(y), we can bound each individual term instead. Since Bi+1(x) −Bi(x) =
+bi+1(x)2−(i+1) ≤2−(i+1), we know the interval [Bi(x), Bi+1(x)] either has zero length, or it is equal
+to one region in the set {[(j −1)2−(i+1), j2−(i+1)], 1 ≤j ≤2i+1}. As a result, we have
+|Zn+1(F −1
+ε
+(Bi+1(x)))−Zn+1(F −1
+ε
+(Bi(x)))| ≤
+sup
+j∈[1,2i+1]
+|Zn+1(F −1
+ε
+(j2−(i+1))) −Zn+1(F −1
+ε
+((j −1)2−(i+1)))|
+(13)
+18
+
+Let
+δi =
+sup
+j∈[1,2i+1]
+|Zn+1([F −1
+ε
+(j2−(i+1)), F −1
+ε
+((j −1)2−(i+1))])|,
+and
+δxN = sup
+x |Zn+1([F −1
+ε
+(BN(x)), x])|.
+It follows that
+|Zn+1(F −1
+ε
+(y))| ≤
+N
+X
+i=1
+δi + δxN.
+(14)
+By the triangle inequality,
+(E( sup
+y∈[0,1]
+|Zn+1(F −1
+ε
+(y))|2))1/2 ≤
+N
+X
+i=1
+(Eδ2
+i )1/2 + (Eδ2
+xN)1/2.
+(15)
+Then we need to bound ∥δi∥2 and ∥δxN∥2 separately. Since δi is computing the supremum over
+a set, it can be bounded by the sum over the set,
+δ2
+i ≤
+2i
+X
+j=1
+(Zn+1(F −1
+ε
+(j2−(i+1))) −Zn+1(F −1
+ε
+((j −1)2−(i+1)))2.
+(16)
+Taking expectation, we have
+Eδ2
+i ≤
+2i
+X
+j=1
+E(Zn+1(F −1
+ε
+(j2−(i+1))) −Zn+1(F −1
+ε
+((j −1)2−(i+1)))2
+=
+2i
+X
+j=1
+Var(Zn+1([F −1
+ε
+((j −1)2−(i+1)), F −1
+ε
+(j2−(i+1))])).
+(17)
+Let (ϵi)i>0 be a sequence of independent and symmetric random variables in {−1, 1}. For any
+finite partition A1, · · · , Ak of R,
+k
+X
+j=1
+Var Zn+1(Aj) = E(Z2
+n+1(
+k
+X
+j=1
+ϵi1Ai))
+(i)
+≤M2
+n(n + 2
+X
+1≤i<j≤n
+αij),
+(18)
+where αij = α(σ(ε(si)), σ(ε(sj))) is the alpha-mixing coefficient, Mn = max1≤i≤n ωn(X(si)) and (i)
+is because of Lemma 1.1 in (Rio et al., 2017).
+Because of Assumption 4.3, we have
+E
+X
+1≤i<j≤n
+αij ≤E
+X
+1≤i<j≤n
+α1(|si −sj|)g(b)
+≤n
+s
+E
+X
+1≤i<j≤n
+α2
+1(|si −sj|)g(b)
+≤n2q
+Ed∼gnα2
+1(d)g(b) ≤n
+√
+Mg(b),
+(19)
+19
+
+where gn is the distribution of the distance between si and sj for any i, j ∈{1, · · · , n}.
+Besides, using Cauchy-Schwarz inequality, the variance can be bounded by
+Var
+X
+1≤i<j≤n
+αij = E
+
+
+X
+1≤i<j≤n
+αij
+
+
+2
+−
+
+E
+X
+1≤i<j≤n
+αij
+
+
+2
+≤E
+
+
+X
+1≤i<j≤n
+αij
+
+
+2
+≤n2E
+
+
+X
+1≤i<j≤n
+α2
+ij
+
+
+≤n2M.
+(20)
+From Markov inequality, we know that for any k > 0,
+P
+
+1
+n
+
+X
+1≤i<j≤n
+αij −E
+X
+1≤i<j≤n
+αij
+
+≥k
+
+≤
+Var P
+1≤i<j≤n αij
+n2k2
+≤M
+k2 .
+(21)
+Let k = n
+γ
+3 (log2 n + 2)−2
+3 , using Inequality 21, with probability higher than 1 −Mn−2γ
+3 (log2 n +
+2)
+4
+3 ,
+1
+n
+X
+1≤i<j≤n
+αij ≤
+√
+Mg(b) + n
+γ
+3 (log2 n + 2)−2
+3 .
+(22)
+Because [F −1
+ε
+((j −1)2−(i+1)), F −1
+ε
+(j2−(i+1))] for j = 1, · · · , 2i+1 is a partition of R, from 18 and
+22,
+Eδ2
+i ≤
+2i
+X
+j=1
+Var(Zn+1([F −1
+ε
+((j −1)2−(i+1)), F −1
+ε
+(j2−(i+1))]))
+≤nM2
+n(1 + 2
+√
+Mg(b) + 2n
+γ
+3 (log2 n + 2)−2
+3 ).
+(23)
+For the other term δxN, we know x = F −1
+ε
+(Fε(x)) ≤F −1
+ε
+(BN(x) + rN(x)). We have
+Zn+1([F −1
+ε
+(BN(x)), x]) = ˜Fn+1([F −1
+ε
+(BN(x)), x]) −Fε([F −1
+ε
+(BN(x)), x])
+≥−Fε([F −1
+ε
+(BN(x)), x])
+= BN(x) −x ≥−2−N.
+(24)
+On the other hand,
+Zn+1([F −1
+ε
+(BN(x)), x]) = Zn+1([F −1
+ε
+(BN(x)), BN(x)) + 2−N]) −Zn+1([F −1
+ε
+(x, BN(x)) + 2−N])
+≤Zn+1([F −1
+ε
+(BN(x)), BN(x)) + 2−N]) + 2−N.
+(25)
+As a result, we have
+δxN ≤δN + 2−N.
+(26)
+20
+
+To sum up, we prove that
+(E( sup
+y∈[0,1]
+|Zn+1(F −1
+ε
+(y))|2))
+1
+2 ≤n
+1
+2 Mn(N + 1 + 2−N)(1 + 2
+√
+Mg(b) + n
+γ
+3 (log2 n + 2)−2
+3 )
+1
+2 .
+(27)
+Let N = log2 n, we have
+E( sup
+y∈[0,1]
+|Zn+1(F −1
+ε
+(y))|2) ≤M2
+nn(2 + log2 n)2(1 + 2
+√
+Mg(b) + n
+γ
+3 (log2 n + 2)−2
+3 ).
+(28)
+Corollary A.3. Under Assumptions 4.1-4.3, with probability higher than 1−(2+M+2
+√
+Mg(b))n−2γ
+3
+(log2 n + 2)
+4
+3 ,
+sup
+y
+ eFn+1(y) −Fϵ(y)
+ ≤Mnn
+1+γ
+2 ,
+(29)
+where eFn+1(y) = Pn
+i=1 ωn(X(si))1(ϵ(si) ≤y).
+Proof. We have that
+˜Fn+1(y) −Fϵ(y) =
+n
+X
+i=1
+ωn(X(si))1(ϵ(si) ≤y) −Fϵ(y)
+=
+n
+X
+i=1
+ωn(X(si))(1(ϵ(si) ≤y) −Fϵ(y)).
+(30)
+Let Z(si) = 1(ϵ(si) ≤y) −Fϵ(y), we know
+EZ(si) = 0,
+(31)
+and Z(s) is stationary. From Lemma A.2, using Markov inequality, we have that for any k,
+P(sup
+y | ˜Fn+1(y) −Fε(y)| ≥k) ≤E(supy | ˜Fn+1(y) −Fε(y)|2)
+k2
+= M2
+nn(2 + log2 n)2(1 + 2
+√
+Mg(b) + n
+γ
+3 (log2 n + 2)−2
+3 )
+k2
+.
+(32)
+Let k = Mnn
+1+γ
+2 , we have
+P
+
+sup
+y | ˜Fn+1(y) −Fε(y)| ≥Mnn
+1+γ
+2
+
+≤(2 + log2 n)2n−γ(1 + 2
+√
+Mg(b) + n
+γ
+3 (log2 n + 2)−2
+3 )
+= (1 + 2
+√
+Mg(b))(2 + log2 n)2n−γ + (2 + log2 n)
+4
+3 n−2γ
+3
+≤(2 + 2
+√
+Mg(b))(2 + log2 n)
+4
+3 n−2γ
+3 .
+(33)
+The last inequality holds because the order of log2n is smaller than n
+γ
+3 .
+Theorem A.4. Under Assumption 4.1-4.3, for any α ∈(0, 1) and sample size T, we have
+P
+
+Y (sn+1) ∈bCt−1 (X(sn+1)) | X(sn+1) = X(sn+1)
+
+−(1 −α)
+
+≤4Ln+1δn + 6Mnn
+1+γ
+2
++ (4 + 2M + 4
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3 .
+(34)
+21
+
+Proof. For simplicity, we use Xi = X(si), Yi = Y (si), εi = ε(si) and ωni = ωn(X(si)). For any
+β ∈[0, 1],
+P
+
+Yn+1 ∈bCt−1 (Xn+1) | Xn+1
+
+−(1 −α)
+
+=
+P
+
+εn+1 ∈[ bQβ∗(Xn+1), bQ1−α+β∗(Xn+1)] | Xn+1
+
+−(1 −α)
+
+=
+P
+ 
+β ≤
+n
+X
+i=1
+ωni1(ˆεi ≤ˆεn+1) ≤1 −α + β
+!
+−(1 −α)
+
+=
+P
+
+β ≤bFn+1(ˆεn+1) ≤1 −α + β
+
+−P (β ≤Fε(εn+1) ≤1 −α + β)
+
+≤E
+1{β ≤bFn+1(ˆεn+1) ≤1 −α + β} −1{β ≤Fε(εn+1) ≤1 −α + β}
+
+(i)
+≤E
+ 1{β ≤bFn+1(ˆεn+1)} −1{β ≤Fε(εn+1)}
+
++
+1{ bFn+1(ˆεn+1) ≤1 −α + β} −1{Fε(εn+1) ≤1 −α + β}
+
+
+(ii)
+≤P
+
+|Fε(εn+1) −β| ≤
+Fε(εn+1) −bFn+1(ˆεn+1)
+
+
++ P
+
+|Fε(εn+1) −(1 −α + β)| ≤
+Fε(εn+1) −bFn+1(ˆεn+1)
+
+
+,
+(35)
+where Inequality (i) follows since for any constants a, b and univariates x, y, | 1{a ≤x ≤
+b} −1{a ≤y ≤b}| ≤|1{a ≤x} −1{a ≤y}| + |1{x ≤b} −1{y ≤b}|. On the other hand, Inequality
+(ii) is a result of |1{a ≤x} −1{b ≤x}| ≤1{|b −x| ≤|a −b|}. Using Lemma A.2,
+P
+
+|Fε(εn+1) −β| ≤
+Fε(εn+1) −bFn+1(ˆεn+1)
+
+
+≤P
+
+|Fε(εn+1) −β| ≤
+Fε(εn+1) −bFn+1(ˆεn+1)
+ , sup
+y
+Fε(y) −bFn+1(y)
+ ≤Mnn
+1+γ
+2
+
++ P
+
+sup
+y
+Fε(y) −bFn+1(y)
+ ≥Mnn
+1+γ
+2
+
+≤P
+
+|Fε(εn+1) −β| ≤
+Fε(εn+1) −bFn+1(ˆεn+1)
+ | sup
+y
+Fε(y) −bFn+1(y)
+ ≤Mnn
+1+γ
+2
+
++ (2 + M + 2
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3
+≤P
+
+|Fε(εn+1) −β| ≤|Fε(εn+1) −Fε(ˆεn+1)| + (Ln+1 + 1)δn + 3Mnn
+1+γ
+2
+
++ (2 + M + 2
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3
+≤P
+
+|Fε(εn+1) −β| ≤Ln+1 |εn+1 −ˆεn+1| + (Ln+1 + 1)δn + 3Mnn
+1+γ
+2
+
++ (2 + M + 2
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3
+≤2Ln+1δn + 3Mnn
+1+γ
+2
++ (2 + M + 2
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3 .
+(36)
+The inequality above also holds for P
+
+|Fε(εn+1) −β| ≤
+Fε(εn+1) −bFn+1(ˆεn+1)
+
+
+, so
+P
+
+Yn+1 ∈bCt−1 (Xn+1) | Xn+1
+
+−(1 −α)
+
+≤4Ln+1δn + 6Mnn
+1+γ
+2
++ (4 + 2M + 4
+√
+Mg(b))n−2γ
+3 (log2 n + 2)
+4
+3 .
+(37)
+22

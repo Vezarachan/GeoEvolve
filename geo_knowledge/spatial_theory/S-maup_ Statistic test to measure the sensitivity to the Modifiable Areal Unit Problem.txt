@@ -1,0 +1,1589 @@
+S-maup: Statistic test to measure the sensitivity to the
+Modiﬁable Areal Unit Problem
+Juan C. Duque
+Department of Mathematical Sciences (RiSE-group), Universidad EAFIT, Medell´ın, Colombia.
+E-mail:jduquec1@eafit.edu.co
+Henry Laniado
+Department of Mathematical Sciences (RiSE-group), Universidad EAFIT, Medell´ın, Colombia.
+E-mail:hlaniado@eafit.edu.co
+Adriano Polo
+Department of Economics, Universidad EAFIT, Medell´ın, Colombia.
+E-mail:apololo@eafit.edu.co
+Abstract:
+This work presents a nonparametric statistical test, S-maup, to measure the sensitivity of a
+spatially intensive variable to the eﬀects of the Modiﬁable Areal Unit Problem (MAUP). S-maup is
+the ﬁrst statistic of its type and focuses on determining how much the distribution of the variable,
+at its highest level of spatial disaggregation, will change when it is spatially aggregated. Through
+a computational experiment, we obtain the basis for the design of the statistical test under the
+null hypothesis of non-sensitivity to MAUP. We performed a simulation study for approaching
+the empirical distribution of the statistical test, obtaining its critical values, and computing its
+power and size. The results indicate that the power of the statistic is good if the sample (number
+of areas) grows, and in general, the size decreases with increasing sample number. Finally, an
+empirical application is made using the Mincer equation in South Africa.
+Keywords: Modiﬁable Areal Unit Problem (MAUP), scale eﬀect, aggregation problem.
+arXiv:1806.08433v1  [stat.AP]  21 Jun 2018
+
+1
+1
+Introduction
+Although spatial data are increasingly disaggregated, many socioeconomic studies require some
+level of aggregation (e.g., neighborhoods, municipalities, states, districts, countries). Spatial aggre-
+gation is useful for calculating rates and indexes, minimizing the inﬂuence of outliers, or preserving
+conﬁdentiality Wise et al. (1997, 2001). Spatial aggregation is also useful for creating meaningful
+units for analysis Yule and Kendall (1950); Duque et al. (2006), reducing computational complexity
+Miller (1999), controlling for spurious spatial autocorrelation Bian and Butler (1999); Duque et al.
+(2012), and comparing results at diﬀerent scales Holt et al. (1996a); Tagashira and Okabe (2002).
+However, spatial aggregation triggers a problem known as the Modiﬁable Areal Unit Problem
+(MAUP). The MAUP, introduced in the literature by Openshaw (1978) and Openshaw and Taylor
+(1979), refers to the sensitivity of statistical results to changes in the spatial units of analysis. The
+MAUP has two dimensions: the scale eﬀect and the zoning eﬀect. The scale eﬀect refers to changes
+in the size of the spatial units, which implies a change in the number of spatial units, e.g., doing the
+analysis at the state or county level. The zoning eﬀect refers to changes in the shape of the spatial
+units preserving the number of units, e.g., aggregating USA counties into 50 states is merely one
+of the many ways in which one can aggregate counties into 50 spatial units.
+Although the literature on MAUP is extensive, to the best of our knowledge, there is no statisti-
+cal tool that allows a practitioner to easily determine the level of sensitivity of a spatially intensive
+variable to the MAUP. Hence, in this paper, we present S-maup, a nonparametric statistical test
+to measure the sensitivity of a spatially intensive variable to the MAUP. Instead of looking at a
+speciﬁc measure of central tendency or dispersion or at the coeﬃcient associated with the variable
+in a speciﬁc regression, S-maup focuses on determining how much the distribution of the variable,
+at its highest level of spatial disaggregation, will change when it is aggregated into a given number
+of regions. For its calculation S-maup requires the number of areas, the ρ parameter, that measures
+the degree of spatial correlation of the variable, and the number of regions in which the areas will
+be aggregated. Under the null hypothesis of non-sensitivity to MAUP, S-maup would be useful
+for determining the maximum level of aggregation that we can apply to a given variable before it
+loses its distributional characteristics. S-maup could also be used to determine whether the results
+obtained at a given scale (e.g., counties) hold for another scale (e.g., states).
+The rest of this article is structured as follows. We begin with a literature review concerning
+the primary research surrounding the MAUP. We then explore the eﬀects of the MAUP through a
+computational experiment. Next, we propose a test statistic, S-maup, and its empirical distribution
+under the null hypothesis of non-sensitivity to MAUP. Next, we establish the power and size of
+the statistic under various levels of spatial autocorrelation and number of areas. We then present
+a simple example of the use of the S-maup statistic. Last, we conclude and suggest avenues for
+further investigation.
+2
+Literature Review
+The eﬀects of aggregating spatial data have been a subject of study since the early 1930s and have
+been referred to by diﬀerent names, such as aggregation eﬀects Gehlke and Biehl (1934), scale
+problem Yule and Kendall (1950), ecological fallacy Robinson (1950), and Modiﬁable Areal Unit
+Problem, MAUP, Openshaw and Taylor (1979). If one delves into the details, it can be argued
+that these previous concepts are diﬀerent. However, these concepts possess as a common factor a
+concern regarding the undesired eﬀects that result from working with aggregate data. Hereinafter,
+we will refer to this problem as MAUP.
+
+2
+The literature on MAUP can be divided into three blocks: ﬁrst, deﬁnition of the problem
+Openshaw (1977); Openshaw and Taylor (1979); Arbia (1989); second, measurement of its eﬀects on
+statistics such as the mean Amrhein (1995); Steel and Holt (1996), median and standard deviation
+Bian and Butler (1999), variance and covariance Amrhein and Reynolds (1996); Reynolds (1998),
+and correlation coeﬃcient Gehlke and Biehl (1934); Yule and Kendall (1950); Openshaw and Taylor
+(1979); Clark and Avery (1976); and last, potential ways to minimize the aggregation eﬀects Coulson
+(1978); Fotheringham (1989); Arbia (1989); Fotheringham et al. (2000); Carrington et al. (2006).
+It is well known that the impact of the MAUP on the mean can be considered negligible Arbia
+(1989); Amrhein (1995); Amrhein and Reynolds (1996); Steel and Holt (1996). However, the MAUP
+has a large impact on the variance, which decreases when the variable exhibit high values of spatial
+autocorrelation Reynolds (1998). With respect to the statistical association, such as the covariance
+and correlation coeﬃcient, Clark and Avery (1976), Openshaw and Taylor (1979) and Arbia (1989)
+found that the sensitivity to MAUP increases as the level of spatial aggregation increases (scale
+eﬀect), i.e., the correlation between variables X and Y will exhibit a wider variation if, for example,
+USA counties are aggregated into 50 spatial units than if they were aggregated into 1,000 spatial
+units.
+The MAUP eﬀects have also been studied in OLS regressions Clark and Avery (1976); Open-
+shaw (1978); Green and Flowerdew (1996); Tagashira and Okabe (2002), logit models Fotheringham
+and Wong (1991), Poisson regression Flowerdew and Amrhein (1989), spatial interaction models
+Arbia and Petrarca (2013), spatial econometrics models Arbia and Petrarca (2011), forecasts in
+regional economy Miller (1998), and spatial autocorrelation statistics, such as the Moran’s coeﬃ-
+cient, Geary’s Ratio, and G-Statistic Fotheringham and Wong (1991); Qi and Wu (1996); Jelinski
+and Wu (1996). Other authors have studied the MAUP eﬀects in more sophisticated methods,
+such as the factorial analysis Hunt and Boots (1996), spatial interpolation Cressie (1996), image
+classiﬁcation Arbia et al. (1996), location and allocation models Goodchild (1979), and discrete
+selection models Guo and Bhat (2004).
+Although there is no solution to the MAUP because it is inherent to the use of spatial data, some
+authors have proposed diﬀerent alternatives to minimize its eﬀects: the formulation of scale-robust
+statistics King (1997), the design of optimal aggregations that minimize the loss of information
+Moellering and Tobler (1972); Openshaw (1977); Nakaya (2000); Tagashira and Okabe (2002);
+Duque et al. (2006), the use of a set of auxiliary or grouping variables together with variables at
+the individual level Holt et al. (1996b); Wrigley et al. (1996), and the measurement of rates of
+change through the concept of a fractal dimension Fotheringham (1989).
+Most studies above required extensive computational experiments. Table 1 summarizes the main
+characteristics of those experiments, including the covered dimensions (scale or zoning), studied
+statistics (mean, variance, correlation, regression coeﬃcients, etc.), type of data (real or simulated),
+studied variables (income, rates, random, etc.), and size of the experiment in terms of the number
+of areas and regions (herein, we will refer to area as the smallest spatial unit of observation and
+region as the spatial units that result from aggregating the areas into contiguous spatial units).
+From this table, we can highlight the dominance of the use of real data over simulated data and
+the evident increase in the size of the experiment as the computational capacity increases over
+the years. As expected, the two driver parameters in these experiments are the number of areas
+and the number of regions. Although it has been considered in a few experiment Openshaw and
+Taylor (1979); Reynolds (1998); Bian and Butler (1999), the level of spatial autocorrelation of
+the variables/attributes being aggregated plays an important role in the level of sensitivity of the
+variable to the MAUP. Finally, the mean is signiﬁcantly highlighted by being the more common
+grouping operator, i.e., if areas i and j, with attribute values Xi and Xj, are merged into a region,
+the attribute value for the resulting region is calculated as the mean of Xi and Xj, which indicates
+
+3
+Figure 1. Instance of the experiment.
+that all of the experiments use spatially intensive variables.
+Based on the available literature, a practitioner can anticipate high(low) variation of its results
+when the aggregation level is high(low) and the level of spatial autocorrelation of its variable is
+low(high). However, there is no tool in the literature that allows the assignment of a speciﬁc number
+and statistical signiﬁcance to that variation. The closest the research can get to that number would
+require a computational experiment involving the calculation of the results for a large number of
+random aggregations of the areas into a predeﬁned number of regions. This paper constitutes the
+very ﬁrst attempt to formulate a nonparametric statistical test to easily measure the sensitivity of
+a spatially intensive variable to the MAUP.
+3
+MAUP Eﬀects
+In this section, we design a computational experiment to identify the key elements that should be
+included in the construction of the statistical test. Following previous experiments in the literature
+on the MAUP eﬀects (e.g., Amrhein and Reynolds (1996) and Arbia and Petrarca (2011)), we
+consider the two main parameters involved in the exploration of scale and zoning eﬀects: number
+of areas (N) and number of regions (K). As in Openshaw and Taylor (1979) and Reynolds (1998),
+we also take into account diﬀerent levels of spatial autocorrelation, ρ.
+Fig 1 summarizes the steps followed to generate an instance of the experiment: (1) yρ=0.9
+is a random variable generated by a Spatial Autoregressive (SAR) process with autoregressive
+parameter ρ = 0.9 and rook contiguity matrix. (2) The areas are randomly aggregated into K
+spatially contiguous regions using a seed-based region growing algorithm proposed by Vickrey
+
+4
+Table 1. Computational experiments on MAUP.
+Author
+(Year)
+Dimension
+/
+Eﬀect
+on...
+Grouping op-
+erator
+Data
+Variable
+Size
+Gehlke
+and
+Biehl (1934)
+Scale / rxy
+Sum
+Census
+Tracts
+in
+Cleveland
+Male
+juvenile
+delinquency
+and
+monthly income.
+Agricultural
+products and the number of farm-
+ers
+1) 252 areas into 200, 175, 150, 125, 100, 50, and
+25 regions 2) 1,000 areas into 63, 40, 31, and 8
+regions
+Robinson
+(1950)
+Scale / rxy
+Proportions
+Nine geographic di-
+visions of the USA in
+1930
+Race and illiteracy
+97,272 individuals into 9 regions
+Yule
+and
+Kendall (1950)
+Scale / rxy
+Mean
+Agricultural counties
+in England
+Production of wheat and potatoes
+per acre
+48 areas into 24, 12, 6, and 3 regions
+Clark and Av-
+ery (1976)
+Scale / rxy
+Mean
+Metropolitan area of
+Los Angeles
+Household income and education
+level of the head of household
+1,556 census tracts into 134 Welfare Planning
+Council Study areas and 35 Regional Planning
+Commission Statistical Areas
+Openshaw and
+Taylor (1979)
+Scale - Zon-
+ing / rxy
+-
+Counties in Iowa and
+simulated data with
+ρ+, ρ0, and ρ−
+% of Republican votes and % pop-
+ulation over 60 years.
+99 areas into 6, 12, 18, 24, 30, 36, 42, 48, 54, 60,
+66, and 72 regions
+Arbia (1989)
+Scale - Zon-
+ing / µ, σ2,
+σ, ρ
+Mean
+Quadrat in Hukuno
+Town,
+Japan
+and
+weights
+of
+wheat
+plots of grain
+Quadrat counts of houses and
+weights of wheat plots of grain
+1) Regular lattice of 32x32 into 16x16, 8x8, 4x4,
+and 2x2 regions 2) Regular lattice of 25x20 cells
+into 8x8, 4x4, and 2x2 regions
+Fotheringham
+and
+Wong
+(1991)
+Scale - Zon-
+ing / β′s
+Mean and Pro-
+portion
+Metropolitan area of
+Buﬀalo
+Household income, % of popula-
+tion per area, % of population over
+65 years
+871 areas into 800, 400, 200, 100, 50, and 25 re-
+gions
+Amrhein
+(1995),
+Steel
+and
+Holt
+(1996)
+Zoning
+/
+µ, σ2,
+rxy y
+β
+Mean
+and
+weighted
+aver-
+age
+Regular lattices
+Simulated
+data
+with
+Uniform,
+Normal and Poisson distribution
+10,000 areas into 10x10, 7x7, and 3x3 regions
+Holt
+et
+al.
+(1996a)
+Zoning / σ2
+Mean
+City
+of
+Adelaide,
+Australia
+82 socioeconomic variables
+917,000 people into 1,584 districts
+Amrhein
+and
+Reynolds
+(1996)
+Zoning / σ2
+Mean
+Lancashire, UK
+8 census variables
+304 areas into 137, 122, 106, 91, 76, 61, 46, and
+30 regions
+Green
+and
+Flowerdew
+(1996)
+Scale - Zon-
+ing / rxy, β
+Mean
+UK
+Census variables and simulated
+variables
+Regular lattice of 120x120 into 1x1, 2x2, 3x3, 4x4,
+and 5x5 regions
+Qi
+and
+Wu
+(1996)
+Scale / I −
+Moran
+and
+G−Statistic
+Mean
+Malasia
+Biomass areas and elevation data
+Regular Lattice of 220x188 into 2x2, 3x3, 4x4, ...,
+and 20x20 regions
+Jelinski
+and
+Wu (1996)
+Scale / I −
+Moran
+and
+G−Statistic
+Mean
+Manitoba, Canada
+Normalized Diﬀerence Vegetation
+Index (NDVI)
+Regular lattice of 300x300 into 3x3, 5x5, 7x7, 9x9,
+11x11, 13x13, and 15x15 areas
+Reynolds
+(1998)
+Zoning / σ2,
+rxy, and β
+Mean
+Regular lattices
+Simulated variables with diﬀer-
+ent levels of spatial autocorrela-
+tion and variance
+400 areas into 180, 160, 140, 120, 100, 80, 60, and
+40 regions
+Bian and But-
+ler (1999)
+Zoning / σ
+Mean and Me-
+dian
+Regular lattices
+Simulated data with diﬀerent lev-
+els of spatial autocorrelation
+Regular lattice of 512x512 into 3x3, 9x9, 11x11,
+21x21, 31x31, 41x41, 51x51, 61x61, 71x71, and
+81x81 pixel window sizes
+Arbia and Pe-
+trarca
+(2011,
+2013)
+Scale / β
+Mean
+Regular lattice
+Simulated data
+Regular lattice of 64x64 into 32x32, 16x16, 8x8,
+and 4x4.
+rxy: Correlation, µ: Media, σ2: Variance, σ: Covariance, ρ: Spatial autocorrelation, β: Regression coeﬃcients.
+
+5
+(1961). The attribute value for each region is calculated as the mean value of the attribute values
+of the areas assigned to the region. This random aggregation is repeated r = 30 times, so that
+we generate 30 diﬀerent ways to aggregate N areas into K regions. (3) We calculate the mean
+and variance of the original, disaggregated, variable as µo and σ2
+o. (4) We calculate the mean and
+variance of each one of the aggregated variables as µag and σ2
+ag. (5) We calculate the relative
+change in the mean (RCM), Eq (1), and the relative change in the variance (RCV ), Eq (2),
+between the original variables and each of the 30 aggregated variables. (6) We summarize the eﬀect
+of aggregating N areas into K regions as the mean RCM, RCM, and mean RCV , RCV , using Eq
+(3) and (4). For each value of ρ considered in the experiment, we repeat steps (1) to (6) 50 times.
+RCMµ,y
+r
+= |µo −µag
+r |
+µo
+(1)
+RCV σ2,y
+r
+=
+σ2
+o −σ2
+ag,r
+
+σ2o
+(2)
+RCM =
+P30
+r=1 RCMµ,y
+r
+30
+(3)
+RCV =
+P30
+r=1 RCV σ2,y
+r
+30
+(4)
+As we will show in the parametrization of the experiment, we generate instances of yρ for
+diﬀerent levels of spatial autocorrelation (−0.9 < ρ < 0.9). If, for example, we generate two spatial
+processes yρ=0.9 and yρ=−0.5, the observed aggregation eﬀects will have two sources, one that comes
+from the change in the value of ρ, and one that comes from the diﬀerences in the values generated
+by the random data generation process. To isolate the eﬀect that comes from the changes in ρ,
+we generate the instances of yρ=0.0 by performing spatial permutations of the values obtained from
+yρ=0.9.
+As an example, Fig 2 summarizes the process that we implemented to generate yρ=0.0
+from yρ=0.9: (1) Generate an SAR process yρ=0.9. (2) Generate a reference SAR process xρ=0.0.
+(3) Generate yρ=0.0 by spatially redistributing the values of yρ=0.9 following the spatial pattern of
+xρ=0.0, i.e., the highest value of yρ=0.9 goes to the area with the highest value of xρ=0.0; the second
+highest value of yρ=0.9 goes to the area with the second highest value of xρ=0.0; and so forth. (4)
+Estimate the true ρ value of yρ=0.0, if (0.0 −0.5) < ρ < (0.0 + 0.5) then keep yρ=0.0; otherwise,
+repeat the process. Note that yρ=0.9 and yρ=0.0 have the same values and therefore the same mean
+and variance, But due to the diﬀerences in the spatial distribution of the values, they have diﬀerent
+ρ values.
+Having clariﬁed the process that we follow at each instance and our strategy for generating the
+yρ values, we present the parameters used in the computational experiment:
+N =
+Number of areas. N = {25, 100, 225, 400, 625, 900} ;
+yρ
+i =
+SAR process with i = {1, . . . , 50} , and ρ = {±0.9, ±0.7, ±0.5, ±0.3, 0} ;
+k =
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+for N=25, k = {3, 5, 10, 13, 15, 18, 20, 22, 24}
+for N=100, k = {2, 4, 7, 12, 25, 40, 53, 67, 80, 90, 99}
+for N=225, k = {3, 5, 10, 15, 30, 60, 90, 120, 150, 180, 200, 220}
+for N=400, k = {4, 9, 18, 26, 50, 110, 160, 213, 267, 320, 360, 396}
+for N=625, k = {4, 6, 14, 27, 43, 80, 170, 250, 333, 417, 500, 563, 618}
+for N=900, k = {4, 9, 20, 40, 60, 120, 240, 360, 480, 600, 720, 810, 890}
+r = 30
+Number of random spatial aggregations.
+
+6
+Figure 2. Example of spatial autocorrelation generation.
+Table 2. Eﬀect on mean - Proportion of signiﬁcant instances.
+Number of areas
+N = 25
+N = 100
+N = 225
+N = 400
+N = 625
+N = 900
+Proportion*
+0
+0.00063
+0.00014
+0.00041
+0.00063
+0.0012
+Proportion of instances for which the two-sample t-test was rejected with α = 0.05. It includes instances with
+k ≥10.
+We implemented the experiment in Python 2.7.10. For the spatial aggregations, we use the
+Python library ClusterPy 0.9.9 Duque et al. (2011). We ran the experiment in the supercomputer
+APOLO, at the Center of Scientiﬁc Computation (Universidad EAFIT), equipped with a Dell Power
+Egde 1950 III of 8 cores, 2.33 GHz Intel Xeon that executes Linux Rocks 6.1 to 64 bits.
+Each box plot in Fig 3 summarizes the 50 values of RCM calculated for each value of ρ and
+k. The maximum bounds value of the vertical axis in the ﬁgure show low relative changes in the
+mean. To make sure that the mean eﬀect can be discarded, we calculate the two-sample t-test to
+compare the mean of each original variable, µo, with the mean of each aggregated variable, µag. We
+report in Table 2 the proportion of instances for which the two-sample t-test was rejected. From
+this result, we can conclude that there is not a MAUP eﬀect on the mean, which is consistent with
+those results found by Arbia (1989); Amrhein (1995) and Amrhein and Reynolds (1996).
+Each box plot in Fig 4 summarizes the i = 50 values of RCV calculated for each value of ρ
+and k. Unlike the case seen with the mean, the eﬀect of variance is considerably greater. The
+box plots show that the eﬀect of MAUP on variance decreases for two reasons: an increase in the
+level of spatial autocorrelation, ρ; and (2) an increase in the number of regions, k. These eﬀects on
+variance are consistent with those found by Reynolds (1998).
+To verify the MAUP eﬀect on variance, we use the Levene test for equality between the variance
+of the original variable, σ2
+o, with the variance of each aggregated variable, σ2
+ag. Fig 5 shows the
+percentage of instances for which the Levene test rejects the null hypothesis H0 : σ2
+o = σ2
+ag, with
+α = 0.05. These results conﬁrm that the MAUP eﬀect decreases as either k or ρ increases.
+Finally, in Fig 6 we present, for illustrative purposes, three instances with ρ = −0.9, ρ = 0.0
+and ρ = 0.9 that aggregate N = 900 areas into k = 240 regions. These examples show how the
+MAUP fades as ρ increases.
+
+7
+Figure 3. Relative change in mean - Average eﬀect. (a) N = 25; (b) N = 100; (c) N = 225; (d) N = 400; (e)
+N = 625; (f) N = 900.
+
+8
+Figure 4. Relative change in variance - Average eﬀect. (a) N = 25; (b) N = 100; (c) N = 225; (d) N = 400; (e)
+N = 625; (f) N = 900.
+
+9
+Figure 5. Proportion of instances for which the Levene test rejects the null hypothesis of equality of variance, with
+a level of signiﬁcance α = 0.05. (a) N = 25; (b) N = 100; (c) N = 225; (d) N = 400; (e) N = 625; (f)
+N = 900.
+
+10
+Figure 6. MAUP eﬀects at three levels of spatial autocorrelation, (a) ρ = −0.9, (b) ρ = 0, and (c) ρ = 0.9. Solid line:
+original variable with N = 900; dashed lines: 30 aggregations with k = 240. The vertical lines indicate µo
+and µag.
+4
+S-maup statistical test
+Findings such as the eﬀect of MAUP on variance and how MAUP fades as ρ and k increase are useful
+to ﬁnd the functional form of our statistical test, S-maup, for measuring the level of sensitivity
+of a spatially distributed variable to the MAUP. We designed the test such that S-maup takes
+values close to zero when the variable is not sensitive to the MAUP and values close to one when
+the variable is highly sensitive to the MAUP. Furthermore, S-maup will be a univariate statistic
+applicable to spatially expansive variables whose aggregated values result from the average of the
+individual values.
+4.1
+S-maup
+To ﬁnd the functional form of S-maup, it is necessary design an expression that describes the
+distribution of the eﬀects of MAUP on the variance (RCV ). To summarize those eﬀects, we took
+the median of each Box Plot in Fig 4. Fig 7 shows an example of those summarized eﬀects.
+According to Fig 7, the mathematical expression of our test should take values close to one
+when the variable under evaluation has high negative spatial autocorrelation, ρ and is aggregated
+into a small number of regions, k. Conversely, the expression should take values close to zero when
+the variable under evaluation has high positive spatial autocorrelation, ρ and is aggregated into a
+large number of regions, k. Our expression should also be able to reproduce the way in which, for
+a give k, the MAUP eﬀects decreases as ρ increases. Note that such a decrease is not the same for
+all values of k: when k is large, the eﬀects of MAUP are low even for highly negative values of ρ;
+therefore, for a high k, the reduction of the MAUP eﬀects, as ρ increases, are almost imperceptible.
+
+11
+Figure 7. Median RCM for N = 100.
+Thus, as k increases, our expression should modify the speed and moment at which the MAUP
+fades along ρ. Taking into account these diﬀerent conditions, we started the construction of our
+S-maup statistic using an inverted logistic function Verhulst (1845), which is deﬁned by Eq (5).
+M(ρ; L, η, τ) =
+L
+1 + ηeτx
+,
+(5)
+where L determines the maximum value of the curve; η determines the moment at which the curve
+begins to decline; and τ indicates the speed at which the curve declines. If we endogenize those
+three parameters, we should be able to approximate any line of the type shown in Fig 7. This is
+what we are going to develop in the rest of this subsection until we obtain an expression of M in
+which parameters L, η and τ depend on ρ, k and N.
+Starting with the parameter L, Fig 7 shows that the maximum value of each logistic curve
+depends on the level of aggregation k. This aggregation can be deﬁned in relative terms as θ = k
+N .
+Therefore, the lower the level of aggregation (i.e., as θ approaches 1), the lower should be L. When
+plotting each median RV C against θ, it depicts an inverted ”S” that could also be modeled as an
+inverse logistic function with the expression presented in Eq (6), whose linear form is given by Eq
+(7).
+L(θ) =
+1
+1 + eb+mθ
+,
+(6)
+Ln
+1 −L
+L
+
+= b + mθ ,
+(7)
+where b and m are the parameters of the inverse logistic function. To estimate those parameters,
+we used a robust linear regression model that minimizes the inﬂuence of outliers. The parameter
+
+12
+Figure 8. Adjustments of robust linear regression models: (a) Linearized logistic function (L); (b) Linearized power
+function (η); (c) Linear function (τ).
+associated with θ is signiﬁcant, and the adjusted R-squared = 86.7%. Fig 8(a) shows the robust
+regression over the linearized logistic function.
+Returning to the logistic curves in Fig 7, both the moment at which the curves begin to decrease,
+η, and the speed of decreasing, τ, depend on k. Therefore, both parameters can be estimated as
+function of θ =
+k
+N . For this, we adjusted an inverse logistic function for each curve of the type
+presented in Fig 7. For each curve, the values of η and τ were calibrated using the optimized
+module of Scipy Phyton Library Jones et al. (2001). With this process, we obtained a value for η
+and τ for each value of θ. Then, we use a linearized power function, Eq (8), and a linear function,
+Eq (9), to express η and τ as a function of θ.
+η(θ) = pθa
+(8)
+τ(θ) = β0 + β1θ
+(9)
+The parameter associated with θ was signiﬁcant in both estimations and the adjusted R2, with
+91.7% and 84.5% respectively. Fig 8b and 8c present the estimations.
+Replacing the Eq (6), (8) and (9) in (5) we have the Eq (10).
+M(ρ, θ) =
+1
+1+eb+mθ
+1 + pθae(β0+β1θ)ρ
+(10)
+The results of the estimation of the parameters in the robust linear regression model for the
+logistic function of L are as follows: m = 7.031 and b = −2.188. Considering that the model is
+
+13
+estimated with the linearized logistic function, these results were transformed by natural logarithm.
+For the power function of η, the results are p = 0.516 and a = 1.287, because of the linearization
+of the power function, we applied the natural logarithm to the parameter p. Finally, the results of
+the linear function of τ are as follows: β0 = 5.319 and β1 = −5.532. Replacing in the equations
+produces the following:
+L(θ) =
+1
+1 + e−2.188+7.301θ
+(11)
+η(θ) = 0.516θ1.287
+(12)
+τ(θ) = 5.319 −5.532θ.
+(13)
+Thus, the expression of the S-maup statistic is the following:
+M(ρ, θ) =
+1
+1+e−2.188+7.031θ
+1 + [0.516θ1.287]e[5.319−5.532θ]ρ
+(14)
+Recall that S-maup statistic (M) is designed in such a way that for a bigger (smaller) sensitivity
+of a variable to the MAUP, the larger (smaller) is the value of M. This characteristic allows us to
+deﬁne a non-parametric unilateral statistical test, which is stated below:
+H0: The variable yi is not signiﬁcantly aﬀected by the MAUP.
+H1: The variable yi is signiﬁcantly aﬀected by the MAUP.
+Where the statistic for the test is given by Eq (14), and therefore, H0 will be rejected if the statistic
+value belongs to the rejection region (RR) deﬁned in Eq (15).
+RR = {M|M > Mα;ρ,N}
+(15)
+Mα;ρ,N is the critical value given a signiﬁcance level α, a level of spatial autocorrelation (ρ), and
+a number of areas (N). We implemented a Monte Carlo simulation to ﬁnd the empirical distribution
+of the S-maup under the null hypothesis previously stated. The empirical distribution allows us to
+obtain the critical values as well as the pseudo-value p to determine the proof signiﬁcance.
+4.2
+Critical values and p-value
+To calculate the critical values, we performed an exhaustive simulation study based on non-
+parametric statistic methodology. Recall that H0 means no sensitivity of a variable to MAUP,
+which is equivalent to stating that, for a given k, the variance of the aggregated variable is statis-
+tically equal to the variance of the original variable. For building the empirical distribution under
+H0, we set a value for N and ρ and generated an SAR process with parameters (N, ρ). Then, we
+randomly selected an integer value k such that 0.1N < k < N, thus yielding 30 random aggre-
+gations of the variable into k regions. Next, we applied the Levene test for equality of variances
+between the original variable and each one of the 30 aggregated variables. The SAR(N, ρ) variable
+was kept if and only if the Levene test was not rejected in all 30 cases. If there was at least one
+rejection, then we chose, at random, a new k and repeated the previous steps. This procedure was
+repeated until we obtained 1,000 instances for each pair (N, ρ). We then calculated the S-maup
+
+14
+statistic for those instances using Eq (14) and generated the empirical distribution of the statistics
+under H0. The critical values were obtained by calculating the 90%,
+95%,
+99% percentiles for
+the empirical distribution. Table 3 presents the table of critical values. This Table implied the
+generation of 54,000 instances.
+Following the percentile approach utilized by Rey (2004), we can calculate a pseudo-p-value for
+a given value of the S-maup test (M), using the Eq (16):
+P(M) =
+1
+1, 000
+1,000
+X
+j=1
+Ψ ,
+(16)
+where Ψ = 1 if Mρ,N
+j
+> M, Ψ = 0 otherwise.
+The vector Mρ,N
+j
+comes from the simulations
+performed to produce Table 3.
+Since those vectors are extremely computationally intensive to
+produce (in some instances requiring months of supercomputer computation for completion), they
+will be publicly available at http://www.
+.edu, as well as the Python script to run the S-maup
+statistic.
+Table 4 presents some examples of the S-maup statistic for diﬀerent values of N and k. Note
+that when the variable yi presents characteristics against the null hypothesis (H0), then the M value
+of the S-maup should be greater than the critical value at some signiﬁcance level α, and therefore,
+the pseudo-value p of the test must be smaller than the signiﬁcance level. If H0 is rejected, it can
+be concluded that the variable yi is sensitive to the MAUP, and therefore, a MAUP eﬀect exists
+when aggregating yi in k regions.
+Note that when the spatial autocorrelation is highly positive (e.g., ρ = 0.801), the variable
+allows high levels of aggregation. The results also conﬁrm that low levels of spatial aggregation do
+not lead to the undesirable eﬀects of MAUP.
+5
+Power and Size
+The power is a natural way of evaluating the test performance. It is deﬁned as the probability
+of rejecting the null hypothesis, given that the null hypothesis is false. In other words, it is the
+probability of not committing a type II error (β); thus, the power is (1 −β). In our context, the
+power means the probability that suﬃcient statistical evidence exists in the sample to aﬃrm that
+the variable yi is aﬀected by the MAUP, when in fact, the variable yi is aﬀected by the dimensions
+of the MAUP. Hence, it is expected that the power of the test is close, or equal, to 1.
+Since H1 implies that the variance of the original variable is diﬀerent from the variance of the
+aggregate variable, we implemented the following simulation experiment to measure the power of our
+statistical test: For each tuple (N, ρ), with N ∈{100, 400, 900} and ρ ∈{±0.9, ±0.7, ±0.5, ±0.3, 0}.
+Given a tuple (N, ρ) we generate an SAR process and perform 30 random spatial aggregations
+of the N areas into k regions such that k is selected at random as an integer value such that
+0.1N < k < N. The SAR process is kept if and only if the Leven test between the original variable
+and each one of the 30 aggregated variables is rejected. We repeat this process until we generate
+1,000 valid instances for each tuple (N, ρ). Each entry in Table 5 reports the proportion of 1,000
+instances for which our test rejects H0. Because most values are close to 1, we can argue that our
+S-maup is highly eﬀective in identifying variables that are sensitive to the MAUP eﬀect.
+Test size is also a way of evaluating the test performance. Test size is deﬁned as the probability
+of rejecting the null hypothesis given that the null hypothesis is true. In other words, it is the
+probability of committing a type I error (α). In our context, test size means the probability that
+suﬃcient statistical evidence exists in the sample to aﬃrm that the variable yi is aﬀected by the
+
+15
+Table 3. Critical Values (Mα;ρ,N)
+Number of areas (N)
+ρ
+α
+25
+100
+225
+400
+625
+900
+-0.9
+0.01
+0.83702
+0.09218
+0.23808
+0.05488
+0.07218
+0.02621
+0.05
+0.83699
+0.08023
+0.10962
+0.04894
+0.04641
+0.02423
+0.1
+0.69331
+0.06545
+0.07858
+0.04015
+0.03374
+0.02187
+-0.7
+0.01
+0.83676
+0.16134
+0.13402
+0.06737
+0.05486
+0.02858
+0.05
+0.83662
+0.12492
+0.08643
+0.05900
+0.04280
+0.02459
+0.1
+0.79421
+0.09566
+0.06777
+0.05058
+0.03392
+0.02272
+-0.5
+0.01
+0.83597
+0.16524
+0.13446
+0.06616
+0.06247
+0.02851
+0.05
+0.83578
+0.13796
+0.08679
+0.05927
+0.04260
+0.02658
+0.1
+0.68900
+0.10707
+0.07039
+0.05151
+0.03609
+0.02411
+-0.3
+0.01
+0.83316
+0.19276
+0.13396
+0.06330
+0.06090
+0.03696
+0.05
+0.78849
+0.16932
+0.08775
+0.05464
+0.04787
+0.03042
+0.1
+0.73592
+0.14282
+0.07076
+0.04649
+0.04001
+0.02614
+0.0
+0.01
+0.82370
+0.17925
+0.15514
+0.07732
+0.07988
+0.09301
+0.05
+0.81952
+0.15746
+0.11126
+0.06961
+0.06066
+0.05234
+0.1
+0.71632
+0.13621
+0.08801
+0.06112
+0.04937
+0.03759
+0.3
+0.01
+0.76472
+0.23404
+0.24640
+0.11588
+0.10715
+0.07070
+0.05
+0.70466
+0.21088
+0.15360
+0.09766
+0.07938
+0.06461
+0.1
+0.63718
+0.18239
+0.12101
+0.08324
+0.06347
+0.05549
+0.5
+0.01
+0.67337
+0.28921
+0.25535
+0.13992
+0.12975
+0.09856
+0.05
+0.59461
+0.23497
+0.18244
+0.11682
+0.10129
+0.08860
+0.1
+0.46548
+0.17541
+0.14248
+0.10008
+0.08137
+0.07701
+0.7
+0.01
+0.52155
+0.47399
+0.29351
+0.23923
+0.20321
+0.16250
+0.05
+0.48958
+0.37226
+0.22280
+0.20540
+0.16144
+0.14123
+0.1
+0.34720
+0.28774
+0.18170
+0.16442
+0.13395
+0.12354
+0.9
+0.01
+0.28599
+0.28938
+0.43520
+0.44060
+0.34437
+0.55967
+0.05
+0.21580
+0.22532
+0.27122
+0.29043
+0.23648
+0.31424
+0.1
+0.17640
+0.18835
+0.21695
+0.23031
+0.19435
+0.22411
+
+16
+Table 4. Example S-maup.
+V ariable
+N
+k
+ρ
+M
+Mα;ρ,n
+Pseudo-v p
+y1
+i
+1,000
+400
+0.007
+0.24002
+0.05234
+0.0 ***
+y2
+i
+1,000
+600
+0.007
+0.05871
+0.05234
+0.034 **
+y3
+i
+1,000
+800
+0.007
+0.01187
+0.05234
+0.616
+y4
+i
+500
+100
+-0.634
+0.09237
+0.05900
+0.0 ***
+y5
+i
+500
+280
+-0.634
+0.05466
+0.05900
+0.078 *
+y6
+i
+500
+380
+-0.634
+0.00767
+0.05900
+0.852
+y7
+i
+220
+60
+0.562
+0.32197
+0.18244
+0.00 ***
+y8
+i
+220
+90
+0.562
+0.18513
+0.18244
+0.046 **
+y9
+i
+220
+150
+0.562
+0.04357
+0.18244
+0.443
+y10
+i
+150
+15
+0.801
+0.29201
+0.22532
+0.009 **
+y11
+i
+150
+50
+0.801
+0.08072
+0.22532
+0.366
+y12
+i
+150
+90
+0.801
+0.00997
+0.22532
+0.883
+*** p < 0.01, ** p < 0.05, * p < 0.1.
+Table 5. Estimated power of S-maup.
+Number of areas (N)
+ρ
+N = 100
+N = 400
+N = 900
+-0.9
+0.989
+0.985
+0.997
+-0.7
+0.986
+0.996
+1.000
+-0.5
+0.981
+0.998
+1.000
+-0.3
+0.982
+0.998
+1.000
+0.0
+0.997
+0.999
+0.999
+0.3
+0.986
+0.996
+1.000
+0.5
+0.986
+0.996
+0.999
+0.7
+0.783
+0.985
+0.995
+0.9
+0.977
+0.703
+0.492
+Level of signiﬁcance α = 0.05.
+
+17
+Table 6. Estimated size of S-maup.
+Number of areas (N)
+ρ
+N = 100
+N = 400
+N = 900
+-0.9
+0.163
+0.087
+0.065
+-0.7
+0.080
+0.037
+0.080
+-0.5
+0.091
+0.043
+0.083
+-0.3
+0.073
+0.097
+0.136
+0
+0.102
+0.066
+0.026
+0.3
+0.081
+0.057
+0.038
+0.5
+0.098
+0.062
+0.032
+0.7
+0.043
+0.032
+0.045
+0.9
+0.110
+0.024
+0.009
+Level of signiﬁcance α = 0.05.
+MAUP, when in fact the variable yi is not. Hence, it is expected that the proportion of instances
+for which our test commits type I error is close the theoretical signiﬁcance level (α).
+The empirical test size is calculated following a similar procedure implemented to calculate the
+power, but in this case, the tuple (N, ρ) is selected if and only if the Levene test is not rejected in
+all 30 cases. Table 6 reports the size of our test, which show the best performance in scenarios of
+positive spatial autocorrelation.
+6
+An illustrative application of the S-maup test
+In this section, we present an empirical illustration within the context of a Mincer wage equation
+Mincer (1974) that explains the salary based on schooling and experience. Eq (17) presents the
+most basic version of the Mincer wage equation.
+LNW = β0 + β1 ∗Y RSCHOOL + β2 ∗EXP + β3 ∗EXP 2 + ε,
+(17)
+where LNW is the natural logarithm of income (hourly wage), Y RSCHOOL years of schooling,
+EXP years of potential labor market experience (calculated as the age in years minus years of
+education plus 6), and ε is a mean zero residual.
+It is important to clarify that this example
+is merely illustrative. We use this equation because its simplicity allows us to present a simple
+application of our test.
+We use the 2011 census data from South Africa retrieved from the Integrated Public Use Mi-
+crodata Series, International (IPUMS-International), at the Minnesota Population Center Center
+(2015). The data include 688,310 individuals who were working at the time of the survey. We aggre-
+gate the individual data into 206 municipalities using the weighted average of individual incomes,
+years of schooling, and the potential work experience.
+The 206 municipalities are our basic unit of analysis (i.e., our disaggregated variable). Other
+administrative units in South Africa include 52 districts and 9 provinces. Table 7 shows some
+descriptive statistics of our variables at the three administrative levels. Note how the standard de-
+viation of the three variables narrows as the level of aggregation increases. The spatial distribution
+of the variables is presented in Fig 9.
+
+18
+Figure 9. Municipalities: (a), (b) and (c). Districts: (d), (e) and (f). Provinces:(g), (h) and (i).
+Table 7. Descriptive Statistics.
+Municipalities
+Variable
+Obs.
+Mean
+Desv. Std.
+M´ın.
+M´ax.
+LNW
+206
+10.51
+0.35
+9.64
+11.73
+YRSCHOOL
+206
+9.95
+0.81
+7.43
+11.87
+EXP
+206
+21.69
+1.71
+15.28
+26.64
+Districts
+LNW
+52
+10.56
+0.25
+10.15
+11.20
+YRSCHOOL
+52
+10.06
+0.61
+8.28
+10.99
+EXP
+52
+21.59
+1.21
+18.66
+24.24
+Provinces
+LNW
+9
+10.57
+0.19
+10.31
+10.86
+YRSCHOOL
+9
+10.00
+0.44
+9.35
+10.59
+EXP
+9
+21.77
+0.77
+20.54
+23.09
+
+19
+Table 8. Mincer Model Estimate: South Africa.
+LNW
+Coef.
+Desv. Std
+p > |t|
+Conﬁdence Interval at 95%
+YRSCHOOL
+0.3364
+0.0259
+0.000 ***
+0.2852
+0.3876
+EXP
+0.4008
+0.1499
+0.008 ***
+0.1051
+0.6965
+EXP2
+-0.0085
+0.0034
+0.016 **
+-0.0153
+-0.0016
+CONST.
+2.4796
+1.6243
+0.128
+-0.7232
+5.6825
+Num. Obs. 206
+F(3,202) = 68.84
+R2 adjusted = 0.498
+*** p < 0.01, ** p < 0.05, * p < 0.1.
+Table 8 presents the estimation at the municipal level. The coeﬃcients of education and expe-
+rience are signiﬁcant and exhibit the expected signs.
+What would be the maximum level of spatial aggregation for which these results hold? Note that
+here we are asking about the minimum value for k that preserves the distributional characteristics
+of the variables; we are not aiming to evaluate a speciﬁc regionalization for a give value of k. We
+can use our S-maup statistic to answer this question by identifying the minimum value of k for
+which our test fails to reject the null hypothesis of no inﬂuence of the MAUP. In Table 9, we present
+the results of our test for diﬀerent levels of spatial aggregations. For this, our test requires the level
+of spatial autocorrelation of each variable (ρ) and the value of θ = k
+N . Note that at k = 135, the
+S-maup indicates that the variable LNW is aﬀected by the MAUP. This ﬁnding may imply that
+the results obtained at municipal level (k = 206) may hold until an aggregation level of k = 136
+that is the aggregation level at which all the variables involved in the regression do not lose their
+distributional characteristics. Another conclusion from these results is that the results obtained at
+the municipal level do not hold at district or province levels.
+Fig 10 compares the coeﬃcients obtained at the municipal level (black and dashed vertical lines)
+with the distribution of the coeﬃcients obtained by estimating the Mincer equation on 1,000 random
+spatial aggregations of the k = 206 municipalities into k = 136 regions. Fig 10a, corresponding
+to years of education, shows that 100% of the coeﬃcients estimated with k = 136 fall into the
+95% conﬁdence intervals.
+Fig 10b, corresponding to years of experience, shows that 98.8% of
+the coeﬃcients estimated with k = 136 fall into the 95% conﬁdence intervals. Finally, Fig 10c,
+corresponding to the squared years of experience, shows that 98.7% of the coeﬃcients estimated
+with k = 136 fall into the 95% conﬁdence intervals.
+Next, we estimated the Mincer model for k = 52 and compared it with the estimation for
+k = 206 municipalities. As we did previously, we made 1,000 random aggregations and obtained
+the distribution of the estimated coeﬃcients for K = 136 and k = 52. Fig 11 shows how the
+estimations with k = 52 are more volatile and deviated than those with k = 136 regions. Note also
+that the coeﬃcients for K = 206
+7
+Conclusions
+This paper introduced the ﬁrst statistic of its kind for measuring the level of sensitivity of a spatially
+expansive variable to the MAUP. The statistic is easy to implement because it only requires as input
+parameters the level of aggregation θ = k
+N and the level of spatial autocorrelation of the variable ρ.
+
+20
+Table 9. Estimator of the statistic S -maup: South Africa.
+N = 206
+LNW
+YRSCHOOL
+EXP
+EXP2
+ρ = 0.05
+ρ = 0.25
+ρ = 0.24
+ρ = 0.40
+k
+M
+Ps-v p
+M
+Ps-v p
+M
+Ps-v p
+M
+Ps-v p
+200
+0.011
+0.806
+0.011
+0.820
+0.011
+0.819
+0.011
+0.833
+180
+0.022
+0.589
+0.021
+0.619
+0.021
+0.619
+0.020
+0.656
+150
+0.057
+0.242
+0.052
+0.330
+0.053
+0.327
+0.048
+0.414
+136
+0.087
+0.101
+0.079
+0.197
+0.079
+0.194
+0.072
+0.302
+135
+0.091
+0.094 *
+0.081
+0.187
+0.082
+0.185
+0.073
+0.295
+134
+0.093
+0.089 *
+0.083
+0.181
+0.084
+0.179
+0.076
+0.290
+132
+0.099
+0.077 *
+0.088
+0.166
+0.089
+0.166
+0.079
+0.273
+124
+0.124
+0.036 **
+0.111
+0.115
+0.112
+0.114
+0.099
+0.208
+122
+0.131
+0.032 **
+0.117
+0.107
+0.118
+0.104
+0.104
+0.186
+120
+0.139
+0.025 **
+0.123
+0.094 *
+0.125
+0.091 *
+0.110
+0.167
+118
+0.147
+0.019 **
+0.131
+0.081 *
+0.132
+0.080 *
+0.142
+0.101
+110
+0.182
+0.003 **
+0.161
+0.043 **
+0.163
+0.042 **
+0.149
+0.093 *
+108
+0.192
+0.001 **
+0.169
+0.034 **
+0.172
+0.033 **
+0.149
+0.093 *
+52
+0.584
+0.000 ***
+0.527
+0.001 ***
+0.533
+0.001 ***
+0.461
+0.00 ***
+9
+0.863
+0.000 ***
+0.847
+0.001 ***
+0.849
+0.001 ***
+0.822
+0.00 ***
+*** p < 0.01, ** p < 0.05, * p < 0.1.
+Figure 10. Distribution of coeﬃcients, k = 136: (a) YRSCHOOL; (b) EXP; (c) EXP2. horizontal black line: coeﬃ-
+cient (206 municipalities), dashed lines are the respective conﬁdence intervals 95%.
+
+21
+Figure 11. Distribution of coeﬃcients.
+line:k = 136, dotted line:k = 52: (a) YRSCHOOL; (b) EXP; (c) EXP2.
+horizontal black line: coeﬃcient (206 municipalities). horizontal dotted line: coeﬃcient (52 districts).
+The test exhibits good statistical power and size. We also provide the table of critical values and
+a procedure to calculate the pseudo-p value of the test.
+The empirical application shows the usefulness of the test for identifying the maximum level of
+aggregation at which the original variable preserves its distributional characteristics. Additionally,
+it can be useful to test whether two aggregation levels are comparable.
+We recognize that the main properties of the S-maup were obtained from an empirical simulation
+procedure, and they rely more heavily on hard experimental computation than theoretical methods.
+However, the complexity of the question addressed in this paper may explain why this is the ﬁrst
+attempt to answer it even though the MAUP has been in the literature since the late 1970s. We
+hope that this ﬁrst attempt motivates other researchers to contribute other approaches to answer
+the same question.
+Acknowledgement
+We thank Professor Andr´es Ram´ırez Hassan for his comments. We also thank the Cyberinfrastruc-
+ture Service for High Performance Computing, Apolo, at Universidad EAFIT for letting us run our
+computational experiments on their supercomputer.
+References
+Amrhein, C. G. (1995).
+Searching for the elusive aggregation eﬀect: evidence from statistical
+simulations. Environment and planning A, 27(1):105–119.
+Amrhein, C. G. and Reynolds, H. (1996). Using spatial statistics to assess aggregation eﬀects.
+Geographical Systems, 3(2/3):143–158.
+
+22
+Arbia, G. (1989). Spatial data conﬁguration in statistical analysis of regional economic and related
+problems. Dordrecht and kluwer academic, Boston.
+Arbia, G., Espa, G., et al. (1996). Eﬀects of the maup on image classiﬁcation. Geographical Systems,
+(3):123–141.
+Arbia, G. and Petrarca, F. (2011). Eﬀects of maup on spatial econometric models. Letters in
+Spatial and Resource Sciences, 4(3):173–185.
+Arbia, G. and Petrarca, F. (2013).
+Eﬀects of scale in spatial interaction models.
+Journal of
+Geographical Systems, 15(3):249–264.
+Bian, L. and Butler, R. (1999). Comparing eﬀects of aggregation methods on statistical and spatial
+properties of simulated spatial data. Photogrammetric Engineering and Remote Sensing, 65:73–
+84.
+Carrington, A., Rahman, N., and Ralphs, M. (2006).
+11th meeting of the national statistics
+methodology advisory committee.
+Center, M. P. (2015). Integrated public use microdata series, international: Version 6.4 [database].
+University of Minnesota, Minneapolis. http://doi.org/10.18128/D020.V6.4.
+Clark, W. A. and Avery, K. L. (1976).
+The eﬀects of data aggregation in statistical analysis.
+Geographical Analysis, 8(4):428–438.
+Coulson, M. R. (1978).
+”potential for variation”: A concept for measuring the signiﬁcance of
+variations in size and shape of areal units. Geograﬁska Annaler. Series B. Human Geography,
+pages 48–64.
+Cressie, N. A. (1996). Change of support and the modiﬁable areal unit problem.
+Duque, J. C., Art´ıs, M., and Ramos, R. (2006). The ecological fallacy in a time series context:
+Evidence from Spanish regional unemployment rates. Journal of Geographical Systems, 8(4):391–
+410.
+Duque, J. C., Dev, B., Betancourt, A., and Franco, J. L. (2011). ClusterPy: Library of spatially
+constrained clustering algorithms, Version 0.9.9. RiSE-group (Research in Spatial Economics).
+EAFIT University., Colombia.
+Duque, J. C., Royuela, V., and Nore˜na, M. (2012). A stepwise procedure to determinate a suitable
+scale for the spatial delimitation of urban slums. In Advances in Spatial Science, volume 75,
+pages 237–254.
+Flowerdew, R. and Amrhein, C. (1989). Poisson regression models of canadian census division
+migration ﬂows. Papers in Regional Science, 67(1):89–102.
+Fotheringham, A. S. (1989). Scale-independent spatial analysis, pages 221–228. Taylor and Francis
+London, USA.
+Fotheringham, A. S., Brunsdon, C., and Charlton, M. (2000). Quantitative geography: perspectives
+on spatial data analysis. Sage.
+Fotheringham, A. S. and Wong, D. W. (1991). The modiﬁable areal unit problem in multivariate
+statistical analysis. Environment and planning A, 23(7):1025–1044.
+
+23
+Gehlke, C. E. and Biehl, K. (1934). Certain eﬀects of grouping upon the size of the correlation coeﬃ-
+cient in census tract material. Journal of the American Statistical Association, 29(185A):169–170.
+Goodchild, M. F. (1979). The aggregation problem in location-allocation. Geographical Analysis,
+11(3):240–255.
+Green, M. and Flowerdew, R. (1996). New evidence on the modiﬁable areal unit problem. Spatial
+analysis: Modelling in a GIS environment, pages 41–54.
+Guo, J. and Bhat, C. (2004). Modiﬁable areal units: Problem or perception in modeling of residen-
+tial location choice?
+Transportation Research Record: Journal of the Transportation Research
+Board, (1898):138–147.
+Holt, D., Steel, D., and Tranmer, M. (1996a). Area homogeneity and the modiﬁable areal unit
+problem. Geographical Systems, 3(2/3):181–200.
+Holt, D., Steel, D. G., Tranmer, M., and Wrigley, N. (1996b). Aggregation and ecological eﬀects in
+geographically based data. Geographical Analysis, 28(3):244–261.
+Hunt, L. and Boots, B. (1996). Maup eﬀects in the principal axis factoring technique. Geographical
+Systems, 3(2/3):101–122.
+Jelinski, D. E. and Wu, J. (1996). The modiﬁable areal unit problem and implications for landscape
+ecology. Landscape ecology, 11(3):129–140.
+Jones, E., Oliphant, T., Peterson, P., et al. (2001). Scipy: Open source scientiﬁc tools for python,
+2009. URL http://scipy. org.
+King, G. (1997). A solution to the ecological inference problem.
+Miller, H. J. (1999). Potential contributions of spatial analysis to geographic information systems
+for transportation (gis-t). Geographical Analysis, 31(4):373–399.
+Miller, J. R. (1998). Spatial aggregation and regional economic forecasting. The Annals of Regional
+Science, 32(2):253–266.
+Mincer, J. (1974). Schooling, experience and earnings. National Bureau of Economic Research.
+Moellering, H. and Tobler, W. (1972). Geographical variances. Geographical Analysis, 4(1):34–50.
+Nakaya, T. (2000). An information statistical approach to the modiﬁable areal unit problem in
+incidence rate maps. Environment and Planning A, 32(1):91–109.
+Openshaw, S. (1977). A geographical solution to scale and aggregation problems in region-building,
+partitioning and spatial modelling. Transactions of the institute of british geographers, pages
+459–472.
+Openshaw, S. (1978). An empirical study of some zone-design criteria. Environment and planning
+A, 10(7):781–794.
+Openshaw, S. and Taylor, P. J. (1979). A million or so correlation coeﬃcients: three experiments
+on the modiﬁable areal unit problem. Statistical applications in the spatial sciences, 21:127–144.
+Qi, Y. and Wu, J. (1996). Eﬀects of changing spatial resolution on the results of landscape pattern
+analysis using spatial autocorrelation indices. Landscape ecology, 11(1):39–49.
+
+24
+Rey, S. J. (2004). Spatial analysis of regional income inequality. Spatially Integrated Social Science,
+1:280–299.
+Reynolds, H. D. (1998). The modiﬁable area unit problem: empirical analysis by statistical simula-
+tion. PhD thesis, Citeseer.
+Robinson, W. S. (1950). Ecological correlations and the behavior of individuals. American Socio-
+logical Review, 15(3):351–357.
+Steel, D. and Holt, D. (1996).
+Rules for random aggregation.
+Environment and Planning A,
+28(6):957–978.
+Tagashira, N. and Okabe, A. (2002). The modiﬁable areal unit problem, in a regression model
+whose independent variable is a distance from a predetermined point. Geographical analysis,
+34(1):1–20.
+Verhulst, P. F. (1845).
+Recherches math´ematiques sur la loi d’accroissement de la population.
+Nouveaux M´emoires de l’Acad´emie Royale des Sciences et Belles-Lettres de Bruxelles, 18:14–54.
+Vickrey, W. (1961). On the prevention of gerrymandering. Political Science Quarterly, 76(1):105–
+110.
+Wise, S., Haining, R., and Ma, J. (1997). Regionalisation tools for the exploratory spatial analysis
+of health data. Springer.
+Wise, S., Haining, R., and Ma, J. (2001). Providing spatial statistical data analysis functionality
+for the gis user: The sage project. International Journal of Geographical Information Science,
+15(3):239–254.
+Wrigley, N., Holt, T., Steel, D., and Tranmer, M. (1996). Analysing, Modelling, and Resolving the
+Ecological Fallacy, pages 23–40. John Wiley and Sons, New York.
+Yule, G. U. and Kendall, M. (1950). An introduction to the theory of statistics. some measures of
+status inconsistency.

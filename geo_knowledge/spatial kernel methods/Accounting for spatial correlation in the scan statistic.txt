@@ -1,0 +1,1115 @@
+arXiv:0712.1458v1  [stat.AP]  10 Dec 2007
+The Annals of Applied Statistics
+2007, Vol. 1, No. 2, 560–584
+DOI: 10.1214/07-AOAS129
+c
+⃝Institute of Mathematical Statistics, 2007
+ACCOUNTING FOR SPATIAL CORRELATION IN THE
+SCAN STATISTIC1
+By Ji Meng Loh and Zhengyuan Zhu
+Columbia University and University of North Carolina at Chapel Hill
+The spatial scan statistic is widely used in epidemiology and
+medical studies as a tool to identify hotspots of diseases. The clas-
+sical spatial scan statistic assumes the number of disease cases in
+diﬀerent locations have independent Poisson distributions, while in
+practice the data may exhibit overdispersion and spatial correlation.
+In this work, we examine the behavior of the spatial scan statistic
+when overdispersion and spatial correlation are present, and propose
+a modiﬁed spatial scan statistic to account for that. Some theoretical
+results are provided to demonstrate that ignoring the overdispersion
+and spatial correlation leads to an increased rate of false positives,
+which is veriﬁed through a simulation study. Simulation studies also
+show that our modiﬁed procedure can substantially reduce the rate
+of false alarms. Two data examples involving brain cancer cases in
+New Mexico and chickenpox incidence data in France are used to
+illustrate the practical relevance of the modiﬁed procedure.
+1. Introduction.
+Detection of clusters in spatial point processes is of
+great practical importance in a broad range of disciplines, such as epi-
+demiology, astronomy and forestry, and has generated considerable interest
+among statisticians in recent years. See Lawson and Denison (2002) for a
+review of the diverse approaches to this problem. In recent literature spa-
+tial scan statistics have been widely used in studies of disease clustering
+in epidemiology and health science [e.g., Hjalmars et al. (1996), Viel et al.
+(2000), Sankoh et al. (2001) and Perez et al. (2002)]. The scan statistic was
+ﬁrst studied by Naus (1965) and others as a means to detect clusters in a
+one-dimensional point process. The basic idea is to move a window with
+width w along the interval over which the point process is observed. The
+Received February 2007; revised July 2007.
+1Supported in part by NSF Grants AST-05-07687 and DMS-06-05434 and SAMSI.
+Both authors contributed equally to the work and writing of this paper.
+Key words and phrases. Multiple comparisons, overdispersion, spatial correlation, spa-
+tial generalized linear mixed model, spatial scan statistic.
+This is an electronic reprint of the original article published by the
+Institute of Mathematical Statistics in The Annals of Applied Statistics,
+2007, Vol. 1, No. 2, 560–584. This reprint diﬀers from the original in pagination
+and typographic detail.
+1
+
+2
+J. M. LOH AND Z. ZHU
+maximum number of points over all possible windows is recorded and used
+to test the null hypothesis of a purely random Poisson process. Kulldorﬀ
+(1997) extended the scan statistic to the spatial setting, allowing for the
+detection of clusters of a multi-dimensional point process.
+The spatial scan statistic is based on the likelihood ratio test: for a region
+C, a likelihood ratio test statistic is computed for testing the null hypoth-
+esis of equal rates within and outside C versus the alternative of higher
+rates inside C. The spatial scan statistic is the likelihood ratio test statistic
+maximized over all possible C (perhaps limited to, say, half the size of the
+observation region). A p value for the cluster C with the maximum value
+of the likelihood ratio test statistic is obtained by comparing the value of
+the spatial scan statistic for that dataset with the distribution under the
+independent Poisson or binomial model. Since the exact distribution of the
+test statistic cannot be easily determined analytically, it is approximated
+by the Monte Carlo simulation. This has been implemented in the SatScan
+software [Kulldorﬀet al. (1998b)].
+In this work we examine the behavior of the spatial scan statistic when
+there is underlying overdispersion and spatial correlation in the data, and
+propose a modiﬁed spatial scan statistic to account for the overdispersion
+and spatial correlation. Overdispersion is commonly found in count data
+ﬁtted with Poisson models [see Cox (1983), Breslow (1984), Lawless (1987)
+and McCullagh and Nelder (1989)]. For typical disease counts data in spatial
+epidemiology studies, it is also reasonable to expect some positive correlation
+between nearby locations. Both are evident in the real data examples we
+consider here.
+We ﬁrst look at this problem from a theoretical perspective, and show
+that when overdispersion or spatial correlation is present, the classical spa-
+tial scan statistic tends to produce more false positives than the nominal
+signiﬁcance level asymptotically under certain conditions. This is conﬁrmed
+by our simulation studies, which show that the classical spatial scan statis-
+tic identiﬁes too many clusters when overdispersion or spatial correlation is
+present.
+We provide a simple modiﬁcation to the spatial scan statistic procedure
+to adjust the p values of identiﬁed clusters (Section 2.3). Essentially, we ﬁt
+a spatial generalized linear mixed model to the data which speciﬁcally in-
+cludes a spatial component. This spatial component is designed to capture
+any spatial correlation or overdispersion in the data. In the Monte Carlo
+simulation to obtain the distribution of the test statistic, we use this new
+model rather than the independent Poisson model to simulate the distribu-
+tion of the scan statistic. In our simulation study we ﬁnd that, by using this
+simple modiﬁcation, we substantially reduce the number of false positives.
+Details of our simulation study are given in Section 3.
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+3
+For the purpose of illustration, we apply both the classical spatial scan
+statistic and our adjusted version to the New Mexico brain cancer data
+[Kulldorﬀet al. (1998b)]. A cluster which is identiﬁed by the classical spatial
+scan statistic as highly signiﬁcant is not signiﬁcant using our adjusted scan
+statistic. Our result is consistent with the result in Kulldorﬀet al. (1998b)
+which used extra covariates in the model. We also applied these methods to
+chickenpox incidence data in France. Here, we ﬁnd that the classical spatial
+scan statistic identiﬁes an excessive number of hot spots (one in almost every
+time period), while the adjusted scan statistic yields more reasonable results
+(see Section 4).
+Section 2 introduces the notation, reviews the classical spatial scan statis-
+tic, presents the main theoretical results, and describes the algorithm for the
+adjusted scan statistic. Section 3 gives the simulation results and the data
+examples are in Section 4. The proof of Proposition 2 is relegated to the
+Appendix.
+2. Spatial scan statistic.
+We begin by introducing some notation and
+the basic statistical model. Let G = Sm
+i=1 Ai be the study region, where A =
+{Ai, i = 1,2,...,m} is a partition of G, that is, the study region G is divided
+into m nonoverlapping subregions Ai. At each subregion Ai, we observe Yi,t,
+the number of cases of disease during time interval t, and the covariates xi,t =
+(x1
+i,t,...,xp
+i,t)′. Examples of covariates include Ni,t, the baseline population
+at risk in Ai, age, race, gender distribution etc. Poisson and Bernoulli models
+are two typical models for Yi,t. In this paper we focus on the Poisson models.
+Similar results can be derived for Bernoulli models as well. We are interested
+in detecting clusters of subregions for which the number of observed cases
+of disease is signiﬁcantly higher than that predicted from the model.
+2.1. The classical spatial scan statistic.
+Kulldorﬀ(1997) introduced a
+spatial scan statistic for the detection of clusters where the null hypothesis
+is that the baseline process is an inhomogeneous Poisson process. We will
+refer to this null model as the following:
+Model I: (inhomogeneous Poisson process/log-linear model)
+Yi,t|λi,t ∼indep. Poisson(λi,t),
+(1)
+log λi,t = log
+Z
+Ai
+λs,t ds = β + xi,tγ + log Ni,t.
+For ﬁxed t, we are interested in testing whether β is a constant across all
+the subregions. A cluster is deﬁned to be a region C, consisting of one or
+more of the Ai ∈A, within which β is higher. For a given ﬁxed C, testing
+whether C is a cluster is just the generalized likelihood ratio test [e.g., Rice
+
+4
+J. M. LOH AND Z. ZHU
+(1995)] with the test statistic given by
+LRC =
+ YC
+NC
+YC YG −YC
+NG −NC
+YG−YC
+,
+(2)
+where YG and NG are the total number of cases and population at risk,
+YC = P
+Ai⊂C Yi and NC = P
+Ai⊂C Ni are the number of cases and population
+at risk in region C. Kulldorﬀsuggested computing LRC for all C ⊂A to ﬁnd
+LR∗= maxC LRC over all possible subsets, and use it as the test statistic.
+The distribution of this test statistic is computed using Monte Carlo sim-
+ulation under Model I, conditional on the total number of cases observed.
+Kulldorﬀ, Tango and Park (2003) compared the spatial scan statistic with
+several other cluster detection methods, and concluded that the spatial scan
+statistic has an advantage for localized hotspot type clusters.
+2.2. Spatial scan statistic with spatial correlation: theoretical results.
+The
+spatial scan statistic in its original setup (Model I) assumes that when there
+are no clusters, the numbers of disease cases in the individual subregions
+have Poisson distributions with rates that are spatially independent. Both
+the Poisson distribution and the spatial independence assumptions may be
+violated in some practical problems. In the context of disease surveillance, it
+is not unusual for the variability of the disease cases to be larger than those
+predicted by the Poisson distribution (over-dispersion). Spatial correlation
+is often present as well, due to the contagious nature of the disease, or to
+some latent variables that are related to the disease but were not included in
+the data collection or in the model. In what follows we present a null model
+that includes spatial correlation, which we refer to as Model II:
+Model II: (Spatial GLMM/GSLM)
+Yi,t|λi,t ∼indep. Poisson(λi,t),
+(3)
+log λi,t = β + xi,tγ + log Ni,t + Zi,t,
+where Zi,t is a Gaussian process with covariance given by Cov(Zi,t,Zi′,t′) =
+Cθ(si −si′,t −t′), si and si′ are the centers of subregions i and i′, and Cθ is
+a positive deﬁnite function with parameter θ, which may be a vector.
+Model II is a special case of the model-based geostatistics model intro-
+duced in the seminal work of Diggle et al. (1998). It is also referred to in
+the literature as the spatial generalized linear mixed model, or generalized
+spatial linear model [Zhang (2002) and Christensen and Ribeiro Jr. (2002)].
+Wikle (2002) used this model for a breeding bird survey dataset and ad-
+dressed some of the computational issues on applying this model to large
+datasets. The role of the Zi,t term in (3) is to capture any (residual) spatial
+correlation in the data. The range of the correlation, smoothness of Z as
+well as anisotropy, can be modeled with diﬀerent choice of Cθ.
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+5
+As an aside, note the subtle diﬀerences between Model II and the follow-
+ing log-Gaussian Cox process model [Møller, Syversveen and Waagepetersen
+(1998)]:
+Model III: (Cox process)
+Yi,t|λi,t ∼indep. Poisson(λi,t),
+λi,t =
+Z
+Ai
+λs,t ds,log λs,t = β + xi,tγ + log Ni(s),t + Zs,t,
+where Zs,t is a Gaussian process with covariance given by Cθ(s −s′,t −t′).
+Here we have log λi,t = β+xi,tγ+logNi,t+Zi,t, where Zi,t = log
+R
+Ai exp{Zs,t}ds
+does not have a Gaussian distribution. Model III may be conceptually more
+appealing based on the principle of invariance under scaling [Gelman (1996)],
+but Model II is easier to ﬁt for the type of aggregated disease surveillance
+data we intend to model, and will be the model we use for the rest of the
+paper. We note that in this paper we assume that the Ai’s are pre-speciﬁed,
+as they usually are by the data collection process. In the case when the exact
+location of each case is known, it will be more desirable to model the point
+process of cases directly, in which case Model III will be a more appropriate
+model. The method we propose to modify the spatial scan statistic can be
+applied using Model III, if so desired. The only diﬀerences in the method
+would be in the way the parameters are estimated and in the simulation of
+the reference distribution.
+In the rest of this section we restrict our attention to pure spatial processes
+and drop the subscript t for brevity. All the results are applicable with the
+added time dimension. For simplicity of notation, we ignore covariates in the
+theoretical derivation below. The generalization to include covariates xi,t is
+trivial.
+Let A = S
+i∈I Ai be a subset of A, I ⊂{1,2,... ,m}, YA = P
+i∈I Yi be the
+observed counts in A, with Yi satisfying (3), λA = P
+i∈I λi, and ¯λA = E[λA].
+We deﬁne P (1)
+k
+and P (2)
+k
+by
+P (1)
+k
+= Pr(YA = k|¯λA),
+P (2)
+k
+= Pr(YA = k) = E[Pr(YA = k|λA)],
+where the expectation is taken over λA.
+Proposition 1.
+There exists a constant K such that, for any k > K,
+P∞
+j=k P (2)
+j
+> P∞
+j=k P (1)
+j
+.
+Proof.
+Let µ1(dx) be the measure that has mass (x!)−1 at x = 0,1,...,
+and µ2(dλA) be the probability measure of λA. Furthermore, let
+f1(x) = exp{xlog ¯λA −¯λA},
+
+6
+J. M. LOH AND Z. ZHU
+f2(x) =
+Z
+exp{xlog λA −λA}µ2(dλA).
+It is easy to check that
+Z
+xf1(x)µ1(dx) =
+Z
+xf2(x)µ1(dx) = ¯λA.
+Theorem 1 in Shaked (1980) implies that f2 −f1 has two sign changes, and
+the sign sequence is +,−,+. Proposition 1 follows as
+∞
+X
+j=k
+(P (2)
+j
+−P (1)
+j
+) =
+Z ∞
+k
+[f2(x) −f1(x)]µ1(dx).
+□
+Remark.
+Proposition 1 shows that a mixture of Poisson distributions
+has a heavier right tail than the Poisson distribution with the same mean.
+It was used as an example in Shaked (1980). In the context of spatial scan
+statistics, it implies that if Model II is the truth, and the signiﬁcance level is
+small enough, Model I gives a p value which is on average smaller, resulting
+in more false positives.
+Proposition 2.
+For Var(Zi) = σ2
+n , as n →∞,
+∞
+X
+j=k
+P (2)
+j
+=
+∞
+X
+j=k
+P (1)
+j
++ (P (1)
+k−2 −P (1)
+k−1)e2β Vn
+2n + Op(n−3/2),
+(4)
+where Vn = nVar(PNiZi) = O(1).
+The proof of Proposition 2 is provided in the Appendix. The following
+corollary follows directly from Proposition 2.
+Corollary 1.
+P∞
+j=k P (2)
+j
+is asymptotically larger than P∞
+j=k P (1)
+j
+iﬀ
+k > λ + 1.
+Remark.
+Corollary 1 gives a speciﬁc condition on the critical value
+(k > λ + 1) under which Model I gives a smaller p value even when the
+variance of the random eﬀects Zi is very small. It implies that the classical
+spatial scan statistic test procedure would be more likely to reject H0 at
+any reasonable signiﬁcance level if Model II is correct, resulting in more
+false positives. From Proposition 2, it is also clear that positive correlation
+leads to more extreme p values for Model I and more false positives.
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+7
+2.3. Spatial scan statistic with spatial correlation: algorithm.
+If Model II
+is the appropriate null hypothesis, the classical spatial scan statistic (which
+assumes Model I) tends to give smaller p values, resulting in more false
+alarms. A remedy for this is to obtain the distribution of the spatial scan
+statistic by simulation under Model II. We propose the following algorithm
+to appropriately account for the spatial correlation in the computation of
+p values for the spatial scan statistic. It is only moderately more time con-
+suming than the classical spatial scan statistic algorithm.
+1. Use the regular spatial scan statistic to identify regions in space and time
+where there are no clusters.
+2. Estimate parameters in Model II using data that excludes clusters.
+3. Simulate M realizations of the process under Model II using the estimated
+parameters from step 2, and compute LR∗for each realization to form a
+distribution of LR∗under Model II.
+4. Compute LR∗for the data and ﬁnd clusters in the data using the distri-
+bution of LR∗from step 3.
+5. Repeat steps 2–4 until the clusters in steps 2 and 4 are similar.
+Parameter estimation for Model II is nontrivial, as the likelihood function
+is not in closed form: it involves a high-dimensional integral over random ef-
+fects Zi. We use the Bayes inference method for the generalized spatial linear
+model implemented in the R package geoRglm [Christensen and Ribeiro Jr.
+(2002)]. The Bayes method assumes a prior distribution on the parameters
+(β,θ), and give samples from the posterior distribution of (β,θ) conditional
+on the data using MCMC. More details on the choice of prior and correlation
+models are given in the simulation studies and data examples.
+To simulate data Yi from Model II, one needs to ﬁrst simulate Zi, a
+Gaussian process with covariance given by Cθ. Let Σ be the covariance
+matrix of Z = (Z1,...,Zm)′, and Σ = LL′ be its Cholesky decomposition.
+Zi can be simulated by multiplying L and a vector of independent normal
+random variables. To simplify the computation, we simulate Zi using the
+covariance matrix computed from Cˆθ, where ˆθ is the mean of the posterior
+distribution of θ.
+We would like to note here similar ideas presented in Efron (2004, 2007). In
+these two papers Efron considered simultaneous testing with a large number
+of tests, in the context of using false discovery rate (FDR) in genetic studies.
+Efron (2004) shows that the choice of diﬀerent null hypotheses can yield
+diﬀerent test decisions, and argues for the use of what he calls the empirical
+null to approximate the correct null. In Efron (2007) he examines the eﬀect of
+correlation of test statistics on simultaneous testing procedures, and shows
+that the presence of correlation can aﬀect the null and have substantial
+impact on the results of simultaneous testing. He recommends accounting
+for this eﬀect, for example, with the use of the empirical null. An important
+
+8
+J. M. LOH AND Z. ZHU
+assumption made in these two papers is that the number of interesting cases
+is small: about 1–5%, but not more than 10%.
+The method presented in this work is in the same spirit as Efron (2004,
+2007). Searching for clusters involves multiple testing of overlapping regions,
+so that these tests are correlated. The regular spatial scan statistic procedure
+accounts for the correlation in the overlapping regions by using the Monte
+Carlo simulation to approximate the distribution of the scan statistic. In
+this work we show that when there is spatial correlation in the data itself,
+the independent Poisson model used in the original spatial scan statistic
+does not produce the appropriate null hypothesis. By modeling the spatial
+correlation, and incorporating this in the Monte Carlo simulation, a more
+appropriate null distribution is used in the testing, and reduces the number
+of false positives. One diﬀerence from Efron (2004, 2007) is that instead of
+using the data to obtain an empirical null, we are proposing a parametric
+model to model the spatial correlation.
+Remark 1.
+The above algorithm essentially uses a parametric boot-
+strap approach. We do not have any theoretical results showing consistency
+of the approach. However, we found empirically that this procedure does
+help address the issue of excessive false alarms with the original spatial scan
+statistics (see Sections 3 and 4).
+Remark 2.
+As in Efron (2004, 2007), we require that the number of
+interesting clusters be small, say, at most 10% of detected clusters. This is
+usually the case in applications of disease surveillance. If many clusters are
+expected to be found, sophisticated statistical methods are probably not
+needed. Accordingly, we suggest that the signiﬁcance level for step 1 of the
+algorithm be set to 0.1.
+Remark 3.
+When there is spatial correlation, instead of using the scan
+statistic, LR∗= maxC LRC, with LRC deﬁned in (2), ideally LRC should
+be re-deﬁned to include the modeled spatial correlation. However, this is of-
+ten computationally prohibitive, since to evaluate the likelihood one would
+need to compute multiple integrals involving the nuisance parameters Zi.
+Our proposed method is a simple, if ad hoc, procedure to improve the per-
+formance of the spatial scan statistic in the presence of spatial correlation.
+3. Simulation study.
+Our simulation study consists of two parts. First,
+we investigate how the classical spatial scan statistic behaves when there is
+underlying correlated error in the true model. Second, we study the eﬀec-
+tiveness of the modiﬁed procedure in reducing the number of false positives
+found by the spatial scan statistic.
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+9
+We base our simulations around the New Mexico brain cancer dataset con-
+sidered in Kulldorﬀet al. (1998a). In particular, we use the counties in this
+dataset as the regions for our simulation. We also use the 1991 population
+numbers. To keep things simple, we do not include any covariates in this sim-
+ulation. Speciﬁcally, we model the number of disease cases Y = (Y1,...,Ym)
+using Model II, with Z = (Z1,...,Zm) ∼N(0,Σ). The quantity β in (3) is
+related to the incidence rate of the disease.
+We take Z to be a realization of a Gaussian random ﬁeld with the Mat´ern
+covariance function, that is,
+Cov(Zi,Zj) =
+σ2
+2ν−1Γ(ν)
+ν1/2dij
+ρ
+ν
+Kν
+dij
+ρ
+
+,
+(5)
+where dij is the distance between the centers of regions i and j, Γ is the
+gamma function and Kν is a modiﬁed Bessel function [Abramowitz and Stegun
+(1965)]. The parameter ν is related to the smoothness or diﬀerentiability of
+the random ﬁeld with larger ν corresponding to a smoother ﬁeld, while the
+parameter ρ is related to the range of dependence in the values of the Zi’s,
+with larger ρ indicating stronger dependence. Finally, Var(Zi) = σ2.
+For a set of values of ν, ρ and σ, we ﬁrst generate a realization of Z
+at the locations of the counties. Each Yi is then simulated from a Poisson
+distribution with mean λi, with λi given by (3). Next, we use SatScan to
+compute the scan statistic of the simulated values of Y to identify clusters
+and the p value of the main cluster is recorded. A small p value would
+indicate that the cluster identiﬁed by the scan statistic is signiﬁcant. This
+whole procedure is repeated 1,000 times, each time with new values of Y and
+Z, yielding 1,000 p values corresponding to the main cluster found in each
+of the 1,000 simulated datasets. We then compute the proportion of these
+p values that are smaller than a given signiﬁcance level α. If the datasets
+were simulated from Model I, the model assumed for the classical spatial
+scan statistic (Poisson, without the error Z), then on average α × 100% of
+the p values will be less then α, that is, the type I error (false alarm rate)
+is the same as the signiﬁcance level.
+We ran the entire simulation described above using a range of values of
+ν,ρ and σ and considered signiﬁcance level α equal to 0.01, 0.05 and 0.1 to
+study the relationship between the false alarm rate and these parameters.
+The results are plotted in Figure 1. Our results are not aﬀected by changes
+in the values of ν, so we only show results for ν = 1.
+Figure 1 contains three plots. From left to right, these plots show the pro-
+portion of p values that are less than 0.01, 0.05 and 0.1, respectively. In each
+plot, the 10 lines from top to bottom correspond to σ = 0.1,0.09,0.08,... ,0.01,
+respectively. The dots at ρ = 0 give the proportions under the model assumed
+in the classical scan statistic, that is, with Z ≡0.
+
+10
+J. M. LOH AND Z. ZHU
+Fig. 1.
+Plots of the proportion of p values that are 0.01, 0.05 and 0.1 (left to right)
+or less, obtained by applying the classical spatial scan statistic to data simulated under
+Model II. Parameters for Model II used are the following: ρ from 0 to 400 (x-axis) and
+σ = 0.01,0.02,... ,0.1 (bottom line to top line).
+The behavior shown in Figure 1 can be understood by examining the
+properties of Z assumed in each simulation run. When Z ≡0, we ﬁnd that
+the scan statistic behaves as it should: the proportion of p values less than
+or equal to 0.01, say, is about 0.01.
+When Z ̸= 0, by Propositions 1 and 2, the scan statistic tends to ﬁnd
+more clusters in the data. Figure 1 shows that this is indeed the case: the
+proportion of p values less than or equal to 0.01, say, can be as high as 80%,
+indicating a severe problem with false alarms. This of course depends on the
+variance of Z. When the variance is large, the values of Z vary a lot more,
+causing the scan statistic to identify a lot more clusters in the data. As
+the variance of Z is reduced, the proportion of false alarms is also reduced.
+However, we ﬁnd that even for σ = 0.01, the proportion of p values less than,
+say, 0.01 (left plot of Figure 1) can be as high as 0.07.
+When the dependence between the values of Zi is very strong, that is,
+when ρ is very large, the values of all Zi become very similar due to the
+strong dependence. This may produce an elevated level of risk of disease
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+11
+uniformly over all the counties, but with less variability, thus reducing the
+number of false alarms found by the spatial scan statistic.
+There is a peak in the proportion at some small value of ρ, diﬀerent from
+zero. For even smaller values of ρ, the proportion drops slightly, but even in
+the case of independent Zi, we ﬁnd that the proportion of p values that are
+less than p is still larger than the value that we would expect if the model
+assumed in the scan statistic is true.
+Thus, the scan statistic is sensitive to model misspeciﬁcation, speciﬁcally
+of the type where there is some error in the model involving λ, producing
+overdispersion or spatial correlation in Y relative to the Poisson model [see,
+e.g., McCullagh and Nelder (1989)]. Our simulation studies indicate that
+the behavior of the scan statistic Z depends a lot on the variability, as
+well as the range of correlation of Z. We expect this type of error to occur
+frequently in real settings, through spatial correlation in the data and various
+sources of measurement errors. Some spatial correlation may be captured by
+incorporating covariates in the model. However, there may still be residual
+spatial correlation, and measurement errors in the covariates. Furthermore,
+there may be instances where covariates are not recorded in the data.
+By modeling the overdispersion and spatial correlation present in a dataset,
+the modiﬁed algorithm given in Section 2.3 aims to reduce the number of
+false positives found by the classical spatial scan statistic. In the context of
+our simulation study, the eﬀect will be to reduce the proportion of p values
+that are less than the nominal value. The simulation experiments described
+below demonstrate the eﬀectiveness of our algorithm.
+For each of the 100 previously simulated realizations corresponding to
+each parameter set, we use Model II to model the spatial correlation. We
+then use the estimated parameters to generate 999 new realizations. The
+spatial scan statistic is computed for each of these new realizations. This set
+of 999 values gives the reference distribution of the spatial scan statistic. The
+p value of the cluster found in the original realization is given by the rank of
+the spatial scan statistic relative to the values in the reference distribution.
+Figure 2 (left column) shows histograms of draws from the posterior dis-
+tribution of ρ and σ obtained from ﬁtting Model II to a single simulated
+realization with ρ = 50, σ = 0.14. Notice that there is quite a lot of uncer-
+tainty in the estimation of ρ.
+Figure 3 shows the results of the modiﬁed procedure. We ﬁnd that the
+proportion of p values less than, for example, 0.05, is substantially smaller
+than the proportion obtained with the original spatial scan statistic, showing
+that the modiﬁed procedure is eﬀective in reducing the number of false
+positives. The proportion is still larger than the nominal level. We believe
+this is due to the high uncertainty in our estimates of ρ, as the number of
+false positives found by the original spatial scan statistic depends strongly
+on ρ (Figure 1).
+
+12
+J. M. LOH AND Z. ZHU
+Fig. 2.
+Histograms showing the posterior distributions of ρ and σ obtained from ﬁtting
+Model II to one realization of the data with ρ = 50,σ = 0.14 (left column). The histograms
+on the right are similar posterior distributions using a dataset with 32 additional randomly
+placed locations and an incidence rate that is ﬁve times higher.
+We constructed reference distributions using the true parameter values
+and computed the modiﬁed p values using these reference distributions. The
+results found here can be used as a guide for the performance of the modiﬁed
+spatial scan statistic algorithm in situations where we can obtain good pa-
+rameter estimates. Figure 4 suggests that, with good parameter estimates,
+the proportion of small p values does become very close to the expected level.
+The amount of variability in the curves in the ﬁgure provides an indication
+of the amount of uncertainty in the distribution of the spatial scan statistic,
+which is estimated by simulation.
+The uncertainty in the estimation of ρ would be reduced if there were
+more locations in the dataset and/or if the incidence rate were higher. As
+an example, we added an additional 32 locations randomly and generated
+a realization using ρ = 50 and σ = 0.14 with an incidence rate that is ﬁve
+times higher. The posterior distributions of ρ and σ obtained from ﬁtting
+Model II are shown in Figure 2 (right column). Notice that the variability is
+much reduced. For example, the standard deviation for ρ drops by 40%. For
+a given dataset, the high uncertainty in estimating ρ may also be reduced by
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+13
+Fig. 3.
+Plots of the proportion of p values equal to 0.01, 0.05 or 0.1 (left to right) or
+less, using the modiﬁed procedure, with the p values obtained by comparing the spatial
+scan statistic to a reference distribution generated with parameters estimated from a ﬁtted
+generalized linear mixed model. The diﬀerent line types refer to diﬀerent values of σ like
+in Figure 1.
+Fig. 4.
+Plots of the proportion of p values equal to 0.01, 0.05 or 0.1 (left to right) or
+less, using the modiﬁed procedure, with the p values obtained by comparing the spatial scan
+statistic to a reference distribution generated with the true parameter values. The line types
+represent diﬀerent values of σ like in Figure 1.
+
+14
+J. M. LOH AND Z. ZHU
+using more robust MCMC methods for ﬁtting the spatial generalized linear
+mixed model [Christensen, Roberts and Sk¨old (2006)]. We did not explore
+this possibility in this paper. Our study shows that even in situations when
+conditions for estimating the parameters are not ideal, the modiﬁed spatial
+scan statistic procedure is nevertheless able to reduce the number of false
+alarms.
+The priors we use for the parameters in this section and in Section 4 are
+the default in the geoRglm package: ﬂat priors for β and σ and a uniform
+discrete prior on (1,U) for ρ. When there is high uncertainty in the estima-
+tion of ρ, the choice of the upper bound U may be important. In practice,
+for a large enough observation region, an upper bound roughly equal to the
+length of the region would usually be suﬃcient. The posterior draws of ρ
+should also be examined, with a high proportion of values near the upper
+bound providing an indication that the upper bound is not large enough.
+4. Data examples.
+4.1. New Mexico brain cancer data.
+Here, we consider the analysis of
+a simple dataset to illustrate the performance of the modiﬁed spatial scan
+statistic. Kulldorﬀet al. (1998a) applied the scan statistic to a New Mex-
+ico brain cancer dataset that contains population and brain cancer inci-
+dence data for counties in New Mexico from 1973 to 1991. There were a
+total of 1175 cases. For each case, information is known about the county
+of residence, year of diagnosis, age, race and sex. The raw data can be ob-
+tained from the National Cancer Institute or from the SatScan software web-
+site http://www.satscan.org. The coordinates recorded for the 32 coun-
+ties range from 8 to 162 for both the East–West and North–South direc-
+tions. This dataset is of interest partly because there was concern in the
+Los Alamos community in 1991 about an apparent increase in brain tumor
+deaths. Kulldorﬀet al. (1998a) found a nonsigniﬁcant cluster with a p value
+of 0.07, adjusting for age, sex and race.
+Here, we consider the brain cancer data as an illustrative example of how
+our method can adjust for spatial correlation. Covariates can capture some
+of the spatial correlation in the data, partially taking the place of Z in (3). If
+covariates are not included, we found that the spatial scan statistic detects a
+highly signiﬁcant cluster with a p value of 0.009. This cluster consists of seven
+counties: Bernallillo, San Miguel, Sandoval, Sante Fe, Socorro, Torrance and
+Valencia.
+To show the performance of the modiﬁed spatial scan statistic, we choose
+to ignore the covariates in the procedure, so that there is spatial correlation
+in the data that is unaccounted for. We ﬁrst ﬁt Model II to the yearly data
+and examine the trend, if any, of the various parameter estimates. Plots of
+the estimates (mean of the posterior distribution) and their 50% posterior
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+15
+Fig. 5.
+Plots of parameter estimates and their 50% posterior credible region of the gen-
+eralized linear mixed model ﬁt to the yearly New Mexico brain cancer data.
+credible regions are given in Figure 5. Most of the estimates are very similar
+from year to year, with overlapping 50% posterior credible regions. Note
+that the estimator of ρ for the year 1987 is higher than the rest, though
+the diﬀerence is not signiﬁcant. This year is within the nonsigniﬁcant but
+most likely space–time cluster of 1985 to 1989 found from the analysis of
+Kulldorﬀet al. (1998a), and the excess incidence is in Los Alamos from 1986
+through 1989.
+Based on the results of Kulldorﬀet al. (1998a) and our analysis on the
+yearly data, we split the data into two sets, one from 1973 to 1982, and the
+other from 1983 to 1991, and consider the total occurrences in the counties
+during these two time periods. Thus, we roughly treat 10 years as one time
+unit. We use data from 1973–1982 as normal data for estimating the param-
+eters of Model II, and data from 1983–1991 as test data. We ﬁt Model II
+to the 1973–1982 data, with the Mat´ern model (5) for Cθ, ﬂat priors for β
+and σ, and a uniform discrete prior on (1,70) for ρ. We take the posterior
+means β = −0.834,σ = 0.176, and ρ = 20.94 as our estimates.
+We used the above parameter estimates in the Monte Carlo procedure
+to account for any spatial correlation in the data. (Recall that the origi-
+nal procedure computed the p value by assuming that Z ≡0 in Model II.)
+Speciﬁcally, using the ﬁtted model, we simulate 999 new incidence datasets
+and compute the scan statistic for each of them. These spatial scan statis-
+tic values are then compared with the value obtained from the real data to
+obtain a p value. Using this method, we ﬁnd that the p value for 1983–1991
+data becomes 0.25. Thus, by using the modiﬁed spatial scan statistic, we
+ﬁnd that the cluster is actually not signiﬁcant.
+In this illustrative example, we showed how modifying the spatial scan
+statistic by using Model II instead of Model I can help capture the spatial
+correlation due to unmeasured covariates. Of course, in a real application,
+any measured covariates should be included in the analysis. However, it is
+common for important covariates to be unmeasured and the modiﬁed scan
+statistic is a general procedure that can account for that.
+
+16
+J. M. LOH AND Z. ZHU
+4.2. France chickenpox incidence data.
+The incidence rates of 15 dif-
+ferent diseases (e.g., inﬂuenza symptoms, chickenpox and diarrhoea) are
+recorded on a weekly basis for the 22 administrative regions of France.
+These regions span roughly 800 km for both the East–West and North–
+South directions. For some of the diseases, the data date back to as far
+as 1985 and data for most of these diseases are still being collected. The
+data collection is part of a comprehensive system set up to monitor the in-
+cidence of these diseases and to facilitate the detection of outbreaks. The
+data is collected from submissions by doctors participating in the network,
+and can be accessed at http://www.b3e.jussieu.fr/sentiweb. More de-
+tails about this surveillance network can be found in Boussard et al. (1996).
+Deguen, Chau and Flahault (1998) indicated that some other covariates such
+as age and gender are also recorded. However, this additional data do not
+appear to be available from the above website.
+Sampling bias could be an issue—since submission of data is voluntary,
+there might be undercoverage in areas where fewer doctors are in the net-
+work. In any region, the number of doctors and the actual doctors par-
+ticipating may change over time. No information about this appears to be
+recorded, other than a map showing participating doctors. However, the sys-
+tem computes an incidence rate from the data it receives. We assume that
+this calculation already takes into account the undercoverage problem and
+will ignore these issues in our analysis.
+In this section we will perform our analysis on both the yearly and 4-
+weekly totals of the incidence of chickenpox (variella) for the period between
+1996 to 2005. Chickenpox is contagious and we expect some degree of spatial
+correlation between the incidence rates of neighboring regions. The position
+of the administrative center of each region is used as the position for all cases
+occurring in that region. Deguen, Chau and Flahault (1998) looked at the
+epidemiology of chickenpox in France, ﬁnding summary statistics for the na-
+tional time series of chickenpox incidence data. Deguen, Thomas and Chau
+(2004) built a SEIR model to estimate the contact rate of chickenpox. For
+inﬂuenza cases, Costagliola et al. (1991) and Viboud et al. (2004) built re-
+gression models based on nonepidemic data with the aim of using these
+models to identify future incidences of epidemics. In each of these cases, the
+spatial information of the data is not considered. We focus our analysis on
+the use of scan statistics to identify hotspots in both space and time. In
+particular, for chickenpox, we ﬁnd that higher incidence rates may occur
+at diﬀerent times for diﬀerent locations. To our knowledge, this is the ﬁrst
+attempt to identify both spatial and temporal outbreaks of chickenpox. In
+a retrospective study, these identiﬁed spatial–temporal outbreaks combined
+with other covariates can be used to study the socio-demographic factors
+that may contribute to the outbreaks and evaluate the eﬀectiveness of cer-
+tain intervention procedures such as mass immunization.
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+17
+We ﬁrst compute the regular scan statistic for the data over this period.
+In particular, the SatScan program can perform a prospective analysis using
+data from prior time periods to detect clusters in the current period. Thus,
+we use data in time period 1 as a baseline to detect clusters in time period
+2, data in time periods 1–2 to detect clusters in time period 3, etc.
+For yearly total incidence data, we ﬁnd that with the regular spatial
+scan statistic, clusters with p values of 0.001 were found for all the years
+from 1997 to 2005, an indication that the independent Poisson model is not
+appropriate. For the 4-weekly data from 1997 to 2005, the regular spatial
+scan statistic identiﬁed 113 primary clusters out of 117 4-week periods, 109
+of which have p values 0.05 or less and 108 have p values 0.001 or less.
+For this data, the regular spatial scan statistic identiﬁed such an excessive
+number of outbreaks that it is not practically useful.
+We next ﬁt the spatial generalized linear mixed Model II to the chickenpox
+incidence rate for an initial period and then use the ﬁtted model to do a
+Monte Carlo adjustment to the scan statistic as described in Section 3 for
+subsequent time periods. With the 1996 data, we obtained posterior mean
+estimates of 6.6, 572 and 0.4 for β,ρ and σ for Model II using the Mat´ern
+model for the covariance function with ν = 0.5, and with ﬂat priors for β
+and σ and a uniform discrete prior on (1,700) for ρ. Plots of the posterior
+draws of β,ρ and σ are shown in Figure 6. Note that in the posterior sample
+of σ, more than 95% of the draws are greater than 0.10, suggesting that
+Model I, with Z ≡0, is not appropriate. Formal testing may be done, for
+example, with Bayes factors [Kass and Raftery (1995)].
+We then computed the spatial scan statistic for each year from 1997 to
+2005 and compared each of these statistics with the spatial scan statistics
+computed from simulated realizations using the estimates of β,ρ and σ.
+With this procedure, the modiﬁed p values look more reasonable, and in
+particular, only 1999 and 2004 have p values less than 0.05. Figure 7 shows
+Fig. 6.
+Plots of the posterior draws of β, ρ and σ, obtained from ﬁtting Model II to the
+1996 chickenpox data.
+
+18
+J. M. LOH AND Z. ZHU
+Fig. 7.
+Maps of incidence rates of chickenpox for 1997 to 2005 in the 22 administrative
+regions of France. The primary and ﬁrst secondary clusters found by the spatial scan
+statistic are indicated (solid and dashed lines, resp.).
+maps of the incidence counts per 10 million. The primary (solid line) and ﬁrst
+secondary (dashed line) clusters identiﬁed by the spatial scan statistic are
+also indicated. Note that although relatively high values occur somewhere in
+each year, the most signiﬁcant ones are clearly those corresponding to 1999
+and 2004.
+We repeat the same procedure for the 4-week data, ﬁtting a spatial GLM
+to each 4-week period of 1996, using the same priors as above for β,σ and
+ρ. We then used the overall mean of the estimates to simulate realizations
+according to Model II. These were found to be 3.8, 390 and 1.05, respectively
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+19
+Fig. 8.
+Maps of incidence rates of chickenpox in the 22 administrative regions of France
+for the 3 most signiﬁcant 4-week periods found in the 1997–2005 data, periods 33, 94 and
+115. Also shown are maps for the periods just before and after these signiﬁcant periods.
+The primary and ﬁrst secondary clusters found by the spatial scan statistic are indicated
+(solid and dashed lines, resp.).
+for β,ρ and σ. The estimate of σ is larger here, reﬂecting the increased
+variability in this data compared to the yearly data. From Figure 1, we
+expect the modiﬁed p values to be much larger. Indeed, we ﬁnd that this is
+the case. Out of 117 4-weekly periods, only 6 have p values 0.1 or less. Of
+these, only 2 have p values 0.05 or less.
+Figure 8 shows incidence maps (counts per 1 million) for the three most
+signiﬁcant 4-week periods, periods 33, 94 and 115 with p values 0.06, 0.04
+
+20
+J. M. LOH AND Z. ZHU
+Fig. 9.
+Time series of chickenpox cases (counts per million; plus signs) at the two loca-
+tions that correspond to the signiﬁcant clusters found at periods 33 and 94 by the modiﬁed
+spatial scan statistic procedure. Also shown are the average counts over all the regions.
+and 0.04, respectively. Also shown are the 4-week periods just before and
+after the signiﬁcant periods. The two main clusters are identiﬁed as before.
+Comparison among the three consecutive periods shows that the signiﬁcant
+clusters found by our modiﬁed procedure appear to be hotspots in both
+space and time.
+The maps in Figure 8 suggest occurrence of an outbreak that rises to a
+peak and then dies oﬀ. Figure 9 shows time series of chickenpox cases (counts
+per million, indicated by the plus signs) at the two locations that yielded the
+signiﬁcant clusters at periods 33 and 94. The circles in the plots show the
+average counts over all the regions. Our method appears to identify when
+the peak occurs, but we did not extensively test this.
+The above analysis does not take into account multiple comparisons in
+time. Thus, there may be signiﬁcant clusters detected even if there are no
+real clusters due to testing in multiple time periods. A way to deal with this
+is to apply FDR techniques [Benjamini and Hochberg (1995)]. Here, we use
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+21
+Fig. 10.
+Histogram of the transformed p values, together with the ﬁtted density (solid
+line) and density of the empirical null (dashed line).
+the local FDR version employed in Efron (2004), using the empirical null to
+compute the FDR.
+Speciﬁcally, we take the 129 p values obtained after applying the modiﬁed
+spatial scan statistic and transform them to z values, that is,
+zi = Φ−1(pi),
+i = 1,...,129,
+where Φ is the standard normal cumulative distribution function. A his-
+togram of these z values is shown in Figure 10. Negative values of z indicate
+possible clusters.
+The empirical density f(·) is obtained by ﬁtting a natural cubic spline
+to the z values. Assuming that the empirical null f0(·) is normal, we ﬁnd
+that its mean and standard deviation are, respectively, δ0 = −0.07 and σ0 =
+0.55. The reader is asked to refer to Efron (2004) for details on the ﬁtting
+procedure. Figure 10 also shows plots of f and f0 (solid and dashed lines,
+resp.). The value of the FDR is then taken to be
+fdr(z) = f0(z)/f(z).
+This is an upper bound of the probability P(Uninteresting|z) = p0f0(z)/f(z),
+where p0 is the proportion of uninteresting cases. Here, we assume that p0
+is large, say, p0 > 0.9.
+
+22
+J. M. LOH AND Z. ZHU
+The histogram of Figure 10 suggests the possibility that the null is a
+mixture of two distributions. This may be due to the seasonality present in
+the data. However, there appears to be spatial variation in seasonality, with
+peaks occurring at diﬀerent times at diﬀerent locations, making it diﬃcult
+to estimate the two components of the mixture distribution. Assuming that
+the null distribution is normal, we ﬁnd that the FDR for periods 33, 94
+and 115 are respectively 0.26, 0.12 and 0.17. Using 0.1 as the cut-oﬀfor the
+FDR, none of the three detected clusters are signiﬁcant, although period
+94 is close to the cut-oﬀ. We note that if the null distribution is indeed a
+mixture of two distributions, the true FDR would be smaller, likely making
+some of the detected clusters signiﬁcant.
+As a validation analysis, we ﬁt time series models to the data at each in-
+dividual location, and then apply outlier detection methods [Tsay (1986)] to
+identify hotspots in time. Speciﬁcally, we ﬁt ARMA models to the logarithm
+of the data. A value of 0.5 was added to zeros in the data before taking logs.
+For most of the locations, seasonality was detected at lag 13, corresponding
+to yearly seasonal eﬀects. A total of 12 hotspots at individual locations were
+found, at time periods 12, 23, 41, 51, 75, 77, 89, 92, 98, 99, 113 and 115.
+Of these 12 hotspots, the last one, at time period 115, corresponds to the
+hotspot identiﬁed by the modiﬁed scan statistic. Since the outlier detection
+method does not include any spatial multiple comparison adjustment, it
+ﬁnds more hotspots. Even so, it did not ﬁnd the hotspots at time periods
+33 and 94 in Figure 8 because the method does not incorporate any spatial
+information.
+We note that three of the 12 hotspots agreed exactly with those found
+by the regular spatial scan statistic. In four other cases, the regular spatial
+scan statistic found clusters containing multiple locations, which the time
+series method obviously cannot detect. Of these, two of the clusters found
+by the regular spatial scan statistic contained the location identiﬁed by
+the outlier detection method. Of the remaining 5 temporal hotspots, there
+were higher rates at other locations that the spatial scan statistic identiﬁed
+instead. Thus, including spatial information provides additional ﬂexibility
+in the detection of hotspots. However, the regular spatial scan statistic,
+which does not take into account spatial correlation, ﬁnds a hotspot at
+almost every time period, too many to be useful. The modiﬁed scan statistic,
+by accounting for spatial correlation, substantially reduces the number of
+identiﬁed hotspots. In addition, by applying FDR techniques, we can also
+account for multiple comparisons in time. The modiﬁed spatial scan statistic
+and the time series outlier detection method can be used as complementary
+methods to study the spatial and temporal aspects of a dataset.
+Note that in our analysis we used actual physical distances between ad-
+ministrative centers. Two physically distant regions might be closely cor-
+related if they have extensive transportation services. We did not consider
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+23
+this in our analysis since it is not clear how distances should be re-deﬁned
+in this case.
+Finally, the deﬁnition of hotspots is dependent on the model assump-
+tion of the process without hotspots. Information about the region sizes,
+population densities and population distribution in each region, as well as
+other covariates, might be useful in building a more structured model. More
+hotspots may be identiﬁed if a more structured model that incorporates
+these other factors is ﬁt to the data. This information, however, was not
+available to us.
+5. Conclusion.
+The spatial scan statistic introduced by Kulldorﬀ(1997)
+can be used to detect hotspots in the incidence of disease and has been
+widely used in epidemiological studies. The null model of the spatial scan
+statistic is Poisson counts at each location, with spatially independent rates.
+The Poisson assumption makes strong statements about the variability of the
+data which may not hold in practical applications. Overdispersion can occur
+through unrecorded covariates that are related to the disease or through er-
+rors in covariate measurement. Furthermore, there is often reason to believe
+that there is spatial correlation between subregions beyond that measured
+by covariates.
+We showed in our simulation study that the spatial scan statistic can
+report a high proportion of small p values when overdispersion or spatial
+correlation exists in the data. This results in many false alarms in disease
+detection. We showed how one can easily account for this by means of a
+simple procedure, speciﬁcally, by obtaining the distribution of the spatial
+scan statistic from simulating a generalized spatial linear model (Model II)
+instead of the independent Poisson model (Model I). This new procedure
+is only slightly more computationally intensive than the original procedure,
+but can greatly reduce the number of false alarms. Kulldorﬀ(1997) also
+considered the binomial model. In this paper we focus on the Poisson model,
+but we expect the ﬁndings to be similar for the binomial model.
+There may be slight loss of power in this modiﬁed procedure—we will
+investigate this in a future work. However, from our data analyses in Sec-
+tion 4, we ﬁnd that the most signiﬁcant clusters are still detected with our
+procedure. Also, with fewer clusters identiﬁed, it will be easier to further
+investigate the identiﬁed clusters. With the classical spatial scan statistic, a
+lot of resources could be spent weeding out the false alarms.
+APPENDIX
+Proof of Proposition 2.
+Letting Ui = √nZi ∼N(0,σ2), it follows
+from the Taylor expansion that
+eZi = 1 + Uin−1/2 + 1
+2U 2
+i n−1 + Op(n−3/2),
+
+24
+J. M. LOH AND Z. ZHU
+λA = eβ X
+BPieZi
+= eβ X
+BPi(1 + Uin−1/2 + 1
+2U 2
+i n−1) + Op(n−3/2)
+= λ∗
+A + eβ X
+BPi(Uin−1/2 + 1
+2(U 2
+i −1)n−1) + Op(n−3/2)
+= λ∗
+A + δ,
+where λ∗
+A = eβ PBPi(1 + 1
+2n). It can be shown that λ∗
+A = E[λ] + O(n−3/2),
+δ = Op(n−1/2), E[δ] = O(n−3/2) and E[δ2] = e2βVnn−1.
+Let fj(x) = e−x xj
+j! . The Taylor expansion of fj(λA) at λ∗
+A gives
+fj(λA) = fj(λ∗
+A) + f ′
+j(λ∗
+A)δ + f ′′
+j (λ∗
+A)δ2/2 + Op(n−3/2)
+= fj(λ∗
+A)
+
+1 +
+N
+λ −1
+
+δ +
+N 2 −N
+λ2
+−2N
+λ + 1
+δ2
+2
+
++ Op(n−3/2)
+and
+∞
+X
+j=k
+P (2)
+j
+=
+∞
+X
+j=k
+E[fj(λA)]
+=
+∞
+X
+j=k
+
+fj(λ∗
+A)
+
+1 +
+N 2 −N
+λ2
+−2N
+λ + 1
+
+e2β Vn
+2n
+
++ Op(n−3/2)
+=
+∞
+X
+j=k
+P (1)
+j
++
+∞
+X
+j=k
+(P (1)
+N−2 −2P (1)
+N−1 + P (1)
+j
+)e2β Vn
+2n + Op(n−3/2)
+=
+∞
+X
+j=k
+P (1)
+j
++ (P (1)
+k−2 −P (1)
+k−1)e2β Vn
+2n + Op(n−3/2).
+□
+REFERENCES
+Abramowitz, M. and Stegun, I. (1965). Handbook of Mathematical Functions, 9th ed.
+Dover, New York.
+Benjamini, Y. and Hochberg, Y. (1995). Controlling the false discovery rate: A practical
+and powerful approach to multiple testing. J. Roy. Statist. Soc. Ser. B 57 289–300.
+MR1325392
+Boussard, E., Flahault, A., Vibert, J.-F. and Valleron, A.-J. (1996). Sentiweb:
+French communicable disease surveillance on the world wide web. British Medical J.
+313 1381–1382.
+Breslow, N. (1984). Extra-Poisson variation in log-linear models. Appl. Statist. 33 38–44.
+Christensen, O. F. and Ribeiro Jr., P. J. (2002). geoRglm—a package for generalised
+linear spatial models. R News 2 26–28.
+Christensen, O. F., Roberts, G. O. and Sk¨old, M. (2006). Robust Markov chain
+Monte Carlo methods for spatial generalized linear mixed models. J. Comput. Graph.
+Statist. 15 1–17. MR2269360
+
+ACCOUNTING FOR SPATIAL CORRELATION IN THE SCAN STATISTIC
+25
+Costagliola, D., Flahault, A., Galinec, D., Garnerin, P., Menares, J. and
+Valleron, A.-J. (1991). A routine tool for detection and assessment of epidemics
+of inﬂuenza-like syndromes in France. Amer. J. Public Health 81 97–99.
+Cox, D. R. (1983). Some remarks on overdispersion. Biometrika 70 269–274. MR0742997
+Deguen, S., Chau, N. P. and Flahault, A. (1998). Epidemiology of chickenpox in
+France (1991–1995). J. Epidemiology and Community Health Supplement 52 46S–49S.
+Deguen, S., Thomas, G. and Chau, N. P. (2004). Estimation of the contact rate in
+a seasonal SEIR model: Application to chickenpox incidence in France. Statistics in
+Medicine 19 1207–1216.
+Diggle, P. J., Tawn, J. A. and Moyeed, R. A. (1998). Model-based geostatistics (with
+discussion). J. Roy. Statist. Soc. Ser. C Appl. Statist. 47 299–350. MR1626544
+Efron, B. (2004). Large-scale simultaneous hypothesis testing: The choice of a null hy-
+pothesis. J. Amer. Statist. Assoc. 99 96–104. MR2054289
+Efron, B. (2007). Correlation and large-scale simultaneous signiﬁcance testing. J. Amer.
+Statist. Assoc. 102 93–103. MR2293302
+Gelman, A. (1996). Bayesian model-building by pure thought: Some principles and ex-
+amples. Statist. Sinica 6 215–232. MR1379058
+Hjalmars, U., Kulldorff, M., Gustafsson, G. and Nagarwalla, N. (1996). Child-
+hood leukemia in Sweden: Using GIS and a spatial scan statistic for cluster detection.
+Statistics in Medicine 15 707–715.
+Kass, R. E. and Raftery, A. E. (1995). Bayes factors and model uncertainty. J. Amer.
+Statist. Assoc. 90 773–795.
+Kulldorff, M. (1997). A spatial scan statistic. Comm. Statist. A—Theory and Methods
+26 1481–1496. MR1456844
+Kulldorff, M., Athas, W. F., Feuer, E. J., Miller, B. A. and Key, C. R. (1998a).
+Evaluating cluster alarms: A space–time scan statistic and brain cancer in Los Alamos,
+New Mexico. Amer. J. Public Health 88 1377–1380.
+Kulldorff, M., Rand, K., Gherman, G., Williams, G. and DeFrancesco, D.
+(1998b). SaTScan v2.1: Software for the Spatial and Space–Time Scan Statistics. Na-
+tional Cancer Institute, Bethesda, MD.
+Kulldorff, M., Tango, T. and Park, P. (2003). Power comparisons for disease clus-
+tering tests. Comput. Statist. Data Anal. 42 665–684. MR1977177
+Lawless, J. F. (1987). Negative binomial and mixed Poisson regression. Canad. J. Statist.
+15 209–225. MR0926553
+Lawson, A. and Denison, D., eds. (2002). Spatial Cluster Modelling. Chapman and
+Hall/CRC, Boca Raton, FL. MR2015027
+McCullagh, P. and Nelder, J. A. (1989). Generalized Linear Models, 2nd ed. Chapman
+and Hall, London. MR0727836
+Møller, J., Syversveen, A. R. and Waagepetersen, R. P. (1998). Log Gaussian Cox
+processes. Scand. J. Statist. 25 451–482. MR1650019
+Naus, J. I. (1965). The distribution of the size of the maximum cluster of points on the
+line. J. Amer. Statist. Assoc. 60 532–538. MR0183041
+Perez, A. M., Ward, M. P., Torres, P. and Ritacco, V. (2002). Use of spatial
+statistics and monitoring data to identify clustering of bovine tuberculosis in Argentina.
+Preventive Veterinary Medicine 56 63–74.
+Rice, J. A. (1995). Mathematical Statistics and Data Analysis, 2nd ed. Wadsworth, Cal-
+ifornia.
+Sankoh, O. A., Y´e, Y., Sauerborn, R., M¨uller, O. and Becher, H. (2001). Cluster-
+ing of childhood mortality in rural Burkina Faso. Internat. J. Epidemiology 30 485–492.
+
+26
+J. M. LOH AND Z. ZHU
+Shaked, M. (1980). On mixtures from exponential families. J. Roy. Statist. Soc. Ser. B
+42 192–198. MR0583355
+Tsay, R. S. (1986). Time series model speciﬁcation in the presence of outliers. J. Amer.
+Statist. Assoc. 81 132–141.
+Viboud, C., Bo¨elle, P.-Y., Pakdaman, K., Carrat, F., Valleron, A.-J. and Fla-
+hault, A. (2004). Inﬂuenza epidemics in the United States, France, and Australia,
+1972–1997. Emerging Infectious Diseases 10 32–39.
+Viel, J. F., Arveux, P., Baverel, J. and Cahn, J. Y. (2000). Soft-tissue sarcoma and
+non-Hodgkin’s lymphoma clusters around a municipal solid waste incinerator with high
+dioxin emission levels. Amer. J. Epidemiology 151 13–19.
+Wikle, C. (2002). Spatial modeling of count data: A case study in modelling breeding
+bird survey data on large spatial domains. In Spatial Cluster Modelling (A. Lawson and
+D. Denison, eds.) 199–209. Chapman and Hall/CRC, Boca Raton, FL. MR2015038
+Zhang, H. (2002). On estimation and prediction for spatial generalized linear mixed
+models. Biometrics 58 129–136. MR1891051
+Department of Statistics
+Columbia University
+New York, New York 10027
+USA
+E-mail: meng@stat.columbia.edu
+Department of Statistics
+and Operations Research
+University of North Carolina at Chapel Hill
+Chapel Hill, North Carolina 27599
+USA
+E-mail: zhuz@email.unc.edu

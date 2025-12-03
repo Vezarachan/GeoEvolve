@@ -1,0 +1,370 @@
+arXiv:0908.3321v1  [stat.ML]  23 Aug 2009
+Relative Expected Improvement in Kriging Based
+Optimization
+ Lukasz  Laniewski-Wo l lk
+Institute of Aeronautics and Applied Mechanics
+Warsaw University of Technology
+Nowowiejska 24, 00-665 Warsaw, Poland
+e-mail: llaniewski@meil.pw.edu.pl
+Web page: http://c-cfd.meil.pw.edu.pl/
+February 4, 2020
+Abstract
+We propose an extension of the concept of Expected Improvement
+criterion commonly used in Kriging based optimization.
+We extend it
+for more complex Kriging models, e.g.
+models using derivatives.
+The
+target ﬁeld of application are CFD problems, where objective function
+are extremely expensive to evaluate, but the theory can be also used in
+other ﬁelds.
+1
+INTRODUCTION
+Global optimization is a common task in advanced engineering. The ob-
+jective function can be very expensive to calculate or measure. In par-
+ticular this is the case in Computational Fluid Dynamics (CFD) where
+simulations are extremely expensive and time-consuming. At present, the
+CFD code can also generate the exact derivatives of the objective function
+so we can use them in our models. The long computation to evaluate the
+objective function and (as a rule) high dimension of the design space make
+the optimization process very time-consuming.
+Widely adopted strategy for such objective functions is to use response
+function methodology. It is based on constructing an approximation of
+the objective function based on some measurements and subsequently
+ﬁnding points of new measurements that enhance our knowledge about
+the location of optimum.
+One of the commonly used response functions models is the Kriging
+model [2, 4, 5, 3]. This statistical estimation model considers the objec-
+tive function to be a realization of a random ﬁeld. We can construct a
+least square estimator. If we assume the ﬁeld to be gaussian, the least
+square estimator is the Bayesian estimator. Conditional distribution of
+1
+
+the ﬁeld with respect to the measurements (a posteriori) is also gaussian
+with known both mean and covariance.
+One of the methods to ﬁnd a point for new measurement is the Ex-
+pected Improvement criterion[3]. It uses a Expected Improvement func-
+tion:
+EI(x) = E(min ( ˆFmin, F(x)))
+where F is the a posteriori ﬁeld and ˆFmin is the minimum of estimator.
+The new point of measurement is chosen in the minimum of EI function.
+Many modiﬁcations and enhancements were considered for the Kriging
+model.
+Application of linear operators, e.g.
+derivatives, integrals and
+convolutions, are easy to incorporate in the model[4, 5].
+Each of these extensions of classic Kriging model is based on measuring
+something else then is returned as the response. For example we measure
+gradient and value of the function, but the response is only the function.
+The Expected Improvement states that we should measure the function
+in place where the minimum of response can be mostly improved. But for
+classic model the notion of the measured and the response functions are
+the same.
+The purpose of this paper is the investigation wether the concept of
+EI can be extended for enhanced Kriging models.
+2
+RELATIVE EXPECTED IMPROVE-
+MENT
+2.1
+Eﬃcient Global Optimization
+Jones et al.[3] propose an Eﬃcient Global Optimization (EGO) algorithm
+based on Kriging model and Expected Improvement. It consists of the
+following steps:
+1. Select a learning group x1, . . . , xn. Measure objective function f in
+these points fi = f(xi).
+2. Construct a Kriging approximation ˆF based on measurements f1, . . . , fn.
+3. Find the minimum of EI(x) function for the approximation.
+4. Augment n and set xn at the minimum of EI.
+5. Measure fn = f(xn) and go back to 2
+EI function can have many local minima (is highly multi-modal) and is
+potentially hard to minimize. The original paper proposed Branch and
+Bound Algorithm (BBA) to eﬃciently optimize the EI function. To use
+BBA authors had to establish upper and lower bonds on minimum of EI
+function over a region.
+It was fairly easy and was the main source of
+eﬀectiveness of EGO. While proposing an extension of EI concept we also
+have to propose a suitable methods of it’s optimization.
+2.2
+Gaussian Kriging
+Kriging, is a statistical method of approximation a multi-dimensional
+function basing on values in a set of points. The Kriging estimator (ap-
+2
+
+proximation) can be interpreted as a least-square estimator, but also as
+a Bayes estimator. We will use the latter interpretation as in the original
+EI deﬁnition.
+Let us take an objective function f : Ω→R. For some probabilistic
+space (Γ, F, P), we consider a random gaussian ﬁeld F on Ωwith the
+known mean µ and covariance K(x, y). Now we take a measurements of
+the objective at points x1, . . . , xn as fi = f(xi). The Bayes estimator of
+f is:
+ˆF(x) = E (F(x) | ∀i F(xi) = fi)
+Where E(A | B) is conditional expected value of A with respect to B.
+This estimator at y will be called the response at y and the (xi, fi) pairs
+will be called measurements at xi.
+Let us take an event M = {∀i F(xi) = fi} ⊂Γ and a a posteriori
+probability space (M, FM, P(· | M)). EM will stand for expected value in
+a posteriori. Field F considered on the M space is also a gaussian random
+ﬁeld with known both mean µM and covariance KM. We will call this
+ﬁeld, the a posteriori ﬁeld.
+2.3
+From EI to REI
+We would want to estimate how much the minimum of ˆF we will be
+improved if will measure f at some point. Estimator ˆF after the mea-
+surement in x can be writhen as Fx = EM(F|F(x)). The best estimate
+of the eﬀect would be EM infΩFx. But computing it would be very time-
+consuming. The idea of Expected Improvement (EI) is to take
+EI(x) = EM min{Fmin, F(x)}
+where Fmin is the actual minimum of approximation ˆF. Expected Im-
+provement is in fact expected value of how response at x will improve the
+actual minimum of ˆF. Of course the deﬁnition is equivalent to:
+EI(x) = EM min{Fmin, EM(F(x)|F(x))}
+This formulation has a natural extension. Let us deﬁne, for a set of points
+η = {η1, . . . , ηl}, a augmented estimator Fη(x) = EM (F(x) | F(η1), . . . , F(ηl)).
+For another set of points ζ = {ζ1, . . . , ζk} we can deﬁne:
+REI(ζ, η) = EM min{Fmin, Fη(ζ1), . . . , Fη(ζk)}
+Our Relative Expected Improvement (REI) is the expected value of how
+much the response at ζ will improve the minimum of ˆF if we measure at
+η. This deﬁnition implies REI({x}, {x}) = EI(x).
+We can use also a more general version:
+REIm(ζ, η) = EM min{Fη(ζ1), . . . , Fη(ζk)}
+The main advantage of REI function is that we can examine the re-
+sponse in a diﬀerent region then the region of acceptable measurements.
+A simple example illustrates it very well:
+3
+
+Figure 1: A and B sets of possible drilling points
+Example 1 We’re searching for some mineral. We have to estimate the
+maximum mineral content in somebody’s land before buying it. We cannot
+drill at his estate, but we can drill everywhere around it.
+In this example response and measurements are in a diﬀerent regions, so
+we cannot use EI. If the estate is A and the surrounding ground is B,
+in order to ﬁnd the best place to drill, we would have to search for the
+minimum of REI({x}, {y}) for x ∈A and y ∈B.
+3
+APPLICATION
+3.1
+Populations of measurement points
+The ﬁrst application of using REI instead of EI is when we want to ﬁnd a
+collection of measurement points instead of a single point, e.g. when the
+objective function can be computed simultaneously at these points. It’s
+a possibility of making the optimization process more parallel.
+(a)
+(b)
+Figure 2: (a) One point of measurement. (b) Population of measurement points.
+Example 2 We have k processors to solve our CFD problem, each run-
+ning a separate ﬂow case.
+This procedure could be, for example, to optimize REI({ζ1, . . . , ζn}, {ζ1, . . . , ζn}).
+The main advantage in using such an expression, over using some selection
+of EI minima, is that REI considers the correlation between these points.
+For example, if x and y are strongly correlated, we don’t want to measure
+in both these points, because the value in x implies the value in y.
+4
+
+3.2
+Input enhancements
+The other application ﬁeld is enhancing the Kriging model, by some other
+accessible information than the values in points.
+Let us deﬁne a generalized point as a pair (x, P), where x ∈Ωis a
+point, and P is a linear operator. We can say that f(x, P) = (Pf)(x).
+The ﬁeld F(x, P) is also gaussian with:
+µ(x, P) = (Pµ)(x)
+K(x, P; y, S) = PxSyK(x, y)
+where Px stands for applying P to K as a function of the ﬁrst coeﬃcient.
+Now all the earlier deﬁnitions can be extended to generalized points. (In
+fact this enhancement can be done by enlarging Ωto Ω× {Id, P, S, . . .})
+Example 3 The CFD code is solving the main and the adjoint problem.
+We have both the value of our objective and its derivatives with respect to
+design parameters. We want to ﬁnd the best place to measure these values.
+We can use f(x,
+∂
+∂xk ) =
+∂f
+∂xk (x) to interpret measuring the derivatives
+of f interpret as measuring at points (x,
+∂
+∂xk ). In the example we have not
+only calculated the value at (x, Id), but also at (x,
+∂
+∂xk ). If we have d design
+parameters (that is Ω⊂Rd) we have d + 1 measurements simultaneously.
+We can now optimize:
+REI
+„
+(ζ1, Id), . . . , (ζd+1, Id)
+ﬀ
+,
+
+(x, Id), (x,
+∂
+∂x1 ), . . . , (x,
+∂
+∂xd )
+ﬀ«
+We take d + 1 points of response ζ to maximize the eﬀect of all the mea-
+sured derivatives. We could of course use EI. In that case we would select
+the next point as if we’re measuring only the value. By using REI we’re
+incorporating the derivative information not only in the model, but also
+in the selection process. The disadvantage of such an expression is that
+we search in Ωd+2 which is d · (d + 2)-dimensional.
+3.3
+Multi-eﬀect response
+Next on our list is the multi-eﬀect model. We can imagine that our mea-
+sured function is composed of several independent or dependent eﬀects,
+while our objective function is only one of them. The simplest case is when
+we want to optimize objective which we measuring with an unknown error.
+Let us now say that F consists of several components F(x) = (Z(x), W (x), V (x), . . .).
+Same letters will stand for linear operators, such that F(x, Z) = Z(x).
+Example 4 Suppose that we’re searching for mineral A, but our drilling
+equipment for measuring content of A, cannot distinguish it from another
+mineral B. We know on the other hand that the latter is distributed ran-
+domly and in small patches.
+Let Z be our objective function (mineral A content) and ε a spatially-
+correlated error (mineral B content). We can measure only Z +ε while we
+want to optimize Z. In this example we can optimize REI({(x, Z)}, {(x, Z+
+5
+
+ε)}). Such a procedure will simultaneously take into consideration opti-
+mization of the objective and correction of the error. To fully understand
+why this example is important, we have to remember that drilling in the
+same place twice would give the same result. The error correction in our
+procedure will bear this in mind and will avoid duplication of measure-
+ments.
+This model would include results obtained from lower-quality numer-
+ical calculations. For an iterative algorithm (non-random), we can state
+a higher error bound and reduce the number of iterations. We cannot
+assume the error to be fully random, because starting from the same pa-
+rameters, the algorithm will give the same results. That’s why a good
+Kriging model, would recognize the error to be a narrowly correlated ran-
+dom ﬁeld ε.
+(a)
+(b)
+Figure 3: (a) High and (b) low ﬁdelity models
+Example 5 We have two CFD models. One accurate and the other ap-
+proximate, but very fast (high and low-ﬁdelity models). We know also, that
+the low-ﬁdelity model is “smoothe” with respect to the design parameters.
+Let Z be our objective function and W be a approximation of Z. In this
+example we can separately optimize:
+REI({(ζ1, Z), . . . , (ζk, Z)}, {(x, Z)})
+REI({(ζ1, Z), . . . , (ζk, Z)}, {(x, W )})
+and subsequently choose between these two points. Field W is strongly
+spatially-correlated (“smooth”) and as such it’s measurement can have
+wider eﬀect than Z. We can also take in to consideration the cost of the
+computation and select a better improvement-to-cost ratio.
+3.4
+Robust response
+The last ﬁeld of application, that we will discus, is the robust response.
+If for instance after optimization, the optimal solution will be used to
+manufacture some objects, we can be sure that the object will be manu-
+factured within certain tolerance. In other words, if the selected point is
+x, the actual point will be x+ǫ. Our real objective function is the average
+performance of these x + ǫ.
+6
+
+(a)
+(b)
+Figure 4: (a) Designed and (b) manufactured product
+Example 6 Suppose we can calculate the drag force of a car. Our factory,
+makes cars with some known accuracy. We want to ﬁnd the car shape,
+that will give the lowest average drag when made in our factory.
+Let Z be our objective function and ǫ - the manufacturing error. We
+can measure only Z(x) while we want to optimize EZ(x + ǫ).
+Let us
+say that ǫ is a random variable (for instance N(0, Σ)), and let φǫ be it’s
+probability density. Now E(h(x + ǫ)) = (φǫ ∗h)(x) = h(x, φǫ∗). In above
+example we can use:
+REI ({(ζ, φǫ ∗Z)}, {(η, Z)})
+The robust response stated as above, has a good physical interpretation. It
+is also fairly easy to use as long as we can eﬀectively calculate convolution
+of φǫ and the covariance function.
+It’s also good to look at this kind of robust response, as a penalty for
+the second derivative. If ǫ ∼N(0, Σ), then:
+E(h(x + ǫ)) ≃h(x) + 1
+2
+X
+ij
+∂2h
+∂xi∂xj Σij
+Of course such a penalty would also be a linear operator PΣh = h +
+1
+2
+P
+ij
+∂2h
+∂xi∂xj Σij and as such can be used instead of φǫ∗. This approach
+can be useful for convolutions that are expensive to calculate.
+4
+OPTIMIZATION
+4.1
+Upper bounds
+As Jones et al.[3] noted, EI function can be highly multi-modal and poten-
+tially hard to optimize. To use the branch and bound algorithm (BBA),
+we have to establish a good upper bounds on REI.
+We deﬁned REI to be:
+REI(ζ, η) = EM min{Fmin, Fη(ζ1), . . . , Fη(ζk)}
+where Fη(x) = EM (F(x) | F(η1), . . . , F(ηl)).
+It is clear that Fη is a
+gaussian ﬁeld (in fact with only l degrees of freedom). We can calculate
+7
+
+its mean and covariance depending on η. In such a case we would wan’t
+to establish upper bounds for an expresion:
+Ψµ,Σ = E min{γ1, . . . , γp}
+for some γ ∼N(µ, Σ).
+To bound such an expression, we can use re-
+cent extensions of comparison principle by Vitale[7].
+The comparison
+principle states that the Φµ,Σ is greater, the greater are E(γi −γj)2 =
+Σii +Σjj −2Σij. To calculate the upper bound for REI, we can maximize
+these expressions over a region and then calculate the independent but
+diﬀerently distributed (IDD) gaussian variables dominating REI. Con-
+struction of such dominating IDD variables is discussed in Ross[6].
+4.2
+Exact calculation
+In the last iterations of BBA the IDD-based bounds will be insuﬃcient.
+The main direction of further research will be to establish a good method
+of calculating an exact bound on Ψµ,Σ. Actual algorithms in this ﬁeld are
+based on Monte Carlo or quasi-Monte Carlo methods, for instance using
+results by Genz[1].
+5
+CONCLUSIONS
+Relative Expected Improvement is proposed to extend the concept of EI
+for more complex Kriging models. It can help search for new points of
+measurements and for populations of such points. It can also help to use
+derivative information more eﬃciently. Further research is needed to ﬁnd
+eﬃcient implementation of this concept.
+6
+ACKNOWLEDGEMENTS
+This work was supported by FP7 FLOWHEAD project (Fluid Optimisa-
+tion Workﬂows for Highly Eﬀective Automotive Development Processes).
+Grant agreement no.: 218626.
+I would also like to thank professor Jacek Rokicki from the Institute of
+Aeronautics and Applied Mechanics (Warsaw University of Technology)
+for encouragement and help in scientiﬁc research.
+References
+[1] Alan Genz. Numerical computation of multivariate normal probabil-
+ities. Journal of Computational and Graphical Statistics, 1:141–150,
+1992.
+[2] Toby J. Mitchell Jerome Sacks, William J. Welch and Henry P. Wynn.
+Design and analysis of computer experiments.
+Statistical Science,
+4(4):409–423, November 1989.
+8
+
+[3] Donald R. Jones, Matthias Schonlau, and William J. Welch. Eﬃcient
+global optimization of expensive black-box functions. Journal of Global
+Optimization, 13(4):455–492, December 1998.
+[4] Stephen J. Leary, Atul Bhaskar, and Andy J. Keane. A derivative
+based surrogate model for approximating and optimizing the output
+of an expensive computer simulation. Journal of Global Optimization,
+30(1):39–58, September 2004.
+[5] Toby J. Mitchell Max D. Morris and Donald Ylvisaker.
+Bayesian
+design and analysis of computer experiments: Use of derivatives in
+surface prediction. Technometrics, 35(3):455–492, August 1993.
+[6] Andrew M. Ross. Computing bounds on the expected maximum of
+correlated normal variables. Methodology and Computing in Applied
+Probability.
+[7] Richard A. Vitale. Some comparisons for gaussian processes. Proceed-
+ings of the American Mathematical Society, 128:3043, 2000.
+9

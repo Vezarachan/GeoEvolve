@@ -16,20 +16,12 @@ max_code_length: 12000                # Maximum allowed code length in character
 
 # LLM configuration
 llm:
-  primary_model: "gpt-4o"
+  primary_model: "openai/gpt-4o"
   primary_model_weight: 0.8
-  secondary_model: "gpt-5"
+  secondary_model: "openai/gpt-4.1"
   secondary_model_weight: 0.2
-  api_base: "https://api.openai.com/v1/"
-  api_key: "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"
-#  primary_model: "openai/gpt-4o"
-#  primary_model_weight: 0.8
-#  secondary_model: "openai/gpt-5.1"
-#  secondary_model_weight: 0.2
-#  api_base: "https://openrouter.ai/api/v1"
-#  api_key: "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"
-#  api_base: "https://generativelanguage.googleapis.com/v1beta/openai/"
-#  api_key: "AIzaSyBMvXWuhFbOhGWJrJ5-qmazAKByFI20eZw"
+  api_base: "https://openrouter.ai/api/v1"
+  api_key: "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"
   temperature: 0.7
   top_p: 0.95
   max_tokens: 12000
@@ -58,7 +50,7 @@ prompt:
 # Database configuration
 database:
   # General settings
-  db_path: ./outputs/kriging_evolution # Path to persist database (null = in-memory only)
+  db_path: null # Path to persist database (null = in-memory only)
   in_memory: true                      # Keep database in memory for faster access
 
   # Evolutionary parameters

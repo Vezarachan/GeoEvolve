@@ -1,0 +1,454 @@
+Inversion model validation of ground emissivity. 
+Contribution to the development of SMOS algorithm 
+ 
+F. Demontoux1, B. Le Crom1,2, G. Ruffié1, JP. Wigneron2, J. Grant2,3 D. Medina Hernandez1 
+1 University Bordeaux - Laboratory IMS-UMR 5218 - 16 av.front Pey-Berland 33607 Pessac -France 
+2 INRA-unit of Bioclimatologie, BP 81, Villenave d' Ornon Cedex 33883 -France 
+3 Faculty of Earth and Life Sciences, Vrije Universiteit Amsterdam, De Boelelaam 1085- Nederland. 
+francois.demontoux@ims-bordeaux.fr 
+ 
+Abstract— SMOS (Soil Moisture and Ocean Salinity), 
+is the second mission of “Earth Explorer” to be developed 
+within the program “Living Planet” of the European 
+Space Agency (ESA). This satellite, containing the very 
+first 1.4GHz interferometric radiometer 2D, will carry out 
+the first cartography on a planetary scale of the moisture 
+of the grounds and the salinity of the oceans.  The forests 
+are relatively opaque, and the knowledge of moisture 
+remains problematic. The effect of the vegetation can be 
+corrected thanks a simple radiative model. Nevertheless 
+simulations show that the effect of the litter on the 
+emissivity of a system litter + ground is not negligible. Our 
+objective is to highlight the effects of this layer on the total 
+multi layer system. This will make it possible to lead to a 
+simple analytical formulation of a model of litter which 
+can be integrated into the calculation algorithm of SMOS. 
+Radiometer 
+measurements, 
+coupled 
+to 
+dielectric 
+characterizations of samples in laboratory can enable us to 
+characterize the geological structure. The goal of this 
+article is to present the step which we chose to validate this 
+analytical model.  
+ 
+Keywords : Permittivity, litter, soil, moisture, emissivity 
+model, L-band 
+ 
+I. INTRODUCTION 
+SMOS (Soil Moisture and Ocean Salinity), whose 
+launching is planned for the horizon 2007, is the second 
+mission of “Earth Explorer” to be developed within the 
+program “Living Planet” of the European Space Agency 
+(ESA) [1]. About the problems of the cycle of water, the 
+data obtained by SMOS will make it possible to establish a 
+chart of the moisture of continental surfaces and salinity of 
+the surface layer of the oceans. The applications are 
+multiple. On Earth, the retention of water in the ground 
+takes a significant place in the climatic evolution because 
+the moisture of the grounds represents a variable key 
+controlling the exchange of water and thermal energy 
+between the ground and the atmosphere. For the sea, salinity 
+is a parameter which influences the circulation of the water 
+masses in the oceans and involves the formation of climatic 
+phenomena such as El Niño. This satellite, containing the 
+very first 1.4GHz interferometric radiometer 2D, will thus 
+carry out the first cartography on a planetary scale of the 
+moisture of the grounds and the salinity of the oceans. There 
+is a direct relation between the moisture of the ground for 
+depths from 2 to 5 cm, the salinity of the oceans and the 
+emissions of terrestrial origin at the frequency of 1.4 GHz. 
+The forests are present in a majority of the pixels of SMOS 
+in tropical, boreal and moderate zone. The forests are 
+relatively opaque, and the knowledge of moisture remains 
+problematic. The effect of the vegetation (tree and under 
+wood) is characterized by its optical thickness τ and its 
+simple diffusion albedo. Its effect can be corrected thanks a 
+simple radiative model. Nevertheless simulations show that 
+the effect of the litter on the emissivity of a system litter + 
+ground is not negligible. It is thus necessary to set up an 
+analytical model which would make it possible to correct 
+the effect of this (these) additional layer (s) and to validate 
+it. The objective is to highlight the effects of this layer on 
+the total multi layer system. This will make it possible to 
+lead to a simple analytical formulation of a model of litter 
+which can be integrated into the calculation algorithm of 
+SMOS in order to collect information on the moisture of the 
+ground from emissivity measurements. A radiometer is 
+installed on the site of the INRA institute (Bray-33) which 
+allows us to take radiometric measurements on under wood 
+of this site. The model of inversion will give us information 
+to consider the geological structure. Measurements of the 
+electromagnetic 
+behaviour 
+in 
+situ 
+can 
+be 
+taken 
+simultaneously with preceding measurements on this ground 
+using a horn antenna and a network analyzer. These 
+measurements, coupled to dielectric characterizations of 
+samples in laboratory can also enable us to characterize the 
+geological structure. All the results obtained by these 
+methods will be confronted in order to validate the 
+analytical model. The goal of this article is to present this 
+step which we chose to validate the analytical model.  
+II. PRESENTATION OF THE MODELS  
+The medium that we will study in this article is the 
+forest. This system can be represented by a tri-layer system 
+made up with vegetation (trees, under wood), with litter 
+(vegetable remains) and ground.  
+ 
+
+A. Correction of the vegetation effect  
+The algorithm developed within the framework of 
+mission SMOS makes possible to associate the required 
+geophysical value SM (for “Soil Moisture”) to the measured 
+radiometric value BT (for Brightness Temperature) thanks 
+to a simplified radiative transfer model called the τ-ω model. 
+This model considered the medium as a double-layered 
+system made up of the vegetation (tree and under wood) and 
+of the ground (ground + litter). Thanks to the simplified 
+approach of the radiative transfer equation which represents 
+the assessment of radiative energy [2] it is possible to obtain 
+a simple expression of the emission of a cover. The 
+radiometer measures a brightness temperature TB which it is 
+possible to associate to the total cover emissivity thanks to 
+the approximation of Rayleigh-Jeans. TB is the sum of 
+outgoing energies and can then be broken up in order to 
+know the emissivity of the ground (ground + litter).  
+ 
+(
+)(
+)(
+)
+S
+V
+V
+S
+V
+V
+V
+B
+eT
+T
+T
+γ
+γ
+γ
+ω
++
+Γ
++
+−
+−
+=
+1
+1
+1
+        (1) 
+Where : 
+ e is the soil emissivity; 
+TS is the soil temperature; 
+ΓS is the soil reflectivity and ΓV is the vegetation 
+reflectivity that will be neglected; 
+ω is the vegetation single scattering albedo; 
+cos(
+)
+e
+τ
+θ
+γ
+−
+=
+ is the attenuation coefficient which 
+calculation is based on the optical depth of the 
+vegetation layer (τ) and on the observation angle (θ). 
+B. Correction of the litter effect with the reflectivity 
+model τ-ω-Rr  
+The principle of this model is nearly the same as the 
+previous model. In this model, the reflectivity of the 
+interface litter/air is not neglected any more. In this case we 
+obtain a formulation in series for each of the various 
+contributions to the temperature of brightness of the system. 
+The extraction of the temperature of brightness of the 
+ground alone is then possible starting from this formulation. 
+The following expression of the global brightness 
+temperature is obtained: 
+ 
+(
+)(
+)(
+)
+(
+)
+[
+]
+S
+S
+L
+S
+S
+L
+L
+B
+T
+T
+T
+γ
+ω
+γ
+γ
+γ
+Γ
+−
++
+−
+−
+Γ
++
+Γ
+Γ
+−
+Γ
+−
+=
+1
+1
+1
+1
+1
+1
+ (2) 
+ 
+Where: 
+the index L refers to the litter and the index S refers to 
+the ground 
+ΓS  and  ΓL are respectively the reflectivity at the 
+interface ground/litter and the interface litter/air; 
+ TS and TL are respectively the temperatures of the  
+ground and the litter; 
+)
+cos(θ
+τ
+γ
+−
+= e
+ is the attenuation coefficient. 
+C. Dielectric measurement of soil and litter. 
+Changes in the dielectric constant of the soil or the litter, 
+which are mainly due to variations in water content, produce 
+a variation in the soil-litter system emission. The knowledge 
+of the electromagnetic properties of these two materials is 
+thus fundamental when computing the system emissivity. 
+We have measured the permittivity of soil and litter 
+with a rectangular waveguide by taking into account the 
+heterogeneity of the sample. The study was based on soil 
+and litter samples collected in the coniferous forest of Les 
+Landes, near Bordeaux, France. Particular attention was 
+given to measurement errors and the calculation of 
+permittivity [5]. 
+All dielectric measurements presented in this study 
+were done using a wave-guide technique in an air-
+conditioned room. This method enabled us to work on 
+samples wide enough to account for the layer heterogeneity. 
+The samples were held inside the guide using a support (100 
+µm thick Mylar sheet), considered to be quasi-transparent 
+for the electromagnetic waves.  
+The electromagnetic parameters of the samples were 
+determined using the Nicolson, Ross and Weir method 
+(NRW) [6] for rectangular waveguides. This calculation 
+process 
+is 
+based 
+on 
+reflection 
+and 
+transmission 
+measurements which are well adapted to the network 
+analyzers. The principle of the calculation is based on the 
+fact that introduction of the sample into the guide produces a 
+change of the impedance.  
+The figures 2 and 3 present results of the measurement 
+for the soil. Taking into account the various errors of 
+measurement and the heterogeneity of the sample we obtain 
+ranges of permittivities. 
+0
+5
+10
+15
+20
+25
+30
+0%
+10%
+20%
+30%
+40%
+SM (vol. %)
+ε'
+ 
+Figure 1.  Range of the real part of the soil permittivity.  
+ 
+
+0,0
+0,5
+1,0
+1,5
+2,0
+2,5
+3,0
+0%
+10%
+20%
+30%
+40%
+SM (vol. %)
+ε''
+ 
+Figure 2.  Range of the imaginary part of the soil permittivity. 
+III. RESULTS  
+The first stage was to measure with a horn antenna and 
+a network analyser the in situ electromagnetic response of 
+ground. A model (model HFSS-EM) simulating this 
+experiment was carried out using the software HFSS (High 
+Frequency Structure Simulator) [7].  
+Comparing the experimental results it was possible for 
+us to improve our knowledge of characteristics of the 
+geological structure profile such as, for example, the 
+thickness of the various layers, their permittivity and thus 
+their moisture. The average thickness of litter was thus 
+evaluated with 4cm and the permittivity of the components 
+of the structure (the day of measurement) refers to a 
+moisture of 25%. The corresponding value of emissivity is 
+0.895 for the total structure (vegetation+litter+soil). 
+ A radiometric measurement gives the emissivity of the 
+structure. Measurements of emissivity according to moisture 
+were carried out over several months (fig 3). Following 
+figures  present curve of emissivity according to the soil 
+moisture. Of course, during the final exploitation of the 
+measurement the soil moisture will be unknown. 
+To validate the  τ−ω−R model, we first applied 
+the  τ−ω model on the measurements to correct the effect of 
+the vegetation. Then we obtain the emissivity of the system 
+litter + ground (fig 4). 
+ 
+Figure 3.   Measurements of emissivity 
+ 
+Figure 4.  Emissivity of the system ground+litter by the τ-ω method 
+(black) and the HFSS model (grey) 
+We then determined if the analytical model τ-ω-R 
+allows the computation of the emissivity of the ground when 
+we know the measured emissivity of the complete structure 
+(litter + ground). TS, TL are known while  ΓS, ΓL, and, τ 
+and the thickness of the litter are to be determined. For the 
+same input data (measurements of permittivities of the 
+ground and litter according to moisture carried out in 
+laboratory) we compared emissivities of the ground 
+resulting  from a HFSS model (HFSS-e model) and the τ-ω-
+R model. A field of emissivity is defined to take into 
+account the errors to the measures of permittivity introduced 
+into HFSS [4]. The following figure presents the results 
+obtained considering an average thickness of the litter layer 
+of 4 cm with the analytical model as well as the HFSS-e 
+model. On the figure 5, we observe the emissivity of the 
+ground by the τ-ω-R method  in black and the emissivity of 
+the ground with the HFSS model in gray according to the 
+moisture of the ground. 
+The initial value of the emissivity of the complete 
+structure was 0.895. The model τ-ω associates a corrected 
+emissivity of the system ground + litter of 0.72. The 
+exploitation of the model τ-ω-R associates a corrected 
+emissivity of the ground of 0,62 with a moisture of 24% 
+which is a good approximation of the value awaited 
+following measurements in-situ (25%).  
+0
+0,1
+0,2
+0,3
+0,4
+0,5
+0,6
+0,7
+0,8
+0,9
+10
+15
+20
+25
+30
+Msoil(%)
+Emissivity
+ 
+Figure 5.  Emissivity of the ground by the τ-ω-R method 
+
+IV. CONCLUSIONS AND PERSPECTIVES 
+Ours first  results confirm  the relevance of the τ-ω-R 
+model to correct the effect of the litter. The good agreement 
+of the results resulting from various models consolidated our 
+choice. The next stage of our work which we wish to present 
+will consist in confirming these results by carrying out new 
+series 
+of 
+in 
+situ 
+measurements 
+(radiometric 
+and 
+electromagnetic behaviour). Thereafter we will study the 
+influence of the surface roughness of the ground on 
+emissivity. Accordingly, the influence of the litter coupled 
+with the roughness of the ground will be approached. 
+Indeed, studies showed that terms can be introduced to 
+compute reflectivity of a surface to take into account its 
+roughness. Corrective terms could thus be integrated into 
+the τ-ω-R model to obtain the emissivity of the structure 
+versus the roughness of the soil layer. Those terms will be 
+determinate and validate thanks series of computation using 
+the τ-ω-R model and the HFSS model. In addition to the 
+roughness or the thickness of litter, we will introduce 
+gradients of moisture in order to study equivalent 
+emissivity.  
+ 
+ [1] Site of the ESA:  
+http://www.esa.int/esaCP/index.html. Bond: Observing 
+the Earth/Esa EO Programme: The living planet/Earth 
+Explorers/SMOS 
+ [2] J. Grant, J.P. Wigneron, A.A. Van de Griend, S. 
+Schmidl Søbjærg, NR. Skou, A. Kruskewski, J. Balling, 
+First Result of the `Bray 2004' field experiment one L-band 
+radiometry - microwave signal behaviour for varying 
+conditions of ground moisture, article subjected “Remote 
+Sensing of Environment” journal 
+[3] DEMONTOUX F., RUFFIE G., WIGNERON J.P., 
+ESCORIHUELA M. - J. Electromagnetic characterization of 
+natural heterogeneous mediums - Application to the 
+measurement of the moisture of the ground by radiometry 
+microwave, JCMM 2006, Saint Etienne, 2006  
+[4] B. THE CROM, F. DEMONTOUX, G. RUFFIE, 
+JP. WIGNERON, J. GRANT Electromagnetic geological 
+material characterization for follow-up of the moisture of 
+the grounds by radiometry microwaves, JFMMA2007 
+[5] F. DEMONTOUX, B. LE CROM, G. RUFFIE, JP. 
+WIGNERON, J.P GRANT 
+Electromagnetic characterization of soil-litter media. 
+Application to the simulation of the microwave emissivity 
+of the ground surface in forests (The European Physical 
+Journal - Applied Physics ) (subjected) 
+[6] Weir W.B, ‘Automatic measurement of complex 
+dielectric 
+constant 
+and 
+permeability 
+at 
+microwave 
+frequencies,’ Proceedings IEEE, Vol 62, pp 33-36, Jan. 
+1974. 
+     [7] Ansoft website: http://www.ansoft.com. HFSS online 
+help, Assigning boundaries. 
+ 
+ 
+ 
+ 

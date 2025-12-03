@@ -1,0 +1,1089 @@
+SPARSE ESTIMATION IN ORDINARY KRIGING
+FOR FUNCTIONAL DATA
+A PREPRINT
+Hidetoshi Matsui
+Faculty of Data Science
+Shiga University
+1-1-1 Banba, Hikone, Shiga
+hmatsui@biwako.shiga-u.ac.jp
+Yuya Yamakawa
+Graduate School of Informatics
+Kyoto University
+Yoshida-Honmachi, Sakyo-ku, Kyoto
+yuya@kyoto-u.ac.jp
+June 11, 2024
+ABSTRACT
+We introduce a sparse estimation in the ordinary kriging for functional data. The functional krig-
+ing predicts a feature given as a function at a location where the data are not observed by a linear
+combination of data observed at other locations. To estimate the weights of the linear combination,
+we apply the lasso-type regularization to minimize the expected squared error. We propose an al-
+gorithm to derive an estimator using an augmented Lagrange method. Tuning parameters included
+in the estimation procedure are selected by cross-validation. Since the proposed method can shrink
+some of the weights of the linear combination to exactly zero, we can investigate which locations
+are necessary or unnecessary to predict the feature. Simulation and real data analysis show that the
+proposed method appropriately provides reasonable results.
+Keywords Functional data analysis · Kriging · Lasso · Spatio-temporal data
+1
+Introduction
+Functional data analysis has received considerable attention in various fields such as medicine, social science, and
+biology, as one of the techniques that treat longitudinal data rather than scalar data. The various methodologies that
+have been developed include functional regression analysis, functional principal component analysis, and functional
+canonical correlation analysis [28, 19]. More recently, there has been a growing interest in approaches to functional
+data where individuals are dependent on each other, in particular data not dependent on individuals [21]. Examples
+include time series analysis [5, 18] and spatial data analysis [9, 20, 24] for functional data.
+In the present work, we focus on spatial data analysis for functional data. Spatial data analysis considers the problem
+of analyzing univariate or multivariate data observed at locations distributed over a certain space while considering
+spatial correlation [11, 8]. Kriging, one of the most typical methods for analyzing spatial data, predicts a feature at
+a location where data have not yet been observed by a linear combination of the feature at locations where the data
+have been observed. When we have longitudinal data for a feature observed at several locations, spatial functional
+data analysis treats longitudinal data as functional data and then applies spatial data analysis such as kriging. As
+an earlier work, Goulard and Voltz [14] approached this problem by fitting the longitudinal data using a parametric
+model and then applying kriging to the fitted data, under the restriction that the number of time points be small. [13]
+proposed the ordinal kriging method for functional data. They derived a procedure for estimating the weights of the
+linear combination under the assumption of weak stationarity. With this procedure, how functional data at observed
+locations relate to the predicted function at the unobserved location can be investigated. [12] extended the ordinary
+functional kriging to the case where the weights vary with time. Furthermore, [7, 25] considered the universal kriging,
+which loosens the assumption of stationarity. Universal kriging assumes that the trend of a functional feature over the
+space can be modeled by regressing out covariates. [1] also examined predicting a function at an unobserved point
+using penalized splines with respect to location and time.
+arXiv:2306.15537v2  [stat.ME]  10 Jun 2024
+
+Sparse estimation for functional kriging
+A PREPRINT
+Kriging with sparse regularization enables us to select information relevant to the prediction of the feature at unob-
+served locations. Sparse regularization is one of the most useful tools for variable selection in that it estimates the
+unknown parameters based on regularization with an L1-type penalty [16]. Typical L1-type penalties include the
+lasso [29], elastic net [35] and minimax concave penalty [32]. Sparse regularization has also been applied to kriging
+methods for scalar data. [22] applied a sparsity-inducing penalty to the ordinary kriging, whereas [17] applied lasso
+to estimate the coefficients of the linear combination of variables that expresses the trend of the universal kriging.
+[31], [33], and [26] also looked at using lasso for selecting important variables determining the trend of the universal
+kriging.
+If we can estimate kriging weights as exactly zero, then we can investigate which locations are related to predicting a
+feature at an unobserved location. To obtain such estimators, we propose applying sparse regularization to the weights
+of the ordinary kriging for functional data. We obtain sparse estimators of the weights by minimizing the integrated
+expected squared error with the L1-type penalty under the assumption of second-order stationarity for the feature.
+Here we apply an adaptive lasso-type regularization [34] to incorporate the ordinary kriging estimator. Since it is
+difficult to derive estimators of kriging weights with the L1-type penalty, we apply an augmented Lagrange method
+to obtain them numerically. We also show that the algorithm converges to the optimal solution. Tuning parameters
+included in the estimation are selected by cross-validation. We apply the proposed method to the analysis of simulated
+data and weather data and investigate whether the proposed method gives appropriate estimates.
+The remainder of this paper is organized as follows. Section 2 provides the ordinary kriging for functional data as
+background. In Section 3 we introduce sparse estimation for the ordinary functional kriging. Section 4 shows the
+results of simulation and real data analysis. Finally, we conclude with the main points in Section 5.
+2
+Ordinary kriging for functional data
+Let X(s; t) be a random function of s ∈S ⊂Rd and t ∈T ⊂R square-integrable with respect to t. Typically, s
+and t correspond to location and time, respectively. Suppose that X(s; t) satisfies the second-order stationarity and
+isotropy conditions with respect to s, that is,
+E [X(s; t)] = m(t),
+Cov [X(s + h; t), X(s; u)] = C(∥h∥; t, u)
+for all h ∈S, where m(t) is a function that depends only on t and C(r; t, u) is a function that depends only on
+r = ∥h∥, t, and u. Under the above conditions, the function
+γ(r; t) = 1
+2V[X(s + h; t) −X(s; t)] = 1
+2E[X(s + h; t) −X(s; t)]2
+depends only on r = ∥h∥and t. In this context, γ(r; t) is called a semi-variogram, and its integral γ(r) =
+R
+T γ(r; t)dt
+is called a trace-variogram.
+We let X(s1; t), . . . , X(sn, t) denote random functions at locations s1, . . . , sn ∈S, respectively, where we assume
+si ̸= sj (i ̸= j). The aim of the ordinary kriging used here is to predict a function X(s0; t) at location s0 ̸= si
+(i = 1, . . . , n) based on the data observed at s1, . . . , sn. We assume that the predicted function for X(s0; t) is
+expressed as a linear combination of the functions at the observed points:
+b
+X(s0; t) =
+n
+X
+i=1
+λiX(si; t),
+(1)
+where λ1, . . . , λn are the unknown kriging weights. Equation (1) allows us to quantify how and which functional
+feature at the observed locations contributes to the prediction at the unobserved location. Under the condition that the
+function b
+X(s0; t) satisfies second-order stationarity, λ1, . . . , λn satisfy Pn
+i=1 λi = 1.
+In the ordinary kriging for functional data, we estimate λi in (1) by solving the following constrained optimization
+problem [13]:
+Minimize
+Z
+T
+E
+h
+X(s0; t) −ˆX(s0; t)
+i2
+dt
+subject to
+n
+X
+i=1
+λi −1 = 0.
+2
+
+Sparse estimation for functional kriging
+A PREPRINT
+Solving the above problem is reduced to minimizing the following Lagrange function with respect to λ and µ by the
+method of Lagrange multipliers:
+L(λ, µ) =
+Z
+T
+E
+h
+X(s0; t) −ˆX(s0; t)
+i2
+dt + 2µ
+ n
+X
+i=1
+λi −1
+!
+= λ⊤Cλ −2c⊤
+0 λ + 2µ(1⊤
+n λ −1).
+(2)
+where µ ∈R is a Lagrange multiplier, λ = (λ1, . . . , λn)⊤, C = (
+R
+T C(∥si −sj∥; t, t)dt)ij, c0 = (
+R
+T C(∥s1 −
+s0∥, t, t)dt, . . . ,
+R
+T C(∥sn −s0∥; t, t)dt)⊤, and 1n = (1, . . . , 1)⊤is an n-dimensional vector. Note that C is positive
+semi-definite, since the matrix whose (i, j)-th element is C(∥si −sj∥; t, t) for a fixed t is positive semi-definite. We
+assume more specifically that C is positive definite. The solution that minimizes (2) is obtained by simple matrix
+calculation under the conditions of second-order stationarity and isotropy. Since partial derivatives of (2) with respect
+to λ and µ respectively are
+∂L(λ, µ)
+∂λ
+= 2Cλ −2c0 + 2µ1n,
+∂L(λ, µ)
+∂µ
+= 2
+ 1⊤
+n λ −1
+
+,
+we should solve the following linear system to estimate the ordinary kriging weights λ1, . . . , λn:
+ C
+1n
+1⊤
+n
+0
+ 
+λ
+µ
+
+=
+
+c0
+1
+
+.
+(3)
+However, it is difficult to estimate the function
+R
+T C(r; t, t)dt directly, so instead we use the relationship γ(r) =
+R
+T C(0; t, t)dt −
+R
+T C(r; t, t)dt and estimate the trace-variogram γ(r). Trace-variogram γ(r) can be obtained by
+calculating the sample variance of the difference of pairs of observations such that the distance between two locations
+equals r. Since such pairs are very scarce, we calculate the variance using a set of observations such that the distance
+between two points is close to r. Denote a set of pairs of points whose distances are close to r as
+Nr = {(si, sj); ∥si −sj∥≈r},
+then estimate the trace-variogram γ(∥si −sj∥) by the sample variance using Nr:
+bγ(∥si −sj∥) =
+1
+2|Nr|
+X
+i,j∈Nr
+Z
+T
+[x(si; t) −x(sj; t)]2 dt,
+(4)
+where |Nr| is the size of Nr. See [8] for details of the estimation of a variogram.
+In real situations, data are observed longitudinally at discrete time points rather than continuously. Therefore, we need
+to transform the observed data into functions. To do this, we assume that functional data x(si; t) are expressed in
+terms of a basis expansion as follows.
+x(si; t) =
+M
+X
+m=1
+wimϕm(t) = w⊤
+i ϕ(t),
+(5)
+where ϕ(t) = (ϕ1(t), . . . , ϕM(t))⊤is a vector of basis functions and wi = (wi1, . . . , wiM)⊤is a vector of coeffi-
+cients. After estimating the coefficient w, we treat {x(si; t) = w⊤
+i ϕ(t); i = 1, . . . , n} as functional data. For details
+of the method for estimating w, see [15, 28]. Using the basis expansion, the integral in (4) is calculated as
+Z
+T
+[x(si; t) −x(sj; t)]2 dt = (wi −wj)⊤Φ(wi −wj),
+where Φ =
+R
+T ϕ(t)ϕ(t)⊤dt. Then the value of (4) is obtained by fitting bγ(r) by some parametric models such as
+Gaussian or exponential models, where here we use the Matérn model.
+Therefore, the ordinary functional kriging (OFK) estimators of λ and µ are given by
+ˆλ
+ˆµ
+
+=
+ C
+1
+1⊤
+0
+−1 
+c0
+1
+
+.
+(6)
+As a result, when we have functional data x(s1; t), . . . , x(sn; t) at n points, we predict a function x(s0; t) at a point
+s0 as
+bx(s0; t) =
+n
+X
+i=1
+bλix(si; t).
+(7)
+For more details, see [13, 24].
+3
+
+Sparse estimation for functional kriging
+A PREPRINT
+3
+Sparse ordinary kriging for functional data
+In this section, we apply sparse regularization to estimate the weights λi in (1). First, for given hyperparameters η and
+τ, we consider the following minimization problem obtained by imposing an L1-type penalization on the minimization
+problem (2).
+Minimize
+f(λ) := λ⊤Cλ −2c⊤
+0 λ + η
+n
+X
+i=1
+bwi|λi|
+subject to
+g(λ) := 1⊤
+n λ −1 = 0,
+(8)
+where η is a regularization parameter and bwi > 0 is an adaptive weight. Here we set bwi = |bλi|−τ, where bλi is the
+ordinary kriging estimator of λi obtained by the method described in the previous section, and τ > 0 is a tuning
+parameter. Note that the problem (8) is obtained by adding an adaptive lasso-type penalty [34] to the OFK. We call
+the solution of (8) the sparse ordinary functional kriging (SOFK) estimator.
+Due to the additional constraint for g(λ) of the optimization problem (8), it is difficult to directly apply the well-known
+estimation algorithms for lasso, such as the coordinate descent method [10] and the alternating direction method [6].
+We use the following augmented Lagrangian method, which is among the most famous algorithms in general and is
+used in many fields.
+Step 0: Choose a positive sequence {ρk}. Select an initial values of kriging weights λ0 and Lagrange multiplier µ0.
+Set k := 0.
+Step 1: Find a minimizer λ∗of the following problem:
+Minimize
+f(λ) + µkg(λ) + ρk
+2 g(λ)2.
+(9)
+Set λk+1 := λ∗.
+Step 2: Update the Lagrange multiplier µk as follows:
+µk+1 := µk + ρkg(λk+1).
+Step 3: If the termination criterion is satisfied, then stop. Otherwise, set k ←k + 1 and go back to Step 1.
+In Step 2, we have to find the minimizer of the problem (9). We note that this problem can be recast in the following
+form:
+Minimize
+1
+2∥Aλ −b∥2 + η
+n
+X
+i=1
+bwi|λi|,
+(10)
+where A and b are defined by
+A :=
+ 2C + ρk1n1⊤
+n
+ 1
+2 ,
+b :=
+ 2C + ρk1n1⊤
+n
+−1
+2 (2c0 + ρk1n −µk1n),
+respectively. Proximal gradient-type algorithms can effectively solve this kind of optimization problem. We apply
+the Fast Iterative Shrinkage Thresholding Algorithm (FISTA) [2] for the problem (10) which is equivalent to the
+problem (9).
+In the following, we provide a theorem regarding the convergence to an optimum of the above augmented Lagrangian
+method. The proof is given in Appendix A.
+Theorem 1 Let {λk} be a sequence generated by the augmented Lagrangian method applied to problem (8). Suppose
+that a positive sequence {ρk} satisfies that P∞
+k=0 ρk = ∞. Then, any accumulation point of {λk} is an optimal
+solution of (8).
+In the present work, the parameter sequence {ρk} is updated by the following rule:
+ρk+1 :=
+κρk
+if g(λk+1) > αg(λk),
+ρk
+otherwise,
+(11)
+4
+
+Sparse estimation for functional kriging
+A PREPRINT
+where α ∈(0, 1) and κ are additional hyperparameters. This updating rule is general and has been adopted in previous
+studies, such as [4, 23, 30]. Here we fixed the hyperparameters as α = 0.9 and κ = 2. Note that the sequence {ρk}
+defined by (11) with these parameters satisfies the assumption P∞
+k=0 ρk = ∞in Theorem 1.
+In the proposed sparse regularization method, we obtain several minimizers λ(1), . . . , λ(N) for given hyperparameters
+(η, τ) = (η(1), τ (1)), . . . , (η(N), τ (N)), respectively. The best tuning parameters (η, τ) are selected using cross-
+validation.
+CV =
+n
+X
+i=1
+Z n
+x(si; t) −bx(−i)(si; t)
+o2
+dt,
+(12)
+where bx(−i)(si; t) is a function predicted by SOFK at the i-th location si obtained using the functional data of size
+n −1 excluding the i-th observation out of n. In particular, we adopt (η, τ) to minimize (12) as the best tuning
+parameters.
+The algorithm for estimating λ and µ is summarized as follows.
+Step 0: Give a fixed hyperparameter set {(η(j), τ (j))}N
+j=1. Set j := 1.
+Step 1: Find the optimal solution λ(j) of (8) with (η, τ) := (η(j), τ (j)).
+Step 2: Calculate (12) using the estimated λ(j) and obtain CV(j) using (12).
+Step 3: If j < N, then j ←j + 1 and go back to Step 1. Otherwise, select (η(ℓ), τ (ℓ)), where ℓsatisfies CV(ℓ) =
+min
+1≤j≤N CV(j). Obtain the corresponding estimator of λ(ℓ).
+4
+Example
+4.1
+Simulation
+We examined the effectiveness of the proposed method through an analysis of simulation data. This simulation ex-
+presses predictions of functions as (7) at locations where data have not been observed, and investigates the behavior
+of the estimated kriging weights {ˆλi; i = 1, . . . , n} in (6) and the prediction accuracy.
+The simulation considers a two-dimensional square-shaped domain S = [0, 1] × [0, 1] and 15 × 15 = 225 equally
+spaced locations in S. Each location has a spatially correlated feature, which is longitudinally observed at n = 15, 25,
+and 50 locations randomly chosen from the 225 locations, as shown in Figure 1 left. We generated longitudinal data
+{xij; j = 1, . . . , N} at the i-th of n locations by adding Gaussian noises to the true structure expressed by basis
+expansion as
+xij = w⊤
+i ϕ(tij) + εij,
+where εij are independently and identically normally distributed with mean 0 and standard deviation 0.3. Here we
+used a B-spline for ϕ(t) with M = 10 basis functions. Coefficients wi (i = 1, . . . , n) are numerically generated
+via the variogram model using R package gstat [27], so that the coefficients have positive spatial correlations. In
+generating wi, we assumed an exponential variogram model with the three ranges 1, 5, and 10, sill as 2, and nugget
+as 0. The number of time points for the longitudinal data is set as N = 31 for all locations. Figure 1 right shows an
+example of a simulated dataset at the n sites illustrated by the black dots in Figure 1 left. We analyzed this dataset by
+applying the SOFK to predict the features at the 225 −n locations, where the longitudinal data are not observed, and
+to investigate the estimated kriging weights. We also applied the OFK for comparison.
+As a first process of the analysis, we transformed the observed longitudinal data at n locations by B-spline basis
+functions. We used the R package fda and fixed the number of basis functions at 10 to restrain the computational
+cost. Then we applied SOFK and OFK to each of the test locations, where we used R package geofd to calculate the
+trace-variogram. Tuning parameters η and τ were selected by CV in (12). We investigated the estimated parameters
+λi (i = 1, . . . , n), especially how many parameters are estimated to be zero.
+Table 1 shows MSEs and their standard deviations for SOFK and OFK and averages and standard deviations of the
+numbers of non-zero estimates of the parameters λi obtained by SOFK. This table indicates that for almost all cases
+the proposed SOFK gives smaller or competitive MSEs than OFK. The standard deviations of MSEs become smaller
+as the sample size grows, except for the case n = 100 and range = 10. Larger ranges also tend to give stable MSEs,
+which seems to be due to the larger numbers of zero estimates of λi. SOFK shrinks some of the parameters to exactly
+5
+
+Sparse estimation for functional kriging
+A PREPRINT
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+s1
+s2
+0
+5
+10
+15
+20
+25
+30
+−1
+0
+1
+2
+3
+4
+5
+6
+t
+x(t)
+Figure 1: Examples of simulation data for n = 50 and range = 5. Left: Locations to be investigated. Longitudinal
+data are observed at black points and not at white points. Right: Observed longitudinal data at black points shown in
+the left figure.
+MSE
+range
+SOFK
+OFK
+non-zero
+1
+5.054 (3.109)
+5.061 (3.106)
+9.160 (3.774)
+n = 25
+5
+1.382 (0.790)
+1.397 (0.797)
+6.695 (2.775)
+10
+0.852 (0.442)
+0.877 (0.443)
+4.635 (1.717)
+1
+3.666 (2.341)
+3.674 (2.326)
+9.989 (4.722)
+n = 50
+5
+0.898 (0.473)
+0.899 (0.469)
+7.006 (3.269)
+10
+0.661 (0.289)
+0.678 (0.295)
+5.669 (2.545)
+1
+2.712 (1.461)
+2.727 (1.485)
+12.808 (4.790)
+n = 100
+5
+0.777 (0.417)
+0.792 (0.428)
+9.760 (4.467)
+10
+0.569 (0.408)
+0.577 (0.399)
+5.288 (1.512)
+Table 1: Simulation results.
+zero, especially for the case with the larger range. This result indicates that data with a larger spatial correlation can
+be estimated with fewer parameters.
+Figure 2 shows boxplots for estimated parameters ˆλ obtained by SOFK and OFK for n = 50 and range = 10 according
+to the distance from the locations to be predicted. These figures show that the SOFK shrank the parameters to exactly
+zero at some distance from the predictor point. In addition, Figure 3 shows histograms of numbers of locations and
+those estimated to be exactly zero according to the distance from the locations to be predicted for all three ranges
+for n = 50. The weights are never shrunken to exactly zero at the nearest locations, whereas almost all weights are
+estimated to be zero at locations a short distance away from the test locations. In particular, we can predict the function
+at unobserved locations using the functions only for the nearer points as the range increases.
+4.2
+Real data analysis
+We applied the proposed method to the analysis of Canadian weather data, available in R package fda. The dataset
+contains locations (longitude and latitude) of 35 cities in Canada and their daily temperatures each of which is averaged
+from 1960 to 1994. The locations and temperature data are shown in Figure 4. This analysis predicts the annual
+temperature curve at one location using the annual temperature curves at the remaining 34 locations and investigates
+which location temperatures are important for this prediction. For this analysis, we applied the proposed SOFK.
+First, we transformed the observed temperature data at 35 locations including the location to be predicted into functions
+by basis expansions. Here we used the Fourier series for the basis functions since the data have periodicity, and fixed
+the number of basis functions 25. For this dataset, we calculated the empirical trace-variogram and then estimated the
+weights λi in (1) by SOFK. Tuning parameters η and τ included in (8) are selected by CV. We repeated the analysis,
+alternating the role of the forecast points.
+6
+
+Sparse estimation for functional kriging
+A PREPRINT
+0.1
+0.3
+0.5
+0.7
+0.9
+1.1
+1.3
+0.0
+0.2
+0.4
+0.6
+Distance
+lambda
+0.1
+0.3
+0.5
+0.7
+0.9
+1.1
+1.3
+0.0
+0.2
+0.4
+0.6
+Distance
+lambda
+Figure 2: Box-plots of the SOFK estimators ˆλi for all unobserved locations according to the distance from the predic-
+tion point for n = 50 and range=10. Left: SOFK, Right: OFK.
+range=1
+Distance
+Frequency
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+0
+200
+600
+1000
+range=5
+Distance
+Frequency
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+0
+200
+600
+1000
+range=10
+Distance
+Frequency
+0.0
+0.5
+1.0
+1.5
+0
+200
+600
+1000
+Figure 3: Histogram for the frequency of parameters estimated to be non-zero (light gray) and zero (charcoal gray) for
+n = 50.
+Figure 6 left is a box-plot of the SOFK estimators ˆλi obtained for the prediction of all locations according to the
+distance from the locations to estimate, and Figure 6 right is the distribution of parameters estimated as zeros or
+non-zero. We can see from these figures that to predict the temperature curve in any city, we only need to use
+the temperature curves of the locations near that city. Figure 7 shows predicted temperature curves for all cities.
+Temperatures in most cities are appropriately predicted, whereas the remaining ones are poorly predicted. The latter
+may not be suitable for having their curves predicted using a small number of other cities because each of these cities
+is isolated from the cities where data are observed (e.g., Pr. Rupert and Resolute).
+Parameters λ1, . . . , λn estimated by SOFK and OFK for predicting the temperature curve at The Pas are shown in
+Figure 5 as an example of the prediction. We can see that SOFK shrinks the weights of most locations except for
+three locations near The Pas to exactly zero, whereas OFK does not— Prince Albert (0.657), Winnipeg (0.250),
+and Churchill (0.093)— as depicted in Figure 5 right. Specifically, the nonzero estimates of SOFK are all positive.
+Although some of the estimates of OFK are negative due to the constraint Pn
+i=1 λi = 1, this result is against the
+intuition that temperatures of close locations are similar.
+5
+Conclusion
+We have proposed a sparse estimation method for ordinary functional kriging. The kriging gives predictions of the
+feature at unobserved locations by a linear combination of the data at observed locations. Using sparse regularization
+to estimate the weights, we can investigate which combination of locations is used to predict the feature of unobserved
+locations. This result may be applicable to the decision-making of prediction. Sparse ordinary functional kriging
+estimates are obtained by adaptive lasso-type regularization and the augmented Lagrange method. Simulation and real
+data analysis show that the proposed method appropriately estimates the unknown parameters and selected locations
+that are necessary to predict the feature at an unobserved location.
+7
+
+Sparse estimation for functional kriging
+A PREPRINT
+0
+100
+200
+300
+−30
+−20
+−10
+0
+10
+20
+Day
+Temperature
+Figure 4: Canadian weather data. Left: Observed locations (black circle). Right: Yearly temperatures at observed 35
+locations.
+10
+20
+30
+40
+50
+0.0
+0.3
+0.6
+Distance
+lambda
+10
+20
+30
+40
+50
+0.0
+0.2
+0.4
+Distance
+lambda
+0.25
+0.093
+0.657
+Figure 5: Estimated kriging weights for predicting the weather at The Pas. Left: Estimated λi by SOFK (top) and
+OFK (bottom). The horizontal axis is the distance from The Pas. Right: Non-zero values of λi estimated by SOFK in
+the map of Canada. The location of The Pas is marked as ×.
+The proposed method assumed second-order stationarity, but this constraint is too strong to predict temperatures in
+all areas. For example, temperatures in Japan are observed over a wide range from northeast to southwest and it is
+unnatural to assume stationarity. To overcome this problem, an extension to the universal kriging that loosens the
+stationarity assumption should be considered. Other sparsity-inducing penalties such as SCAD and MCP may be
+suitable for performing SOFK. A comparison of these penalties remains as future work.
+References
+[1] M. C. Aguilera-Morillo, M. Durbán, and A. M. Aguilera. Prediction of functional data with spatial dependence:
+a penalized approach. Stoch. Environ. Res. Risk. Assess., 31(1):7–22, 2017.
+[2] A. Beck and M. Teboulle. A fast iterative shrinkage-thresholding algorithm for linear inverse problems. SIAM J.
+Imaging Sci., 2(1):183–202, 2009.
+[3] D. P., Bertsekas. Convex Optimization Algorithms. Athena Scientific, 2015.
+[4] E. G. Birgin and J. M. Mart’inez. Augmented lagrangian method with nonmonotone penalty parameters for
+constrained optimization. Comput. Optim. Appl., 51(3):941–965, 2012.
+[5] D. Bosq. Linear processes in function spaces: theory and applications. Springer, New York, 2000.
+[6] S. Boyd, N. Parikh, E. Chu, B. Peleato, and J. Eckstein. Distributed optimization and statistical learning via the
+alternating direction method of multipliers. Found. Trends Mach. Learn., 3(1):1–122, 2011.
+8
+
+Sparse estimation for functional kriging
+A PREPRINT
+10
+20
+30
+40
+50
+60
+70
+80
+90
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Distance
+lambda
+Distance
+Frequency
+0
+20
+40
+60
+80
+0
+20
+40
+60
+80
+100
+120
+Figure 6: Left: Boxplots of the estimated SOFK weights λ1, λn according to the distance from the location to be
+predicted (horizontal axis). Right: Histogram of the locations used for the prediction according to the distance from
+the location to be predicted (horizontal axis). Black bars are numbers of locations where the kriging weights λi are
+estimated to be 0.
+[7] W. Caballero, R. Giraldo, and J. Mateu. A universal kriging approach for spatial functional data. Stoch. Environ.
+Res. Risk. Assess., 27(7):1553–1563, 2013.
+[8] N. Cressie. Statistics for spatial data. John Wiley & Sons, 2015.
+[9] P. Delicado, R. Giraldo, C. Comas, and J. Mateu. Statistics for spatial functional data: some recent contributions.
+Environmetrics, 21:224–239, 2010.
+[10] J. Friedman, T. Hastie, and R. Tibshirani. Regularization paths for generalized linear models via coordinate
+descent. J. Statist. Software, 33(1):1–22, 2010.
+[11] A. E. Gelfand, P. Diggle, P. Guttorp, and M. Fuentes. Handbook of spatial statistics. CRC press, Boca Raton,
+2010.
+[12] R. Giraldo, P. Delicado, and J. Mateu. Continuous time-varying kriging for spatial prediction of functional data:
+An environmental application. J. Agric. Biol. Environ. Stat., 15(1):66–82, 2010.
+[13] R. Giraldo, P. Delicado, and J. Mateu. Ordinary kriging for function-valued spatial data. Environ. Ecol. Stat.,
+18(3):411–426, 2011.
+[14] M. Goulard and M. Voltz. Geostatistical interpolation of curves: a case study in soil science. In Geostatistics
+Tróia, pages 805–816. Springer, 1993.
+[15] P. J. Green and B. W. Silverman. Nonparametric regression and generalized linear models: a roughness penalty
+approach. Chapman & Hall/CRC, London, 1994.
+[16] T. Hastie, R. Tibshirani, and M. Wainwright. Statistical Learning with Sparsity: The Lasso and Generalization.
+Chapman & Hall/CRC, Boca Raton, 2015.
+[17] Y. Hung. Penalized blind kriging in computer experiments. Stat. Sin., pages 1171–1190, 2011.
+[18] R. J. Hyndman and S. M. Ullah. Robust forecasting of mortality and fertility rates: A functional data approach.
+Comput. Stat. Data Anal., 51(10):4942–4956, 2007.
+[19] R. Kokoszka and M. Reimherr. Introduction to functional data analysis. CRC Press, Boca Raton, 2017.
+[20] R. Kokoszka and M. Reimherr. Some Recent Developments in Inference for Geostatistical Functional Data.
+Revista Colombiana de Estadística, 42(1):101–122, 2019.
+[21] S. Koner and A.-M. Staicu. Second-Generation Functional Data. Annu. Rev. Stat. Appl., 10:547–572, 2023.
+[22] S. Liu, E. Masazade, M. Fardad, and P. K. Varshney. Sparsity-aware field estimation via ordinary kriging. In
+IEEE ICASSP, pages 3948–3952. IEEE, 2014.
+[23] H. Z. Luo, H. X. Wu, and G. T. Chen. On the convergence of augmented lagrangian methods for nonlinear
+semidefinite programming. J. Glob. Optim., 54(3):599–618, 2012.
+9
+
+Sparse estimation for functional kriging
+A PREPRINT
+0
+100
+200
+300
+−5
+5
+15
+St. Johns
+0
+100
+200
+300
+−5
+5
+15
+Halifax
+0
+100
+200
+300
+−5
+5
+15
+Sydney
+0
+100
+200
+300
+−10
+0
+10
+20
+Yarmouth
+0
+100
+200
+300
+−5
+5
+15
+Charlottvl
+0
+100
+200
+300
+−10
+0
+10
+20
+Fredericton
+0
+100
+200
+300
+−20
+0
+Scheffervll
+0
+100
+200
+300
+−10
+10
+Arvida
+0
+100
+200
+300
+−10
+10
+Bagottville
+0
+100
+200
+300
+−10
+5
+15
+Quebec
+0
+100
+200
+300
+−10
+5
+15
+Sherbrooke
+0
+100
+200
+300
+−10
+5
+15
+Montreal
+0
+100
+200
+300
+−10
+5
+15
+Ottawa
+0
+100
+200
+300
+−5
+5
+15
+Toronto
+0
+100
+200
+300
+−5
+5
+15
+London
+0
+100
+200
+300
+−10
+10
+Thunder Bay
+0
+100
+200
+300
+−20
+0
+20
+Winnipeg
+0
+100
+200
+300
+−20
+0
+The Pas
+0
+100
+200
+300
+−20
+0
+Churchill
+0
+100
+200
+300
+−20
+0
+20
+Regina
+0
+100
+200
+300
+−20
+0
+20
+Pr. Albert
+0
+100
+200
+300
+−20
+0
+Uranium City
+0
+100
+200
+300
+−15
+0
+10
+Edmonton
+0
+100
+200
+300
+−15
+0
+10
+Calgary
+0
+100
+200
+300
+−5
+5
+15
+Kamloops
+0
+100
+200
+300
+5
+10
+Vancouver
+0
+100
+200
+300
+5
+10
+Victoria
+0
+100
+200
+300
+−10
+0
+10
+20
+Pr. George
+0
+100
+200
+300
+−10
+0
+10
+Pr. Rupert
+0
+100
+200
+300
+−20
+0
+10
+Whitehorse
+0
+100
+200
+300
+−30
+−10
+10
+Dawson
+0
+100
+200
+300
+−30
+−10
+10
+Yellowknife
+0
+100
+200
+300
+−20
+0
+Iqaluit
+0
+100
+200
+300
+−30
+−10
+10
+Inuvik
+0
+100
+200
+300
+−30
+−10
+10
+Resolute
+Figure 7: Prediction results. Solid: transformed into functional data. Dashed: estimated by SOFK.
+[24] J. Mateu and R. Giraldo. Geostatistical functional data analysis. John Wiley & Sons, 2021.
+[25] A. Menafoglio, P. Secchi, and M. Dalla Rosa. A universal kriging predictor for spatially dependent functional
+data of a hilbert space. Electron. J. Statist., 7:2209–2240, 2013.
+[26] I. Park. Lasso kriging for efficiently selecting a global trend model. Struct. Multidiscipl. Optim., 64(3):1527–
+1543, 2021.
+[27] E. J. Pebesma. Multivariable geostatistics in s: the gstat package. Comput. Geosci., 30(7):683–691, 2004.
+[28] J. O. Ramsay and B. W. Silverman. Functional data analysis (2nd ed.). Springer, New York, 2005.
+[29] R. Tibshirani. Regression shrinkage and selection via the lasso. J. Roy. Statist. Soc. Ser. B Stat. Methodol.,
+58(1):267–288, 1996.
+[30] Y. Yamakawa and H. Sato. Sequential optimality conditions for nonlinear optimization on riemannian manifolds
+and a globally convergent augmented lagrangian method. Comput. Optim. Appl., 81(2):397–421, 2022.
+[31] D Yang, Z Dong, T. Reindl, P. Jirutitijaroen, and W. M. Walsh. Solar irradiance forecasting using spatio-temporal
+empirical kriging and vector autoregressive models with parameter shrinkage. Solar Energy, 103:550–562, 2014.
+[32] C.-H. Zhang. Nearly unbiased variable selection under minimax concave penalty. Ann. Statist., 38(2):894–942,
+2010.
+[33] Y. Zhang, W. Yao, S. Ye, and X. Chen. A regularization method for constructing trend function in kriging model.
+Struct. Multidiscipl. Optim., 59(4):1221–1239, 2019.
+[34] H. Zou. The adaptive lasso and its oracle properties. J. Am. Stat. Assoc., 101(476):1418–1429, 2006.
+[35] H. Zou and T. Hastie. Regularization and variable selection via the elastic net. J. Roy. Statist. Soc. Ser. B Stat.
+Methodol., 67(2):301–320, 2005.
+10
+
+Sparse estimation for functional kriging
+A PREPRINT
+A
+Proof of Theorem 1
+In this appendix, we provide a proof of Theorem 1. In the following, we denote the closer and relative interior of a
+set S as cl(S) and ri(S), respectively. Moreover, we say that a function F : R →R is proper if dom(F) ̸= ∅and
+f(x) > −∞for all x ∈R, where dom(F) := {x ∈R; F(x) < ∞}.
+Proof. We begin by defining some notation:
+p(u) := inf{f(λ); λ ∈S(u)},
+S(u) := {λ ∈Rn; 1⊤
+n λ −1 = u}.
+From [3, Proposition 5.2.1], it is sufficient to show that
+(i) p(0) is finite;
+(ii) the function p is closed and proper;
+(iii) the dual problem of (8) has at least one optimal solution.
+Note that f is bounded below on Rn because
+−c⊤
+0 C−1c0 = ∥C
+1
+2 λ −C−1
+2 c0∥2 −c⊤
+0 C−1c0
+≤∥C
+1
+2 λ −C−1
+2 c0∥2 −c⊤
+0 C−1c0 + η
+n
+X
+i=1
+bwi|λi|
+= f(λ)
+∀λ ∈Rn.
+(A.1)
+Note also that 1
+n1n ∈S(0). Hence, we have from the definition of p(0) that p(0) ≤f( 1
+n1n). Thus, it is clear that
+p(0) is finite, that is, that item (i) is verified.
+From here, we show item (ii). Since p is proper from item (i) and inequality (A.1), we will prove that p is closed. We
+first show that dom(p) is closed. Let us take v ∈R arbitrarily. We note that λv := 1+v
+n 1n ∈S(v). Thus, we readily
+have p(v) ≤f(λv) < ∞, that is, v ∈dom(p). Since dom(p) = R holds, it is clear that dom(p) is closed. Secondly,
+we prove that V(γ) := {u ∈R; p(u) ≤γ} is closed for each γ ∈R. Let γ ∈R and u ∈cl(V(γ)) be arbitrary. By the
+definition of cl(V(γ)), there exists {uj} ⊂R such that
+p(uj) ≤γ
+∀j ∈N,
+lim
+j→∞uj = u.
+(A.2)
+We arbitrarily take j ∈N. From the definitions of p(uj) and S(uj), there exists ξj ∈Rn such that
+1⊤
+n ξj −1 = uj,
+f(ξj) < p(uj) + 1
+j
+∀j ∈N.
+(A.3)
+Combining (A.1)–(A.3) gives that −c⊤
+0 C−1c0 ≤f(ξj) ≤γ + 1, namely that {f(ξj)} is bounded. It then follows
+from equality (A.1) that {ξj} is also bounded. Thus, we can assume without loss of generality that ξj →ξ∗as
+j →∞. Using uj →u (j →∞) in (A.2) and 1⊤
+n ξj −1 = uj in (A.3), we get 1⊤
+n ξ∗−1 = u, i.e., ξ∗∈S(u).
+Then, noting the definition of p(u) yields p(u) ≤f(ξ∗). Since f(ξ∗) ≤γ holds by exploiting (A.2) and (A.3), we
+can derive p(u) ≤γ. As a result, the inequality ensures V(γ) = cl(V(γ)) because u ∈cl(V(γ)) implies u ∈V(γ).
+Therefore, item (ii) is proven.
+Finally, we verify that item (iii) holds. We can easily see that ¯λ := 1
+n1n ∈Rn = ri(Rn) and 1⊤
+n ¯λ −1 = 0. It then
+follows from item (i) and [3, Proposition 5.3.3] that the dual problem of (8) has at least one optimal solution, namely
+that item (iii) is satisfied. □
+11

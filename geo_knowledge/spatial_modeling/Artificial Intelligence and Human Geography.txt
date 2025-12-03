@@ -1,0 +1,459 @@
+arXiv:2312.08827v1  [cs.AI]  14 Dec 2023
+Artiﬁcial Intelligence and Human Geography
+Chapter in the Encyclopedia of Human Geography
+Song Gao
+Geospatial Data Science Lab, Department of Geography, University of
+Wisconsin-Madison, 550 N Park Stret, Madison, 53706, WI, USA.
+Contributing authors: song.gao@wisc.edu;
+Abstract
+This paper examines the recent advances and applications of AI in human geogra-
+phy especially the use of machine (deep) learning, including place representation
+and modeling, spatial analysis and predictive mapping, and urban planning
+and design. AI technologies have enabled deeper insights into complex human-
+environment interactions, contributing to more eﬀective scientiﬁc exploration,
+understanding of social dynamics, and spatial decision-making. Furthermore,
+human geography oﬀers crucial contributions to AI, particularly in context-aware
+model development, human-centered design, biases and ethical considerations,
+and data privacy. The synergy beween AI and human geography is essential
+for addressing global challenges like disaster resilience, poverty, and equitable
+resource access. This interdisciplinary collaboration between AI and geography
+will help advance the development of GeoAI and promise a better and sustainable
+world for all.
+Keywords: AI, GeoAI, human-in-the-loop, ethics, trustworthiness
+1 Introduction
+Artiﬁcial intelligence (AI) is a ﬁeld in computer science and engineering that focuses
+on developing intelligent machines capable of performing problem-solving tasks and
+achieving goals that typically require human intelligence (Turing, 1950; McCarthy,
+2004). There are generally two types of AI: Weak AI and Strong AI. Weak AI sits
+at the foundation of AI development, with its focused human-like speciﬁc abilities
+(e.g., conversation in Siri) and practical applications (e.g., facial recognition from
+images and videos) in speciﬁc contexts, while Strong AI (known as Artiﬁcial General
+1
+
+Intelligence) represents the ultimate goal of AI research, aiming to replicate or even
+surpass human intelligence to solve problems, learn, and plan for the future with
+self-aware consciousness (Goertzel, 2014).
+AI is revolutionizing many domains including geographical sciences, presenting
+both immense opportunities and formidable challenges. The rapid advancement of AI
+is fueled by theoretical breakthroughs in neural science and computer science, the
+ubiquity of big data, advanced computer hardware such as graphics processing units
+(GPUs) and powerful high-performance computing platforms that enable the eﬃcient
+development training, and deployment of AI models, and the ﬂourishing AI products,
+services and applications that are changing human behaviors (Gao, 2020; Li, 2020;
+Torrens, 2018).
+As Couclelis (1986) expressed her excitement about the AI-driven evolution—“It
+is not often that geography is touched by a development having the potential to aﬀect
+substantially all of the practical, technical, methodological, theoretical and philo-
+sophical aspects of our work.” The intersection of AI and geography has a rich and
+evolving history, with its early roots documented in works by Couclelis (1986); Smith
+(1984); Openshaw and Openshaw (1997). Prior to the surge of deep learning research
+in the 2010s (LeCun et al, 2015) and its applications in geography and earth sci-
+ences (Hu et al, 2019b; Goodchild and Li, 2021; Liu and Biljecki, 2022; Reichstein et al,
+2019), signiﬁcant AI advancements included theoretical explorations in the 1950s and
+1960s (Buchanan, 2005); the emergence of artiﬁcial neural networks, heuristic search
+algorithms, knowledge-based symbolic expert systems, neurocomputing, and artiﬁcial
+life concepts (e.g., cellular automata) in the 1980s; the development of genetic pro-
+gramming, fuzzy logics, and hybrid intelligent systems in the 1990s (Openshaw and
+Openshaw, 1997); the integration of ontology and semantics for information retrieval
+and knowledge graphs in the 2000s; and the recent development of foundation model
+(Bommasani et al, 2021; Mai et al, 2023). All of these advances have laid the founda-
+tion for the burgeoning ﬁeld of Geospatial artiﬁcial intelligence (GeoAI) (Gao et al,
+2023).
+Rooted in geography and geographic information science (GIScience), GeoAI
+has now emerged as a transformative interdisciplinary ﬁeld, integrating geographi-
+cal studies with AI techniques, particularly spatially-explicit machine learning and
+deep learning methods as well as geo-knowledge graphs (Gao, 2020; Janowicz et al,
+2020; Mai et al, 2022). This convergence has spurred groundbreaking advancements
+in both academia and industry. GeoAI encompasses the development of intelligent
+computer programs that emulate human perception, spatial reasoning, and the ability
+to uncover insights from geographical phenomena and understanding their complex
+dynamics through coupling spatial knowledge and earth science process-based mod-
+els with deep neural networks (Gao, 2021; Reichstein et al, 2019). The researches in
+GeoAI can deepen our understanding of complex human-environmental systems and
+their interactions, particularly within a spatial context.
+Regarding the topics of AI in human geography, a recent conversation about GeoAI,
+counter-AI, and human geography by Janowicz et al (2022) discussed opportunities
+and challenges in deﬁning intelligence for machines, and the role of humans in AI
+2
+
+development and decision-making processes, emphasizing the need for ethical consid-
+erations and accountability in the development of GeoAI. In the following, I will ﬁrst
+introduce some of the recent advances of AI in human geography and then discuss the
+role of human geography in AI development.
+2 AI in Human Geography
+Human geography has a long tradition of studying the spatially and temporally vary-
+ing interrelationships between people, place, and environment, and the ways in which
+people and their activities shape, and are shaped by, the physical, economic, political,
+and cultural environment (Jones, 2012). The integration of AI technologies has signif-
+icantly expanded the capacity of researchers and practitioners in understanding the
+complex human-environment interactions. Geographers have explored a wide range of
+topics and made advances in the following areas (but not limited to).
+Place Representation and Modeling: Place can serve as a function between
+location and people (Mennis and Mason, 2016), a function of location, activity and
+time (McKenzie and Adams, 2017), and a function of social relations (Giordano and
+Cole, 2018). Traditionally, data about places were collected through mapping agencies
+(e.g., digital gazetteers) and survey-based narratives. The emergence of geospatial big
+data brings new opportunities to extract ﬁne spatiotemporal resolution of human-place
+interaction data and understand the rich place semantics from large-scale volunteered
+geographic information and crowdsourced data streams, such as social media posts
+(including texts, photos, and videos), GPS tracks, text reviews on points of interest
+(POIs) and neighborhoods, and other Web documents (Gao et al, 2017b,c; Liu et al,
+2015). A wide-range of AI methods provide new opportunities to understand and
+extract the characteristics of places as well as associated human activities, experiences,
+emotions, and movements in diﬀerent contexts. For example, urban areas of interest
+that attract people’s attention but with diﬀerent spatial patterns and region-speciﬁc
+semantics were automatically extracted from georeferenced photos posted on social
+media by employing spatial and spectral clustering algorithms, and natural language
+processing techniques (Hu et al, 2015). In addition, the spatial and hierarchical seman-
+tics between places that support human cognition of places, identiﬁcation of urban
+functional regions, and information retrieval in digital maps, were modelled using POI
+embeddings (i.e., multidimensional vectors) via topic modeling (Gao et al, 2017a)
+and deep learning techniques (Huang et al, 2022). Patterns and relations between
+places can be computed and extracted from collective human descriptions using place
+graphs (Chen et al, 2018). Empowered by the state-of-the-art human face and emo-
+tion recognition AI techniques, human emotions at diﬀerent places were extracted
+from millions of georeferenced photos (Kang et al, 2019), which enabled the study of
+spatially embodied emotions in human geography (Simonsen et al, 2007). Recently,
+researchers found that geo-knowledge-guided large language models (e.g., ChatGPT)
+improved the extraction of location textual descriptions from disaster-related social
+media messages, which can facilitate collaborations between disaster response experts
+and AI developers and ultimately help save human lives (Hu et al, 2023).
+3
+
+Spatial Analysis and Predictive Mapping: AI has revolutionized geospatial
+data analysis, interpretation, and modeling of human-environment relations by pro-
+viding innovative spatial analytical tools and methodologies. New or modiﬁcation of
+spatial analysis methods and spatial statistical models have been proposed by incor-
+porating deep neural networks, which we termed as Intelligent Spatial Analytics (Zhu
+et al, 2022a). Geographically weighted artiﬁcial neural network (GWANN) (Hage-
+nauer and Helbich, 2022) and geographically neural network weighted regression
+(GWNNR) (Du et al, 2020) models were developed by constructing the spatial non-
+stationary weights with neural networks and feeding into the geographically weighted
+regression for more accurate predictive modeling. Similarly, new spatial regression
+graph convolutional neural networks (SRGCNNs) were developed for the spatial
+regression analysis of geographical multivariate distributions and outperformed tra-
+ditional spatial autoregressive models (Zhu et al, 2022b). Machine learning and deep
+learning algorithms have also been widely used for data-driven modeling and pre-
+dictive mapping in geography (Miller and Goodchild, 2015) and identifying patterns
+and relationships that would be nearly impossible for human researchers to discern
+manually (Lavallin and Downs, 2021). For example, Zhu et al (2020) applied the
+graph convolutional neural networks (GCNNs) for modeling place graphs and infer-
+ring the unknown properties of a place with a high prediction accuracy by utilizing
+both the observed attributes (e.g., visual and functional features) and the relational
+characteristics (e.g., distance, adjacency, spatial interaction intensity) of the places.
+When applying state-of-the-art deep learning models for population mapping in geog-
+raphy, the issues on model selection, neighboring eﬀects, and systematic biases play an
+important role on the predictive mapping accuracy (Huang et al, 2021). Researchers
+found that population estimation performance reduced with increasing neighborhood
+sizes and a pervasive bias existed in which all tested deep learning models (i.e.,
+VGG, ResNet, Xception, and DenseNet) overestimated sparsely populated patches and
+underestimated densely populated ones (Huang et al, 2021). This work also demon-
+strated the importance of spatial concepts and some limitations when applying AI
+methods in human geography due to spatial heterogeneity. Future eﬀorts need to be
+made towards the (weak) replication of GeoAI models across space and time in the
+social and environmental sciences (Goodchild and Li, 2021).
+Urban Planning and Design:
+Human geographers have long been interested
+in understanding the intricate relationships between people and the environment and
+collaborating with urban planners for planning our cities. By applying AI algorithms,
+they can eﬀectively interpret large geospatial datasets, including census surveys, satel-
+lite imagery, street-view images, social media posts, and other sensor data to support
+urban analytics (De Sabbata et al, 2023). By utilizing the state-of-the-art deep learning
+models, human perception of neighborhood playability for childhood development in
+cities (Kruse et al, 2021) and urban visual intelligence about the hidden neighborhood
+socioeconomic status, such as poverty status and health outcomes, can be extracted
+from street-view images (Fan et al, 2023; Kang et al, 2020); near real-time global land
+cover and land use patterns and temporal changes can be detected from 10m spatial
+resolution of Sentinel-2 remote sensing imagery (Brown et al, 2022). Urban geographers
+4
+
+and planners can also extract valuable insights into population dynamics, traﬃc pat-
+terns, land use patterns, environmental changes, and the interactions between social
+and ecological systems, so as to optimize urban spatial structure, improving trans-
+portation eﬃciency and quality of living, and environmental sustainability (Mortaheb
+and Jankowski, 2023; Liu and Biljecki, 2022). AI-driven predictive modeling can assist
+in rooftop solar potential estimation for sustainable city design (Wu and Biljecki,
+2021), and anticipating changes in population density and mobility, facilitating better
+resource allocation and disaster preparedness in (Zou et al, 2022; Vongkusolkit and
+Huang, 2021). Additionally, AI-powered semantic and sentiment analyses of online
+neighborhood reviews helped better understand the perceptions and emotions of peo-
+ple toward their living neighborhoods and environments, which can be applied for
+supporting urban planning and improving quality of life studies (Hu et al, 2019a).
+Furthermore, the advances in generative AI models brings exiting opportunities for
+urban planners to facilitate the automatic rendering of urban master plans (Ye et al,
+2022) and building ﬂoorplan layouts (Wu et al, 2022) via generative adversarial net-
+works (GANs), otherwise they need to rely on subjective design and labor-intensive
+production process. However, the generative AI also introduces the deep fakes into
+geography (Zhao et al, 2021) and we need to make more eﬀorts on the investigation
+of trustworthiness of such AI generated geospatial data and city plans.
+3 Human Geography for AI
+Human geography also contributes to the development and applications of AI by
+providing valuable insights into the social, cultural, and economic factors that shape
+human behavior and interactions with the technology.
+Context-Aware and Debiasing AI:
+Human geography contributes to AI
+through the development of context-aware models and the analysis of biases of AI
+models when applied in heterogeneous contexts and places. Human perception of the
+physical and socioeconomic environments through deep learning has attracted large
+interest of scholars from geography, computer sciences, urban planning, and environ-
+mental psychology (Gebru et al, 2017; Fan et al, 2023; Kang et al, 2020; Han et al,
+2022). Human perception of places reﬂects people’s subjective feelings towards their
+surrounding environment, e.g., whether a place is safe, lively, and wealthy (Zhang
+et al, 2018). However, there exist multiple types of biases in existing AI-driven compu-
+tational frameworks when quantifying human perceptions of places: data bias, model
+bias, and perception bias. Kang et al (2023) compared the safety perception mea-
+sures from the survey based on neighborhood residents’ responses with those from
+the GeoAI approach with street-view imagery to better understand the relationship
+between the two types of measures. This research found that citywide residents, but
+not neighborhood residents, may feel economically vibrant places look safe; elder peo-
+ple may underestimate the safety of their living places which may enlarge perception
+bias. Therefore, integrating cultural, historical, and socioeconomic insights into pre-
+trained AI models and ﬁne-tuning them with local data and participant inputs may
+enhance AI’s ability to comprehend and respond to spatial heterogeneity and diverse
+5
+
+human experiences. This approach not only improves the accuracy of AI applications
+but also fosters inclusivity and respect for social diversity across geographic regions.
+Data Privacy and Ethical Framework:
+Human geography addresses ethi-
+cal concerns related to data collection and usage, as well as community trust (Rowe,
+2021). This knowledge is invaluable for AI developers who must navigate the ethi-
+cal implications of collecting and analyzing vast amounts of data regarding privacy
+and security. In GeoAI development, such concerns often refer to the use or exposure
+of sensitive geospatial information such as a user’s home location, workspace, POI
+preferences, daily trajectories, and associated personal inferences based on such infor-
+mation (Keßler and McKenzie, 2018; Rao et al, 2023b). There is a trade-oﬀbetween
+the data utility in downstream tasks (e.g., user proﬁling) and user privacy (Gao et al,
+2019). In human mobility studies, common user privacy protection methods include
+de-identiﬁcation, geomasking, trajectory k-anonymization, and diﬀerential privacy.
+Recently, deep neural networks such as LSTM and GANs have been used in human
+movement trajectory generation tasks with the aim to balance the data utility-privacy
+trade-oﬀ(Rao et al, 2020, 2023b). With the substantial advances in AI foundation
+models, recent studies, however, revealed that the development and use of founda-
+tion models could potentially unveil substantial privacy and security risks, including
+the disclosure of sensitive information, representational bias, hallucinations, and mis-
+use (Bommasani et al, 2021). In the lifecycle of building and using GeoAI foundation
+models (Mai et al, 2023), a series of potential privacy and security risks that existed
+around the pre-training and ﬁne-tuning stages with geospatial data, centralized serv-
+ing and tooling, prompting-based interaction, and feedback mechanisms (Rao et al,
+2023a). Looking ahead, human geographers and GIScience scholars can further con-
+tribute to establishing guidelines that ensure responsible and privacy-conscious GeoAI
+practices.
+Human-Centered Design: Understanding the perspectives, experiences, emo-
+tions, and lived realities of people in diﬀerent places and regions is essential for human
+geography research (Tuan, 1979). Therefore, human geography emphasizes the impor-
+tance of human-centered design in place-based innovation and policy making, aligning
+seamlessly with the principles of ethical (Geo-)AI development (Siau and Wang, 2020;
+Kang et al, 2024) and user-centered design in cartography (Roth, 2017). By incorpo-
+rating human geographers in the (Geo-)AI design processes, developers can create AI
+systems that better serve diverse communities and mitigate potential negative impacts
+on our society, which is well aligned with the core idea of keeping “human-in-the-loop”
+for the development of AI systems and algorithms (Janowicz et al, 2022; Zanzotto,
+2019). Several principles and practices like collaborative engagement with data (Lloyd
+and Dykes, 2011), accountability mechanisms in AI systems design (Mittelstadt, 2019)
+and empathy (Srinivasan and Gonz´alez, 2022) can be considered for addressing the
+social-technical challenges in the AI paradigm.
+4 Conclusion
+The relationship between AI and human geography is not a one-way street. As
+AI becomes increasingly sophisticated, its applications in human geography will
+6
+
+become even more diverse and impactful. At the same time, the abovementioned
+critical insights provided by human geographers will be crucial for ensuring that
+less-biased (Geo-)AI is developed and deployed in a responsible and ethical man-
+ner. Mitigating multiple types of biases throughout the “data-model-action” loop in
+human-environment systems may ensure equitable outcomes and AI-driven spatial
+decision making. By working together, AI and human geography can address some
+of the most pressing challenges facing human-environment nexus today, including cli-
+mate change, poverty, food security, health, disaster resilience, and equitable access to
+resources and services. This interdisciplinary collaboration has the potential to create
+a better and sustainable world for all.
+References
+Bommasani R, Hudson DA, Adeli E, et al (2021) On the opportunities and risks of
+foundation models. arXiv preprint arXiv:210807258
+Brown CF, Brumby SP, Guzder-Williams B, et al (2022) Dynamic world, near real-
+time global 10 m land use land cover mapping. Scientiﬁc Data 9(1):251
+Buchanan BG (2005) A (very) brief history of artiﬁcial intelligence. AI Magazine
+26(4):53–53
+Chen H, Winter S, Vasardani M (2018) Georeferencing places from collective human
+descriptions using place graphs. Journal of Spatial Information Science (17):31–62
+Couclelis H (1986) Artiﬁcial intelligence in geography: Conjectures on the shape of
+things to come. The Professional Geographer 38(1):1–11
+De Sabbata S, Ballatore A, Miller HJ, et al (2023) Geoai in urban analytics
+Du Z, Wang Z, Wu S, et al (2020) Geographically neural network weighted regres-
+sion for the accurate estimation of spatial non-stationarity. International Journal of
+Geographical Information Science 34(7):1353–1377
+Fan Z, Zhang F, Loo BP, et al (2023) Urban visual intelligence: Uncovering hidden city
+proﬁles with street view images. Proceedings of the National Academy of Sciences
+120(27):e2220417120
+Gao S (2020) A review of recent researches and reﬂections on geospatial artiﬁcial
+intelligence. Geomatics and Information Science of Wuhan University 45(12):1865–
+1874
+Gao S (2021) Geospatial artiﬁcial intelligence (GeoAI). Oxford University Press
+Gao S, Janowicz K, Couclelis H (2017a) Extracting urban functional regions from
+points of interest and human activities on location-based social networks. Transac-
+tions in GIS 21(3):446–467
+7
+
+Gao S, Janowicz K, Montello DR, et al (2017b) A data-synthesis-driven method
+for detecting and extracting vague cognitive regions. International Journal of
+Geographical Information Science 31(6):1245–1271
+Gao S, Li L, Li W, et al (2017c) Constructing gazetteers from volunteered big geo-data
+based on hadoop. Computers, Environment and Urban Systems 61:172–186
+Gao S, Rao J, Liu X, et al (2019) Exploring the eﬀectiveness of geomasking techniques
+for protecting the geoprivacy of twitter users. Journal of Spatial Information Science
+(19):105–129
+Gao S, Hu Y, Li W (2023) Handbook of Geospatial Artiﬁcial Intelligence. CRC Press,
+URL https://doi.org/10.1201/9781003308423
+Gebru T, Krause J, Wang Y, et al (2017) Using deep learning and google street view
+to estimate the demographic makeup of neighborhoods across the united states.
+Proceedings of the National Academy of Sciences 114(50):13108–13113
+Giordano A, Cole T (2018) The limits of gis: Towards a gis of place. Transactions in
+GIS 22(3):664–676
+Goertzel B (2014) Artiﬁcial general intelligence: concept, state of the art, and future
+prospects. Journal of Artiﬁcial Intelligence 5(1):1
+Goodchild MF, Li W (2021) Replication across space and time must be weak in the
+social and environmental sciences. Proceedings of the National Academy of Sciences
+118(35):e2015759118
+Hagenauer J, Helbich M (2022) A geographically weighted artiﬁcial neural network.
+International Journal of Geographical Information Science 36(2):215–235
+Han X, Wang L, Seo SH, et al (2022) Measuring perceived psychological stress in
+urban built environments using google street view and deep learning. Frontiers in
+Public Health 10:891736
+Hu Y, Gao S, Janowicz K, et al (2015) Extracting and understanding urban areas
+of interest using geotagged photos. Computers, Environment and Urban Systems
+54:240–254
+Hu Y, Deng C, Zhou Z (2019a) A semantic and sentiment analysis on online neigh-
+borhood reviews for understanding the perceptions of people toward their living
+environments. Annals of the American Association of Geographers 109(4):1052–1073
+Hu Y, Li W, Wright D, et al (2019b) Artiﬁcial intelligence approaches. The Geographic
+Information Science & Technology Body of Knowledge
+Hu Y, Mai G, Cundy C, et al (2023) Geo-knowledge-guided gpt models improve
+the extraction of location descriptions from disaster-related social media messages.
+8
+
+International Journal of Geographical Information Science 37(11):2289–2318
+Huang W, Cui L, Chen M, et al (2022) Estimating urban functional distributions
+with semantics preserved poi embedding. International Journal of Geographical
+Information Science 36(10):1905–1930
+Huang X, Zhu D, Zhang F, et al (2021) Sensing population distribution from satel-
+lite imagery via deep learning: Model selection, neighboring eﬀects, and systematic
+biases. IEEE Journal of Selected Topics in Applied Earth Observations and Remote
+Sensing 14:5137–5151
+Janowicz K, Gao S, McKenzie G, et al (2020) GeoAI: spatially explicit artiﬁcial intel-
+ligence techniques for geographic knowledge discovery and beyond. International
+Journal of Geographical Information Science 34(4):625–636
+Janowicz K, Sieber R, Crampton J (2022) Geoai, counter-ai, and human geography:
+A conversation. Dialogues in Human Geography 12(3):446–458
+Jones A (2012) Human geography: The basics. Routledge
+Kang Y, Jia Q, Gao S, et al (2019) Extracting human emotions at diﬀerent places
+based on facial expressions and spatial clustering analysis. Transactions in GIS
+23(3):450–480
+Kang Y, Zhang F, Gao S, et al (2020) A review of urban physical environment sensing
+using street view imagery in public health studies. Annals of GIS 26(3):263–275
+Kang Y, Abraham J, Ceccato V, et al (2023) Assessing diﬀerences in safety perceptions
+using geoai and survey across neighbourhoods in stockholm, sweden. Landscape and
+Urban Planning 236:104768
+Kang Y, Gao S, Roth R (2024) Artiﬁcial intelligence studies in cartography: A review
+and synthesis of methods, applications, and ethics. pp 1–20
+Keßler C, McKenzie G (2018) A geoprivacy manifesto. Transactions in GIS 22(1):3–19
+Kruse J, Kang Y, Liu YN, et al (2021) Places for play: Understanding human percep-
+tion of playability in cities using street view images and deep learning. Computers,
+Environment and Urban Systems 90:101693
+Lavallin A, Downs JA (2021) Machine learning in geography–past, present, and future.
+Geography Compass 15(5):e12563
+LeCun Y, Bengio Y, Hinton G (2015) Deep learning. nature 521(7553):436–444
+Li W (2020) GeoAI: Where machine learning and big data converge in GIScience.
+Journal of Spatial Information Science (20):71–77
+9
+
+Liu P, Biljecki F (2022) A review of spatially-explicit geoai applications in urban
+geography. International Journal of Applied Earth Observation and Geoinformation
+112:102936
+Liu Y, Liu X, Gao S, et al (2015) Social sensing: A new approach to understanding our
+socioeconomic environments. Annals of the Association of American Geographers
+105(3):512–530
+Lloyd D, Dykes J (2011) Human-centered approaches in geovisualization design: Inves-
+tigating multiple methods through a long-term case study. IEEE Transactions on
+Visualization and Computer Graphics 17(12):2498–2507
+Mai G, Hu Y, Gao S, et al (2022) Symbolic and subsymbolic geoai: Geospatial
+knowledge graphs and spatially explicit machine learning
+Mai G, Huang W, Sun J, et al (2023) On the opportunities and challenges of foundation
+models for geospatial artiﬁcial intelligence. arXiv preprint arXiv:230406798 pp 1–32
+McCarthy J (2004) What is artiﬁcial intelligence? Stanford University pp 1–15
+McKenzie G, Adams B (2017) Juxtaposing thematic regions derived from spatial and
+platial user-generated content. In: 13th international conference on spatial informa-
+tion theory (COSIT 2017), Schloss Dagstuhl-Leibniz-Zentrum fuer Informatik
+Mennis J, Mason MJ (2016) Modeling place as a relationship between a person and a
+location. In: International Conference on GIScience Short Paper Proceedings
+Miller HJ, Goodchild MF (2015) Data-driven geography. GeoJournal 80:449–461
+Mittelstadt B (2019) Principles alone cannot guarantee ethical ai. Nature Machine
+Intelligence 1(11):501–507
+Mortaheb R, Jankowski P (2023) Smart city re-imagined: City planning and geoai in
+the age of big data. Journal of Urban Management 12(1):4–15
+Openshaw S, Openshaw C (1997) Artiﬁcial intelligence in geography. John Wiley &
+Sons, Inc.
+Rao J, Gao S, Kang Y, et al (2020) Lstm-trajgan: A deep learning approach to tra-
+jectory privacy protection. In: 11th International Conference on Geographic Infor-
+mation Science (GIScience 2021), Schloss Dagstuhl-Leibniz-Zentrum f¨ur Informatik,
+p 12
+Rao J, Gao S, Mai G, et al (2023a) Building privacy-preserving and secure geospatial
+artiﬁcial intelligence foundation models. In: The 31st ACM International Conference
+on Advances in Geographic Information Systems (SIGSPATIAL’23). ACM, pp 1–4
+10
+
+Rao J, Gao S, Zhu S (2023b) Cats: Conditional adversarial trajectory synthesis
+for privacy-preserving trajectory data publication using deep learning approaches.
+International Journal of Geographical Information Science 37(12):2538–2574
+Reichstein M, Camps-Valls G, Stevens B, et al (2019) Deep learning and process
+understanding for data-driven earth system science. Nature 566(7743):195–204
+Roth R (2017) User interface and user experience (ui/ux) design. Geographic
+Information Science & Technology Body of Knowledge 2017(Q2):1–10
+Rowe F (2021) Big data and human geography. SocArXiv Papers 2021(0):1–10
+Siau K, Wang W (2020) Artiﬁcial intelligence (ai) ethics: ethics of ai and ethical ai.
+Journal of Database Management (JDM) 31(2):74–87
+Simonsen K, et al (2007) Practice, spatiality and embodied emotions: An outline of a
+geography of practice. Human Aﬀairs (2):168–181
+Smith TR (1984) Artiﬁcial intelligence and its applicability to geographical problem
+solving. The Professional Geographer 36(2):147–158
+Srinivasan R, Gonz´alez BSM (2022) The role of empathy for artiﬁcial intelligence
+accountability. Journal of Responsible Technology 9:100021
+Torrens PM (2018) Artiﬁcial intelligence and behavioral geography. Handbook of
+Behavioral and Cognitive Geography 20(0):357–371
+Tuan YF (1979) Space and place: humanistic perspective. In: Philosophy in geography.
+Springer, p 387–427
+Turing AM (1950) Computing machinery and intelligence. Mind 49(0):433–460
+Vongkusolkit J, Huang Q (2021) Situational awareness extraction: a comprehensive
+review of social media data classiﬁcation during natural hazards. Annals of GIS
+27(1):5–28
+Wu AN, Biljecki F (2021) Roofpedia: Automatic mapping of green and solar roofs for
+an open roofscape registry and evaluation of urban sustainability. Landscape and
+Urban Planning 214:104167
+Wu AN, Stouﬀs R, Biljecki F (2022) Generative adversarial networks in the built
+environment: A comprehensive review of the application of gans across data types
+and scales. Building and Environment p 109477
+Ye X, Du J, Ye Y (2022) Masterplangan: Facilitating the smart rendering of urban
+master plans via generative adversarial networks. Environment and Planning B:
+Urban Analytics and City Science 49(3):794–814
+11
+
+Zanzotto FM (2019) Human-in-the-loop artiﬁcial intelligence. Journal of Artiﬁcial
+Intelligence Research 64:243–252
+Zhang F, Zhou B, Liu L, et al (2018) Measuring human perceptions of a large-scale
+urban region using machine learning. Landscape and Urban Planning 180:148–160
+Zhao B, Zhang S, Xu C, et al (2021) Deep fake geography? when geospatial data
+encounter artiﬁcial intelligence. Cartography and Geographic Information Science
+48(4):338–352
+Zhu D, Zhang F, Wang S, et al (2020) Understanding place characteristics in geo-
+graphic contexts through graph convolutional neural networks. Annals of the
+American Association of Geographers 110(2):408–420
+Zhu D, Gao S, Cao G (2022a) Towards the intelligent era of spatial analysis and
+modeling. In: Proceedings of the 5th ACM SIGSPATIAL International Workshop
+on AI for Geographic Knowledge Discovery. ACM, pp 10–13
+Zhu D, Liu Y, Yao X, et al (2022b) Spatial regression graph convolutional neu-
+ral networks: A deep learning paradigm for spatial multivariate distributions.
+GeoInformatica 26(0):645—-676
+Zou L, Cai H, Mandal D, et al (2022) Empowering smart disaster response with social
+media and geoai. In: AGU Fall Meeting, vol 2022. American Geophysical Union, pp
+NH15C–0329
+12

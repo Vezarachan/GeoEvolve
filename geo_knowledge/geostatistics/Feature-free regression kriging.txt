@@ -1,0 +1,1529 @@
+Feature-free regression kriging
+Peng Luoa, Yilong Wub, Yongze Songb
+aSenseable City Lab, Massachusetts Institute of Technology, Cambridge, USA
+bSchool of Design and the Built Environment, Curtin University, Perth, Australia
+Abstract
+Spatial interpolation is a crucial task in geography. As perhaps the most widely used
+interpolation methods, geostatistical models—such as Ordinary Kriging (OK)—assume
+spatial stationarity, which makes it difficult to capture the nonstationary characteristics
+of geographic variables. A common solution is trend surface modeling (e.g., Regression
+Kriging, RK), which relies on external explanatory variables to model the trend and
+then applies geostatistical interpolation to the residuals. However, this approach re-
+quires high-quality and readily available explanatory variables, which are often lacking
+in many spatial interpolation scenarios—such as estimating heavy metal concentra-
+tions underground. This study proposes a Feature-Free Regression Kriging (FFRK)
+method, which automatically extracts geospatial features—including local dependence,
+local heterogeneity, and geosimilarity—to construct a regression-based trend surface
+without requiring external explanatory variables. We conducted experiments on the
+spatial distribution prediction of three heavy metals in a mining area in Australia. In
+comparison with 17 classical interpolation methods, the results indicate that FFRK,
+which does not incorporate any explanatory variables and relies solely on extracted
+geospatial features, consistently outperforms both conventional Kriging techniques and
+machine learning models that depend on explanatory variables. This approach effec-
+tively addresses spatial nonstationarity while reducing the cost of acquiring explana-
+tory variables, improving both prediction accuracy and generalization ability. This
+finding suggests that an accurate characterization of geospatial features based on do-
+main knowledge can significantly enhance spatial prediction performance—potentially
+yielding greater improvements than merely adopting more advanced statistical models.
+∗Corresponding author: Yongze Song, yongze.song@curtin.edu.au
+Email addresses: pengluo@mit.edu (Peng Luo), 22074689@student.curtin.edu.au (Yilong
+Wu)
+Preprint submitted to Elsevier
+July 11, 2025
+arXiv:2507.07382v1  [physics.soc-ph]  10 Jul 2025
+
+Keywords:
+Spatial interpolation, regression kriging, spatial statistics
+1. Introduction
+Spatial interpolation is one of the essential tasks in geography (Lam, 1983; Good-
+child, 2004). Based on samples collected from the Earth’s surface (e.g., land and ocean),
+a continuous surface is estimated by appropriately modeling the relationships between
+the samples (Webster and Oliver, 2007). With the new Earth observation technolo-
+gies, such as remote sensing, have emerged in recent years, the availability of many
+geographical variables has increased dramatically (Campbell and Wynne, 2011). How-
+ever, there are still scenarios where the distribution of variables can only be obtained
+through sampling, such as the soil organic matter (Cheng et al., 2024) or the elemental
+content under the ocean (Luo et al., 2023). Recently, the potential of spatial interpo-
+lation method in deep space exploration, such as Mars mineral prediction, has been
+recognized (Jiao et al., 2025). In such cases, spatial interpolation remains a necessary
+step.
+From the perspective of modern spatial statistics, the earliest interpolation methods
+are considered to belong to the category of deterministic interpolation, such as Inverse
+Distance Weighting (IDW) (Panigrahi, 2021). They based on an assumption that the
+value at a certain location can be obtained by inversely weighting the distances from
+surrounding observed points (Tomczak, 1998). However, this approach neglects spatial
+dependencies and fails to adequately consider the overall spatial distribution character-
+istics and patterns of observed points, limiting its interpolation accuracy. Geostatistical
+models were developed with a thorough consideration of spatial dependence (Matheron,
+1963). For example, the original geostatistical method was Ordinary Kriging (Cressie,
+1988). They interpolate based on the spatial variation patterns in the data, resulting
+in more accurate and unbiased estimation results. This approach has found extensive
+applications across various fields — from geology and mining, where it is used to pre-
+dict unknown geological features or the distribution of mineral deposits, to agriculture,
+environmental science, and ecology. The basic assumption of geostatistical models is
+second-order stationarity, which assumes that the variance between two samples de-
+pends only on their distance and direction, regardless of their absolute locations (Clark
+2
+
+et al., 1979).
+However, the distribution of geographic variables can exhibit non-stationary char-
+acteristics (Cantrell and Cosner, 1991).
+For example, when a study area contains
+multiple distinct terrain structures, the distribution patterns of geographic variables
+often vary (Anselin, 2013).
+This phenomenon contradicts the assumptions of ordi-
+nary kriging, highlighting the need for interpolation methods specifically designed for
+non-stationary features.
+Many methods have been developed to enhance the Kriging model to account for
+second-order spatial non-stationarity and improve interpolation accuracy. The first
+and most straightforward solution for handling spatial second-order non-stationarity is
+to divide the non-stationary surface into several homogeneous subregions (Luo et al.,
+2023). Within each subregion, spatial stationarity holds, allowing for separate applica-
+tion of Ordinary Kriging. A representative method following this approach is Stratified
+Kriging (StK). However, modeling at partition boundaries can introduce discontinuities
+in the prediction results. To do the stratified modelling while maintain the smooth of
+the prediction result over space, some methods have been proposed to comprehensively
+model spatial relationships, enabling the construction of semivariogram functions for
+different strata. Notable examples include P-MSN (Gao et al., 2020) and the Gen-
+eralized Heterogeneous Model (GHM) (Luo et al., 2023). P-MSN and GHM provide
+effective stratified modeling solutions with improved spatial continuity and accuracy
+compared to ordinary StK. However, they still suffer from the inherent drawbacks of
+stratified modeling, namely, the effectiveness of this approach heavily depends on the
+reliability of spatial partitioning algorithms. Furthermore, partition-based modeling
+reduces the number of available samples within each subregion, which makes it chal-
+lenging to fit reliable semivariogram functions (Liu et al., 2021).
+The second solution is to model spatial non-stationary patterns by decomposing
+the predicted values of geographic variables into two components: a trend surface and
+spatial variability (Hengl et al., 2007). The trend surface is assumed to be fitted by a
+deterministic function, while the spatial variability represents a random process that
+geostatistical methods can predict. Different methods are developed to model the trend
+(Hengl et al., 2007). When non-stationarity varies by region, location information can
+3
+
+be used to model the spatial trend, leading to the development of Universal Kriging
+(Stein and Corsten, 1991). In this approach, a deterministic polynomial function is
+used to represent the trend surface, while the residual spatial variability is captured
+through a stochastic component. Regression Kriging (RK) generalizes this idea by
+explicitly modeling the trend using a regression model, which can include multiple
+explanatory variables (Hengl et al., 2007). RK first fits a regression model to predict
+the trend and then applies Kriging to the residuals (Hengl et al., 2004). Because it
+integrates diverse information sources and allows for a flexible choice of trend models,
+regression kriging often achieves the highest predictive accuracy among Kriging-based
+interpolation methods.
+However, incorporating explanatory variables significantly increases the cost of spa-
+tial interpolation and introduces more uncertainty. Additionally, for many geostatisti-
+cal tasks, obtaining high quality explanatory variables remains a challenge (Yao et al.,
+2023). For example, a classic kriging interpolation task involves predicting mineral
+distribution. Despite the availability of numerous satellite sensors for obtaining remote
+sensing data, collecting explanatory variables for subsurface prediction is difficult. This
+presents a challenge for current spatial interpolation methods, including geostatistical
+models.
+In this study, we are committed to developing a regression kriging method that do
+not require explanatory variables and can address spatial non-stationarity. In cases
+where explanatory variables cannot be obtained, we can utilize the spatial patterns of
+geographic variables to predict the trend surface. Specifically, we propose a feature
+free regression kriging model. For each observation point, a series of features can be
+extracted from the values and distance relationships of the remaining points in its
+neighboring region. These features are then used to construct a regression model for
+fitting the trend surface. Finally, the residuals are employed to construct Ordinary
+Kriging for spatial interpolation. To validate the performance of FFRK, we conducted
+a case study in a selected region of Australia, focusing on the prediction of three heavy
+metal concentrations. Furthermore, FFRK was compared against 17 classical spatial
+interpolation models.
+4
+
+2. Feature-free regression kriging
+2.1. Basic of Regression Kriging
+Regression Kriging is a hybrid spatial prediction method that combines a determin-
+istic regression model with a geostatistical interpolation model. The fundamental idea
+of RK is to separately model the trend component and spatially correlated residuals,
+allowing for a more flexible and accurate spatial prediction.
+2.1.1. General Formulation of Regression Kriging
+Given an observed spatial variable Z(x) at location x, RK decomposes the spatial
+variation into two components:
+Z(x) = m(x) + ε(x)
+(1)
+where m(x) represents the deterministic trend component, which captures large-scale
+variations and can be modeled using regression techniques, ε(x) represents the spatially
+correlated residuals, which account for small-scale variations and are modeled using
+geostatistical interpolation.
+2.1.2. Trend Modeling via Regression
+The trend component m(x) is typically modeled using a regression function:
+m(x) = g(X(x))
+(2)
+where g(·) is a regression model, which can be a linear regression, random forest, or
+any machine learning algorithm. X(x) is a vector of explanatory variables at location
+x, which can include environmental, demographic, or geospatial factors.
+The regression model is trained using known data points {xi, Z(xi)}n
+i=1.
+Once
+trained, this regression model can predict the trend component at any location xp:
+m(xp) = g(X(xp))
+(3)
+where m(xp) is the predicted trend at the location xp.
+5
+
+2.1.3. Residual Modeling via Kriging
+After estimating the trend component, the residuals at known sample locations xi
+are computed as:
+ε(xi) = Z(xi) −m(xi)
+(4)
+where the ε(xi) is the residuals at the location xi.
+These residuals are spatially correlated and modeled using geostatistical techniques.
+Using the fitted semivariogram γ(h), residuals at unknown locations xp are interpolated
+using ordinary kriging:
+ε∗(xp) =
+n
+X
+i=1
+wiε(xi)
+(5)
+where wi are kriging weights derived from the semivariogram model.
+2.1.4. RK Prediction
+The predicted value at an unknown location xp is obtained by combining the
+regression-predicted trend and the kriging-interpolated residual:
+Z∗(xp) = m(xp) + ε∗(xp)
+(6)
+where Z∗(xp) is the predicted value at location xp, and
+2.2. Concept of FFRK
+The most important feature of RK is its ability to fully utilize explanatory variables
+to fit the trend, thereby improving the accuracy of ordinary kriging.
+However, its
+limitation is also evident: if explanatory variables are difficult to obtain, the method
+becomes unusable.
+As is shown in Figure 1, the idea behind our proposed FFRK is straightforward:
+in the absence of explanatory variables, we replace them with the spatial distribution
+characteristics of the predicted variable itself to perform regression kriging. Therefore,
+FFRK follows the same algorithmic foundation as RK, with the only difference being in
+trend fitting—rather than constructing a regression model using explanatory variables,
+it is built based on geospatial features.
+6
+
+Z(x) = m(x) + ε(x)
+(7)
+m(x) = g(F(x))
+(8)
+where: g(·) is a predictive model, F(x) is the extracted geo-feature vector.
+Subsequently, the process of FFRK is entirely consistent with that of RK: the trend
+surface m(x) is fitted based on geospatial features, followed by residual computation
+and kriging interpolation of the residuals.
+Figure 1: Schematic overview of the developed feature-free regression kriging (FFRK) for spatial
+interpolation, and its different wit the Regression Kriging
+2.3. Geofeature extraction
+In spatial analysis, the interpolation accuracy highly depends on the feature rep-
+resentations of the data. the framework of FFRK can be combined with any kinds of
+geofeature, according to the specific application.
+In this study, as a showcase of the FFRK framework, we consider three distinct
+types of geospatial features to capture both local pattern and global pattern in spatial
+distributions (Figure 2). These features are designed to provide a more comprehensive
+7
+
+representation of spatial processes and to enhance interpolation performance. The first
+is the local trend feature, extracted using IDW, which describes the general directional
+pattern of spatial structure in the neighborhood of each sample. This feature reflects
+the core principle of Tobler’s First Law of Geography—spatial proximity—and helps
+characterize the local continuity of spatial variables. The second is the local hetero-
+geneity feature, which captures intra-regional variability and unevenness by computing
+statistical descriptors (e.g., quantiles) of neighboring observations. This feature high-
+lights the spatial heterogeneity inherent in many geospatial phenomena. The third is
+the geosimilarity feature, which measures statistical similarity between sample points
+based on the local distributions used in the second feature. Unlike traditional distance-
+based methods, this similarity reflects environmental resemblance between distant loca-
+tions, allowing the model to account for non-local spatial dependencies and enhancing
+its ability to identify globally consistent patterns.
+Figure 2: Three types of geofeatures for FFRK-based spatial interpolation used in this study, including
+local trend, local heterogeneity, and geosimilarity
+8
+
+Each prediction location xp is associated with a feature vector:
+F(xp) = [FIDW(xp), FSVD(xp), FGOS(xp)]
+(9)
+where the three feature sets are computed as follows.
+2.3.1. Local Dependence: IDW Feature Extraction
+The IDW method estimates the value of a target point xp based on the weighted
+average of surrounding observations xi, where the weight is inversely proportional to
+the distance:
+Z∗(xp) =
+Pk
+i=1 wiZ(xi)
+Pk
+i=1 wi
+(10)
+where the weight wi is defined as:
+wi =
+1
+d(xp, xi)p
+(11)
+where d(xp, xi) is the Euclidean distance between the target point xp and an observation
+xi.
+IDW assumes a spatially homogeneous distribution without explicit trend modeling.
+However, it may introduce bias when a strong spatial trend exists. The extracted IDW-
+based feature for each point is:
+FIDW(xp) = [fIDW(xp)]
+(12)
+2.3.2. Local Heterogeneity: Spatially varying distribution
+We refer to the quantile-based characterization of local neighborhoods as the Spa-
+tially Varying Distribution (SVD) feature, which captures the local statistical structure
+of spatial data. The extracted feature vector FSVD(xp) provides a structured represen-
+tation of local heterogeneity. By incorporating SVD into spatial modeling, we can
+effectively account for local non-stationarity and spatial variability, making interpola-
+tion more adaptive to complex spatial structures.
+First, given a target location xp, we define its neighborhood Nk(xp) as the set of its
+k nearest observed points:
+Nk(xp) = {xi | d(xi, xp) is among the k smallest distances}
+(13)
+9
+
+where the distance d(xi, xp) is computed using the Euclidean metric.
+Second, for each point xp, we compute the empirical quantiles of the variable Z(x)
+within its neighborhood Nk(xp):
+Qq(xp) = Quantile ({Z(xi) | xi ∈Nk(xp)}, q)
+(14)
+where Qq(xp) represents the q-th quantile of the observed values in the neighborhood.
+Third, the final SVD feature vector for location xp consists of multiple quantile
+values across different probability levels:
+FSVD(xp) = [Qq1(xp), Qq2(xp), ..., Qqd(xp)]
+(15)
+where {q1, q2, ..., qd} represents the predefined quantile levels (e.g., q ∈{0, 0.05, 0.10, ..., 1.0}).
+2.3.3. Geosimilarity: GOS Feature Extraction
+The Geographically Optimal Similarity (GOS) method is selected to being as the
+third geofeature to estimate the target variable at unknown locations (Song, 2023).
+GOS identifies spatial configurations with similar structures to make predictions.
+First, we define the spatial configuration of each observed location based on ex-
+tracted features.
+For each observed location xi, we define its spatial configuration
+based on a set of extracted features FSVD(xp).
+Second, the similarity between an unknown location xp and an observed location
+xi is defined as:
+S(xi, xp) = P {Ej(fSVD,j(xi), fSVD,j(xp))}
+(16)
+where Ej is the similarity function between the j-th feature of the observed and un-
+known locations, P is an aggregation function to determine overall similarity.
+For continuous spatial features, we define Ej as:
+Ej(xi, xp) = exp
+
+−(FSVD,j(xi) −FSVD,j(xp))2
+2σ2
+j
+
+(17)
+where σj represents the standard deviation of feature j.
+10
+
+Third, instead of using all observations for prediction, GOS selects only the most
+similar locations. The optimal similarity threshold Sλ is determined by minimizing
+prediction errors:
+λ = arg min
+κ RMSE(κ)
+(18)
+where κ is the proportion of the most similar samples used for prediction, and RMSE
+is the root mean square error from cross-validation.
+Fourth, the prediction at xp is computed as:
+FGOS(xp) =
+P
+i∈Nλ Sλ(xi, xp)Z(xi)
+P
+i∈Nλ Sλ(xi, xp)
+(19)
+where Nλ is the set of selected observations with similarity above Sλ.
+2.4. Regression kriging with geofeatures
+Combining all three components, we define the final spatial feature vector:
+F(xp) = [FIDW(xp), FSVD(xp), FGOS(xp)]
+(20)
+where: FIDW(xp) captures local dependence. FSVD(xp) captures local heterogeneity
+using statistical quantiles.
+FGOS(xp) captures global similarity based on regression
+over spatially similar regions.
+The final feature vector has a total of:
+dim(F) = 1 + dSVD + 1
+(21)
+where: 1 represents the IDW feature. dSVD represents the number of quantile-based
+SVD features (which can be adjusted based on resolution).
+1 represents the GOS
+similarity feature.
+A machine learning regression model g(F) is trained on known observations, which
+captures the large-scale trend:
+Ztrend(x) = g(F(x))
+(22)
+where Ztrend(x) is the trend value at the location x.
+11
+
+The final step is to interpolate the residuals and combine them with the predicted
+trend using ordinary kriging.
+3. Case study: mapping trace elements with FFRK
+3.1. Study area and data
+In this work, we use trace element data of Cu, Pb, and Zn, from one region of Aus-
+tralia to test the performance of FFRK. We concentrated on the geographic variability
+of the three elements for the trace element distribution because these elements are well
+known to be important markers of environmental contamination and are essential for
+evaluating ecological health. The spatial distributions of trace elements are shown in
+Figure 3.
+Study_Area
+75.01 - 353.50
+41.01 - 75.00
+26.01 - 41.00
+16.01- 26.00
+2.00 - 16.00
+Zn(ppm)
+Study_Area
+24.01 - 75.00
+17.01 - 24.00
+12.01 - 17.00
+6.13 - 12.00
+0.70 - 6.12
+Pb(ppm)
+Study_Area
+54.01 - 8600.00
+24.01 - 54.00
+13.01 - 24.00
+8.01 - 13.00
+0.60 - 8.00
+Cu(ppm)
+0
+25
+12.5
+km
+Cu
+Zn
+Pb
+Figure 3: Spatial distributions of trace elements: Cu, Zn, and Pb
+We included nine environmental explanatory variables in alphabetical order to ex-
+amine the factors influencing their spatial patterns: slope, road network density (Road),
+normalized difference vegetation index (NDVI), distance to major roads (MainRd), dis-
+tance to lithology (Dlith), distance to fault lines (Dfault), soil organic carbon (SOC),
+soil pH levels, and water distribution. These variables were selected for their relevance
+in characterizing and predicting the distribution of trace elements. The calculation of
+the variables, such as Dlith, Dfault, is referenced in (Song, 2023). Table 1 summa-
+rizes the descriptive statistics of all explanatory variables, including the mean (Mean),
+minimum (Min), median, maximum (Max), standard deviation (SD), and coefficient
+of variation (CV).
+12
+
+Table 1: Descriptive statistics of environmental variables
+Variable
+Code
+Mean
+Min
+Median
+Max
+SD
+CV
+Distance to water(km)
+Water
+1.114
+0.000
+0.648
+7.696
+1.188
+1.067
+Distance to mainroads(km)
+MainRoads
+19.991
+0.010
+17.485
+58.371
+14.219
+0.711
+Distance to roads(km)
+Roads
+9.817
+0.002
+7.953
+50.141
+8.363
+0.852
+Distance to mine(km)
+MineKm
+14.785
+0.025
+11.425
+56.638
+12.117
+0.820
+Slope(degree)
+Slope
+0.275
+0.008
+0.246
+1.712
+0.161
+0.585
+Normalized difference vegetation index
+NDVI
+0.178
+0.062
+0.180
+0.251
+0.024
+0.135
+Soil organic carbon
+SOC
+0.868
+0.686
+0.870
+1.066
+0.053
+0.061
+Soil pH
+pH
+5.741
+5.113
+5.753
+6.178
+0.178
+0.031
+Distance to lithology (km) for Cu
+DlithCu
+9.132
+0.000
+7.147
+39.839
+7.769
+0.851
+Distance to lithology (km) for Zn
+DlithZn
+8.150
+0.000
+6.229
+39.839
+7.637
+0.937
+Distance to lithology (km) for Pb
+DlithPb
+3.363
+0.000
+2.627
+15.946
+3.020
+0.898
+Distance to fault(km) for Cu
+DfaultCu
+16.070
+0.001
+13.285
+54.765
+12.150
+0.756
+Distance to fault(km) for Pb
+DfaultPb
+12.017
+0.003
+11.111
+43.471
+8.090
+0.673
+Distance to fault(km) for Zn
+DfaultZn
+14.174
+0.001
+11.844
+52.697
+10.851
+0.766
+Elevation(m)
+Elevation
+482.699
+398.050
+485.128
+588.649
+36.700
+0.076
+Aspect(degree)
+Aspect
+171.645
+0.751
+174.126
+358.712
+90.576
+0.528
+3.2. Experiment design
+Figure 4 illustrates the experimental design of this study, which aims to validate
+the reliability of the proposed FFRK method. For the target variable, we computed
+its three-dimensional geofeatures, including dependence, heterogeneity, and similarity.
+Subsequently, we selected four types of machine learning models—linear model (LM),
+decision tree (DT), random forest (RF), and support vector machine (SVM)—to pre-
+dict the trend of the target variable. After obtaining the residuals by comparing the
+predicted trend with observations, we applied ordinary kriging for spatial interpolation
+of the residuals. Finally, the predicted trend and interpolated residuals were combined
+to produce the prediction.
+We compare our proposed method with several representative baselines, including
+classical geostatistical approaches, machine learning models, and their stratified and
+hybrid variants. First, Ordinary Kriging (OK) serves as the foundational geostatistical
+method and is used as a baseline for performance comparison. Second, we consider
+machine learning models, which directly establish predictive relationships between ex-
+planatory variables and the target variable. In this study, we employ four commonly
+13
+
+Figure 4: Experimental design for evaluating the performance of FFRK in comparison with other
+interpolation models
+used models: Linear Regression (LM), Decision Tree Regression (DT), Random Forest
+Regression (RF), and Support Vector Machine Regression (SVM).
+Third, stratified models are introduced to better account for spatial heterogeneity.
+These models partition the study area into multiple subregions based on homogeneity
+analysis, with separate machine learning models trained within each region. The same
+four algorithms (LM, DT, RF, and SVM) are applied in each subregion. The spatial
+partitioning is conducted using a decision tree, which segments the domain based on
+geographic coordinates (longitude and latitude) as well as trace element values. In ad-
+dition to stratified machine learning models, we also include stratified kriging, resulting
+in a total of five stratified models.
+Fourth, we evaluate Regression Kriging (RK), a hybrid method that combines trend
+modeling and spatial interpolation. Specifically, a machine learning model (LM, DT,
+RF, or SVM) is used to estimate the trend, and the residuals are then interpolated
+using kriging. Finally, we present our proposed method, Feature-Filtered Regression
+Kriging (FFRK). Similar to RK, FFRK follows a two-step structure but incorporates a
+feature selection process prior to regression. The four variants of FFRK correspond to
+the four regression models used: FFRK (LM), FFRK (DT), FFRK (RF), and FFRK
+(SVM).
+14
+
+In total, we compared 18 models. Among them, only Ordinary Kriging (OK), Strat-
+ified Kriging (StK) and four FFRK models do not require any explanatory variables,
+whereas the other three model categories require nine explanatory variables as inputs.
+In the FFRK model, two hyperparameters are involved.
+The first is K, which
+defines the number of neighboring sample points used to compute geo-features and fit
+the semivariogram. The second is the quantile interval, used in the second geo-feature
+to characterize the statistical information within the neighborhood of each sample
+point. In this study, we set K = 15 and the quantile interval = 5%, following the
+settings adopted in a previous study (Song, 2023). A sensitivity analysis of these two
+hyperparameters and their impact on the performance of FFRK is presented in Section
+3.4.2.
+3.3. Cross-validation and Model Evaluation
+In this study, we adopted 10-fold cross-validation to evaluate the prediction per-
+formance and generalization capability of the proposed FFRK method and baseline
+models. Specifically, the dataset was randomly divided into ten subsets of equal size.
+In each iteration, nine subsets served as the training set, while the remaining subset
+was reserved as the validation set. This training-validation procedure was repeated ten
+times, with the averaged results across the ten iterations representing the final model
+performance. This approach effectively mitigates the instability arising from a single
+random partition and enhances the robustness of model evaluation.
+In particular, for Stratified Models, we employed a regression tree to partition
+the study area spatially, and subsequently performed stratified sampling based on the
+distribution of the target variable. This ensured consistent internal data distribution
+across each of the ten folds constructed for cross-validation.
+Moreover, the cross-validation process was utilized for model parameter optimiza-
+tion. Optimal parameters for each machine learning model were determined by min-
+imizing the mean RMSE obtained from cross-validation. Finally, each model was re-
+trained once using the complete dataset to derive globally optimal parameters, and the
+resulting optimized models were preserved for subsequent global spatial predictions.
+15
+
+3.4. Results
+3.4.1. Accuracy evaluation
+Figure 5 presents the spatial interpolation results of FFRK alongside several other
+regression-based models. We selected Linear Model (LM) as the representative machine
+learning regression method, and also included Regression Kriging (RK) based on LM,
+as well as Stratified Kriging (StK). Additionally, we compared the results of Ordinary
+Kriging (OK) and StK. Our observations show that OK and StK produce the smoothest
+interpolation surfaces among the methods evaluated. However, this smoothness comes
+at the cost of lacking fine-grained spatial detail. In contrast, FFRK produces spatial
+patterns that closely resemble those of LM and RK, capturing more nuanced local
+variations.
+Figure 6 presents the accuracy results of 13 global modeling approaches for predict-
+ing the concentrations of three heavy metals, evaluated using R², RMSE, and MAE.
+Among these methods, 12 involve the use of machine learning (ML) models, with the
+exception of ordinary kriging (OK). To ensure a fair comparison, we categorized the
+methods into four groups based on the ML model used for trend modeling: LM-based,
+DT-based, RF-based, and SVM-based.
+The results indicate that the FFRK method, despite not incorporating any explana-
+tory variables, achieves significantly higher accuracy than both standalone ML models
+and regression models based on ML modeling. The latter two approaches utilized nine
+explanatory variables and a large dataset but failed to yield higher prediction accu-
+racy. For example, in Cu prediction, the R² values of FFRK with LM-, DT-, RF-,
+and SVM-based trend modeling exceeded those of regression kriging using the same
+ML models by 73.72%, 40.31%, 26.87%, and 21.27%, respectively. The most signifi-
+cant improvement was observed in Pb prediction, where FFRK with DT-based trend
+modeling achieved an R² of 0.27, surpassing regression kriging and the DT model by
+0.07 and 0.03, respectively.
+In Table 2, we present the results of five stratified modeling approaches. First,
+we partitioned the spatial domain into multiple homogeneous subregions based on the
+values of explanatory variables.
+Within each subregion, we decomposed and fitted
+separate models to perform spatial predictions. Finally, we evaluated the overall pre-
+16
+
+Figure 5: Spatial distributions of the predicted results for three trace elements—Cu, Zn, and Pb—are
+shown using six prediction models: FFRK, LM, RK, Stratified RK, OK, and STK
+17
+
+LM RK
+(LM)
+FFRK
+(LM)
+OK
+DT RK
+(DT)
+FFRK
+(DT)
+RF RK
+(RF)
+FFRK
+(RF)
+SVM RK
+(SVM)
+FFRK
+(SVM)
+LM RK
+(LM)
+FFRK
+(LM)
+OK
+DT RK
+(DT)
+FFRK
+(DT)
+RF RK
+(RF)
+FFRK
+(RF)
+SVM RK
+(SVM)
+FFRK
+(SVM)
+LM RK
+(LM)
+FFRK
+(LM)
+OK
+DT RK
+(DT)
+FFRK
+(DT)
+RF RK
+(RF)
+FFRK
+(RF)
+SVM RK
+(SVM)
+FFRK
+(SVM)
+LM-based 
+models
+DT-based 
+models
+RF-based 
+models
+SVM-based 
+models
+LM-based 
+models
+DT-based 
+models
+RF-based 
+models
+SVM-based 
+models
+LM-based 
+models
+DT-based 
+models
+RF-based 
+models
+SVM-based 
+models
+0.4
+0.3
+0.2
+0.1
+R2
+0.7
+0.5
+0.3
+0.1
+RMSE
+0.5
+0.3
+0.1
+MAE
+0.7
+0.4
+0.1
+MAE
+1.0
+0.8
+0.6
+0.4
+0.2
+RMSE
+0.4
+0.3
+0.2
+0.1
+0.5
+R2
+0.4
+0.3
+0.2
+0.1
+R2
+0.8
+0.6
+0.4
+0.2
+RMSE
+0.5
+0.6
+0.4
+0.3
+0.2
+0.1
+MAE
+Cu
+Zn
+Pb
+Regression Kriging
+(RK)
+Feature-free Regression Kriging
+(FFRK)
+Machine learning regression
+Figure 6: Evaluation results (R2, RMSE, and MAE) for the 13 global models
+diction accuracy across the entire study area. To assess the impact of stratification,
+we experimented with different numbers of partitions, ranging from 2 to 10, and cal-
+culated the average accuracy. The results indicate that compared to global modeling
+approaches, including OK and various machine learning models, stratified modeling
+can effectively improve prediction accuracy, as discussed in the Introduction. How-
+ever, its performance still falls short of that achieved by the FFRK method. In some
+cases, stratification resulted in over-segmentation, where certain subregions contained
+too few observations, leading to model underfitting and significantly reduced predic-
+tive performance. Additionally, stratified modeling introduced abrupt and unrealistic
+discontinuities in the final spatial interpolation results, which arose due to artificial
+boundaries between partitions.
+The scatter plots comparing the observed and predicted values for all models are
+presented in the appendix (Figures S1, S2, and S3). It can be seen that the scatter
+plots of the FFRK models, which exhibit the highest accuracy, are the closest to the
+1:1 line.
+18
+
+Table 2: Mean R², MAE, and RMSE for Different Models and Elements (K=2 to 10)
+Element
+Model
+Mean R²
+Mean MAE
+Mean RMSE
+Cu
+Stratified Kriging
+0.3584
+0.6720
+0.8964
+Stratified LM
+0.3738
+0.6699
+0.8978
+Stratified DT
+0.3009
+0.7114
+0.9486
+Stratified RF
+0.4115
+0.6406
+0.8705
+Stratified SVM
+0.4205
+0.6318
+0.8637
+Zn
+Stratified Kriging
+0.3791
+0.4830
+0.6287
+Stratified LM
+-6.4581
+0.5559
+1.5290
+Stratified DT
+0.3546
+0.5054
+0.6613
+Stratified RF
+0.4367
+0.4575
+0.6179
+Stratified SVM
+0.4147
+0.4725
+0.6298
+Pb
+Stratified Kriging
+0.2747
+0.5277
+0.6958
+Stratified LM
+0.1043
+0.5040
+0.7462
+Stratified DT
+0.2178
+0.5296
+0.7041
+Stratified RF
+0.4063
+0.4399
+0.6137
+Stratified SVM
+0.3776
+0.4474
+0.6283
+3.4.2. Sensitivity analysis for the hyperparameter in FFRK
+In Kriging-based methods, an hyperparameter is the number of neighboring points
+used when fitting the semivariogram and performing interpolation. In the previous
+experiments, to ensure a fair comparison among different methods, we set the number
+of nearest neighbors (k) to 15 for all models. In this section, we assess the sensitivity
+of different methods to k. Figure 7 presents the accuracy of FFRK and RK models
+under varying numbers of neighboring points.
+The results indicate that for the same type of ML model used in trend modeling,
+FFRK (dashed line) consistently outperforms RK (solid line) across most k values,
+demonstrating higher R² and lower RMSE. However, there are a few exceptions. For
+instance, when k is less than 11 in Zn prediction, the RF-based RK model achieves
+higher accuracy than the RF-based FFRK model. Despite this, FFRK based on LM
+and DT still significantly outperforms RK when k is below 11. This discrepancy may
+19
+
+be attributed to the distribution characteristics of Zn: when k is small, the geofeatures
+used by FFRK may not provide sufficient information to properly fit the RF model.
+In contrast, the RK method, which utilizes nine explanatory variables, has enough
+information for RF to achieve better fitting. However, for the relatively simpler LM and
+DT models, the geofeatures in FFRK provide sufficient information, enabling FFRK
+to surpass RK in predictive performance.
+6
+8
+10
+12
+14 16
+18
+20
+6
+8
+10
+12
+14 16
+18
+20
+6
+8
+10
+12
+14 16
+18
+20
+6
+8
+10
+12
+14 16
+18
+20
+6
+8
+10
+12
+14 16
+18
+20
+6
+8
+10
+12
+14 16
+18
+20
+0.50
+0.40
+0.30
+0.25
+0.45
+0.35
+0.80
+0.85
+0.90
+0.95
+0.60
+0.62
+0.64
+0.66
+0.68
+0.30
+0.35
+0.40
+0.45
+R2
+R2
+R2
+0.10
+0.20
+0.30
+0.40
+0.50
+RMSE
+RMSE
+RMSE
+0.55
+0.60
+0.65
+0.70
+0.75
+LM
+DT
+RF
+SVM
+OK
+RK
+FFRK
+Cu
+Zn
+Pb
+Figure 7: The sensitivity analysis for the K value
+In the second category of geofeatures, we sample the value distribution of surround-
+ing sample points for each predicted location. This sampling is based on fixed quantile
+intervals, such as 1% or 5%. In the previous experiments, we selected a 5% quantile
+interval, resulting in 20 features in this geofeature category. To assess the sensitivity
+of FFRK to this parameter, we varied the quantile interval from 5% to 50% and eval-
+uated its impact on the results. Figure 8 shows that the FFRK method is relatively
+robust to changes in the quantile sampling interval. The maximum fluctuation in R²
+is approximately 0.05, while the highest variation in RMSE is only around 0.02.
+20
+
+LM
+DT
+RF
+SVM
+0.1
+0.2
+0.3
+0.4
+0.5
+0.1
+0.2
+0.3
+0.4
+0.5
+0.1
+0.2
+0.3
+0.4
+0.5
+0.1
+0.2
+0.3
+0.4
+0.5
+0.1
+0.2
+0.3
+0.4
+0.5
+0.1
+0.2
+0.3
+0.4
+0.5
+R2
+RMSE
+0.80
+0.84
+0.88
+0.92
+0.35
+0.40
+0.45
+0.50
+0.62
+0.64
+0.66
+RMSE
+R2
+0.36
+0.40
+0.44
+0.60
+0.64
+RMSE
+0.40
+0.45
+0.30
+0.35
+R2
+Cu
+Zn
+Pb
+FFRK
+Figure 8: The sensitivity analysis for the quantile step
+3.4.3. Generalized regression kriging
+In previous experiments, we have demonstrated that FFRK, despite not requiring
+any explanatory variables, can outperform RF models that utilize multiple explana-
+tory variables solely through the extraction of geofeatures. Here, we propose a new
+question: if geofeatures and explanatory variables are integrated together for trend
+modeling, can the predictive performance be further improved? We define this ap-
+proach, which incorporates both geofeatures and explanatory variables, as generalized
+regression kriging (GRK).
+The results, shown in Figure 9, indicate that across three different datasets and
+12 prediction tasks (based on four ML models for trend modeling), GRK outperforms
+FFRK in 10 cases and significantly surpasses RK in all cases. The two exceptions
+occur in Cu and Zn prediction tasks when DT is used for trend modeling, where
+FFRK, relying solely on geofeatures, achieves a slightly higher R² than GRK, which
+includes explanatory variables.
+These findings suggest that incorporating more information into trend modeling
+enhances the performance of regression kriging models. The proposed GRK model is
+21
+
+particularly suitable for spatial interpolation tasks where explanatory variables are
+available.
+Compared to conventional regression kriging, which relies solely on ex-
+planatory variables, integrating geofeatures into trend modeling leads to substantial
+improvements in predictive accuracy.
+LM
+DT
+RF
+SVM
+Trend modeling method
+RK
+FFRK
+GRK
+Framework
+0.260
+0.278
+0.396
+0.383
+0.443
+0.355
+0.510
+0.459
+0.445
+0.345
+0.521
+0.497
+0.30
+0.35
+0.40
+0.45
+0.50
+RK
+FFRK
+GRK
+0.177
+0.070
+0.407
+0.311
+0.375
+0.273
+0.471
+0.419
+0.410
+0.309
+0.517
+0.475
+0.10
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40
+0.45
+0.50
+RK
+FFRK
+GRK
+0.274
+0.311
+0.433
+0.378
+0.397
+0.380
+0.451
+0.401
+0.417
+0.357
+0.490
+0.437
+0.275
+0.300
+0.325
+0.350
+0.375
+0.400
+0.425
+0.450
+0.475
+RK
+FFRK
+GRK
+0.973
+0.961
+0.879
+0.888
+0.844
+0.908
+0.792
+0.832
+0.843
+0.915
+0.783
+0.802
+0.800
+0.825
+0.850
+0.875
+0.900
+0.925
+0.950
+RK
+FFRK
+GRK
+0.720
+0.766
+0.611
+0.659
+0.628
+0.677
+0.578
+0.605
+0.610
+0.660
+0.552
+0.575
+0.575
+0.600
+0.625
+0.650
+0.675
+0.700
+0.725
+0.750
+RK
+FFRK
+GRK
+0.701
+0.684
+0.620
+0.649
+0.640
+0.649
+0.610
+0.637
+0.629
+0.660
+0.588
+0.618
+0.60
+0.62
+0.64
+0.66
+0.68
+0.70
+LM
+DT
+RF
+SVM
+LM
+DT
+RF
+SVM
+LM
+DT
+RF
+SVM
+LM
+DT
+RF
+SVM
+LM
+DT
+RF
+SVM
+Trend modeling method
+Trend modeling method
+Trend modeling method
+Trend modeling method
+Trend modeling method
+Framework
+Framework
+Framework
+Framework
+Framework
+Cu
+Zn
+Pb
+RMSE
+R2
+R2
+R2
+RMSE
+RMSE
+Figure 9: Accuracy of three framework: regression kriging, FFRK, and Generalized Regression Kriging
+(GRK)
+4. Discussion
+Regression Kriging is a highly effective spatial interpolation model for addressing
+second-order spatial non-stationarity, which fits a trend surface based on explanatory
+variables and then performs kriging on the residuals. However, in many spatial inter-
+polation tasks, it is often difficult to obtain explanatory variables, or to find variables
+that are sufficiently suitable, which greatly limits the applicability of regression kriging.
+This work proposes a novel interpolation method for regression kriging under spatial
+non-stationarity without relying on explanatory variables, called FFRK. FFRK substi-
+tutes the traditional need for explanatory variables in trend surface fitting by creating
+features—termed geofeatures—based on the spatial distribution patterns of geographic
+variables. In this study, we introduce three categories of geofeatures, derived respec-
+tively from spatial dependence, spatial heterogeneity, and geographic similarity. We
+22
+
+apply FFRK to a case study involving the spatial distribution of three heavy metal
+concentrations in a region of Australia. We also compare the performance of FFRK
+against 17 other interpolation methods of various types, demonstrating that FFRK
+achieves the highest predictive accuracy.
+FFRK achieves superior performance without using any explanatory variables, out-
+performing other methods that do use explanatory variables, including machine learn-
+ing models and regression kriging.
+This showcases the advantage of using features
+derived from the spatial distribution itself in regression kriging.
+However, the ad-
+vantage does not imply that such spatial distribution features can entirely replace
+information from traditional explanatory variables. For the specific case study in this
+paper—predicting heavy metal concentrations—it is particularly difficult to identify
+suitable, large-scale, readily available explanatory variables. In most spatial prediction
+tasks, large-scale remote sensing observations are typically relied upon. However, sub-
+surface distributions are often poorly represented by surface-level features detectable
+through remote sensing. This is precisely the application scenario that FFRK aims
+to address. As shown in Figure 9, when both explanatory variables and geofeatures
+are used together (a model we refer to as GRK), the prediction accuracy generally
+improves further compared to FFRK alone.
+5. Conclusion
+This study proposes FFRK, a regression kriging approach that eliminates the need
+for explanatory variables by extracting geospatial features from the response variable
+itself. Addressing key limitations in existing methods—such as reliance on external
+variables and assumptions of spatial stationarity—FFRK captures spatial dependence,
+local heterogeneity, and geographic similarity to construct a robust trend surface. We
+demonstrate the effectiveness of FFRK through a spatial prediction task involving the
+distribution of three heavy metal concentrations in a region of Australia. FFRK outper-
+forms traditional kriging, machine learning, and stratified methods, offering a practical
+solution for large-scale, non-stationary spatial interpolation tasks where explanatory
+data are scarce or unavailable. This work contributes to GIScience by demonstrat-
+ing that spatial features alone can effectively support predictive modeling. However,
+23
+
+FFRK’s performance depends on the spatial density of observations. Future work will
+explore its extension to spatiotemporal settings and automated feature learning for
+broader applicability.
+Disclosure Statement
+No conflict of interest exists in this manuscript, and the manuscript was approved
+by all authors for publication.
+References
+Anselin, L., 2013. Spatial econometrics: methods and models. volume 4. Springer
+Science & Business Media.
+Campbell, J.B., Wynne, R.H., 2011. Introduction to remote sensing. Guilford press.
+Cantrell, R.S., Cosner, C., 1991. The effects of spatial heterogeneity in population
+dynamics. Journal of Mathematical Biology 29, 315–338.
+Cheng, S., Zhang, W., Luo, P., Wang, L., Lu, F., 2024. An explainable spatial inter-
+polation method considering spatial stratified heterogeneity. International Journal
+of Geographical Information Science , 1–27.
+Clark, I., et al., 1979. Practical geostatistics. volume 3. Applied Science Publishers
+London.
+Cressie, N., 1988. Spatial prediction and ordinary kriging. Mathematical geology 20,
+405–421.
+Gao, B., Hu, M., Wang, J., Xu, C., Chen, Z., Fan, H., Ding, H., 2020.
+Spatial
+interpolation of marine environment data using p-msn.
+International Journal of
+Geographical Information Science 34, 577–603.
+Goodchild, M.F., 2004. Giscience, geography, form, and process. Annals of the Asso-
+ciation of American Geographers 94, 709–714.
+Hengl, T., Heuvelink, G.B., Rossiter, D.G., 2007.
+About regression-kriging: From
+equations to case studies. Computers & geosciences 33, 1301–1315.
+Hengl, T., Heuvelink, G.B., Stein, A., 2004. A generic framework for spatial prediction
+of soil variables based on regression-kriging. Geoderma 120, 75–93.
+Jiao, L., Luo, P., Huang, R., Xu, Y., Ye, Z., Liu, S., Liu, S., Tong, X., 2025. Modeling
+hydrous mineral distribution on mars with extremely sparse data: A multi-scale
+spatial association modeling framework. ISPRS Journal of Photogrammetry and
+Remote Sensing 222, 16–32.
+Lam, N.S.N., 1983. Spatial interpolation methods: a review. The American Cartogra-
+pher 10, 129–150.
+Liu, Y., Chen, Y., Wu, Z., Wang, B., Wang, S., 2021. Geographical detector-based
+stratified regression kriging strategy for mapping soil organic carbon with high spatial
+heterogeneity. Catena 196, 104953.
+24
+
+Luo, P., Song, Y., Zhu, D., Cheng, J., Meng, L., 2023. A generalized heterogeneity
+model for spatial interpolation. International Journal of Geographical Information
+Science 37, 634–659.
+Matheron, G., 1963. Principles of geostatistics. Economic geology 58, 1246–1266.
+Panigrahi, N., 2021. Inverse distance weight, in: Encyclopedia of Mathematical Geo-
+sciences. Springer, pp. 1–7.
+Song, Y., 2023. Geographically optimal similarity. Mathematical Geosciences 55, 295–
+320.
+Stein, A., Corsten, L., 1991. Universal kriging and cokriging as a regression procedure.
+Biometrics , 575–587.
+Tomczak, M., 1998.
+Spatial interpolation and its uncertainty using automated
+anisotropic inverse distance weighting (idw)-cross-validation/jackknife approach.
+Journal of Geographic Information and Decision Analysis 2, 18–30.
+Webster, R., Oliver, M.A., 2007. Geostatistics for environmental scientists. John Wiley
+& Sons.
+Yao, Y., Dong, A., Liu, Z., Jiang, Y., Guo, Z., Cheng, J., Guan, Q., Luo, P., 2023. Ex-
+tracting the pickpocketing information implied in the built environment by treating
+it as the anomalies. Cities 143, 104575.
+Appendix
+25
+
+STK
+OK
+Stratified_LM
+Stratified_DT
+Stratified_RF
+Stratified_SVM
+LM
+DT
+RF
+SVM
+RK_LM
+RK_DT
+RK_RF
+RK_SVM
+FFRK_LM
+FFRK_DT
+FFRK_RF
+FFRK_SVM
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+Observed
+Predicted
+# of data
+0.1
+0.2
+0.3
+0.4
+0.5
+Figure S1: Scatter plot of the prediction results for Cu
+26
+
+STK
+OK
+Stratified_LM
+Stratified_DT
+Stratified_RF
+Stratified_SVM
+LM
+DT
+RF
+SVM
+RK_LM
+RK_DT
+RK_RF
+RK_SVM
+FFRK_LM
+FFRK_DT
+FFRK_RF
+FFRK_SVM
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+Observed
+Predicted
+# of data
+0.25
+0.50
+0.75
+Figure S2: Scatter plot of the prediction results for Zn
+27
+
+STK
+OK
+Stratified_LM
+Stratified_DT
+Stratified_RF
+Stratified_SVM
+LM
+DT
+RF
+SVM
+RK_LM
+RK_DT
+RK_RF
+RK_SVM
+FFRK_LM
+FFRK_DT
+FFRK_RF
+FFRK_SVM
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+0
+2
+4
+Observed
+Predicted
+# of data
+0.2
+0.4
+0.6
+0.8
+Figure S3: Scatter plot of the prediction results for Pb
+28

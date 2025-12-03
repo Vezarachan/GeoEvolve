@@ -1,0 +1,595 @@
+arXiv:astro-ph/0702542v3  24 Jan 2009
+Cosmological Model Selection: Statistics and Physics
+Eric V. Linder
+Berkeley Lab, University of California, Berkeley, CA 94720, USA∗
+Ramon Miquel
+Instituci´o Catalana de Recerca i Estudis Avan¸cats, Institut de F´ısica d’Altes Energies
+Campus UAB, E-08193 Bellaterra (Barcelona), Spain†
+(Dated: August 16, 2018)
+Interpretation of cosmological data to determine the number and values of parameters describ-
+ing the universe must not rely solely on statistics but involve physical insight. When statistical
+techniques such as “model selection” or “integrated survey optimization” blindly apply Occam’s
+Razor, this can lead to painful results. Sensitivity to prior probabilities and to the number of mod-
+els compared can lead to “prior selection” rather than robust model selection. A concrete example
+demonstrates that Information Criteria can in fact misinform over a large region of parameter space.
+I.
+INTRODUCTION
+Recently several papers (e.g. [1, 2, 3], and references
+therein) have claimed that ﬁtting cosmological parame-
+ters to data may be inadequate, if not misguided, as a
+means of determining cosmology, in particular the nature
+of dark energy accelerating the expansion of the universe.
+They advocate interpreting the evidence for or against
+a model in a manner intimately tied to the parameter
+space volume: models with fewer parameters get boosted
+in preference while models with more parameters – and
+possibly better ﬁts – should be penalized.
+This is all
+in accord with statistical theory. In this approach one
+should not ﬁt parameters but rather select models; we
+will refer to the various related techniques along these
+lines generically as “model selection”.
+However, this point of view can be taken too far,
+and has as well some essential assumptions that pre-
+vent model selection from being either a panacea or a
+substitute for parameter ﬁtting (which admittedly can
+have pitfalls of its own). In general, statisticians want
+to model data in an eﬃcient way. That is, they want to
+go from many data points to just a few parameters in a
+model that captures the essence of the data accurately
+and eﬃciently.
+Then, one can use that model to pre-
+dict future outcomes, say (clinical trials, stock market,
+climate change, etc.). However, physicists do not regard
+the models as just useful summaries of the data, but as
+fundamental descriptions of the data based on physical
+principles. The parameters in our models have (or should
+have) deep physical meanings, and are not just concise
+ways of representing the data. Model eﬃciency takes a
+back seat to physical ﬁdelity.
+We discuss drawbacks of the model selection paradigm
+in §II, and give several historical examples in §III where
+model selection would have led physicists astray, espe-
+cially as a predictive mechanism.
+In §IV we present
+∗Electronic address: evlinder@lbl.gov
+†Electronic address: rmiquel@ifae.es
+a complete numerical example, using simulated cosmo-
+logical data, that shows how easily model selection can
+lead us to the wrong physics. Inadequate data, or ex-
+trapolation to future, better data, is particularly prob-
+lematic within a model selection scenario since that re-
+wards mathematical simplicity, which blurry data are
+more likely to be consistent with. We emphasize in §V
+that one can too easily misuse this paradigm in attempt-
+ing survey design, judging data before it is taken.
+This article does not oppose model selection as an ap-
+proach, it just provides necessary highlights of areas of
+caution such as sensitivity to the outer ranges – “cor-
+ners” – of priors and unphysical dependence on number
+of models being considered. Through a series of concrete
+examples we illustrate why physics, not just statistics,
+must retain a central role in interpreting data.
+II.
+BAYESIAN APPROACH
+An
+essential
+ingredient
+of
+the
+parameter
+ﬁtting
+paradigm is that the model described by the parame-
+ter set is a reasonable choice. Model selectors ask what
+if the model is faulty to begin with, and seek to avoid,
+or at least dilute, this step by considering sets of models,
+containing parameters, rather than sets of parameters.
+As far as this goes, it is certainly reasonable – parameter
+ﬁtters must take care in choosing parameter sets, with
+respect to validity and lack of bias. However, in parame-
+ter ﬁtting to data one already has built in tests to check
+that the model is reasonable: 1) ideally one starts with
+a physically motivated model, 2) if the goodness of ﬁt
+(e.g. chi-squared per degree of freedom) is poor then the
+model receives careful scrutinization or is discarded, and
+3) if subsets of data disagree then this may be a sign that
+the parameter space should be expanded or abandoned.
+So parameter ﬁtting can check itself.
+Model selection seeks to consider a space of models and
+ﬁnd the Bayesian evidence for each. Here the key ingre-
+dient is the assigning of prior probabilities to parameter
+states within each model. That is, in a not-insigniﬁcant
+sense one must guess what the data are going to say
+
+2
+before you have them. The ﬁnal answer from model se-
+lection depends on the prior assumptions, assumptions
+often with relatively little physics guidance. Whether the
+prior is uniform in a parameter itself or in a function of
+the parameter has substantial impact on the results (for
+one telling example concerning our very existence, see
+[4]). The range of the prior is another crucial element.
+Finally, while in parameter ﬁtting one must ensure that
+the particular parameter values of the ﬁt are physical, in
+model selection one must extend the probability analysis
+throughout the entire range of parameter values, some
+portions of which may be pathological without this be-
+ing apparent (indeed the “corners” – the extreme ranges
+of the prior – constitute 99.8% of the volume in a 10 di-
+mensional space [5]). Only after these assumptions can
+the model probability be computed.
+The ﬁnal quantity for selecting models is their evidence
+value, the mean likelihood averaged over the prior. Since
+probability must sum to unity, large parameter spaces,
+or spaces where the prior extends widely, are strongly
+penalized. Doesn’t this make sense, though? Shouldn’t
+we apply Occam’s Razor to shave the models with more
+“hair”? We agree that the consistency of data with a
+model with few parameters can be a useful guide, but
+there are several points that caution against overly strict
+application of model selection: shaving blindly with Oc-
+cam’s Razor is a dangerous activity.
+For one thing, there is only one universe accessible
+to us, so prior probability has a very limited meaning.
+If only one point in the model parameter space ﬁts the
+data, nevertheless our universe may be described by that
+model. Indeed, even the number of models being com-
+pared inﬂuences the probabilities, as the Bayesian evi-
+dence is calculated under the constraint that the total
+probability must sum to unity.
+For another, any model that somewhere ﬁts the data
+must be allowed to live or else we sacriﬁce the good with
+the bad. If there is one “ﬁt” fruit on a tree with bad
+apples, using model selection criteria everything would
+be thrown away without exception.
+The role of the prior for model selection is crucial, yet
+the method of selection of the prior is completely un-
+deﬁned. Consider the equation of state phase space w-
+w′, where w is the equation of state ratio of the dark
+energy pressure to energy density, and w′ = dw/d ln a.
+Should we choose a prior distribution uniform in w and
+w′, or perhaps uniform in w and ˙w = Hw′ – the Bayesian
+evidence will be diﬀerent in the two cases and models
+may be ruled out in one case but not the other.
+Or
+should we choose a uniform prior in the ﬁeld values φ
+and ˙φ? Perhaps ˙φ2 and V , where V is the potential en-
+ergy and ˙φ2/2 the kinetic energy? Perhaps V and V ′,
+where V ′ = dV/dφ?
+What model selection tells us is
+an acceptable cosmology diﬀers in each case. The foun-
+dation, the priors, are essentially undeﬁned by physics
+but put in by the model selectors by hand. Indeed it is
+tempting to call this approach “prior selection” rather
+than model selection. Many of these issues are indeed
+recognized in the statistics community (see, e.g., [6]), if
+not with full emphasis on physical ﬁdelity.
+Mathematical simplicity – the essential weighting for
+model selection – does not necessarily accord with phys-
+ical simplicity.
+We do not always recognize simplicity
+when we see it. Consider the model spanned by the coef-
+ﬁcients of a polynomial function f(x) = a0+a1x+a2x2+
+. . . Model selection will deal harshly with it, despite that
+the apparent complexity – in some cases an inﬁnite num-
+ber of parameters – sometimes represents simplicity, such
+as f(x) = ex, with zero parameters. Conversely, mod-
+els which appear simple can hide deeper complexity, e.g.
+where a Gaussian is actually approximating the convolu-
+tion of multiple functions.
+Braneworld models in a spatially ﬂat universe are ex-
+tremely simple, involving one parameter, the crossover
+distance.
+However if we do model selection in terms
+of the distance-redshift relation d(z), or the equation
+of state ratio w(z), it appears the braneworld models
+have many more parameters than the cosmological con-
+stant model. Model selection will penalize strongly the
+braneworld model for the apparent number of parame-
+ters, despite the underlying physics being quite simple.
+As another example, a constant equation of state model
+would appear to have many parameters if discussed in
+terms of redshift-binned densities ρ(zi) or principal com-
+ponents of the density (also see [7]). Thus the concept of
+simplicity is actually quite complicated. We discuss this
+further in §III, giving historical examples.
+Parameter ﬁtting allows us to compare cosmologies
+equally in the space describing cosmological distances,
+or densities, or equation of state, or somewhat “non-
+parametric” forms like principal components. Model se-
+lection imposes an unphysical overlayer of expectation on
+such comparisons, based on a perceived simplicity.
+Parameter ﬁtting does not require prior knowledge of
+the probability weighting within the parameter space; it
+allows the physics to, literally, impose “survival of the
+ﬁttest”.
+The most useful parameterizations are more-
+over motivated physically. Consider the equation of state
+phase space w-w′. While model selection would weight
+this as a whole, as two parameters, physics calls out cer-
+tain subregions of this space as being especially phys-
+ically relevant [8].
+In particular, thawing dark energy
+cosmologies, where the dark energy was locked by Hub-
+ble expansion drag in a cosmological constant like state
+in the early universe and more recently released to evolve,
+follow one-dimensional trajectories in a narrow region, or
+inverse power law models actually possess only a single
+equation of state parameter, not two. Model selection
+deweights these solutions because – although they may
+be perfectly good ﬁts – they reside in a larger param-
+eter space. Conversely, model selection favors constant
+equation of state models, with a single parameter, de-
+spite their being physically unstable, requiring a precise
+ﬁne tuning of the ratio between kinetic and potential en-
+ergies.
+
+3
+III.
+REALITY CHECK
+Prior to 1998, supernova distance data were consistent
+with a ﬂat, matter dominated universe. Model selection
+would have claimed strong evidence for the zero parame-
+ter SCDM (Ωm = 1) model, disfavored the general mat-
+ter dominated universe OCDM (Ωm ∈[0, 2], say), and
+dismissed a cosmological constant universe ΛCDM (Ωm
++ Λ). Simplicity does not automatically bring truth.
+Feynman famously pointed up the pitfall in calling on
+simplicity as a guidepost in physics by rewriting all of
+physics as ⃗U = 0, where each element of ⃗U contained
+the hidden structure, e.g. Newton’s second law as U1 =
+F −ma.
+Before 1992 the Bayesian evidence was overwhelming
+against structure in the cosmic microwave background,
+i.e. comparing the model parametrized by the temper-
+ature power spectrum multipoles Cℓ= 0 vs. the much
+larger parameter space spanned by C2, C3, etc. But no
+one would have taken such an argument seriously. (Of
+course using individual Cℓis a statistical approach not a
+physical one, but that is part of the point about needing
+physical input.)
+The galaxy two-point spatial correlation function for
+many years was thought to be a power law, with only
+two parameters, yet now we know there is little physics
+in that model; rather the apparent power law is nearly a
+coincidence from evolution in the true matter clustering
+and in the bias between mass and light.
+The mass power spectrum looks like a smooth curve
+yet we appreciate the deeper physics only by going to an
+apparently more complicated halo model involving the
+addition of multiple terms.
+In a particle physics context, the Fermi theory of
+weak interactions managed to describe all low-energy
+phenomenology with one single parameter, the Fermi
+constant GF .
+However, the underlying renormalizable
+physical theory, the Glashow-Weinberg-Salam Standard
+Model of electroweak interactions, has many more free
+parameters, and has also a realm of application much
+wider than that of the Fermi theory, which came to be
+regarded as just a low-energy eﬀective theory.
+These historical examples are clearest for information
+criteria approximations to the full Bayesian evidence, but
+such simplicity or “predictiveness” arguments apply to
+the evidence as well. While the full evidence factorizes
+out unconstrained parameters, these parameters may not
+be recognized, e.g. when an equation of state parameter
+is viewed in density or distance (see §II), and in any case
+the mere presence of more models aﬀects the evidence.
+Purely statistical ideas of simplicity are insuﬃcient in
+physics.
+To a large extent, beauty follows truth, not
+truth beauty. What we consider simple is what we un-
+derstand. A mess of spectral lines from a hydrogen atom
+is ugly until we understand the physics behind it, then we
+realize it is beautiful and simple. The simple cosmologi-
+cal constant hides, within present physics knowledge, all
+sorts of ugly ﬁne tunings, while a complicated equation
+of state w(z) may turn into something as beautiful as the
+hydrogen atom. Model selection forces us to give undue
+weight to our guess as to which is an ugly duckling and
+which will be a beautiful swan.
+IV.
+A WORKED-OUT EXAMPLE
+As a speciﬁc example of the overemphasis that model
+selection places on models with fewer parameters, despite
+the physics, we analyze constraints on dark energy from
+future data. For such data we take a distance-redshift
+survey over redshifts z = 0.1 −1.7, similar to the su-
+pernova half of the proposed SNAP satellite mission [9],
+supplemented by 300 local Hubble ﬂow (z = 0.03 −0.08)
+supernovae as will be provided from the Nearby Super-
+nova Factory (SNF) survey [10], and by measurement of
+the distance to the surface of CMB last scattering pro-
+vided by the ESA-NASA mission Planck [11].
+The supernovae (SNe) numbers and redshift distribu-
+tion are as given in [12].
+We include a linearly rising
+systematic error ﬂoor in each ∆z = 0.1 redshift bin of
+σsyst = 0.02z/1.7, to be added in quadrature in each red-
+shift bin to the measurement error given by σint/√NSN,
+with σint = 0.12 and NSN being the number of Type Ia
+SNe in that bin. We take a relative precision of 0.7% in
+the Planck distance measurement.
+A standard cosmological ﬁt analysis of actual SNAP
++ SNF + Planck data will produce a central value in
+the (w0,wa) plane (recall that wa = −2w′(z = 1)) and a
+contour around it encompassing some chosen conﬁdence
+level (CL), typically 68, 90, or 95%. The point corre-
+sponding to a cosmological constant (-1,0) may or may
+not lie inside the contour. If it does not, we may say that
+we exclude ΛCDM at that CL.
+More precisely, in a frequentist analysis in which one
+aims to prove or disprove ΛCDM, one would simulate
+the expected SNAP + SNF + Planck data sample as-
+suming a ΛCDM universe, and, analyzing this synthetic
+data sample as if it were the real data, one would draw a,
+say, 90% CL contour around the (-1,0) point, much like
+the one depicted as the inner contour in Fig. 1. (Note no
+assumption of Gaussianity in likelihoods has been made.)
+That contour tells us that, if ΛCDM is true, we expect to
+get a central value inside that contour in 90% of the ob-
+servations like SNAP + SNF + Planck that we may per-
+form. Therefore, if our one real SNAP + SNF + Planck
+observation delivers a central value outside that contour,
+irrespectively of its associated error ellipse, we will be
+able to say that we have excluded ΛCDM at greater than
+90% CL. For all true models deﬁned by (w0,wa) values
+outside that contour, we expect (in the statistical sense)
+the measured values to lie, indeed, outside, and so we
+expect to be able to select them over ΛCDM at greater
+than 90% CL.
+With the information criteria approach used by model
+selection advocates, one penalizes models with more pa-
+rameters. Various information criteria exist (see [3] for
+
+4
+-1.25
+-1
+-0.75
+-0.5
+-0.25
+0
+0.25
+0.5
+0.75
+1
+1.25
+-1.3
+-1.2
+-1.1
+-1
+-0.9
+-0.8
+-0.7
+w0
+wa
+-2∆ln L = 4.61 (90% CL)
+∆BIC = 6
+SNAP(SNe) + SNF + Planck
+Linearly rising systematic error included
+Thawing
+Thawing
+Freezing
+Freezing
+Λ
+FIG. 1:
+Conﬁdence-level contours for a SNAP(SNe) + SNF
++ Planck combined data sample. The cosmological models
+deﬁned by (w0,wa) lying outside the inner contour would be
+favored over ΛCDM at more than 90% CL by a standard
+ﬁtting analysis. The models lying inside the outer contour
+would be strongly rejected by a BIC analysis. The shaded
+area in between the contours corresponds to the loci of models
+that, if realized in nature, would be preferred at over 90% CL
+by ﬁtting, but strongly, and wrongly, rejected by BIC.
+an overview); here we concentrate on the Bayesian In-
+formation Criterion (BIC), which is closely related to
+the Bayesian evidence but frequently used because it
+is simpler to compute.
+The outer contour in Fig. 1
+shows the formal BIC contour corresponding to ∆BIC ≡
+BIC(w0, wa) −BIC(ΛCDM) = 6. Values of ∆BIC ≥6
+indicate strong evidence against the model being probed.
+That is, for all models deﬁned by (w0,wa) inside the
+outer contour of Fig. 1, BIC would give strong evidence
+against them and strong evidence supporting, instead,
+ΛCDM. (In contrast, the iso-contour in likelihood L with
+−2∆ln L = 9.48 (not shown), which, with the penalty
+from (w0, wa) models having two additional parameters
+beyond ΛCDM, roughly corresponds in our problem to
+∆BIC = 6, yields a 99.13% CL against ΛCDM in the
+ﬁtting analysis.)
+For this combined data sample, one can say that a
+Bayesian Information Criterion analysis misinforms us
+about, i.e. spuriously rules out, all models inside the
+dashed contour.
+In order for BIC to give the same
+hint against ΛCDM that the standard ﬁtting analysis
+gives at 90% CL, one has to go in this case to a con-
+tour with ∆BIC = −2 (or roughly −2∆ln L = 17.48),
+which would extend to the margins of the ﬁgure. Note
+−2∆ln L = 17.48 corresponds to 99.98% CL in the ﬁtting
+analysis. That is, only when the ﬁtting analysis gives Λ
+less than a 2 × 10−4 chance of being correct, does model
+selection start to give a weak hint of preference for the
+(w0, wa) model, turning away from the incorrect model
+ΛCDM.
+For all models whose (w0,wa) lies between the two
+contours in Fig. 1 the standard ﬁtting analysis would
+guide us away from ΛCDM, while the BIC analysis would
+strongly, and wrongly, discard the true – by construction
+– model. Such are the dangers of model selection based
+on simplicity arguments.
+Indeed the area of the BIC
+“misinformation” region is larger than the entire region
+where Λ is viable according to standard ﬁtting. Fig. 1
+also shows the physically motivated freezing and thaw-
+ing regions [8] where models should generically lie. We
+see that BIC is particularly slanted against the half of
+the physical space that is thawing models.
+V.
+PREDICTION AND SURVEY DESIGN
+As shown from the historical examples in §III, model
+selection is unsuitable for predicting constraints from fu-
+ture data and surveys.
+Physics input, not statistical
+probability, is required for assessing the value of future
+surveys.
+Claims for survey optimization that average likelihoods
+over prior probabilities are basically betting on absence
+of any physical structure. A similar assumption was ad-
+dressed in [13] where it was shown that a ﬁgure of merit
+based solely on the area of the conﬁdence region was ro-
+bust only on abdication of physics input. Such a “blank
+map” approach was there called Snarkian statistics, af-
+ter Lewis Carroll’s poem, “The Hunting of the Snark”.
+Using model selection to design surveys or plan for the
+future based on present consistency with the cosmologi-
+cal constant is similarly like saying the snark hunters are
+well served by a “map representing the sea without the
+least vestige of land” because the sea so far has been fea-
+tureless: it may be simple and favored in model selection,
+but is not to be trusted for navigating if reefs and islands
+– structure – may exist.
+Standard parameter ﬁtting methods should and can
+test if the model framework is reasonable or not, as men-
+tioned in §II. In particular, the cosmological w0-wa pa-
+rameterization was speciﬁcally invented from the physi-
+cal motivation of scalar ﬁeld behavior [14] and has been
+carefully shown to be largely safe from bias [13]. Good-
+ness of ﬁt alerts us to problems in the parameterization,
+informs us if we should enlarge the parameter space (e.g.
+by comparison of the results of data subsets or multi-
+ple probes – a very important aspect of learning about
+dark energy physics), and allows comparison of disjoint
+models that do not share a parameter space. We do not
+need to know a priori the probabilities at every point in
+parameter space; the data lead us.
+
+5
+VI.
+CONCLUSIONS
+When coupled with strong physical inputs, tests of ro-
+bustness against priors, and precise data, model selection
+techniques can be a useful companion to the standard
+parameter ﬁtting approach. They are not, however, a
+panacea or a way to draw conclusions stronger than ac-
+tual data can support. We cannot get answers about the
+physics before we get the data. The sensitivity to prior
+guesses about the probability of the correct physics runs
+the risk of turning this approach into “prior selection”
+rather than model selection.
+Overenthusiastic application of model selection has led
+to some claims about the probability of future experi-
+ments failing to see characteristics such as dynamics that
+current data cannot access. Such statistical pronounce-
+ments from the shaky foundation of priors are reminis-
+cent of the Dao De Qing, which lessons us that “Without
+going outside, you may know the whole world, without
+looking through the window, you may see the ways of
+heaven. The farther you go, the less you know.” Though
+a larger parameter space – representing “farther” physics
+– has many points that fail to ﬁt, only one point needs
+to be correct, and that large parameter space may arise
+from a simple, beautiful theory once we understand it.
+As the eminent statistician C.R. Rao puts it, “The [in-
+formation] criteria do not take into account the purpose
+for which the model is estimated and the loss incurred in
+using the estimated distribution to predict future events”
+[15].
+Parameters should have physical meanings, and statis-
+ticians’ model eﬃciency then takes a back seat to physical
+ﬁdelity. Through a concrete example we showed how a
+statistical Information Criterion can decisively rule out
+a physical model – incorrectly.
+Furthermore, the mis-
+information area of model selection exhibited in Fig. 1
+grows even larger with more parameters. Recalling our
+Standard Model analogy of §III, we should have no ex-
+pectation that the physics of 75% of the universe’s energy
+density can be explained by a single number.
+Acknowledgments
+We thank Don Groom, and Andrew Liddle for lively
+discussions. This work has been supported in part by the
+Director, Oﬃce of Science, Department of Energy under
+grant DE-AC02-05CH11231.
+[1] R. Trotta, arXiv:astro-ph/0607496
+[2] A.R.
+Liddle,
+P.
+Mukherjee,
+D.
+Parkinson,
+and
+Y.
+Wang,
+Phys.
+Rev.
+D
+74,
+123506
+(2006)
+[arXiv:astro-ph/0610126]
+[3] A.R.
+Liddle,
+MNRAS
+377,
+L74
+(2007)
+[arXiv:astro-ph/0701113]
+[4] G.D. Starkman and R. Trotta, Phys. Rev. Lett. 97,
+201301 (2006) [arXiv:astro-ph/0607227]
+[5] T.
+Loredo,
+http://astrostatistics.psu.edu/su05/
+bayes freq2.pdf
+[6] W.H.
+Jeﬀerys,
+http://astrostatistics.psu.edu/scma4/
+Jeﬀerys.pdf
+[7] V. Sahni and A. Starobinsky, Int. J. Mod. Phys. D 15,
+2105 (2006) [arXiv:astro-ph/0610026]
+[8] R. R. Caldwell and E. V. Linder, Phys. Rev. Lett. 95,
+141301 (2005) [arXiv:astro-ph/0505494].
+[9] G.
+Aldering
+et
+al.
+[SNAP
+Collaboration],
+arXiv:astro-ph/0405232.
+[10] W. M. Wood-Vasey et al., New Astron. Rev. 48, 637
+(2004) [arXiv:astro-ph/0401513].
+[11] http://planck.esa.int
+[12] A. G. Kim, E. V. Linder, R. Miquel and N. Mostek,
+Mon.
+Not.
+Roy.
+Astron.
+Soc.
+347,
+909
+(2004)
+[arXiv:astro-ph/0304509].
+[13] E.
+V.
+Linder,
+Astropart.
+Phys.
+26,
+102
+(2006)
+[arXiv:astro-ph/0604280].
+[14] E.V.
+Linder,
+Phys.
+Rev. Lett.
+90,
+091301
+(2003)
+[arXiv:astro-ph/0208512]
+[15] C.R.
+Rao,
+http://astrostatistics.psu.edu/su05/
+rao060705.pdf

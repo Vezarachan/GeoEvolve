@@ -1,0 +1,355 @@
+arXiv:0803.1795v1  [astro-ph]  12 Mar 2008
+Astrophysics and Space Science
+DOI 10.1007/s•••••-•••-••••-•
+The search for Primordial Quark Nuggets among Near
+Earth Asteroids
+J. E. Horvath
+c⃝Springer-Verlag ••••
+Abstract Primordial Quark Nuggets,remnants of the
+quark-hadron phase transition, may be hiding most of
+the baryon number in superdense chunks have been dis-
+cussed for years always from the theoretical point of
+view. While they seemed originally fragile at interme-
+diate cosmological temperatures, it became increasingly
+clear that they may survive due to a variety of eﬀects
+aﬀecting their evaporation (surface and volume) rates.
+A search of these objects have never been attempted to
+elucidate their existence. We discuss in this note how
+to search directly for cosmological fossil nuggets among
+the small asteroids approaching the Earth.
+“Aster-
+oids” with a high visible-to-infrared ﬂux ratio, constant
+lightcurves and devoid of spectral features are signals
+of an actual possible nugget nature. A viable search
+of very deﬁnite primordial quark nugget features can
+be conducted as a spinoﬀof the ongoing/forthcoming
+NEAs observation programmes.
+Keywords Quark Nuggets, Dark matter, Near Earth
+Asteroids
+1 Introduction
+Primordial quark nuggets (PQNs) have been postulated
+to contain most of the baryonic number of the uni-
+verse many years ago (Witten, 1984), being a physical
+realization of the so-called strange matter hypothesis.
+The strange matter hypothesis states that a cold, cat-
+alyzed form of the quark gluon plasma could be the true
+ground state of the hadronic matter and, if formed at
+the QCD scale when color become conﬁned, remnants of
+J. E. Horvath
+Instituto de Astronomia, Geof´ısica e Ciˆencias Atmosf´ericas, Uni-
+versidade de S˜ao Paulo, Rua do Mat˜ao 1226 , 05508-090 S˜ao
+Paulo, SP, Brazil
+substellar mass could help to ”hide” the baryon number
+content and achieve a large value of Ωmatter ∼0.25 now
+favoured by observations. The initial excitement about
+this possibility gave place to several analysis addressing
+whether the PQN could survive from the initial high-
+temperature environment until the lower temperature
+universe, where the contribution −T S to their free en-
+ergy make them stable against evaporation-boiling. In
+fact both processes (evaporation of ordinary hadrons
+from the surface and bulk conversion -boiling-) have
+been examined with varying results (Madsen and Ole-
+sen, 1991; Alcock and Olinto, 1989; Olesen and Mad-
+sen, 1993; Sumiyoshi and Kajino, 1991).
+Generally
+speaking, it can be stated that the slower the pro-
+cess, the larger the mass that can survive; thus it is
+of great interest to pinpoint the realistic models to es-
+timate reliably a surviving mass. It is generally agreed
+that the latter can not be larger than the mass in-
+side the horizon, corresponding to a baryon number of
+Ahor = 1049( 100 MeV
+Tqcd
+) (where Tqcd is the temperature
+for the conﬁnement phase transition, assumed to be
+ﬁrst order); and while no consensus has been achieved
+on the exact value of this surviving nugget mass, val-
+ues as low as A = 1040 have been estimated in the
+literature (Sumiyoshi and Kajino, 1991; Bhattacharyya
+et al., 2000). Recently we have shown that the inclu-
+sion of pairing eﬀects in strange matter would increase
+the binding energy of the nugget and hence push down
+the survival mass substantially (Lugones and Horvath,
+2004). There is a strong belief that dense quark mat-
+ter should undergo pairing of some of all quark ﬂavors,
+although the precise form of the phase diagram is still
+under debate (Alford, 2006).
+Given this attractive possibility we address here a
+novel and feasible search for PQN in the asteroidal-mass
+range; in several senses complementary to the searches
+of smaller masses (nuclearities) already performed or
+underway (Finch, 2006). We present a discussion of the
+
+2
+general features of the nuggets in Section 2. Section 3
+addresses the detectability of this population by photo-
+metric and spectroscopic techniques. A discussion and
+some conclusions are summarized in last Section.
+1.1 Primordial Quark Nuggets
+According to the Bodmer-Witten-Terazawa hypothe-
+sis (Witten, 1984; see previous work by Bodmer, 1971
+and Terazawa, 1979), a stable form of the QGP with
+high strangeness content could be self-bound and there-
+fore form objects from a minimum (nuclear) size until
+∼M⊙at the onset of the general relativistic instability.
+While the former (“strangelets”) are amenable to parti-
+cle search techniques (Klingenberg, 1999) and the latter
+may constitute compact stars (Witten, 1984; Alcock,
+Farhi and Olinto, 1986; Haensel, Zdunik and Schaeﬀer
+1986; Benvenuto and Horvath 1989), in the interme-
+diate range PQNs would resemble extremely compact
+asteroids.
+For constant density ρ = 5 × 1014g cm−3
+(which is an excellent approximation for this range; see
+Alcock, Farhi and Olinto, 1986) the size of the nuggets
+is
+RN = 2 × 102 ×
+
+MN
+10−12M⊙
+ 1
+3
+cm
+(1)
+and we have scaled to the mass corresponding to a
+baryon number A = 1045 above the evaporating mass
+(Lugones and Horvath, 2004).
+Because of the large size of the galactic halo, the
+isotropic nugget ﬂux of this mass-scale is always very
+small, of the order of 3 × 10−37cm−2s−1sr onto the
+Earth neighborhood. For a minimum approach of one
+PQN at a distance D ≤2× the Earth-Moon distance,
+or 2 × RMoon (see below) a passage would happen at
+a rate 10−6 yr−1.
+This small rate gives no hope for
+detecting PQNs freely roaming the halo passing by in
+open orbits.
+A captured nugget population in orbit provides much
+better prospects. To be captured by the gravitational
+ﬁeld of the Sun the nuggets coming from an isotropic
+ﬂux must loose energy and angular momentum. A ﬁrst
+viable mechanism would be a number of ﬂyby encoun-
+ters with stars in the galactic disk.
+Then a fraction
+of these slower nuggets, having now E ≳0 respect
+to the solar potential would be captured in ﬂy-by en-
+counters with Jupiter. Let us stress that even if the
+distribution of PQNs will not slow down statistically,
+individual objects from that distribution may be eﬀec-
+tively captured by this mechanism.
+The PQNs with
+this mass-scale do not slow down appreciably even by
+passing through stars, since the basic energy loss rate
+dE/dt = −πR2
+Nρmatterv3
+N (with ρmatter the density of
+the traversed stellar material and vN the nugget veloc-
+ity ∼250 km s−1) is many orders of magnitude smaller
+than the incoming kinetic energy of the nugget.
+The estimated number of PQNs eﬀectively captured
+is always tiny, but perhaps enough to yield 10-100 of
+them bound to the solar system out of the ∼1023
+existing in the whole galactic population.
+Note that
+this capture rate, if extrapolated to all the stars in the
+disk, would still mean a total capture nugget fraction
+of ≤10−10. A variety of orbital elements is expected
+because of the random incidence, however, since the
+nuggets would have Apollo-like, planet-crossing orbits,
+their residence in the solar system would be limited to a
+dynamical time of ≤10 Myr. Finally, there should be a
+huge number (≥107) of PQN at a given time inside the
+bounds of the solar system, adding up to a mass com-
+parable to several times the Earth’s mass. They may be
+perturbed and directed to the inner solar system much
+in the same way that ordinary cometary nuclei do, only
+that they would remain unseen most of the time. The
+identiﬁcation of the tiny dense nuggets among the sub-
+population of NEAs would be the subject of the next
+section.
+2 How to detect nuggets among NEAs
+A great deal of attention has been paid recently to the
+issue of NEAs and the possible hazards for the Earth in
+the case of direct collisions. Actually, a few observing
+programs to look for close-by encounters are already op-
+erating (for example, Spacewatch, see Mc Millan, 2006)
+or being implanted.
+A huge number of small NEAs,
+those not very hazardous to the Earth in the ballpark
+of ∼tens of meters are being currently detected. The
+observations indicate that at a given time > 100 aster-
+oids pass closer than the Moon, while at least one of
+∼30 m and ≃10 of about 10 m collide with the Earth
+each year. At a distance comparable to the Moon these
+would have magnitudes mv = 13 and 15.5 respectively
+(assuming, as usual, a zero phase angle; see Paczy´nski,
+2006). These fast-moving boulders would be visible for
+a ∼days at most because of their high velocities rela-
+tive to the Earth, of the order of 20 km s−1.
+As is well-known, one of the simplest forms for de-
+termining the albedo A (and hence gather information
+on their composition) of an asteroid is to perform at
+least simultaneous V and I images to infer A from the
+quotient of ﬂuxes.
+The exotic nature of the nuggets
+allows one relatively easy form of distinguishing them
+from conventional asteroids: since the strange quark
+matter is expected to have a plasma frequency as high
+
+Quark nuggets among NEAs
+3
+as 20 MeV (well in the hard γ-ray frequencies), the bare
+quark surface would act as a perfect mirror to the in-
+cident solar light. Hence, contrary to the case of even
+metallic asteroids for which A ∼0.1, we expect albe-
+dos ≈1 and therefore a quotient FV /FI much larger
+than any reasonable normal surface. Therefore a PQN
+would appear to have a magnitude mV ≃20 at a dis-
+tance ∼RMoon, looking like a larger “normal” asteroid
+but showing the abnormal ﬂux quotient. Speciﬁc pro-
+grammes like the Spacewatch (Mc Millan, 2006) already
+mentioned and several other programs (see for example
+the compilation of the NASA, 2007) currently monitor
+objects fainter than mV ∼20, and should be able to
+detect ∼1 m nuggets out to ∼RMoon (hence the dis-
+tance estimate given in the former Section). A recent
+discussion by Paczy´nski (2006) has shown the conve-
+nience of a satellite at the L1 Lagrangian point for the
+NEAs study and early alert. The main diﬃculties for
+such identiﬁcations are the high proper motion of the
+candidates, which render them observable for a short
+time ∼1 day, and also the large number of candidates
+in a given night, provided that there is no simple way
+of selecting a subsample, for instance, based on orbits.
+A second prediction for these objects is that their
+spectra would be essentially solar and devoid of any
+characteristic line that distinguish asteroidal composi-
+tions. This seems promising, although spectroscopy of
+dim fast-moving objects is certainly diﬃcult.
+In any
+case the slower candidates (say, with µ ≤1”/s) could be
+scanned by suitably setup devices. Thus both the pho-
+tometric and spectroscopic measurements would show
+signatures of the exotic nugget features diﬃcult to miss
+for good observational data. This feature (and the for-
+mer ﬂux quotient as also) implicitly assumes that the
+surface of the nugget is not covered with normal mat-
+ter, which would restore the ability of radiating con-
+ventionally the reﬂecting light. The situation is quite
+like the discussion of strange stars (Alcock, Farhi and
+Olinto, 1986; Haensel, Zdunik and Schaeﬀer 1986; Ben-
+venuto and Horvath 1989), but now referring to much
+smaller objects, 12 orders of magnitude less massive
+than a strange star, with a correspondingly small sur-
+face gravity. This consideration supports, but does not
+prove, the expectation of a bare surface.
+A third complementary signature could be obtained
+by precise stellar occultation observations, given that
+the tiny nugget with high albedo would mimic a larger
+radius asteroid (at least 10 times bigger) but would
+show a very short occultation time corresponding to
+a small and sharp edge ball. Even the lack of occulta-
+tion where it should be one (if the asteroid was normal)
+could be helpful for characterizing the PQN candidates.
+Finally we note that a very uniform light curve, (in con-
+trast with most of the asteroids of irregular size which
+tumble and rotate) is expected from the spherical super-
+dense nugget, quite independently of the wavelength.
+This completes a short list of testable predictions for
+these objects.
+Several contemporary sources (as opposite to the dis-
+cussed primordial population) that could supply a ﬂux
+of small nuggets have been advanced, like the disrup-
+tion of binary strange stars (Madsen, 2005; however see
+Klu´zniak and Lee, 2002 for a calculation of a strange
+star-black hole encounter not leaving any ejected de-
+bris).
+It is amusing to note that long ago Friedman
+and Caldwell (1991) predicted the stripping of nuggets
+of precisely A = 1045 from the simple balance of tidal
+and surface forces in a binary merging. However, the
+small number of events of this type ∼10−5yr−1 argues
+against stripped nuggets of this origin being a signif-
+icant source when compared to the hypothetical pri-
+mordial population, and in any case there is no way for
+distinguishing both.
+The possibility of a direct impact onto the Earth is
+extremely small (about one event per Hubble time) for
+halo PQNs, but grows considerably for a captured pop-
+ulation. Speciﬁc signatures of such an hypothetic colli-
+sion (likely giving rise to a huge epilinear earthquake)
+have never been worked out in full detail.
+However,
+lighter PQNs from astrophysical origin may be candi-
+dates to direct impacts with masses down to tens of
+tons (see Herrin, Rosenbaum and Teplitz, 2006, for this
+milder but related signal search).
+3 Conclusions
+We have discussed some observations which may pos-
+sibly test the presence of a population of primordial
+quark nuggets captured in solar orbits. We have been
+led by the fact that the mass range predicted by the-
+oretical calculations falls precisely in the ballpark of
+small asteroids, and by the existence of advanced pro-
+grammes of NEAs search. We suggested a few obser-
+vational tests to reveal the nature of the nuggets as
+they approach the Earth. If an eﬃcient setup for the
+fast-moving candidates can be established it would be
+possible to identify some deﬁnite signatures predicted
+by the basic physics of the nugget surface reﬂecting sun-
+light. Although the search for PQNs could be diﬃcult
+and take several years, the payoﬀwould be uttermost
+rewarding even if they are not ﬁnally found.
+In any
+case, valuable information about the normal asteroid
+population would be gathered. Few other programmes
+could be suitable for searching such an elusive primor-
+dial relics.
+
+4
+Acknowledgements
+CNPq (Brazil) is acknowledged
+for ﬁnancing JEH through a fellowship. C. Beaug´e, F.
+Roig and S. Ferraz-Mello have provided scientiﬁc ad-
+vice to this work. Finally, the criticisms of an anony-
+mous referee have added a few interesting points to the
+present article.
+
+Quark nuggets among NEAs
+5
+References
+Alcock, C., Olinto, A.V.: Phys. Rev. D 39, 1233 (1989)
+Alcock, C., Farhi, E., Olinto, A.V.: ApJ310, 261 (1986)
+Alford, M.G.: hep-lat/0610046 (2006) and references therein
+Benvenuto, O.G., Horvath, J.E.: MNRAS241, 43 (1989)
+Bhattacharyya, A., Jan-e Alam, Sarkar, S., Roy, P., Sinha,
+B., Raha, S., Bhattacharjee, P.: Phys. Rev. D61, 083509
+(2000)
+Bodmer A.: Phys. Rev. D4, 1601 (1971)
+Caldwell, R.R., Friedman, J.L.:
+Phys. Lett. B264, 143
+(1991)
+Finch, E.: nucl-ex/0605010 (2006)
+Haensel, P.; Zdunik, J. L.; Schaefer, R.:
+A&A160, 121
+(1986)
+Herrin, E. T.; Rosenbaum, D. C., Teplitz, V. L.: Phys. Rev.
+D 73, 043511 (2006)
+Klinbenerg, R.: Jour. Phys. G25, R273 (1999)
+Klu´zniak, W., Lee, W.: MNRAS335, L29 (2002)
+Lugones, G., Horvath, J.E.: Phys. Rev. D69, 063509 (2004)
+Madsen, J., Olesen, M.: Phys. Rev. D 43, 1069 (1991)
+Madsen, J.: J. Phys. G31, 833 (2005)
+McMillan, R. S., in Near Earth Objects, Our Celestial
+Neighbors: Opportunity and Risk, International Astro-
+nomical Union. Symposium 236, (2006), unpublished
+NASA info available at http://neo.jpl.nasa.gov/programs/
+(2007)
+Olesen, M., Madsen, J.: Phys. Rev. D47, 2313 (1993)
+Paczy´nski, B.: astro-ph/0609161 (2006)
+Sumiyoshi, K., Kajino, T.: Nucl. Phys. B. Proc. Supp. 24,
+80 (1991)
+Terazawa H.: INS-Report 336 (1979), unpublished
+Witten E.: Phys. Rev. D 30, 272 (1984)
+This manuscript was prepared with the AAS LATEX macros v5.2.

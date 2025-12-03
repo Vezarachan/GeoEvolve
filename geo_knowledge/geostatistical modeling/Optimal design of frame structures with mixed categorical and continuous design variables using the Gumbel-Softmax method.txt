@@ -1,0 +1,1570 @@
+Optimal Design of Frame Structures with Mixed Categorical and
+Continuous Design Variables Using the Gumbel-Softmax Method∗
+Mehran Ebrahimi†,a, Hyunmin Cheonga, Pradeep Kumar Jayaramana, and Farhad Javida
+aAutodesk Research, 661 University Avenue, Toronto, ON M5G 1M1, Canada
+Abstract
+In optimizing real-world structures, due to fabrication or budgetary restraints, the design vari-
+ables may be restricted to a set of standard engineering choices. Such variables, commonly
+called categorical variables, are discrete and unordered in essence, precluding the utilization of
+gradient-based optimizers for the problems containing them. In this paper, incorporating the
+Gumbel-Softmax (GSM) method, we propose a new gradient-based optimizer for handling such
+variables in the optimal design of large-scale frame structures. The GSM method provides a
+means to draw differentiable samples from categorical distributions, thereby enabling sensitivity
+analysis for the variables generated from such distributions. The sensitivity information can
+greatly reduce the computational cost of traversing high-dimensional and discrete design spaces
+in comparison to employing gradient-free optimization methods. In addition, since the developed
+optimizer is gradient-based, it can naturally handle the simultaneous optimization of categorical
+and continuous design variables. Through three numerical case studies, different aspects of the
+proposed optimizer are studied and its advantages over population-based optimizers, specifically
+a genetic algorithm, are demonstrated.
+Keywords Categorical design variables, Gumbel-Softmax method, Frame structures, Structural
+optimization, Differentiable sampling, Sensitivity analysis
+1
+Introduction
+The application of frame structures composed of interconnected beams and columns is ubiquitous
+in various fields of engineering making their simulation and optimization attractive subjects of
+interest in both academia and industry [1–4]. Commonly, the finite element (FE) analysis of frame
+structures is performed by modeling their components with beam elements which are capable
+of undergoing longitudinal (axial), transverse (bending) and torsional deformations, unlike truss
+∗This is a preprint of an article published in Structural and Multidisciplinary Optimization. The final authenticated
+version is available online at: https://doi.org/10.1007/s00158-024-03745-7.
+†E-mail address: mehran.ebrahimi@autodesk.com
+1
+arXiv:2501.00258v1  [cs.CE]  31 Dec 2024
+
+elements that can handle only the first one. Accurately capturing these deformation modes and
+their interactions makes the simulation of frame structures computationally more demanding than
+that for truss structures [4]. The difference becomes particularly more noticeable and exceedingly
+cumbersome in the optimal design of large-scale frame structures which has led to considerably
+fewer extensive investigations of this topic for such structures in the literature.
+The focus of the present paper is the optimal design of frame structures with mixed categorical and
+continuous design variables. Categorical design variables are inherently discrete and their values
+belong to an unordered set of available choices. Examples of such variables in frame structures
+include beam cross-sections (profiles) and materials.
+In real-world applications, only a limited
+number of cross-sectional profiles and material choices may be available to design a structure due
+to various limitations such as manufacturing process and cost. For instance, the beam material
+may only be steel or aluminum, and its cross-section may only be I-profile or T-profile with limited
+options for their geometrical attributes. Therefore, for practical purposes, it is crucial to distinguish
+between categorical and continuous design variables, as the latter ones are free to take any value
+within their bounds and are more straightforward to handle.
+The challenges associated with considering categorical design variables are not exclusive to frame
+structures and have been explored significantly in other application areas [5–9].
+Of particular
+relevance to this paper are truss structures and the techniques developed for handling categorical
+variables therein. A worthwhile review of the available techniques for truss structures can be found
+in [10]. Although frame and truss structures behave differently, they bear a close resemblance in the
+way they are designed. Thus, the methodology and arguments presented in this paper are directly
+applicable to truss structures as well.
+Broadly, existing optimization techniques applied to structural problems with categorical variables
+can be classified into gradient-free and gradient-based schemes. The majority of methods developed
+for these problems utilize gradient-free optimizers such as the branch-and-bound [2, 11], genetic
+algorithm (GA) [12,13], simulated annealing [14,15] and particle swarm optimization [16,17], among
+others. It is well-known that due to the combinatorial nature of problems with categorical design
+variables, the computational cost associated with exploring their design space, which typically
+grows exponentially with the number of variables, becomes intractable for large-scale problems
+using the gradient-free optimization routines [18–20]. Hence, most cases studied in the literature
+involve structures with a small number of components and a few (predominantly two) categorical
+choices per element (component).
+Employing gradient-based optimization techniques can be considered as a remedy to alleviate the
+scalability issue [10,19,21]. However, as the categorical variables are discrete and more importantly
+unordered, computing the gradients of objective and constraint functions with respect to these
+variables is problematic. There are hence rare precedents of incorporating gradient-based optimiz-
+ers in the optimal design of beam and truss structures with categorical design variables [22–25].
+The proposals in this area apply some form of approximation to compute the function gradients
+with respect to the categorical variables (e.g., relaxation of discrete to continuous variables [23],
+which only makes sense if the variables are ordered) along with rounding techniques to enforce the
+discreteness of the categorical variables. In another body of work [22, 24], the weights associated
+2
+
+with each categorical choice, in their case material types, are treated as design variables. Subse-
+quently, in [22] the Heaviside function has been applied to penalize the intermediate weight values
+to a particular categorical choice.
+One can think of several scenarios where these approaches fall short and a more robust technique
+is desired. For instance, if cross-sectional profiles are design variables in a problem, say I-, T-
+and U-profiles, it is mathematically challenging (if not impossible) to interpret the meaning of
+the gradient of a function with respect to these profiles in a direct sense. One possible solution
+to this problem is to work with the attributes of categorical variables. For example, instead of
+operating directly on the cross-sectional profiles, their areas can be taken as design variables.
+However, this becomes troublesome when categorical variables have multiple attributes influencing
+the optimization progress in a conflicting manner, such as for a cantilever beam under gravity
+where its cross-sectional area and its second moment of area can affect the beam’s deflection in
+opposing ways. Furthermore, relaxing the discrete variables to continuous ones—inspired by the
+SIMP method for the topology optimization of solid structures [26]—is often limited to problems
+wherein categorical variables are ordered or have only two choices.
+In this paper, we propose a technique for resolving the aforementioned issues in computing the
+gradients with respect to categorical variables, thus enabling the use of gradient-based optimizers
+in structural design problems. This novel optimization scheme is founded upon two main ideas.
+Firstly, we propose reparametrizing the categorical design variables and taking the probability of
+using them in the structure as their corresponding design variables. For instance, if a categorical
+variable is a beam’s cross-section chosen from I-, T- and U-profiles, we propose taking the prob-
+abilities of having I-, T- and U-profiles for that beam as its corresponding design variables. As a
+result, instead of discrete variables, the optimizer deals with continuous ones. Consequently, the
+optimization functions must be reparameterized in terms of the probabilities and their sensitivity
+analysis must be carried out with respect to these probabilities, the details of which are presented
+in the forthcoming sections. Obviously, defining functions in terms of probabilities makes them
+probabilistic (i.e., stochastic) and in order to compute their values a sampling process is involved,
+which is in general nondifferentiable. Therefore, secondly, we propose using the Gumbel-Softmax
+(GSM) technique for making the sampling process differentiable [27,28].
+The GSM method is a relaxed version of the original Gumbel-Max (GM) method [29] that provides
+a simple mechanism for drawing differentiable samples from a categorical probability distribution
+parameterized by the unnormalized log-probabilities of the classes (choices) of that categorical
+variable [30]. In recent years, since the seminal papers [27] and [28], the GSM method and its
+variants have garnered significant attention in the machine learning community (e.g., [31–34]).
+The intrinsic commonalities between combinatorial problems in machine learning and (structural)
+engineering applications prompted us to explore the utilization of the GSM technique in frame
+structures. To the best of the authors’ knowledge, this study is the first of its kind to employ the
+GSM method in optimization problems involving mixed continuous and categorical design variables.
+The remainder of the present paper is organized as follows.
+Section 2 introduces the general
+problem formulation and the notations involved. In Section 3, we present the GSM method; the
+pivotal ingredient of the proposed optimization technique in this study. Then, in Section 4, the
+3
+
+details of the optimizer are laid out. Three numerical examples are provided in Section 5 to assess
+the performance of the developed optimizer and discuss its various aspects. Finally, the paper is
+concluded by making a few remarks about our proposal in this article and potential considerations
+for further improvement.
+2
+Problem statement
+The optimal design problem of a frame structure can be posed as follows. Given a frame struc-
+ture, find the optimum values of continuous design variables as well as optimum choices for the
+categorical design variables such that the target structural performance function is achieved and
+the governing linear elasticity equations due to a FE discretization and imposed constraints are
+satisfied. Accordingly, the topology of the structure does not change throughout the optimization
+routine. Denoting x := [x1, · · · , xnx]T and c := [c1, · · · , cnc]T as the vectors of continuous and
+categorical design variables, respectively, the optimization problem mathematically reads
+min
+x,c
+J (u(x, c), x, c)
+(1)
+subject to
+K(x, c) u(x, c) = f(x, c),
+g (u(x, c), x, c) ≤0,
+lbi ≤xi ≤ubi,
+i = 1, · · · , nx,
+ci ∈{1, · · · , Ni},
+i = 1, · · · , nc.
+In this equation, J is the scalar-valued objective function, g ∈Rng represents the vector of op-
+timization constraint functions, K ∈Rnu×nu indicates the structure’s stiffness matrix, f ∈Rnu
+specifies the external load vector, and u ∈Rnu denotes the vector of nodal displacements (state
+variables). Also, lbi and ubi, i = 1, · · · , nx, refer to the lower and upper bounds of the continuous
+variable xi, respectively. Furthermore, Ni, i = 1, · · · , nc, is the number of choices available for the
+categorical variable ci. Therefore, without loss of generality, we assume the existing choices for
+each ci, i = 1, · · · , nc, are indexed as {1, · · · , Ni}.
+Depending on the problem at hand and the capabilities of the FE solver, J and g can be linear or
+nonlinear functions of their arguments. Other than continuity and (at least first order) differen-
+tiability, we make no further assumptions on J and g. Given a structure, some examples of these
+functions include mass, compliance, displacement, von Mises stress and natural frequencies. Since
+the response of a structure is affected by the values of the design variables, the nodal displacements
+u are implicit functions of x and c. As mentioned in the introduction, we aim to use gradient-based
+optimizers to solve the problem in (1). However, due to the challenges elaborated earlier, direct
+4
+
+computation of ∇c J and ∇c g gives rise to mathematical hurdles. Thus, we restate (1) as
+min
+x,θ
+J (u(x, θ), x, θ)
+(2)
+subject to
+K(x, θ) u(x, θ) = f(x, θ),
+g (u(x, θ), x, θ) ≤0,
+lbi ≤xi ≤ubi,
+i = 1, · · · , nx,
+where θ := [θ1,1, · · · , θ1,N1, θ2,1, · · · , θ2,N2, · · · , θnc,1, · · · , θnc,Nnc]T denotes the vector of unnormal-
+ized log-probabilities of the categorical variables formulated in (3). The first and second indices in
+θi,j refer, respectively, to the variable index and its available choices’ index. If for a categorical vari-
+able i, the probability of using its Ni choices in the structure is defined by pi := [pi,1, · · · , pi,Ni]T ,
+then
+θi,j = logit(pi,j) := ln
+
+pi,j
+1 −pi,j
+
+,
+j = 1, · · · , Ni,
+(3)
+where pi,j is the likelihood of choice j for categorical variable i. Here, we opt for using unnor-
+malized log-probabilities θi,j, i = 1, · · · , nc, j = 1, · · · , Ni, as the design variables instead of their
+corresponding probabilities pi,j. Once the optimal values of θi,j’s are found, their corresponding
+optimal probabilities pi,j can be computed through the Softmax function as
+pi,j = (softmax(θi))j :=
+exp(θi,j)
+PNi
+k=1 exp(θi,k)
+,
+i = 1, · · · , nc, j = 1, · · · , Ni.
+(4)
+The benefits of using θi,js are twofold. Firstly, following (3), as opposed to pi,js that are between
+0 and 1, unnormalized log-probabilities θi,js are unbounded continuous variables and can take
+any value between −∞and +∞. Secondly, for each categorical variable i the probabilities must
+satisfy PNi
+j=1 pi,j = 1 at each optimization iteration, whereas working with its associated θi,js and
+eventually converting them to pi,js using (4) would naturally satisfy this constraint. This reduces
+the number of optimization constraints significantly, especially in large-scale problems.
+In order to utilize gradient-based optimizers, one needs to compute the sensitivities (gradients) of
+objective and constraint functions with respect to θ and x (i.e., ∇xJ, ∇xg, ∇θJ and ∇θg). Most
+often, in structural engineering problems, J and g are not explicit functions of the probabilities θ.
+For instance, for a categorical variable corresponding to a beam’s material, J and g are functions
+of the properties of the selected material such as its Young’s modulus or density, not the material
+itself as an object. Therefore, for all categorical variables, a sampling process must be performed
+independently to draw a sample from each of their existing choices based on their probabilities and
+then compute the values of J and g using that sample. The sampling process, however, in general
+breaks down the differentiability of these functions. This issue can be resolved by incorporating
+the GSM method. In the subsequent section, the GSM method and its application in having a
+differentiable sampling procedure are introduced.
+5
+
+3
+Differentiable sampling via the GSM method
+For conciseness, the subject of the current section is presented only for J. The same idea can be
+directly applied to the constraint functions g in a similar fashion. The goal is to compute the
+value of J and its gradient with respect to the vector of unnormalized log-probabilities θ. For
+the sake of brevity, we assume θ is associated with just one categorical variable with N choices
+and J is only a function of θ (and not x and u as in the previous section). More general cases
+are provided in Section 4. Note that J is not an explicit function of θ but rather the continuous
+attributes (properties) of a sample (i.e., choice) drawn from the categorical distribution function
+characterized by θ. In other words, once a sample is picked from the categorical distribution of θ,
+the value of J using the properties of this sample is computed.
+A categorical distribution function is a discrete probability distribution specifying the likelihood
+of the choices (classes) for a categorical random variable [35].
+For instance, applying (4), the
+categorical distribution of θ is pθ := {(softmax(θ))1, · · · , (softmax(θ))N}. A one-hot sample vector
+s can be generated from pθ utilizing Algorithm 1. The size of s is N and its entries are all 0 except
+for the index corresponding to the selected class at which its entry is 1. Suppose the attributes of
+the selected class are collected in a vector a. Since J is a function of θ through the drawn sample
+and its attributes, it can be formulated as J (a (s(θ))). The sensitivity of J with respect to θ
+therefore can be written as
+∇θJ = (∇θa)T ∇aJ = (∇sa ∇θs)T ∇aJ.
+(5)
+The sample vector s, generated by incorporating the common sampling process described in Algo-
+rithm 1, is not differentiable with respect to θ creating issues in computing ∇θs and consequently
+∇θJ in (5). The step causing nondifferentiability is Step 5. The GSM method resolves this issue
+by a simple yet remarkably efficient solution [29,36].
+3.1
+The GSM method
+We first introduce the GM method from which the GSM method is derived (recall that GM stands
+for Gumbel-Max). Define I(i) as an operator that returns a one-hot vector of size N with an entry
+of 1 at index i and zero elsewhere. In the GM method, a sample vector s is generated by
+s = I
+ 
+arg max
+i∈{1,··· ,N}
+
+θi + G(i)!
+,
+(6)
+where θi, i = 1, · · · , N, are unnormalized log-probabilities of the classes and G(i), i = 1, · · · , N,
+are independent and identically distributed samples (noises) generated from the standard Gumbel
+distribution Gumbel(0, 1). For each class index i, the noise G(i) can be obtained by independently
+sampling Gumbel(0, 1) through drawing a uniformly distributed random real number r and setting
+G(i) = −ln (−ln(r)) [27]. Therefore, instead of employing Algorithm 1, which is the common,
+nondifferentiable way of drawing samples from a categorical distribution, s can be drawn from θ
+6
+
+Algorithm 1: The common, nondifferentiable way of drawing samples from a categorical
+distribution
+Input: Unnormalized log-probabilities θ ∈RN associated with a categorical variable.
+Output: One-hot sample vector s.
+1 Initialize s ∈RN by zeros;
+2 Compute the probabilities pi, i = 1, · · · , N, using (4) and put them into a (not necessarily
+ordered) set pθ := {p1, · · · , pN};
+3 Calculate the corresponding cumulative distribution function as
+pθ := {0, p1, p1 + p2, · · · ,
+N−1
+X
+i=1
+pi};
+4 Choose a uniformly distributed random real number r ∈[0, 1];
+5 Find the largest index i in pθ such that (pθ)i ≤r;
+6 Set the entry in s corresponding to index i to 1;
+by perturbing each entry of θ via independently adding a Gumbel noise to them, selecting the
+index corresponding to the largest perturbed entry of θ, and returning the sample associated with
+that index. The sample vector s produced this way has theoretically the same distribution as the
+categorical distribution associated with θ (i.e., s ∼pθ). For the sake of conciseness, the proof of
+this statement is provided in Appendix A. It is of the utmost importance to note that in (6) only
+the noise generated from the standard Gumbel distribution—and not any other types of probability
+distributions—results in a sample vector s ∼pθ. Interested readers may refer to [27, 29, 30] for
+further details about the GM method and other versions of the proof.
+Since the arg max function in (6) is not differentiable, Jang et al. [27] proposed a continuous,
+differentiable approximation (relaxation) to this function by introducing a temperature parameter
+τ and utilizing a so-called soft one-hot sample vector es with entries
+esi :=
+exp
+ (θi + G(i))/τ
+
+PN
+j=1 exp
+ (θj + G(j))/τ
+,
+i = 1, · · · , N,
+(7)
+or put it shortly es = softmax ((θ + G)/τ) with G := [G(1), · · · , G(N)]T . Although esi entries in (7)
+have the advantage of being differentiable with respect to θi, i = 1, · · · , N, there are two concerns
+with having a soft one-hot sample vector es in the GSM method.
+Firstly, due to the applied
+relaxation, es does not exactly follow the pθ distribution, as opposed to s in (6). However, as τ →0,
+this soft one-hot vector becomes a true one-hot vector and subsequently, the samples generated
+by the GSM method would have the exact pθ distribution [27]. Therefore, at the beginning of
+the optimization routine, one can set τ to a high temperature (in a relative sense) and using an
+annealing scheme reduce it to a small nonzero value as the optimization progresses. For machine
+learning applications, the typical range suggested for τ is between 100 to 0.1 (e.g., [33, 37–39]).
+More details about the annealing scheme and temperature range used in this study are provided
+7
+
+in Section 5.
+Secondly, with regard to the concerns facing the GSM method, having a soft one-hot vector es leads
+to generating a sample vector that is a combination of all choices in the target categorical variable
+which oftentimes does not bear any physical realization, causing problems in computing the value
+of J and its gradients. For example, for the applications considered in this paper, we cannot have
+a beam cross-sectional profile that is a combination of I- and U-profiles. In such scenarios, the
+so-called straight-through GSM [27] can be adopted to generate a true one-hot sample vector
+bs := I
+ 
+arg max
+i∈{1,··· ,N}
+(esi)
+!
+,
+(8)
+and to compute the value of J using this vector. Then, for the sensitivity analysis in (5), since
+bs is not differentiable with respect to θ, ∇θes instead of ∇θbs is utilized.
+As the optimization
+advances and es approaches toward being a true one-hot vector, the discrepancy between ∇θes and
+∇θbs diminishes. Ultimately, following (5) and generating es using the GSM method, the gradient
+of J with respect to θj, = 1, · · · , N, reads
+∇θjJ = ∇θja · ∇aJ =
+ ∇esa ∇θjes
+
+· ∇aJ = ∇aJ ·
+N
+X
+i=1
+∂a
+∂esi
+∂esi
+∂θj
+,
+j = 1, · · · , N,
+(9)
+where
+∂esi
+∂θj
+=
+(
+(1 −esi) esi,
+if i = j
+−esiesj,
+otherwise ,
+(10)
+is easily derived using (7).
+Note that although G(i), i = 1, · · · , N, which are random Gumbel
+noises appear in computing esi values in (7), they do not cause any differentiability issues in (9)
+and (10). Assuming ∇aJ and ∇esa are known, Algorithm 2 encapsulates the steps involved in the
+GSM method for generating sample vectors es and bs, as well as computing the value of a function
+J that through es is implicitly a function of unnormalized log-probabilities θ corresponding to a
+categorical distribution and eventually calculating ∇θJ. The details of computing ∇aJ and ∇esa
+are laid out in the next section.
+4
+Optimization methodology
+In Section 3, the GSM method was described in its most general form regardless of the application.
+Henceforth, to establish a more oriented dialogue, we limit the scope to structural problems and
+optimization functions arising in such applications. Considering the optimization problem stated in
+(2), in this section, we develop a scheme to compute the sensitivities of the optimization objective
+and constraint functions (J and g, respectively) with respect to both x and θ. Without loss of
+generality, we only focus on computing ∇xJ and ∇θJ. Computing ∇xg and ∇θg proceeds similarly.
+For the structural problems considered in this article, continuous design variables x could be compo-
+nents’ cross-sectional dimensions (or properties), their orientation, length and material properties.
+8
+
+Algorithm 2: The GSM method for computing the value and gradient of a function of a
+categorical distribution
+Input: Function J and its gradients ∇aJ and ∇esa, unnormalized log-probabilities
+θ ∈RN associated with a categorical variable, temperature parameter τ.
+Output: J and ∇θ J.
+1 Generate samples G(i), i = 1, · · · , N, from the standard Gumbel distribution Gumbel(0, 1);
+2 Compute esi, i = 1, · · · , N, through (7);
+3 Calculate bs using (8);
+4 Get J using bs;
+5 Compute ∂esi/∂θj, i, j = 1, · · · , N, using (10);
+6 Get ∇θ J via (9);
+The categorical variables may be material and cross-sectional profile choices of each component.
+The categorical variables are determined by their corresponding continuous attributes. For example,
+material choices are characterized through their Young’s modulus, Poisson’s ratio and density. The
+objective and constraint functions may be the structure’s mass, its compliance, nodal displacement
+and maximum stress to name a few. The proposed optimization framework and required deriva-
+tions are elucidated in a general format such that other types of design variables and functions can
+be incorporated in a straightforward manner.
+For the sake of brevity, suppose the aim is to compute the sensitivities of J with respect to a single
+continuous variable xl, l = 1, · · · , nx and unnormalized log-probabilities θm := [θm,1, · · · , θm,Nm]T
+associated with a single categorical variable cm, m = 1, · · · , nc. Subsections 4.1 and 4.2 present
+the procedures for computing ∇xlJ and ∇θmJ, respectively. Once sensitivities of J are calculated,
+they can be utilized for optimizing the frame structures using the optimization approach proposed
+in Subsection 4.3.
+4.1
+Sensitivity analysis for continuous variables
+Recall from Section 2 that J can explicitly and implicitly be a function of xl (and θm) through u.
+Accordingly, the gradient of J with respect to xl is expressed as
+∇xlJ = ∂J
+∂xl
++ ∇xlu · ∇uJ,
+l = 1, · · · , nx,
+(11)
+where ∂J/∂xl and ∇uJ which are, respectively, explicit derivatives of J with respect to xl and u can
+be carried out in a simple manner knowing the function formulation, thus not further elaborated
+in this paper. For example, if J = 0.5uT Ku, then ∂J/∂xl = 0.5uT (∇xlK) u and ∇uJ = Ku. The
+onerous term in (11) is ∇uJ for which we appeal to the adjoint method [21,40] well-known to be
+advantageous over the direct differentiation method for optimizing problems with several design
+variables. The process is presented for a general J that may be a linear or nonlinear function of
+its arguments. Using the discretized governing equation Ku −f = 0 and differentiating it with
+9
+
+respect to xl yields
+K ∇xlu + (∇xlK) u −∇xlf = 0,
+(12)
+where it is assumed that the external force vector f is only a function of xl not u. Since the
+left-hand side of (12) is zero, multiplying it by any arbitrary vector of a conforming size to the
+governing equation also results in zero. Denote this multiplier vector, called the adjoint variable
+vector, by λJ ∈Rnu. Applying it to (12) and employing the result in (11) leads to
+∇xlJ = ∂J
+∂xl
++ ∇xlu · ∇uJ −λJ · (K ∇xlu + (∇xlK) u −∇xlf) ,
+l = 1, · · · , nx.
+(13)
+This equation holds regardless of the value of λJ; ergo, it can be chosen such that ∇xlu in (13)
+vanishes. Meaning
+KλJ = ∇uJ.
+(14)
+Once λJ is found through (14), putting it in (13) gives
+∇xlJ = ∂J
+∂xl
+−λJ · ((∇xlK) u −∇xlf) ,
+l = 1, · · · , nx.
+(15)
+This is the final equation for computing the sensitivity of J with respect to continuous design
+variables. Note that solving (14) can be carried out quite efficiently as factorizing K, the arduous
+step in the solution process, has already been performed in solving the governing equation Ku = f.
+Furthermore, there is no dependence on xl or any other continuous design variable in (14); hence
+(14) is solved only once (and not for each variable individually), justifying the application of the
+adjoint method for problems with several design variables. The adjoint equation for each constraint
+function gi, i = 1, · · · , ng, is formulated as
+Kλgi = ∇ugi.
+(16)
+4.2
+Sensitivity analysis for categorical variables
+With respect to θm, the gradient of J using (5) reads
+∇θmJ = (∇esma ∇θmesm)T ∇aJ = ∇aJ · (∇esma ∇θmesm) ,
+m = 1, · · · , nc,
+(17)
+where esm is the sample vector drawn from the categorical probability distribution characterized by
+θm employing the GSM method. Calculating ∇θmesm can be performed incorporating the procedure
+developed in Section 3 and (10). We first focus on handling ∇esma and then ∇aJ in (17). Naturally,
+each entry of esm corresponds to a class which can be characterized by some continuous attributes
+(properties). If esm is associated with an isotropic material its entries are determined by Young’s
+modulus and Poisson’s ratio. On the other hand, if esm is linked to a cross-sectional profile, the
+relevant continuous attributes are cross-sectional properties such as area and second moments of
+area. It is important to note that all the choices considered for a categorical variable must be
+characterized using the same set of attributes.
+10
+
+Suppose esm corresponds to a categorical variable with Nm choices. Let ak := [a1,k, · · · , anm,k]T , k =
+1, · · · , Nm, be the vector of size nm containing the continuous attributes of each choice. Also, define
+Am ∈Rnm×Nm the attribute matrix of this categorical variable as
+Am :=
+
+
+a1,1
+· · ·
+a1,Nm
+...
+...
+...
+anm,1
+· · ·
+anm,Nm
+
+.
+(18)
+If esm is a hard one-hot vector, the attributes of the selected class in this categorical variable can
+be picked out by
+a = Amesm.
+(19)
+As mentioned earlier in Section 3, for running the structural simulation and computing the opti-
+mization functions, bsm (given by (8)) instead of esm needs to be used in (19). During the sensitivity
+analysis, however, esm itself is employed leading to ∇esma = Am. As the optimization advances, esm
+approaches bsm. Finally, inserting this relation into (17) yields
+∇θmJ = ∇aJ · (∇esma ∇θmesm) = ∇aJ · (Am ∇θmesm) ,
+m = 1, · · · , nc.
+(20)
+In this equation, ∇aJ is the sensitivity of J with respect to the a associated with the continu-
+ous attributes of the class with the highest unnormalized log-probability at a given optimization
+iteration (i.e., the attributes of the sample generated by the straight-through GSM). Since a is a
+continuous variable, computing ∇aJ can be carried out by adopting the adjoint method described
+in the earlier subsection. In other words,
+∇aiJ = ∂J
+∂ai
+−λT
+J ((∇aiK) u −∇aif) ,
+i = 1, · · · , nm,
+(21)
+with the same λJ found by (14). Equation (20) is the final equation for computing the sensitivity of
+J with respect to θm. To further clarify the presented procedure for computing ∇θmJ, we provide
+the following example. Suppose an optimization problem whose categorical design variables are the
+cross-sectional profiles of its beams. Assume for one of the variables the choices are circular and
+rectangular profiles each characterized by their area A, second moments of area Iyy and Izz and
+torsion constant K. Also, let θ = [θ1, θ2]T be the unnormalized log-probabilities associated with
+each profile at a given optimization iteration. For this variable, the attribute matrix A reads
+A :=
+
+
+Acircle
+Arectangle
+Iyycircle
+Iyyrectangle
+Izzcircle
+Izzrectangle
+Kcircle
+Krectangle
+
+.
+(22)
+There may be two scenarios for θ1 and θ2 at any optimization iteration:
+1. θ1 ≥θ2: leading to es1 ≥es2 using (7) and bs = [1, 0]T according to (8).
+11
+
+2. θ1 < θ2: resulting in es1 < es2 based on (7) and bs = [0, 1]T utilizing (8).
+In the former situation, J and ∇aJ in (20) are computed employing the circular profile and its
+continuous attributes, otherwise, the rectangular profile is adopted.
+Finally, ∇θJ is obtained
+through ∇esma = A, finding ∇aJ via (21) and calculating ∇θes applying the GSM method. We
+once again highlight that as the optimization moves toward convergence, es approaches a true one-
+hot vector and the errors due to the applied relaxations inherent in the GSM method dwindle.
+4.3
+Optimization scheme
+The proposed optimization routine—named GSMO standing for Gumbel-Softmax optimization—
+for frame (or truss) structures with mixed categorical and continuous design variables is presented in
+Algorithm 3. Although this scheme is described for a particular class of structures undergoing linear
+elasticity behavior, it can be applied with minor modifications to other problems (not necessarily
+structural) with mixed categorical and continuous design variables governed by a different set of
+physics equations.
+An important fact about GSMO in Algorithm 3 is that there is no stratification between continuous
+and categorical design variables. In other words, both classes of variables are handled concurrently
+in each optimization iteration, thus giving no priority to either of them. This is unlike the bilevel
+optimization routines where categorical and continuous variables are treated at different levels
+(stages) [25,41–43]. In such techniques, first, the categorical variables are taken into account and
+the structure is optimized updating only those. Then, in the second level, the continuous design
+variables are handled. A shortcoming of these approaches is that each variable type is optimized
+sequentially at one level at a time, which may lead to underperformance. Nevertheless, a bilevel
+version of GSMO, named BiGSMO, is provided in Algorithm 4 of Appendix B and assayed against
+GSMO in the forthcoming section.
+5
+Case studies
+Prior to introducing the case studies, we note a few remarks. Since the GSM method relies on
+generating Gumbel samples which is a stochastic process, the optimum solution found through
+GSMO (and BiGSMO) may vary every time the optimization is executed. Therefore, GSMO (and
+BiGSMO) shares a similarity in this aspect with stochastic optimizers such as GA. Hence, to make
+a fair comparison with stochastic methods, we run each of the case studies 10 times and report
+the best, average and standard deviation of optimum solutions. As for the temperature τ in (7)
+and its annealing scheme, an initial temperature of 100 scaled by 0.9 per iteration is adopted. The
+minimum temperature is kept at 0.01. Other options for the temperature and its annealing scheme
+are described in [30]. Also, a step size of 10−3 is set for the optimization routine. These choices can
+be seen as hyper-parameters for GSMO. Moreover, an identical initial probability value is assigned
+to the available choices of each categorical variable. Further remarks about them are provided in
+the conclusion section.
+12
+
+Algorithm 3: The GSMO scheme for optimizing frame/truss structures with mixed cat-
+egorical and continuous design variables
+Input: Objective function J, constraint functions g, continuous design variables x and
+their bounds, categorical design variables c and their available choices, GSM
+annealing scheme.
+Output: Optimum design.
+1 Initialize x;
+2 Initialize θi, i = 1, · · · , nc, for each categorical variable ci by entry values of zero assuming
+equal probabilities for the choices in each ci;
+3 while not converged do
+4
+for i = 1, · · · , nc do
+5
+Generate Gumbel noises G(j), j = 1, · · · , Ni, from the standard Gumbel
+distribution Gumbel(0, 1);
+6
+Compute (esi)j, j = 1, · · · , Ni, using (7) and ∇θiesi via (10);
+7
+Calculate bsi through (8);
+8
+end
+9
+Solve the governing equations Ku = f using bsi, i = 1, · · · , nc, and get u;
+10
+Compute J and g values using bsi, i = 1, · · · , nc, and u;
+11
+Calculate ∇uJ then find λJ by solving (14);
+12
+Compute ∇ugi, i = 1, · · · , ng, then find λgi, i = 1, · · · , ng, by solving (16);
+13
+Calculate ∂J/∂xi, ∂g/∂xi, ∂K/∂xi and ∂f/∂xi, i = 1, · · · , nx;
+14
+Get ∇xJ and ∇xg incorporating the corresponding adjoint vectors and (15);
+15
+for i = 1, · · · , nc do
+16
+Form the attribute matrix Ai as in (18);
+17
+Calculate ∂J/∂ai, ∂g/∂ai, ∂K/∂ai and ∂f/∂ai using the attributes of the selected
+class for this categorical variable;
+18
+Compute ∇aiJ and ∇aig utilizing the adjoint vectors found in Steps 11 and 12,
+∇θiesi found in Step 6 and employing (21);
+19
+Get ∇θiJ and ∇θig through (20);
+20
+end
+21
+Update x and θi, i = 1, · · · , nc, using the sensitivities found in Steps 14 and 19;
+22 end
+Unfortunately, the relevant literature to this article lacks a repository of well-documented bench-
+marks, particularly for beam structures [10]. Nevertheless, to study the performance of GSMO,
+its results are compared to those reported in [20] using different optimization techniques (which
+includes GA, particle swarm optimization (PSO) [16], mine blast optimization (MBO) [44], wa-
+ter cycle optimization (WCO) [45], colliding bodies optimization (CBO) [46], differential evolution
+(DE) [47] and neighborhood search (NS) [20]) for a 72-bar truss structure (first case study) and
+those produced by a GA scheme for the other case studies. For the implemented GA, the popu-
+lation size of 10 times the number of design variables, crossover rate of 0.9 and mutation rate of
+13
+
+0.1 are selected. Furthermore, the constraints are enforced using a penalty method with a penalty
+factor of 1000. The maximum number of iterations for both GSMO and GA is set to 100. The case
+studies with a mix of continuous and categorical variables are also run by BiGSMO considering 10
+iterations for both outer and inner loops (Lines 3 and 4 in Algorithm 4). All tests are run on a
+single desktop computer with an Intel Core i9 Processor at 2.40GHz with 8 cores and 16 threads.
+5.1
+72-bar truss structure
+The 72-bar truss structure [20,48] depicted in Figure 1 undergoes two load cases. In the first one,
+a force of f = [5000, 5000, 0]T lbf is applied to Node 1, and in the second load case, a force of
+f = [0, 0, −5000]T lbf is exerted on Nodes 1, 2, 3 and 4. The objective function for this problem is
+to minimize the structure’s mass and the design variables are the cross-sectional areas of all trusses
+(hence 72 variables in aggregate) selected from a discrete set given in Table 1. All members are
+made of an aluminum alloy with a density of 0.1lb/in3, Young’s modulus of 107 psi and yield stress
+of 25000 psi. For both load cases, the stress in all trusses must remain below the given yield stress
+and the displacement of Nodes 1, 2, 3 and 4 along X and Y axes must be bounded by ±0.25 in.
+Figure 2 shows the convergence plot of the mean and standard deviation of the 10 GSMO and
+GA runs. Accordingly, the optimization routine advances smoothly and reaches convergence quite
+rapidly using both algorithms. Table 2 presents the optimum solution obtained by GSMO (the best
+one amongst the 10 runs), GA and those of other approaches reported in [20]. For this problem,
+since the design variables are only categorical, in essence, there is no difference between GSMO
+and BiGSMO and the result of the latter is not provided.
+As can be seen, the best solution
+generated by GSMO has a slight lead compared to those reported previously.
+The mean and
+standard deviation of the 10 optimal results by GSMO are respectively 394.31 and 11.14, which
+may be taken as an affirmation of the fact that although a sampling process is involved in GSMO, the
+method consistently finds close optimum solutions (we have reviewed this claim in the subsequent
+case studies as well).
+In this problem, perhaps the most significant advantage of GSMO is its
+computational time. Since GSMO is a gradient-based approach, it requires only one FE solve per
+Table 1: Categorical choices of the cross-sectional areas for the 72-bar truss structure
+Areas (in2)
+0.111, 0.141, 0.196, 0.250, 0.307, 0.391, 0.442, 0.563, 0.602, 0.766, 0.785,
+0.994, 1.000, 1.228, 1.266, 1.457, 1.563, 1.620, 1.800, 1.990, 2.130, 2.380,
+2.620, 2.630, 2.880, 2.930, 3.090, 3.130, 3.380, 3.470, 3.550, 3.630, 3.840,
+3.870, 3.880, 4.180, 4.220, 4.490, 4.590, 4.800, 4.970, 5.120, 5.740, 7.220,
+7.970, 8.530, 9.300, 10.85, 11.50, 13.50, 13.90, 14.20, 15.50, 16.00, 16.90,
+18.80, 19.90, 22.00, 22.90, 24.50, 26.50, 28.00, 30.00, 33.50
+14
+
+optimization iteration leading to a total of 100 FE solves for each run. For this example, each
+GSMO run takes about 0.9 seconds on average on the computer specified earlier.
+X
+Y
+X
+Top view
+A typical story
+(Top one)
+Side view
+Iso view
+Z
+(1)
+(5)
+(9)
+(13)
+(17)
+(2)
+(6)
+(10)
+(14)
+(18)
+120 in
+120 in
+60 in
+60 in
+60 in
+60 in
+(1)
+1
+(2)
+(5)
+(6)
+(7)
+(8)
+(4)
+(3)
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12 13
+14
+15
+16
+17
+18
+Figure 1: The 72-bar truss structure. The typical story is repeated 4 times along the Z axis. The
+node and element numbering also follows suit.
+5.2
+812-bar lattice structure
+In this example, the goal is to optimize the lattice structure shown in Figure 3 to have nonpositive
+Poisson’s ratios in X and Y directions. The lattice is symmetric with respect to XY, XZ and YZ
+planes and is composed of 4 by 4 unit cells depicted in Figure 3. It is pulled along the Z axis by
+0.2 m, while the nodes on the outer edges of the mid-plane are expected to satisfy
+xf,i
+x0,i
+≥1,
+yf,i
+y0,i
+≥1,
+i = 1, · · · , 16,
+(23)
+where xf,i and x0,i are respectively final and initial x-coordinates, and yf,i and y0,i are respectively
+final and initial y-coordinates of Node i on the outer edges of the plane. Equation 23 means that the
+lattice structure must not shrink and possibly expand from the middle in both X and Y directions
+15
+
+Table 2: Categorical choices of the cross-sectional areas (in2) for the truss structure found by
+various optimization methods in the literature
+Member ID
+PSO
+[16]
+MBO
+[44]
+CBO
+[46]
+WCO
+[45]
+DE
+[47]
+NS
+[20]
+GA
+GSMO
+1-4
+0.196
+1.800
+0.196
+0.196
+0.196
+0.196
+0.196
+0.141
+5-12
+0.563
+0.602
+0.563
+0.563
+0.563
+0.563
+0.563
+0.563
+13-16
+0.442
+0.111
+0.391
+0.391
+0.391
+0.391
+0.391
+0.391
+17-18
+0.563
+0.111
+0.563
+0.563
+0.563
+0.563
+0.563
+0.563
+19-22
+0.563
+1.266
+0.563
+0.563
+0.563
+0.563
+0.563
+0.563
+23-30
+0.563
+0.563
+0.563
+0.563
+0.563
+0.563
+0.563
+0.563
+31-34
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+35-36
+0.250
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+37-40
+1.228
+0.442
+1.228
+1.228
+1.228
+1.228
+1.228
+1.228
+41-48
+0.563
+0.442
+0.442
+0.442
+0.563
+0.563
+0.442
+0.442
+49-52
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+53-54
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+55-58
+1.800
+0.196
+1.990
+1.990
+1.990
+1.990
+1.990
+1.990
+59-66
+0.442
+0.563
+0.563
+0.563
+0.442
+0.442
+0.563
+0.563
+67-70
+0.141
+0.442
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+71-72
+0.111
+0.602
+0.111
+0.111
+0.111
+0.111
+0.111
+0.111
+Optimum
+mass (lbm)
+393.38
+390.73
+389.33
+389.33
+389.33
+389.33
+389.33
+388.01
+while being pulled along the Z direction. Note that even though the deformations are large, we still
+model the structure assuming linear elasticity as the focus of this paper is optimization rather than
+simulation. In this example, the sole purpose is to satisfy the constraints expressed in (23), hence
+the constant function J = 0 is considered for the objective function. The lattice is discretized by
+Euler-Bernoulli beam elements all of which are made of a steel alloy with a Young’s modulus of
+210 GPa and a Poisson’s ratio of 0.3.
+This problem contains a mix of continuous and categorical design variables. The former variables
+include the orientation of all the 812 beams and the spatial position of the nodes interior to the
+structure (i.e., those not lying on the lattice’s top, bottom, front, back and side planes; 91 nodes
+in total). This leads to a total of 1085 continuous design variables. For the categorical variables,
+the 812 beams of the lattice are classified into 4 groups; those along the X, Y and Z axes as well as
+those along the unit cells’ diagonal directions. For each group, 4 cross-sectional choices exist. The
+16
+
+Figure 2: Convergence plot of the 10 GSMO and GA runs for the truss structure
+details of these cross-sections are provided in Figure 4.
+All three methods, GSMO, BiGSMO and GA, were able to produce a feasible solution albeit
+different from one another.
+Out of the 10 runs of GSMO and BiGSMO, all converged to the
+same solution. This once again demonstrates that although a sampling process is involved in these
+algorithms the optimum solutions generated in different runs are similar (in this example identical).
+Unlike GSMO and BiGSMO, GA had a hard time finding a feasible solution. For GA, only 3 of the
+runs led to a solution satisfying the constraints in (23) (All GA runs could find a feasible solution
+after about 300 iterations). Figure 5 illustrates the optimum solutions obtained by GSMO and
+BiGSMO in their undeformed and deformed configurations. The optimum value of cross-sectional
+choices is provided in Table 3.
+Table 3: Optimum cross-sectional choices of the lattice structure
+Member group
+GSMO
+BiGSMO
+GA
+Along X
+CS4
+CS2
+CS1
+Along Y
+CS4
+CS2
+CS4
+Along Z
+CS2
+CS1
+CS4
+Along diagonal
+CS3
+CS3
+CS3
+17
+
+Z
+X
+1 m
+1 m
+Iso view
+Unit cell
+Z
+Y
+1 m
+Mid-plane
+Front view
+Side view
+Figure 3: Geometry of the lattice structure
+20 mm
+10 mm
+20 mm
+10 mm
+5 mm
+10 mm
+CS2
+CS3
+CS4
+CS1
+Figure 4: Available cross-sectional choices for the beams in the lattice structure
+18
+
+Undeformed
+conﬁguration
+Deformed
+conﬁguration
+Non-optimum
+solution 
+Optimum 
+solution of GSMO 
+Optimum 
+solution of BiGSMO 
+Figure 5: Optimum solutions of the lattice structure due to GSMO and BiGSMO
+Similar to the previous case study, a major superiority of GSMO and BiGSMO relative to GA is
+their computational cost. Both GSMO and BiGSMO require only one FE solve per optimization
+iteration regardless of the number of design variables.
+For GA on the other hand, since there
+are 1089 design variables (1085 continuous and 4 categorical variables), with a population size of
+10 times the number of design variables, 10890 FE solves are needed per iteration. Even if the
+FE routine is parallelized with GA, with the computational resource used for the experiment (16
+threads), the number of FE solves required for every optimization iteration per CPU core would be
+10890/16 ≈680. For this example, each FE solve takes about 0.8 seconds on the computer specified
+earlier, leading to 95 seconds for each GSMO and BiGSMO run (encompassing gradient calculations
+and other associated overheads). Each GA run with parallelization, on the other hand, extends to
+around 55000 seconds. Subsequently, the computation cost of GA for this problem is significantly
+larger than that of GSMO and BiGSMO making it prohibitive for larger-scale problems. The same
+adversity is expected for other population-based optimization approaches as well.
+19
+
+5.3
+258-bar bridge structure
+The bridge structure depicted in Figure 6 is composed of 258 components modeled by Euler-
+Bernoulli beam elements. The bridge spans 14 m along the X axis, has a width of 1 m and a
+maximum height of 3.45 m. All of its components are made of steel with a Young’s modulus of 210
+GPa, a yield stress of 360 MPa and a Poisson’s ratio of 0.3. The members lying on the bridge floor
+are subject to a downward (along the negative Z axis) uniform load of 1000 N/m. Furthermore,
+the entire bridge is under the gravity load. The bridge is clamped from Nodes 1 to 4.
+Side view
+Iso view
+Bridge ﬂoor
+X
+Z
+Node 1
+Node 2
+Node 3
+Node 4
+Figure 6: The 258-bar bridge structure
+The objective function of this problem is to minimize the total strain energy of the structure due to
+the applied loads while the maximum stress in all elements remains below their yield strength. Also,
+the smallest natural frequency of the structure must be larger than 50 Hz. Similar to the previous
+case study, in this problem too we deal with a combination of continuous and categorical design
+variables. The former variables include the orientation of all 258 beam elements and the length
+of the beams not lying on the bridge floor (187 beams in total). Hence, there are 445 continuous
+design variables in aggregate. The categorical design variables contain the cross-sectional choices of
+20
+
+all the elements which are allowed to change independently (i.e., 258 categorical design variables).
+The available 5 cross-sectional profiles are illustrated in Figure 7 and their associated parameters
+are provided in Table 4.
+CS1
+CS2
+CS3
+CS4
+CS5
+Figure 7: Available cross-sectional choices for the beams in the bridge structure
+Figure 8 portrays the convergence plot of GSMO, BiGSMO and GA for the 10 runs. Accordingly,
+GSMO and BiGSMO have a slightly better convergence rate compared to that of GA for this partic-
+ular problem. both GSMO and BiGSMO exhibit rapid convergence during the initial optimization
+stages, followed by a gradual deceleration as they approach a local optimum. This slowdown in
+convergence can be attributed to the diminishing gradient magnitude as the optimization nears
+a local optimum, leading to smaller solution updates at each iteration. Furthermore, as perhaps
+expected, two distinct stages can be observed in the BiGSMO plot; a somewhat flat region followed
+by a steep decline in every 10 iterations. This behavior is due to the fact that in BiGSMO the
+Table 4: Parameter values associated with available cross-sectional choices for the beams in the
+bridge structure
+Parameter name
+r1
+h2
+w2
+h3
+w3
+t3
+h4
+w4
+t4
+h5
+w5
+t5
+Value (mm)
+40
+80
+100
+125
+75
+5
+200
+150
+10
+150
+80
+7
+21
+
+categorical and continuous design variables are handled in different levels of the optimization rou-
+tine. As detailed in Algorithm 4, considering each 20-iteration interval, the first 10 iterations are
+dedicated to evolving the categorical variables and the second 10 iterations advance the continuous
+variables.
+Figure 8: Convergence plot of GSMO, BiGSMO and GA averaged over the 10 runs for the bridge
+structure problem
+The best objective value among the 10 runs as well as their average and standard deviations
+for the three optimization methods are presented in Table 5. Accordingly, GSMO outperforms
+BiGSMO and GA in all three aspects. The advantage of GSMO over GA for this example may be
+mainly attributed to the existence of a considerably large number of design variables, particularly
+the categorical variables.
+Since GSMO relies on sensitivity analysis, it is able to explore the
+high-dimensional design space more effectively compared to GA. Therefore, although GA is by
+construction capable of finding the global optimum, it falls short of finding one in this problem. On
+the other hand, the best solution found via BiGSMO is not as good as those of GSMO and GA.
+The reason could be due to the bilevel nature of BiGSMO. Since the categorical and continuous
+variables are handled in two different stages in this algorithm, at each stage, a portion of the design
+space is obscured and inadmissible for exploration by the optimizer. For this example, this has led
+to a less qualified solution compared to that generated by the other two methods.
+Other noteworthy considerations in Table 5 are due to average and standard deviation values.
+22
+
+Unlike the previous case study, for this problem, the optimum solutions produced in the 10 runs
+using GSMO and BiGSMO are not unique, pointing to the fact that the sampling involved in these
+two approaches may lead to generating different solutions every time they are run. However, as
+can be seen, the average values are quite close to their corresponding best optimum values and
+the solutions are highly clustered around the best solutions. In this problem, that is not the case
+for GA. Looking at GA’s average and standard deviation values, there is a high chance of getting
+a solution relatively far from the best possible solution every time GA is executed. While this
+trait can sometimes help in obtaining hard-to-find global optimums, such is not the case in this
+experiment as GA failed to find the best solution compared to GSMO. This is in fact a well-known
+phenomenon for other population-based optimizers as well.
+Table 5: Performance of GSMO, BiGSMO and GA on the bridge structure
+Method
+Best Value
+(N.m)
+Average
+(N.m)
+Standard Deviation
+(N.m)
+Approximate Execution Time
+(s)
+GSMO
+12.998
+13.643
+0.348
+140
+BiGSMO
+15.121
+15.853
+0.350
+140
+GA
+13.642
+20.520
+2.712
+49000
+Similar to other case studies, the advantage of GSMO and BiGSMO over GA can be appreciated
+more from the computational perspective. For this example, the computational cost per iteration
+of GA is about 7000 times larger than that of both GSMO and BiGSMO. The difference once again
+is due to requiring one linear elasticity and one modal analysis solve per optimization iteration for
+GSMO and BiGSMO as compared to 7030 of each solve for GA (total number of design variables is
+445 + 258 = 703). For this problem, one FE linear elasticity solve and one FE modal analysis solve
+combined take about 1.1 seconds on the computer specified earlier. This leads to approximately
+140 seconds per run on average (including other overloads such as gradient calculations) for both
+GSMO and BiGSMO and about 49000 seconds per run (executing 16 solves in parallel per iteration)
+for GA. Figure 9 shows the GSMO’s best optimum solution and nonoptimum (initial) solution in
+their undeformed and deformed configurations.
+6
+Conclusion
+The optimal design of real-world frame structures presents a significant challenge due to the presence
+of a large number of categorical design variables, such as cross-sectional profiles and material choices.
+The categorical nature of these variables precludes the employment of gradient-based optimizers
+and necessitates the use of gradient-free optimizers that are known to be less efficient. To address
+this challenge, this paper proposes a gradient-based optimizer that leverages the GSM method. The
+GSM method represents categorical choices as continuous probability distributions and enables the
+23
+
+Undeformed
+conﬁguration
+Deformed
+conﬁguration
+Nonoptimum
+solution 
+Optimum 
+solution of GSMO 
+0
+-5.9e-4
+Z Disp.
+Z Disp.
+0
+-5.9e-4
+Figure 9: Optimum solution of the bridge structure due to GSMO. The deformations are scaled by
+a factor of 1000.
+sampling process from such distributions to be differentiable. This in turn allows computing the
+sensitivities of objective and constraint functions with respect to the categorical design variables.
+This information can be combined with the sensitivities with respect to the continuous design
+variables to enable either simultaneous or bilevel optimization of categorical and continuous design
+variables, corresponding to the development of GSMO and BiGSMO, respectively.
+Relative to GA, we have demonstrated that both GSMO and BiGSMO can find optimal solutions
+in a significantly shorter amount of time because the number of FE solves required is orders of
+magnitudes smaller. Specifically, our case studies showed that compared to GA, the computational
+costs of GSMO and BiGSMO were O(103) lower for the lattice and bridge structure problems. This
+remarkable improvement can be ascribed to two primary factors. Firstly, we have essentially trans-
+formed combinatorial optimization problems involving categorical design variables—which typi-
+cally have exponential complexity—into problems involving only continuous design variables with
+a polynomial complexity [49]. Secondly, the incorporation of continuous design variables enables
+the application of gradient-based optimizers, which are well-known for their superior efficiency and
+scalability in comparison to gradient-free optimization methods [50].
+In addition to the computational advantages, our case studies also showed that GSMO and BiGSMO
+found better solutions with more consistency than GA. In the 72-bar truss structure, GSMO gen-
+erated an optimal solution that outperformed those of other methodologies reported in various
+24
+
+studies. For the 812-bar lattice structure, both GSMO and BiGSMO consistently found a unique
+optimum solution in all 10 runs, while GA only managed to find an optimum solution in 3 out of
+the 10 runs. Lastly, in the 258-bar bridge structure, both GSMO and BiGSMO resulted in a small
+standard deviation in optimal objective function values across the 10 runs, with GSMO delivering
+a noticeably better solution compared to BiGSMO and GA.
+These findings were somewhat surprising because GA is known to be more adept at finding global
+optimum solutions than gradient-based approaches due to its ability to explore the solution space,
+albeit at the expense of efficiency. We hypothesize several reasons for this outcome. Assuming
+the general understanding that the gradient-based optimizers are susceptible to falling into local
+optima, it is likely that the consistent sets of solutions found by our method were indeed local
+minima. Conversely, because of the high complexity of frame structure design problems, GA was
+unable to get close to any optimal solution (neither local nor global) within the given number of
+iterations. Hence, the best solutions found by GA in our case studies tended to have high variance
+and subpar objective values. Had we run GA for a longer period of time (as was done in the
+second case study), it might have been possible that GA would have eventually converged to a
+better optimal solution. However, we conjecture that this would require an extraordinary amount
+of computational time for solving real-world design problems with even greater complexity than
+those studied in this paper.
+Another important advantage of our method is that we are able to simultaneously optimize both
+categorical and continuous design variables. Typically, the problems involving both variable types
+are solved in a bilevel manner, wherein a gradient-free optimizer is used to solve for categori-
+cal variables at the outer level while a gradient-based optimizer is used to solve for continuous
+variables at the inner level. In this paper, we have investigated how this bilevel approach per-
+forms using a gradient-based optimizer for both levels. The last case study of bridge structure
+design demonstrated that the simultaneous approach employed by GSMO outperforms the bilevel
+approach employed by BiGSMO. This superior performance can likely be attributed to GSMO’s
+enhanced efficacy in exploring the design space by considering both categorical and continuous
+design variables concurrently, while BiGSMO solves for each variable type sequentially.
+Regarding the limitations, a distinctive aspect of our method is the requirement for each categorical
+variable to be represented by a set of continuous attributes (properties) to compute sensitivities.
+For instance, computing the gradients of an objective function with respect to cross-sectional pro-
+files requires the gradients of the objective function with respect to the cross-sectional areas and
+moments of inertia, as expressed in (20). In certain applications, such characterization of categor-
+ical variables might not be readily available (e.g., the choice of joint types for a multi-component
+structural problem). Nonetheless, we assert that the majority of categorical choices involved in
+engineering design problems are associated with continuous parameters, enabling sensitivity com-
+putation and making our approach applicable to a wide range of applications.
+Another limitation is that since GSMO and BiGSMO are gradient-based approaches, they are
+susceptible to getting trapped in local minima. However, the inherent stochastic nature of the GSM
+method provides a means to control the exploration capability of our method, thereby increasing
+the likelihood of finding global optima. Specifically, the Gumbel temperature annealing schedule
+25
+
+can be varied such that the optimizer can use more iterations to sample a variety of solutions
+before converging. In addition, one can take the initial and final Gumbel temperatures as design
+variables and determine their optimum values for a given problem alongside other design variables.
+Furthermore, adopting a multi-start strategy where the problem is run using various initial solutions
+might mitigate the risk of being trapped in a local minimum. Such extensions should be explored
+in future work.
+Furthermore, our broader application experience beyond the cases showcased in this study indi-
+cates that as the number of choices for individual categorical variables increases, both GSMO and
+BiGSMO exhibit oscillatory convergence behavior and, occasionally, may even fail to converge to
+a mathematically optimal solution. This phenomenon stems from the fact that when numerous
+choices are available for a variable, generating a sole sample from the distribution might not ade-
+quately capture the actual distribution associated with that variable. A plausible resolution could
+involve generating multiple samples for each categorical variable and subsequently selecting the
+sample generated most frequently. Lower Gumbel temperatures can also reduce the variance of the
+generated samples.
+Lastly, in the presented second and third case studies, we compared our method to only one
+specific derivative-free method, GA. While GA is a well-known method that has been successfully
+applied to various engineering design applications, there are other derivative-free methods suitable
+for solving problems with categorical variables such as Tabu search, Monte Carlo tree search and
+estimation of distribution algorithms. However, all of these methods require a large number of
+function evaluations as they rely on either unguided (i.e., not guided by gradients) search moves
+or population-based improvements. Therefore, we are confident that the proposed method in this
+study will outperform such alternatives in terms of computational efficiency.
+It is important to note that while we developed GSMO and BiGSMO in this study with structures
+undergoing linear elasticity behavior in mind, the algorithms presented in Algorithms 3 and 4 can
+be adapted to any optimization problem with mixed categorical and continuous design variables
+subject to other types of governing equations, with only minor modifications. The core principles
+of the presented algorithms remain unchanged; only the adjoint equations need to be adjusted
+accordingly. This versatility further underscores the potential of GSMO (and BiGSMO) for a wide
+range of applications, including structures with nonlinear behaviors.
+26
+
+Appendix A
+Proposition 1. The samples generated through (6) have the same probability distribution as θ.
+Proof. Let us first introduce the standard Gumbel distribution Gumbel(0, 1). Its cumulative dis-
+tribution function F and probability density function f read
+FX(x) = P(X ≤x) = exp (−exp(−x)) ,
+fX(x) = d
+dxFX(x) = exp (−(x + exp(−x))) ,
+(24)
+where the subscript X is the random variable associated with Gumbel(0, 1). Defining Y and Θ as
+two other random variables satisfying Y = Θ + X, we have
+FY (y) = P(Y ≤y) = P(Θ + X ≤y) = P(X ≤y −Θ) = FX(y −Θ) = exp (−exp(Θ −y)) , (25)
+leading to
+fY (y) = d
+dyFY (y) = d
+dy exp (−exp(Θ −y)) = exp (Θ −y) exp (−exp(Θ −y)) .
+(26)
+Now, defining zi := θi + G(i) as in (6), to prove the proposition, it suffices to show that the
+probability of zk, k ∈[1, N] being the maximum of set {z1, · · · , zN} is [softmax(θ)]k as given in
+(4). In other words,
+P(zk = max{z1, · · · , zN}) =
+exp(θk)
+PN
+i=1 exp(θi)
+,
+k ∈[1, N].
+(27)
+We proceed as follows: Another way of interpreting zk = max{z1, · · · , zN} is to set z := zk and
+write zk = max{z1, · · · , zN} as
+z1 ≤z, · · · , zk−1 ≤z, zk = z, zk+1 ≤z, · · · , zN ≤z.
+(28)
+Then, since the samples zi are generated independently, using (25) and (26) we have
+P (zk = max{z1, · · · , zN}) = P (z1 ≤z, · · · , zk−1 ≤z, zk = z, zk+1 ≤z, · · · , zN ≤z)
+=
+Z ∞
+−∞
+
+exp (θk −z) exp (−exp(θk −z))
+N
+Y
+i=1,i̸=k
+exp (−exp(θi −z))
+
+dz
+=
+Z ∞
+−∞
+"
+exp (θk −z)
+N
+Y
+i=1
+exp (−exp(θi −z))
+#
+dz
+=
+Z ∞
+−∞
+"
+exp (θk −z) exp
+ 
+−exp (−z)
+N
+X
+i=1
+exp(θi)
+!#
+dz
+=
+exp(θk) exp
+
+−exp (−z) PN
+i=1 exp(θi)
+
+PN
+i=1 exp(θi)
+
+∞
+−∞
+=
+exp(θk)
+PN
+i=1 exp(θi)
+.
+(29)
+Therefore, (27) holds and the proposition is proved.
+27
+
+Appendix B
+Algorithm 4: The BiGSMO scheme
+Input: Objective function J, constraint functions g, continuous design variables x and
+their bounds, categorical design variables c and their available choices, GSM
+annealing scheme.
+Output: Optimum design.
+1 Initialize x;
+2 Initialize θi, i = 1, · · · , nc, for each categorical variable ci by entry values of zero;
+3 while outer optimizer not converged do
+4
+while inner optimizer not converged do
+5
+for i = 1, · · · , nc do
+6
+Generate Gumbel noises G(j), j = 1, · · · , Ni, from Gumbel(0, 1);
+7
+Compute (esi)j, j = 1, · · · , Ni, using (7) and ∇θiesi via (10);
+8
+Calculate bsi through (8);
+9
+end
+10
+Solve the governing equations Ku = f using bsi, i = 1, · · · , nc, and get u;
+11
+Compute J and g values using bsi, i = 1, · · · , nc, and u;
+12
+Calculate ∇uJ then find λJ by solving (14);
+13
+Compute ∇ugi, i = 1, · · · , ng, then find λgi, i = 1, · · · , ng, by solving (16);
+14
+for i = 1, · · · , nc do
+15
+Form the attribute matrix Ai as in (18);
+16
+Calculate ∂J/∂ai, ∂g/∂ai, ∂K/∂ai and ∂f/∂ai using the attributes of the
+selected class for this categorical variable;
+17
+Compute ∇aiJ and ∇aig utilizing the adjoint vectors found in Steps 12 and 13,
+∇θiesi found in Step 7 and employing (21);
+18
+Get ∇θiJ and ∇θig through (20);
+19
+end
+20
+Update θi, i = 1, · · · , nc, using the sensitivities found in Step 18;
+21
+end
+22
+Update esi and bsi, i = 1, · · · , nc, using the new θi values;
+23
+Solve the governing equations Ku = f using bsi, i = 1, · · · , nc, in Step 22 and get u;
+24
+Compute the new values of J, ∇uJ, λJ; and gi, ∇ugi and λgi, i = 1, · · · , ng;
+25
+Calculate ∂J/∂xi, ∂g/∂xi, ∂K/∂xi and ∂f/∂xi, i = 1, · · · , nx;
+26
+Get ∇xJ and ∇xg incorporating the corresponding adjoint vectors and (15);
+27
+Update x using the sensitivities found in Steps 26;
+28 end
+28
+
+References
+[1] W. McGuire, R. H. Gallagher, and H. Saunders, Matrix structural analysis. John Wiley &
+Sons, 1982.
+[2] M.-W. Huang and J. S. Arora, “Optimal design of steel structures using standard sections,”
+Structural Optimization, vol. 14, no. 1, pp. 24–35, 1997.
+[3] A. Kaveh and S. Talatahari, “Charged system search for optimal design of frame structures,”
+Applied Soft Computing, vol. 12, no. 1, pp. 382–393, 2012.
+[4] M. Ebrahimi, A. Butscher, and H. Cheong, “A low order, torsion deformable spatial beam
+element based on the absolute nodal coordinate formulation and bishop frame,” Multibody
+System Dynamics, vol. 51, no. 3, pp. 247–278, 2021.
+[5] C. D. Chapman, K. Saitou, and M. J. Jakiela, “Genetic algorithms as an approach to config-
+uration and topology design,” Journal of Mechanical Design, vol. 116, pp. 1005–1012, 1994.
+[6] P. P. Angelov, Y. Zhang, J. A. Wright, V. I. Hanby, and R. A. Buswell, “Automatic design syn-
+thesis and optimization of component-based systems by evolutionary algorithms,” in Genetic
+and Evolutionary Computation Conference, pp. 1938–1950, Springer, 2003.
+[7] E. Lund and J. Stegmann, “On structural optimization of composite shell structures using a
+discrete constitutive parametrization,” Wind Energy, vol. 8, no. 1, pp. 109–124, 2005.
+[8] H. Cheong, M. Ebrahimi, A. Butscher, and F. Iorio, “Configuration design of mechanical
+assemblies using an estimation of distribution algorithm and constraint programming,” in
+IEEE Congress on Evolutionary Computation, pp. 2339–2346, 2019.
+[9] C. Piacentini, H. Cheong, M. Ebrahimi, and A. Butscher, “Multi-speed gearbox synthesis
+using global search and non-convex optimization,” in International Conference on Integration
+of Constraint Programming, Artificial Intelligence, and Operations Research, pp. 381–398,
+Springer, 2020.
+[10] M. Stolpe, “Truss optimization with discrete design variables: a critical review,” Structural
+and Multidisciplinary Optimization, vol. 53, no. 2, pp. 349–374, 2016.
+[11] M. Stolpe and A. Kawamoto, “Design of planar articulated mechanisms using branch and
+bound,” Mathematical Programming, vol. 103, no. 2, pp. 357–397, 2005.
+[12] W. Jenkins, “Plane frame optimum design environment based on genetic algorithm,” Journal
+of Structural Engineering, vol. 118, no. 11, pp. 3103–3112, 1992.
+[13] A. Kaveh and V. Kalatjari, “Size/geometry optimization of trusses by the force method and
+genetic algorithm,” ZAMM-Journal of Applied Mathematics and Mechanics/Zeitschrift f¨ur
+Angewandte Mathematik und Mechanik: Applied Mathematics and Mechanics, vol. 84, no. 5,
+pp. 347–357, 2004.
+29
+
+[14] H. S. Park and C. W. Sung, “Optimization of steel structures using distributed simulated
+annealing algorithm on a cluster of personal computers,” Computers & Structures, vol. 80,
+no. 14-15, pp. 1305–1316, 2002.
+[15] M. Kripka, “Discrete optimization of trusses by simulated annealing,” Journal of the Brazilian
+Society of Mechanical Sciences and Engineering, vol. 26, no. 2, pp. 170–173, 2004.
+[16] A. Kaveh and S. Talatahari, “A particle swarm ant colony optimization for truss structures
+with discrete variables,” Journal of Constructional Steel Research, vol. 65, no. 8-9, pp. 1558–
+1568, 2009.
+[17] L. Li, Z. Huang, and F. Liu, “A heuristic particle swarm optimization method for truss struc-
+tures with discrete variables,” Computers & Structures, vol. 87, no. 7-8, pp. 435–443, 2009.
+[18] D. Yates, A. Templeman, and T. Boffey, “The complexity of procedures for determining min-
+imum weight trusses with discrete member sizes,” International Journal of Solids and Struc-
+tures, vol. 18, no. 6, pp. 487–495, 1982.
+[19] I. Fister Jr, X.-S. Yang, I. Fister, J. Brest, and D. Fister, “A brief review of nature-inspired
+algorithms for optimization,” arXiv preprint arXiv:1307.4186, 2013.
+[20] M. Shahabsafa, A. Mohammad-Nezhad, T. Terlaky, L. Zuluaga, S. He, J. T. Hwang, and J. R.
+Martins, “A novel approach to discrete truss design problems using mixed integer neighborhood
+search,” Structural and Multidisciplinary Optimization, vol. 58, no. 6, pp. 2411–2429, 2018.
+[21] M. Ebrahimi, A. Butscher, H. Cheong, and F. Iorio, “Design optimization of dynamic flexi-
+ble multibody systems using the discrete adjoint variable method,” Computers & Structures,
+vol. 213, pp. 82–99, 2019.
+[22] J. Yan, Z. Duan, E. Lund, and G. Zhao, “Concurrent multi-scale design optimization of com-
+posite frame structures using the Heaviside penalization of discrete material model,” Acta
+Mechanica Sinica, vol. 32, pp. 430–441, 2016.
+[23] C. Krogh, M. H. Jungersen, E. Lund, and E. Lindgaard, “Gradient-based selection of cross sec-
+tions: a novel approach for optimal frame structure design,” Structural and Multidisciplinary
+Optimization, vol. 56, no. 5, pp. 959–972, 2017.
+[24] Z. Duan, J. Yan, I. Lee, E. Lund, and J. Wang, “Discrete material selection and structural
+topology optimization of composite frames for maximum fundamental frequency with manu-
+facturing constraints,” Structural and Multidisciplinary Optimization, vol. 60, pp. 1741–1758,
+2019.
+[25] P.-J. Barjhoux, Y. Diouane, S. Grihon, D. Bettebghor, and J. Morlier, “A bi-level methodology
+for solving large-scale mixed categorical structural optimization,” Structural and Multidisci-
+plinary Optimization, vol. 62, no. 1, pp. 337–351, 2020.
+30
+
+[26] M. P. Bendsoe and O. Sigmund, Topology optimization: theory, methods, and applications.
+Springer Science & Business Media, 2003.
+[27] E. Jang, S. Gu, and B. Poole, “Categorical reparameterization with Gumbel-Softmax,” in The
+International Conference on Learning Representations, 2017.
+[28] C. Maddison, A. Mnih, and Y. Teh, “The concrete distribution: A continuous relaxation
+of discrete random variables,” in The International Conference on Learning Representations,
+2017.
+[29] E. J. Gumbel, Statistical theory of extreme values and some practical applications: a series of
+lectures, vol. 33. US Government Printing Office, 1954.
+[30] I. A. Huijben, W. Kool, M. B. Paulus, and R. J. Van Sloun, “A review of the Gumbel-max
+trick and its extensions for discrete stochasticity in machine learning,” IEEE Transactions on
+Pattern Analysis and Machine Intelligence, 2022.
+[31] N. Cesa-Bianchi, C. Gentile, G. Lugosi, and G. Neu, “Boltzmann exploration done right,”
+Advances in Neural Information Processing Systems, vol. 30, 2017.
+[32] J. Gu, D. J. Im, and V. O. Li, “Neural machine translation with Gumbel-greedy decoding,”
+in Proceedings of the AAAI Conference on Artificial Intelligence, vol. 32, 2018.
+[33] J. Yang, Q. Zhang, B. Ni, L. Li, J. Liu, M. Zhou, and Q. Tian, “Modeling point clouds with
+self-attention and Gumbel subset sampling,” in Proceedings of the IEEE/CVF Conference on
+Computer Vision and Pattern Recognition, pp. 3323–3332, 2019.
+[34] W. Kool, H. Van Hoof, and M. Welling, “Stochastic beams and where to find them: The
+Gumbel-top-k trick for sampling sequences without replacement,” in International Conference
+on Machine Learning, pp. 3499–3508, PMLR, 2019.
+[35] V. K. Rohatgi and A. M. E. Saleh, An introduction to probability and statistics. John Wiley
+& Sons, 2015.
+[36] C. J. Maddison, D. Tarlow, and T. Minka, “A* sampling,” Advances in Neural Information
+Processing Systems, vol. 27, 2014.
+[37] A. Baevski, S. Schneider, and M. Auli, “VQ-WAV2VEC: Self-supervised learning of discrete
+speech representations,” in International Conference on Learning Representations, 2019.
+[38] P. Guo, C.-Y. Lee, and D. Ulbricht, “Learning to branch for multi-task learning,” in Interna-
+tional Conference on Machine Learning, pp. 3854–3863, 2020.
+[39] M. Kang and B. Han, “Operation-aware soft channel pruning using differentiable masks,” in
+International Conference on Machine Learning, pp. 5122–5131, 2020.
+31
+
+[40] Y. Cao, S. Li, L. Petzold, and R. Serban, “Adjoint sensitivity analysis for differential-algebraic
+equations: The adjoint dae system and its numerical solution,” SIAM Journal on Scientific
+Computing, vol. 24, no. 3, pp. 1076–1089, 2003.
+[41] G. Allaire and G. Delgado, “Stacking sequence and shape optimization of laminated composite
+plates via a level-set method,” Journal of the Mechanics and Physics of Solids, vol. 97, pp. 168–
+196, 2016.
+[42] M. J. Islam, X. Li, and K. Deb, “Multimodal truss structure design using bilevel and niching
+based evolutionary algorithms,” in Proceedings of the Genetic and Evolutionary Computation
+Conference, pp. 274–281, 2017.
+[43] H. Cheong, M. Ebrahimi, and T. Duggan, “Optimal design of continuum robots with reach-
+ability constraints,” IEEE Robotics and Automation Letters, vol. 6, no. 2, pp. 3902–3909,
+2021.
+[44] A. Sadollah, A. Bahreininejad, H. Eskandar, and M. Hamdi, “Mine blast algorithm for opti-
+mization of truss structures with discrete variables,” Computers & Structures, vol. 102, pp. 49–
+63, 2012.
+[45] A. Sadollah, H. Eskandar, A. Bahreininejad, and J. H. Kim, “Water cycle, mine blast and
+improved mine blast algorithms for discrete sizing optimization of truss structures,” Computers
+& Structures, vol. 149, pp. 1–16, 2015.
+[46] A. Kaveh and M. I. Ghazaan, “A comparative study of CBO and ECBO for optimal design of
+skeletal structures,” Computers & Structures, vol. 153, pp. 137–147, 2015.
+[47] V. Ho-Huu, T. Nguyen-Thoi, T. Vo-Duy, and T. Nguyen-Trang, “An adaptive elitist differential
+evolution for optimization of truss structures with discrete design variables,” Computers &
+Structures, vol. 165, pp. 59–75, 2016.
+[48] R. T. Haftka and Z. G¨urdal, Elements of structural optimization, vol. 11. Springer Science &
+Business Media, 2012.
+[49] J. Lenstra and A. Rinnooy Kan, “Computational complexity of discrete optimization prob-
+lems,” in Discrete Optimization I (P. Hammer, E. Johnson, and B. Korte, eds.), vol. 4 of
+Annals of Discrete Mathematics, pp. 121–140, Elsevier, 1979.
+[50] J. R. R. A. Martins and A. Ning, Engineering design optimization. Cambridge University
+Press, Jan 2022.
+32

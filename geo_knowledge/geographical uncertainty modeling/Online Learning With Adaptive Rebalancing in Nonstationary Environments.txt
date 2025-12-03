@@ -1,0 +1,2204 @@
+Please cite as follows: K. Malialis, C. G. Panayiotou and M. M. Polycarpou, ”Online Learning With Adaptive
+Rebalancing in Nonstationary Environments,” in IEEE Transactions on Neural Networks and Learning Systems,
+doi: 10.1109/TNNLS.2020.3017863.
+1
+Online Learning with Adaptive Rebalancing
+in Nonstationary Environments
+Kleanthis Malialis, Christos G. Panayiotou, and Marios M. Polycarpou
+Abstract—An enormous and ever-growing volume of data is
+nowadays becoming available in a sequential fashion in various
+real-world applications. Learning in nonstationary environments
+constitutes a major challenge, and this problem becomes orders
+of magnitude more complex in the presence of class imbalance.
+We provide new insights into learning from nonstationary and
+imbalanced data in online learning, a largely unexplored area. We
+propose the novel Adaptive REBAlancing (AREBA) algorithm
+that selectively includes in the training set a subset of the majority
+and minority examples that appeared so far, while at its heart
+lies an adaptive mechanism to continually maintain the class
+balance between the selected examples. We compare AREBA
+with strong baselines and other state-of-the-art algorithms and
+perform extensive experimental work in scenarios with various
+class imbalance rates and different concept drift types on both
+synthetic and real-world data. AREBA signiﬁcantly outperforms
+the rest with respect to both learning speed and learning quality.
+Our code is made publicly available to the scientiﬁc community.
+Index Terms—Class imbalance, concept drift, neural networks,
+nonstationary environments, online learning.
+I. INTRODUCTION
+E
+FFICIENT and effective analysis methods for the ever-
+increasing volume of sequential data in a wide range of
+applications is of paramount importance. In practical applica-
+tions, data is evolving or drifting over time, i.e., data is drawn
+from nonstationary distributions. Various factors can trigger a
+nonstationarity effect or concept drift, for example, seasonality
+or periodicity effects, changes in users’ habits, interests or
+preferences, and hardware or software faults [1]. Learning in
+nonstationary environments constitutes a major challenge. In
+such environments, a classiﬁer with learning capabilities is
+of vital importance as it will provide an adaptive behaviour
+and help maintain optimal performance. The problem becomes
+signiﬁcantly more complex if class imbalance co-exists with
+concept drift. In this case, class imbalance refers to sequential
+data that have skewed distributions and is a difﬁcult problem
+as it causes a traditional learning algorithm to be ineffective
+because of its poor generalisation ability and its weak predic-
+tion power for the minority class examples [2].
+Learning from nonstationary and imbalanced data has been
+studied separately but several key challenges remain open
+when the joint problem is considered. The majority of existing
+work, focuses on batch (or chunk-by-chunk) learning i.e. when
+Authors are with the KIOS Research and Innovation Center of Excel-
+lence (K.M., C.G.P., M.M.P.) and the Department of Electrical and Com-
+puter Engineering (C.G.P., M.M.P.), University of Cyprus, Cyprus. Contact:
+{malialis.kleanthis, christosp, mpolycar}@ucy.ac.cy. ORCID: {0000-0003-
+3432-7434, 0000-0002-6476-9025, 0000-0001-6495-9171}
+examples arrive in batches (or chunks). In this paper we ad-
+dress the combined challenges of drift and imbalance in online
+(or one-by-one) learning, i.e., when a single example arrives
+at each step. The design of batch learning algorithms differs
+signiﬁcantly from that of online learning and, therefore, the
+majority are typically unsuitable for online learning tasks [3].
+Addressing these key challenges can have a signiﬁcant impact
+in various applications areas, e.g., in critical infrastructure
+systems, smart buildings, ﬁnance and banking, security and
+crime, healthcare and environmental sciences [3]–[6].
+The desired properties of an online classiﬁer learning from
+nonstationary and imbalanced data are [4], [7]: (1) Learning
+new knowledge: The classiﬁer should learn novel knowledge
+as new data is arriving. (2) Preserving previous knowledge:
+Being able to preserve previous knowledge relies on the ability
+of the classiﬁer to determine what previous knowledge is still
+relevant (and hence to preserve it) and what has now become
+irrelevant (and hence to discard or “forget” it). (3) High
+performance: The classiﬁer should obtain high performance on
+both the majority and minority classes. (4) Fast operation: The
+classiﬁer should operate in less than the example (or batch)
+arrival time. (5) Fixed storage: The classiﬁer should use no
+more than a ﬁxed amount of memory for any storage; ideally,
+it should be capable of incremental learning i.e. when learning
+occurs on a single instance (or batch) without considering (and
+hence storing) previous data. Balancing the trade-offs between
+the aforementioned properties is a challenging task.
+The contributions made are: (i) We provide new insights into
+learning from nonstationary and imbalanced data, a largely
+unexplored area which focuses on the combined challenges of
+class imbalance and concept drift in online learning. (ii) We
+propose the novel Adaptive REBAlancing (AREBA) algorithm
+that maintains the aforementioned desired properties. AREBA
+selectively includes in the training set a subset of the positive
+and negative examples that appeared so far, while at its heart
+lies an adaptive rebalancing mechanism to continually main-
+tain class balance. (iii) We compare AREBA to strong base-
+lines and state-of-the-art algorithms and perform an extensive
+experimental work in scenarios with various imbalance rates
+and different drift types on both synthetic and real-world data.
+AREBA signiﬁcantly outperforms the rest with respect to both
+learning speed and learning quality. (iv) To our knowledge,
+this paper is one of the very few studies that examines online
+imbalance learning under each type of drift independently. For
+reproducibility of our results we make the datasets used and
+our code publicly available to the community1.
+1https://github.com/kmalialis/areba/
+arXiv:2009.11942v1  [cs.LG]  24 Sep 2020
+
+2
+The organisation of this paper is as follows. Section II
+provides the background material necessary to understand the
+contributions made. Section III provides an in-depth review
+of related work. AREBA is presented in Section IV. Our
+experimental setup is described in Section V. An analysis of
+the proposed method is given in Section VI, followed by a
+comprehensive comparative study in Section VII. We conclude
+in Section VIII where we discuss some important remarks, the
+pros and cons of AREBA and pointers for future work.
+II. BACKGROUND
+We consider a data generating process that provides at
+each time step t a sequence of examples or instances
+St = {(xt
+i, yt
+i)}M
+i=1 from an unknown probability distribution
+pt(x, y), where xt ∈Rd is a d-dimensional input vector
+belonging to input space X ⊂Rd, yt ∈Y is the class label
+where Y = {0, 1} and M is the number of instances arriving
+at each step. The focus of this paper is on binary classiﬁcation
+and, as a convention, the positive class represents the minority
+class. When the observed sequence St consists only of a
+single instance (i.e. M = 1), it is termed online (or one-
+by-one) learning, otherwise it is termed batch (or chunk-by-
+chunk) learning [1]. The design of batch learning algorithms
+differs signiﬁcantly from that of online learning as they are
+designed to process batches of data, possibly by utilising
+an ofﬂine learning algorithm [3]. Therefore, the majority of
+batch learning algorithms are typically not suitable for online
+learning tasks [3]. This work focuses on online learning.
+An online classiﬁer receives a new example xt at time step
+t and makes a prediction ˆyt based on a concept h : X →Y
+such that ˆyt = h(xt). The classiﬁer receives the true label
+yt, its performance is evaluated using a loss function and
+is then trained, i.e., its parameters are updated accordingly
+based on the loss incurred. This process is repeated at each
+time step. Depending on the application, new examples do not
+necessarily arrive at regular and pre-deﬁned intervals.
+If data is sampled from a long, potentially inﬁnite, sequence
+which is typically the case for big data applications, it is
+unrealistic to expect that all the previously observed data will
+always be available. If learning occurs on the most recent
+single instance only without taking into account previously
+observed data, it is termed incremental learning [1]. For
+online and incremental learning, the cost at time t is calculated
+using the loss function l as follows J = l(yt, ˆyt).
+This framework is suitable for human-in-the-loop learning.
+As mentioned, the label becomes available as the next example
+arrives i.e. veriﬁcation latency does not exist. Algorithms of
+this framework, including AREBA, are typically trained from
+user interaction by domain experts. Various and widely studied
+domains exist that ﬁt into this framework, and hence, this
+assumption is satisﬁed e.g. in ﬁnancial fraud [6], a banker
+can provide every few minutes if a credit card transaction is
+fraudulent. For rain prediction [4] an expert can provide every
+few hours if rain precipitation was observed. In healthcare
+applications [8], a doctor can provide the x-ray result as
+soon as it is completed. The framework may not be ideal
+in some cases (e.g. for real-time applications). Relaxing this
+assumption will be part of our future work, but we take a ﬁrst
+step towards this direction and examine the robustness of all
+algorithms under conditions where this assumption is violated.
+According to the Bayesian decision theory, a classiﬁcation
+can be described by the prior probability p(y) and the class
+conditional probability or likelihood p(x|y) for all classes
+y [7]. The classiﬁcation decision is made according to the
+posterior probability, which for class y, is expressed as:
+p(y|x) = p(x|y)p(y)
+p(x)
+(1)
+where p(x) = P
+y={0,1} p(x|y)p(y).
+Class imbalance [2] is a key challenge in learning and
+occurs when at least one data class is under-represented,
+thus constituting a minority class. For a binary classiﬁcation
+problem, class imbalance at time t occurs if:
+pt(y = 0) >> pt(y = 1)
+(2)
+where class 0 (negative) and 1 (positive) represents the major-
+ity and minority class respectively.
+Concept drift represents a change in the joint probability
+and the drift between time step t0 and t1 is deﬁned as follows:
+∃x
+pt0(x, y) ̸= pt1(x, y)
+(3)
+Concept drift can occur in three forms: (i) a change in prior
+probability p(y) (ii) a change in class-conditional probability
+or likelihood p(x|y) and (iii) a change in posterior probability
+p(y|x). In real-world applications, the three forms can appear
+together. A change in posterior probability p(y|x) which may
+or may not be due to a change in p(x), is known as real drift
+because the true decision boundary is changed. A change in
+the distribution of the incoming data p(x) without affecting
+p(y|x) is known as virtual drift because the true decision
+boundary remains unchanged, however, the classiﬁer’s learnt
+decision boundary may drift away from the true one.
+While other drift characteristics [9] are important, our focus
+is on the drift type. As mentioned, along with [3], this paper is
+one of the few studies that examines online imbalance learning
+under each type of concept drift independently.
+III. RELATED WORK
+This section provides an in-depth review of related work and
+describes the state-of-the-art methods. For exhaustive surveys,
+the interested reader is directed towards these excellent papers:
+[1], [7] for drift methods, [2] for imbalance methods, [3] for
+methods that address both, and [10] for online ensembles.
+A. Concept drift
+Concept drift algorithms are classiﬁed as memory-based,
+change detection-based and ensembling [7].
+1) Memory-based: algorithms typically employ a sliding
+window approach to maintain a set of recent examples that
+a classiﬁer is trained on; a representative algorithm of this
+category is FLORA [11]. A key challenge is to determine a
+priori the window size as a larger window is better suited for a
+gradual drift, while a smaller window is suitable for an abrupt
+drift. To address this, methods use an adaptive sliding window
+
+3
+[11] or multiple sliding windows [12]. This is also known as
+an abrupt forgetting approach because the examples that fall
+outside the window are immediately dropped out of memory.
+Alternatively, gradual forgetting approaches employ the full
+memory but the inﬂuence of older examples is deteriorating,
+e.g., using an exponential decay weighting strategy [13].
+2) Change detection-based: algorithms that employ ex-
+plicit mechanisms to detect concept drift. These methods are
+based on sequential analysis and control charts, e.g., Page-
+Hinkley (PH) test [14], cumulative sum (CUSUM) [14], just-
+in-time (JIT) classiﬁers [15], [16] and on monitoring two
+distributions, e.g., adaptive windowing (ADWIN) [17]. These
+approaches are also known as active detectors and are gen-
+erally suitable for detecting abrupt concept drift but may fail
+to work well in prediction settings with gradual or recurring
+concept drift [1], although recently JIT classiﬁers have been
+extended to address recurring concept drift [18].
+3) Ensembling: an ensemble of classiﬁers can improve per-
+formance and provide the ﬂexibility of injecting new data by
+adding classiﬁers or “forgetting” irrelevant data by removing
+or updating existing classiﬁers [19]. It can be computationally
+costly; recall that one of the desired properties of a classiﬁer is
+to be able to operate fast in less than the example arrival time.
+Popular methods are the streaming ensemble algorithm (SEA)
+[20], Learn++.NSE [21], diversity for dealing with drifts
+(DDD) [22] and online bagging (OB) [23]. Another method is
+the accuracy updated ensemble (AUE) [24] which combines
+accuracy-based weighting mechanisms known from chunk-
+based ensembles with the incremental nature of Hoeffding
+Trees. Its follow-up work Online AUE (OAUE) is provided
+in [25]. The interested reader is directed towards [10] for a
+survey on ensemble learning for data streams.
+None of the aforementioned approaches consider class im-
+balance. Below we discuss how these are combined with class
+imbalance methods to address the joint problem.
+B. Class imbalance
+Cost-sensitive learning and resampling algorithms have
+recently shown particular success in this area [3].
+1) Cost-sensitive learning: The cost-sensitive online gra-
+dient descent method (CSOGD) uses this loss function:
+J = (Iyt=0 + Iyt=1
+cp
+cn
+) l(yt, ˆyt),
+(4)
+where Icondition is the indicator function that returns 1 if
+condition is satisﬁed and 0 otherwise, cp, cn ∈[0, 1] and
+cp + cn = 1 are the misclassiﬁcation costs for positive
+and negative classes respectively [26]. The authors use the
+perceptron classiﬁer and stochastic gradient descent, and apply
+the cost-sensitive modiﬁcation to the hinge loss function,
+achieving excellent results. The downside of this method is
+that the costs need to be pre-deﬁned, however, the extent of
+the class imbalance may not be known in advance. Moreover,
+in nonstationary environments, it cannot cope with imbalance
+changes (i.e. p(y) drift) as the pre-deﬁned costs remain static.
+This issue can be resolved by introducing an adaptive cost
+strategy. One way to achieve an adaptive cost strategy is by
+using class imbalance detection (CID) [27] to determine the
+imbalance rate in an online manner. The authors deﬁne a time-
+decayed class size metric, where for each class k, its size sk
+is updated at each time t according to the following equation:
+st
+k = θst−1
+k
++ Iyt=k(1 −θ)
+(5)
+where 0 < θ < 1 is a pre-deﬁned time decay factor that gives
+less emphasis to older data. This metric can determine the
+imbalance rate at any given time, for instance, for a binary
+classiﬁcation problem where the positive class is the minority
+(st
+p < st
+n), the imbalance rate at time t is given by st
+n/st
+p.
+Another method that uses an adaptive cost strategy with a
+perceptron-based classiﬁer is RLSACP [28]. EONN [29] uses
+an ensemble of cost-sensitive online neural networks to cope
+with drift and imbalance. As with CSOGD, the costs are pre-
+deﬁned, thus limiting its adaptability to evolving data.
+2) Resampling: Traditionally, in ofﬂine learning, resam-
+pling techniques alter the training set to deal with the skewed
+data distribution, speciﬁcally, oversampling techniques “grow”
+the minority class while undersampling techniques “shrink”
+the majority class. The simplest and most popular technique is
+random oversampling (or undersampling) where data examples
+are randomly added (or removed) respectively [30]. More
+sophisticated techniques exist, for example, the use of Tomek
+links [31] discards borderline examples while the SMOTE
+[32] algorithm generates new minority class examples based
+on the similarities to the original ones. Recently, Generative
+Adversarial Networks (GANs) have been used to approximate
+the distribution and generate data for the minority class [33].
+Resampling has been demonstrated to be a powerful tech-
+nique for addressing online imbalance learning problems as
+well. Uncorrelated bagging (UCB) [34] is an ensembling
+technique that is trained on all the minority examples observed
+so far, plus a subset of the most recent majority examples. This
+technique has two drawbacks; it assumes that the distribution
+of the minority class is stationary and it does not handle the
+accumulated minority class examples for lifelong learning.
+SERA [35] and REA [36] are based on UCB and use more
+intelligent oversampling techniques. Other notable examples
+are the Learn++CDS and Learn++NIE [4] methods where
+both of them use the aforementioned Learn++NSE method
+(Section III-A3) to address concept drift. The former combines
+the SMOTE algorithm to address class imbalance while the
+latter combines a variation of bagging. Despite their effective-
+ness, all these techniques are only suitable for batch learning
+and not for online learning, which is the focus of this paper.
+ESOS-ELM [37] is an ensemble of online sequential extreme
+learning machines that are trained on balanced subsets of the
+data stream. It relies, however, on the assumption that drift
+does not affect the minority class. Oversampling-based online
+bagging (OOB) [38] is an online ensembling method that ex-
+tends the OB method (Section III-A3) which addresses concept
+drift. It works by adjusting the learning bias from the majority
+to the minority class adaptively through resampling by utilising
+the CID method (Section III-B1) and its time-decayed class
+size metric deﬁned in Eq (5). Its basic idea is as follows.
+OOB updates each classiﬁer of the ensemble K times. If a
+minority example arrives the value of K increases, otherwise
+it decreases. The effectiveness of OOB has been demonstrated
+
+4
+using two types of classiﬁers, namely, Hoefﬁding trees and
+neural networks. The ensemble size varies for each study e.g.
+in [38] 50 trees and 50 neural networks were used while
+in [3] 15 neural networks were used. The approach can be
+computationally costly and may hinder online learning in high-
+speed sequential applications for two reasons. The ﬁrst reason
+is due to the multiple classiﬁers (ensembling) and the second
+is because each classiﬁer gets updated multiple times per time
+step. Analogous to OOB, its authors also introduce [38] the
+Undersampling-based online bagging (UOB) algorithm.
+C. Open Challenges
+Several key challenges still remain open when the joint
+problem of imbalance and drift is considered. The authors in
+[10] state that “working with class-imbalanced and evolving
+streams is still in early stages”, while this study [3] “reveals
+research gaps in the ﬁeld of online imbalance learning with
+concept drift”. Speciﬁcally, many existing methods are capable
+of addressing only a single problem, either imbalance or drift,
+but not the joint problem. In other methods that address
+the joint problem, weaknesses are revealed under conditions
+where one or both the problems become very challenging.
+For instance, we will demonstrate these weaknesses under
+conditions where class imbalance is extreme (e.g. 0.1%). This
+paper introduces the concept of maintaining separate and
+balanced queues for each class, and has a dual-nature as it
+merges ideas from memory-based and resampling algorithms.
+Also, besides its type, drift can be classiﬁed by its severity,
+speed, predictability, frequency and recurrence [39]. A more
+recent study characterises drift by subject, frequency, transi-
+tion, re-occurrence and magnitude [9]. Therefore, in practice,
+it is very difﬁcult to characterise concept drift. Our focus is on
+learning the concept drift without its explicit characterisation
+and detection. As discussed in Section III-A2, explicit or
+active drift detectors can perform well under speciﬁc drift
+characteristics. However, no detector can universally perform
+satisfactory under any combination of drift characteristics
+[40]. In fact, detailed characteristics of drift have not been
+consistently investigated in the literature [10]. Our proposed
+approach learns the concept drift without its explicit charac-
+terisation and detection, and adapts the classiﬁer continuously.
+IV. PROPOSED METHOD
+We now introduce the Adaptive REBAalancing (AREBA) al-
+gorithm. Its central idea is to selectively include in the training
+set a subset of the positive and negative examples that appeared
+so far. At its heart lies an adaptive rebalancing mechanism that
+dynamically modiﬁes the queue sizes to maintain class balance
+between the selected examples. AREBA extends our recently
+introduced algorithm queue-based resampling (QBR) [41].
+A. Queue-based Resampling (QBR)
+The memory size B ∈2Z+ (i.e. B ≥2 and even) deter-
+mines how many previously observed examples can be stored.
+The selection of the examples is achieved by maintaining at
+any given time t two separate windows of capacity (maximum
+! = 100
+%& %'
+()).
+.
+.
+()2
+(*++
+.
+.
+.
+(,+
+(5,5)
+! = 4
+%& %'
+(4.
+.
+.
+(+
+(5 ,1)
+010!
+%& %'
+(1 ,1)
+! = 0
+%& %'
+(+
+(2 ,1)
+(*+
+! = 10
+%& %'
+().
+.
+.
+(2
+(5 ,2)
+(.+
+! = 20
+%& %'
+().
+.
+.
+(2
+(5 ,3)
+(*+
+Fig. 1. Example of QBR for B = 10. Negative examples are shown in green,
+positive ones in light red and the minority class is the positive class. It takes
+100 time steps for the queues to become balanced.
+! = 10
+%& %'
+()
+(*+
+(1 ,2)
+! = 101
+%& %'
+(*+*
+.
+.
+.
+(),
+(*++
+.
+.
+.
+(,+
+(5,5)
+! = 20
+%& %'
+(*) (.+
+(*+
+(2,3)
+! = 21
+%& %'
+(.*
+(*)
+(.+
+(*+
+(2,3)
+! = 9
+%& %'
+().
+.
+.
+.
+.
+.
+.
+.
+(+
+(10 ,1)
+010!
+%& %'
+(1 ,1)
+! = 0
+%& %'
+(+
+(2 ,1)
+Fig. 2.
+Example of AREBA for B = 10. Negative examples are shown in
+green, positive ones in light red and the minority class is the positive class.
+Rebalancing enforces the queues to remain balanced throughout the time.
+length) B
+2 . The windows are implemented using queues i.e. qt
+n
+and qt
+p contain the negative and positive examples respectively:
+qt
+n = {(xi, yi)}|qt
+n|
+i=1
+qt
+p = {(xi, yi)}
+|qt
+p|
+i=1
+(6)
+where |qt
+n|, |qt
+p| ∈[0, B
+2 ] are the current lengths of the queues.
+Let zi = (xi, yi), for any two zi, zj ∈qt
+n (or qt
+p) such that
+j > i, zj arrived more recently in time.
+An example showing how QBR works when B = 10 for 100
+time steps is shown in Figure 1. Negative examples are shown
+in green, positive ones in light red and the minority class is
+the positive class. The class imbalance is set to CI = 10%
+i.e. p(y = 1) = 0.1 and for the sake of illustration, positive
+instances arrive at times multiple of ten (t = 10, 20, ..., 100).
+Initially, both queues are empty (shown as empty boxes) but
+their capacity is set to one (shown in the parenthesis). At t =
+0 a negative example (z0) arrives which is appended to the
+negative queue and the queue’s capacity is incremented by
+one. At t = 4 the negative queue is full and has reached
+the full capacity B
+2 . At t = 10 the ﬁrst positive example (z10)
+arrives which is appended to the positive queue and the queue’s
+capacity is incremented. At t = 100 the positive queue is full
+and has reached the full capacity B
+2 . Note that at this time both
+queues contain the most recent B
+2 examples i.e. z95, .., z99 and
+z60, .., z100 for the negative and positive queue respectively.
+The union of the two queues is then taken to form the new
+training set. The cost function is given by:
+J =
+1
+|qt|
+|qt|
+X
+i=1
+l(yi, h(xi)),
+(7)
+where qt = qt
+p ∪qt
+n and |qt| ∈[1, B]. At each step the
+classiﬁer is updated once based on the cost J incurred. QBR’s
+
+5
+Algorithm 1 Queue-based Resampling (QBR)
+1: Input:
+2: f: classiﬁer
+3: B: total storage size (B ≥2)
+4: Initialisation:
+5: queues q0
+p, q0
+n = {}
+6: queue capacities q0
+p.cap = q0
+n.cap = 1
+7: for each time step t do
+8:
+receive example xt ∈Rd
+9:
+predict class ˆyt ∈{0, 1}
+10:
+receive true label yt ∈{0, 1}
+11:
+if yt == 1 then
+12:
+qt
+p = qt−1
+p
+.append
+ (xt, yt)
+
+13:
+else
+14:
+qt
+n = qt−1
+n
+.append
+ (xt, yt)
+
+15:
+if qt
+p.is full() then
+16:
+if qt
+p.cap < B
+2 then
+17:
+qt
+p.cap = qt
+p.cap + 1
+▷increase capacity
+18:
+else if qt
+p.cap == B
+2 then
+19:
+pass
+▷queue no longer grows
+20:
+if qt
+n.is full() then
+21:
+if qt
+n.cap < B
+2 then
+22:
+qt
+n.cap = qt
+n.cap + 1
+23:
+else if qt
+n.cap == B
+2 then
+24:
+pass
+25:
+prepare the training set qt = qt
+p ∪qt
+n
+26:
+calculate cost J on qt using Eq (7)
+27:
+update classiﬁer once f.train()
+pseudocode is shown in Algorithm 1. In Lines 5-6 the queues
+are initially empty with a capacity of one each. In Lines 11-14
+a new example is appended in its relevant queue based on its
+true label. The append function behaves exactly as in Fig. 1 i.e.
+it inserts the most recent example in a queue, while discarding
+the oldest one. Consider the case of t = 10 where the most
+recent example in the negative queue is z9. When the example
+z9 arrived at t = 9, the example z4 was discarded from the
+queue. In Lines 15-24 the capacity of the relevant queue is
+incremented. In Lines 25-27 the training set is prepared, the
+cost is calculated and the classiﬁer is updated once.
+Of particular importance, is the observation that the original
+class imbalance problem still persists in the queues for a
+sustained period of time. Let’s revisit time t = 10 in Figure 1.
+While the qt
+n is full, the qt
+p only contains a single example.
+Recall that to train the classiﬁer we ﬁrst take the union of
+the queues and then calculate the cost. Class imbalance is
+reduced as positive examples arrive and the problem eventually
+disappears at t = 100 when the queues become balanced.
+B. Adaptive Rebalancing (AREBA)
+Adaptive rebalancing introduces a novel element that dy-
+namically modiﬁes the queue lengths in order to constantly
+maintain balance between the queues. Without this element,
+the initial class imbalance problem would still persist in the
+queue-based system as discussed in the previous section.
+Algorithm 2 Adaptive Rebalancing (AREBA)
+1: Input:
+2: f: classiﬁer
+3: B: total storage size (B ≥2)
+4: θ: decay factor for class size metrics st
+p, st
+n
+5: Initialisation:
+6: class sizes s0
+p, s0
+n = 0
+7: queues q0
+p, q0
+n = {}
+8: queue capacities q0
+p.cap = q0
+n.cap = 1
+9: for each time step t do
+10:
+receive example xt ∈Rd
+11:
+predict class ˆyt ∈{0, 1}
+12:
+receive true label yt ∈{0, 1}
+13:
+update positive class size st
+p = θst−1
+p
++ Iyt=1(1 −θ)
+14:
+update negative class size st
+n = θst−1
+n
++ Iyt=0(1 −θ)
+15:
+if yt == 1 then
+16:
+qt
+p = qt−1
+p
+.append
+ (xt, yt)
+
+17:
+else
+18:
+qt
+n = qt−1
+n
+.append
+ (xt, yt)
+
+19:
+if qt
+p.is empty() then
+20:
+if qt
+n.cap < B then
+21:
+qt
+n.cap = qt
+n.cap + 1
+▷increase capacity
+22:
+else if qt
+n.cap == B then
+23:
+pass
+▷queue no longer grows
+24:
+else if qt
+n.is empty() then
+25:
+if qt
+p.cap < B then
+26:
+qt
+p.cap = qt
+p.cap + 1
+27:
+else if qt
+p.cap == B then
+28:
+pass
+29:
+else
+30:
+if st
+n > st
+p then
+▷if positive class is minority
+31:
+if qt
+p.is full() then
+32:
+if qt
+p.cap < B
+2 then
+33:
+qt
+p.cap = qt
+p.cap + 1
+34:
+qt
+n.cap = qt
+p.cap −1
+35:
+else if qt
+p.cap == B
+2 then
+36:
+if qt
+n.cap ̸= qt
+p.cap then
+37:
+qt
+n.cap = qt
+p.cap
+38:
+if st
+n ≤st
+p then
+▷if negative class is minority
+39:
+if qt
+n.is full() then
+40:
+if qt
+n.cap < B
+2 then
+41:
+qt
+n.cap = qt
+n.cap + 1
+42:
+qt
+p.cap = qt
+n.cap −1
+43:
+else if qt
+n.cap == B
+2 then
+44:
+if qt
+p.cap ̸= qt
+n.cap then
+45:
+qt
+p.cap = qt
+n.cap
+46:
+prepare the training set qt = qt
+p ∪qt
+n
+47:
+calculate cost J on qt using Eq (7)
+48:
+update classiﬁer once f.train()
+We describe in Figure 2 how AREBA works through the
+same example as before. Negative examples are shown in
+green, positive ones in light red and the minority class is
+the positive class. The class imbalance is set to CI = 10%
+i.e. p(y = 1) = 0.1 and for the sake of illustration, positive
+
+6
+instances arrive at times multiple of ten (t = 10, 20, ..., 100).
+Initially, both queues are empty (shown as empty boxes) but
+their capacity is set to one (shown in the parenthesis). At
+t = 0 a negative example (z0) arrives which is appended to
+the negative queue and the queue’s capacity is incremented
+by one. Contrary to QBR, each queue is allowed to have a
+maximum capacity of B (rather than
+B
+2 ). Since no positive
+examples are observed in the beginning, at t = 9 the qn is full
+and has reached the maximum capacity B.
+The ﬁrst positive example (z10) arrives at t = 10 and is
+appended to qp. Rebalancing is now initiated and the capacity
+of qn and qp becomes 1 and 2 respectively. The qn only
+contains its most recent example (z9), hence, the queues are
+now balanced. The queues remain balanced until the second
+positive example (z20) arrives at t = 20. The qp contains now
+the two most recent positive examples (z20, z10) while qn
+contains the most recent negative example (z19). At t = 20 the
+capacity of qn and qp becomes 2 and 3 respectively. At t = 21
+another negative example (z21) arrives which is appended to
+the relevant queue, thus the queues are again balanced. At
+t = 101 each queue is full and has a capacity of B
+2 .
+AREBA proposes an adaptive mechanism that dynamically
+alters the queue sizes to maintain balance between the exam-
+ples contained in the queues. To achieve this, it is necessary
+to be able to decide in an online fashion which class is the
+minority and which the majority. AREBA adopts the CID
+method’s time-decayed class size metrics deﬁned in Eq (5).
+AREBA is shown in Algorithm 2. In Lines 7-8 the capacity
+of each queue is initialised to 1. In Lines 13 and 14 the class
+size metrics are updated. The new example is appended in
+its relevant queue (Lines 15-18). We then check if one of the
+queues is empty (Lines 19-28). For instance, if the positive
+queue is empty, we increase the capacity of the negative
+queue by 1; this corresponds to the cases t = 0 to t = 9
+in Figure 2. Since the positive class is the minority class, the
+rest of the cases in Figure 2 are captured by Lines 30-37. Line
+31 checks if the positive queue is full (in our illustration this
+occurs at t = 10, 20, ..., 100) and then we adapt the capacities
+accordingly (Lines 32-37) depending on whether the capacity
+of the positive queue has reached B
+2 . Similarly, Lines 38-45
+are applicable when the negative class is the majority class.
+In summary, AREBA introduces the concept of maintaining
+separate and balanced queues for each class and its effec-
+tiveness is attributed to its dual-nature as it combines ideas
+from memory-based and resampling methods. These and other
+important remarks are discussed in detail in Section VIII.
+V. EXPERIMENTAL SETUP
+This section describes the synthetic and real-world datasets
+used along with any data pre-processing steps performed. It
+also describes the baseline and state-of-the-art methods used
+along with their selected parameters. It further describes the
+performance metrics and the evaluation method used.
+A. Datasets
+1) Synthetic datasets: They provide the ﬂexibility to control
+the imbalance level, when to introduce drift, and control the
+drift type. We experiment with imbalance of 10% (mild),
+1% (severe) and 0.1% (extreme) and examine each drift type
+individually to inspect the advantages and limitations of all
+the compared methods. The three synthetic datasets used
+are described below where we will use their balanced and
+imbalanced versions, with and without drift.
+Circle [42]: It has the two features x1, x2 ∈[0, 1]. The
+classiﬁcation function is a circle (x1−x1c)2+(x2−x2c)2 = r2
+c
+where (x1c, x2c) is its centre and rc its radius. The circle with
+(x1c, x2c) = (0.4, 0.5) and rc = 0.2 is created. Instances in-
+side the circle are classiﬁed as positive, otherwise as negative.
+Sine [42]: It consists of the features x1 ∈[0, 2π] and x2 ∈
+[−1, 1]. The classiﬁcation function is sin(x1). Instances below
+the curve are classiﬁed as positive, otherwise as negative.
+Feature rescaling has been performed so that x1, x2 ∈[0, 1].
+Sea [20]: It has the features x1, x2 ∈[0, 10]. Instances that
+satisfy x1 + x2 ≤7 are classiﬁed as positive, otherwise as
+negative. Rescaling has been performed so that x1, x2 ∈[0, 1].
+2) Real-world datasets: They are typically more complex
+than synthetic ones and have a large number of noisy features,
+but the true nature of concept drift may be unknown. The
+ﬁve datasets used in this paper cover various application
+domains, speciﬁcally, healthcare, security and crime, ﬁnance
+and banking, image classiﬁcation and environmental sciences.
+Cervical Cancer [8]: The dataset was collected at the
+Hospital Universitario de Caracas in Caracas, Venezuela and
+contains demographic information, habits and historical medi-
+cal records of 858 patients. The task is to predict the outcome
+of a biopsy with respect to cervical cancer and each class label
+was decided by a team of six experts. The dataset is highly
+imbalanced as 55 out of the 858 cases (6.4%) correspond to
+cases of cervical cancer. The number of features is 45. The
+exact nature of drift is unknown but it is expected to occur
+due to the fact that cancer cells gain genetic variation over
+time and also due to changes in patients’ habits.
+Fraud [6]: The dataset contains transactions made by
+credit cards in September 2013 by European cardholders. This
+dataset presents transactions that occurred in two days, where
+we have 492 frauds out of 284,807 transactions. The dataset
+contains 30 features and is severely imbalanced as the positive
+class (frauds) accounts for 0.172% of all transactions. The
+exact nature of concept drift is unknown but it is expected to
+occur due to the adaptive nature of adversarial actions.
+Credit Score [43]: The dataset contains demographic and
+ﬁnancial / banking information. The task is to predict the
+credit score (good, bad) of a customer. The dataset contains
+1000 entries, out of which 300 correspond to a bad credit i.e.
+class imbalance is 30%. The number of features is 24. The
+exact nature of concept drift is unknown but may occur due
+to customer attempts to fake or improve their credit score.
+MNIST [44]: It is a database of handwritten digits (“0”-“9”)
+where each image is 28x28. Contrary to the rest of the datasets
+where their data type is numeric, MNIST is commonly used
+for training image processing systems for visual tasks. The
+dataset is diverse as the digits were written by ∼250 adult
+and student writers. We selected digit “7” to be the majority
+class with 6000 instances and digit “2” to be the minority class
+
+7
+with 60 instances, therefore, imbalance is close to 1%. Drift
+can occur as new handwriting styles appear during learning.
+Forest Cover Type [45]: The datasets consists of carto-
+graphic information obtained from the US Forest Service.
+The task is to predict the forest cover type for given 30x30
+meter cells from the Roosevelt National Forest in Colorado.
+We have selected the cover type “1” to be the majority class
+with 200000 instances and type “4” to be the minority class
+with 2000 instances, therefore, imbalance is close to 1%. This
+dataset has been used in many concept drift studies e.g. [24].
+B. Compared methods
+All compared methods share the same base classiﬁer which
+is a fully-connected neural network of one 8-neuron hidden
+layer, except for MNIST which consists of two 512-neuron
+hidden layers to deal with its complex data type (i.e. images).
+The base classiﬁer is conﬁgured as follows: He Normal [46]
+weight initialisation, the Adam [47] optimisation algorithm,
+LeakyReLU [48] as the activation function of the hidden
+neurons, sigmoid activation for the output neuron, and the
+binary cross-entropy loss function. The learning rate is 0.01
+for the synthetic, Credit Score and Forest Cover Type datasets,
+0.1 for Cervical Cancer and 0.0001 for Fraud. For MNIST the
+learning rate is 0.001 and L2 regularisation is set to 0.01.
+Baseline. A baseline algorithm where no mechanisms to
+address class imbalance or concept drift exist. This baseline
+method is an online and incremental learning algorithm.
+Sliding window. A memory-based method that uses a single
+sliding window to address drift, but no mechanism to address
+imbalance exists. This is in contrast to QBR which utilises one
+sliding window per class. The window size is set to W = 100.
+It is an online but not incremental learning algorithm as it
+requires access to W −1 previously observed data examples.
+Adaptive CS. A state-of-the-art adaptive cost-sensitive
+learning method. It uses the CSOGD cost function deﬁned
+in Eq (4) initialised to c =
+cp
+cn =
+0.95
+0.05 = 19 as suggested
+by its authors. These costs are adapted according to the CID
+approach, where its time-decayed class size metrics are deﬁned
+in Eq (5). The time-decayed factor is set to θ = 0.99. To
+overcome stability issues in performance we set an upper
+bound to the ratio i.e. 1 ≤c ≤50 and we update the costs
+every 250 steps. This method is both online and incremental.
+OOB. A state-of-the-art online resampling algorithm (Sec-
+tion III-B2). We will consider OOB with 20 classiﬁers and the
+special case OOB single where only a single classiﬁer is used.
+The time-decayed factor is set to θ = 0.99. OOB is an online
+and incremental learning algorithm but unlike other methods,
+it performs multiple updates of the classiﬁer at each time step.
+AREBA. The proposed method whose pseudocode is pro-
+vided in Algorithm 2. The time-decayed factor is set to
+θ = 0.99. AREBA is an online learning algorithm. When
+B = 2, the method (referred to as AREBA 2) becomes a near-
+incremental learning algorithm as it requires access only to a
+single old example. In our study, we will examine various
+values of memory size, which we will refer to as AREBA B.
+We discuss now some aspects concerning the computational
+cost of algorithms. For all methods, one-pass learning is used
+i.e. the base classiﬁer is updated once (#epochs=1) at every
+step, except for OOB which is updated K times (#epochs=K).
+A single batch update is performed within an epoch; this is
+to allow fast learning in high-speed applications. For AREBA,
+the qt is the batch while for Sliding, the window W is the
+batch. For the rest, the batch size is 1 as they are incremental
+algorithms. The same classiﬁer gets updated throughout the
+duration of an experiment. Even in the presence of drift, we
+never reset the classiﬁer or introduce any new classiﬁer(s).
+C. Performance metrics
+Traditionally, classiﬁers are evaluated using the overall
+accuracy metric. When class imbalance exists, accuracy be-
+comes problematic as it is biased towards the majority class.
+This occurs because any metric that uses values from both
+columns of the confusion matrix will be inherently sensitive
+to class imbalance [2]. Therefore, it is necessary to adopt a
+performance metric which is not sensitive to class imbalance.
+The geometric mean G-mean [2] is such a suitable metric
+that evaluates the degree of inductive bias in terms of a ratio
+of positive accuracy Acc+ (or recall) and negative accuracy
+Acc−(or speciﬁcity), as deﬁned below: [49].
+G-mean =
+√
+Acc+ ∗Acc−=
+p
+(TP/P) ∗(TN/N)
+(8)
+where TP, P, TN and N is the number of true positives,
+total positives, true negatives and total negatives respectively.
+G-mean has some desirable properties as it is high when both
+Acc+ and Acc−are high and when their difference is small.
+D. Evaluation method
+To evaluate, compare and assess predictive sequential learn-
+ing algorithms we adopt the prequential error with fading
+factors method. It has been proven that for learning algorithms
+in stationary data this method converges to the Bayes error
+[50]. This method does not require a holdout set and the
+predictive model is always tested on unseen data. In our
+experimental study the fading factor is set to θ = 0.99.
+In all simulations we plot the prequential metric (e.g. G-
+mean) in every step averaged over 50 repetitions, including
+the error bars displaying the standard error around the mean.
+Additionally, in all experiments we test for statistical signif-
+icance using a one-way repeated measures ANOVA and then
+using post-hoc multiple comparisons tests with Fisher’s least
+signiﬁcant difference correction procedure to show which of
+the compared method is signiﬁcantly different from the others.
+VI. EMPIRICAL ANALYSIS OF AREBA
+This section presents a two-fold analysis of the proposed
+method. In particular, we examine and discuss the roles of the
+adaptive rebalancing mechanism and the memory size.
+A. Role of the adaptive rebalancing mechanism
+This analysis has been conducted on the stationary Circle
+dataset, i.e., without concept drift. Figures 3a - 3c depict how
+the memory size affects the learning performance of QBR. The
+
+8
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+B=1000
+B=500
+B=100
+B=50
+B=2
+(a) CI = 10%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(b) CI = 1%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(c) CI = 0.1%
+Fig. 3.
+QBR’s behaviour for the Circle dataset (stationary) with different
+memory sizes B = 2, 50, 100, 500, 1000 and class imbalance rates of CI =
+10%, 1%, 0.1%. QBR is very sensitive to the memory size as the learning
+speed and/or the ﬁnal performance are heavily affected by the choice of B.
+left, middle and right columns correspond to experiments with
+class imbalance of CI = 10%, 1%, 0.1% respectively.
+In Fig. 3a, where imbalance is mild i.e. CI = 10%, the ﬁnal
+performance remains unaffected for B ≥50, while for B <
+50 it performs slightly worse. However, the learning speed is
+severely affected by the choice of B i.e. it gets slower with
+an increasing value of B. For instance, QBR with B = 500
+equalises the performance of B = 2 at about t = 2000.
+In Fig. 3b where class imbalance is severe i.e. CI = 1%,
+both the learning speed and ﬁnal performance are severely
+affected by the choice of B. The learning speed gets slower
+with an increasing value of B, for instance, QBR with B =
+500 equalises the performance of B = 2 at about t = 5000.
+In regard to the ﬁnal performance, after a certain threshold
+(here, B ≥50), it signiﬁcantly deteriorates as the value of B
+increases. For instance, QBR with B = 1000 does not even
+equalise the performance of B = 2 after 5000 time steps.
+In Fig. 3c where imbalance is extreme (CI = 0.1%), the
+learning speed and ﬁnal performance are severely affected by
+B, as previously. QBR with B = 2 is by far the best algorithm.
+QBR with B = 50, 100 only start closing the gap after 5000
+time steps while B = 500, 1000 perform poorly at t = 5000.
+The analogous experiments for AREBA are shown in Figures
+4a - 4c. Irrespective of the imbalance severity, after a certain
+threshold (here, B ≥50), all AREBA versions behave almost
+identically. To sum up, these important remarks can be made:
+• Without the adaptive rebalancing mechanism, QBR is
+very sensitive to the choice of the memory size B and, as
+a result, the learning speed and/or the ﬁnal performance
+are signiﬁcantly affected. The problem becomes more
+acute as class imbalance becomes more severe.
+• The adaptive rebalancing mechanism makes AREBA ro-
+bust to the choice of the memory size B, irrespective
+of the imbalance severity. Speciﬁcally, the higher the
+value of B the better, however, after a (dataset-speciﬁc)
+threshold, the improvement is negligible.
+B. Role of the memory size
+This section identiﬁes the role of the memory size in the
+presence of outdated concepts. We examine both the leaning
+speed and ﬁnal performance. To examine the learning speed
+we present the learning curves; when the curve is steep it
+means the algorithm is learning faster. The learning curves
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+B=1000
+B=500
+B=100
+B=50
+B=2
+(a) CI = 10%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(b) CI = 1%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(c) CI = 0.1%
+Fig. 4.
+Role of the adaptive rebalancing mechanism for the Circle dataset
+(stationary) with different memory sizes (B) and class imbalance (CI) rates.
+The AREBA mechanism is robust to different values of the memory size.
+present the prequential G-mean at every time step. To examine
+the learning quality we present the ﬁnal performance i.e. the
+one obtained at the last time step of the curve.
+The analysis is conducted on the synthetic datasets on two
+settings, based on [3]. The short setting (5000 steps, drift at t =
+2500) allows us to examine AREBA’s behaviour immediately
+after the drift, while the long (20000 steps, drift at t = 10000)
+allows us to examine AREBA’s long-term behaviour.
+For the Circle dataset the drift is deﬁned as follows:
+p(y = 1|x inside circle) = 1.0 −→0.0
+p(y = 1|x outside circle) = 0.0 −→1.0
+p(y = 0|x outside circle) = 1.0 −→0.0
+p(y = 0|x inside circle) = 0.0 −→1.0
+(9)
+Figure 5 shows the results for the Circle dataset under
+posterior drift. Figures 5a - 5c depict AREBA’s learning
+curves for various memory sizes with class imbalance of
+CI = 10%, 1%, 0.1% respectively. Figures 5d and 5e depict
+the ﬁnal performances before and after the drift respectively.
+We start with the case of mild imbalance (Fig. 5a). For the
+part of the curves before the drift, we conclude that the higher
+the value of B the better, however, after a (dataset-speciﬁc)
+threshold, the improvement is negligible. This has been studied
+in Section VI-A (Fig 4a), therefore, from now on, we turn our
+attention to the part of the learning curves after the drift.
+For the learning speed, AREBA with B = 500, 1000 is
+slower than B = 20, 100 which in turn is slower than B = 2.
+For the ﬁnal performance, AREBA with B = 2 signiﬁcantly
+outperforms the rest. We observe that the smaller the value
+of B the better the results. This is also clear in Fig. 5e. This
+is expected as immediately after a drift, a larger value of B
+means that more outdated examples exist in the queues.
+Surprisingly, this no longer holds when imbalance becomes
+severe or extreme (Figs. 5b and 5c) where all AREBA versions
+yield the same ﬁnal performance. This is attributed to two
+reasons. Firstly, a small value of B is suitable in case of
+outdated examples with mild imbalance (Fig. 5a). Secondly,
+in case of severe imbalance without drift, a large value of B
+is suitable (Fig. 4b). In the presence of both drift and severe
+imbalance, the aforementioned are in conﬂict with each other
+and, interestingly, it appears that imbalance becomes the key
+issue when it is severe rather than drift.
+Overall, an important trade-off exists. In stationary settings,
+the higher the value of B the better the results, as shown in
+
+9
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+B=1000
+B=500
+B=100
+B=50
+B=2
+(a) CI = 10%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(b) CI = 1%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(c) CI = 0.1%
+10%
+1%
+0.1%
+Class Imbalance
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+1000
+500
+100
+50
+2
+(d) Pre-drift
+10%
+1%
+0.1%
+Class Imbalance
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(e) Post-drift
+Fig. 5. Role of the memory size (B) for AREBA in the Circle dataset with posterior probability drift and various class imbalance (CI) rates. The last two
+ﬁgures depict the ﬁnal performance before (t = 2499) and after (t = 5000) the drift.
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+B=1000
+B=500
+B=100
+B=20
+B=2
+(a) CI = 10%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(b) CI = 1%
+0
+1000 2000 3000 4000 5000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(c) CI = 0.1%
+10%
+1%
+0.1%
+Class Imbalance
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+1000
+500
+100
+20
+2
+(d) Pre-drift
+10%
+1%
+0.1%
+Class Imbalance
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(e) Post-drift
+Fig. 6. Role of the memory size (B) for AREBA in the Sine dataset with posterior probability drift and various class imbalance (CI) rates. The last two
+ﬁgures depict the ﬁnal performance before (t = 2499) and after (t = 5000) the drift.
+(a) CI = 10%
+(b) CI = 1%
+(c) CI = 0.1%
+10%
+1%
+0.1%
+Class Imbalance
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+1000
+500
+100
+20
+2
+(d) Pre-drift
+10%
+1%
+0.1%
+Class Imbalance
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+(e) Post-drift
+Fig. 7.
+Role of the memory size (B) for AREBA in the Sea dataset with posterior probability drift and various class imbalance (CI) rates. The last two
+ﬁgures depict the ﬁnal performance before (t = 9999) and after (t = 20000) the drift.
+Fig 4a. In nonstationary settings, the smaller the value of B
+the better the performance, as shown in Fig 5a. The effect of
+this trade-off appears to be fading away in the presence of
+severe or extreme imbalance, as shown in Fig 5b - 5c. The
+importance of this trade-off is high and should be carefully
+assessed, as the optimal value of B depends on the dataset.
+For the Sine dataset the posterior drift is deﬁned as follows:
+p(y = 1|x below curve) = 1.0 −→0.0
+p(y = 1|x above curve) = 0.0 −→1.0
+p(y = 0|x above curve) = 1.0 −→0.0
+p(y = 0|x below curve) = 0.0 −→1.0
+(10)
+Figure 6 shows the results for the Sine dataset under
+posterior drift. Figures 6a - 6c depict AREBA’s learning curves
+while Figures 6d and 6e depict the ﬁnal performances. For
+mild imbalance (Fig. 6a), the learning speed of AREBA with
+B = 500, 1000 is slower than B = 20, 100. In case of
+severe imbalance (Fig. 6b), we can conclude that the key
+issue becomes the imbalance rather than the drift. Notably,
+AREBA with B = 1000 outperforms B = 2 and equalises the
+performance of B = 100, 500 despite containing signiﬁcantly
+more outdated examples in its queues. In Fig. 6e, the best
+ﬁnal performance when imbalance is mild (CI = 10%) occurs
+when B = 100. The best ﬁnal performance when imbalance is
+severe (CI = 1%) occurs when B = 20. Under conditions of
+mild imbalance (Fig 6a), the aforementioned trade-off is not
+as clear as it was for the Circle dataset (Fig 5a). Therefore, we
+note that the need for some experimentation to ﬁnd a suitable
+choice of B becomes even more important.
+For the Sea dataset the posterior drift is deﬁned in Eq. 11.
+Figure 7 shows the results for the Sea dataset under posterior
+drift. Figures 7a - 7c depict AREBA’s learning curves while
+Figures 7d and 7e depict the ﬁnal performances.
+p(y = 1|x1 + x2 ≤7) = 1.0 −→0.0
+p(y = 1|x1 + x2 > 7) = 0.0 −→1.0
+p(y = 0|x1 + x2 > 7) = 1.0 −→0.0
+p(y = 0|x1 + x2 ≤7) = 0.0 −→1.0
+(11)
+
+10
+Notice that the experiment runs for 20000 steps to inspect
+AREBA’s long-term behaviour. We start with the case of mild
+imbalance (Fig. 7a). While immediately after the drift, AREBA
+with B = 500, 1000 appear to be learning slower, given
+additional time, the two eventually outperform the rest. This is
+expected because after a long time without any recurring drift,
+the data can be considered as stationary and, hence, we reach
+the same conclusion as previously (Section VI-A, Fig. 4a).
+For severe imbalance (Fig. 7b), we conclude that the key
+issue becomes the imbalance rather than the drift. Notably,
+AREBA with B = 1000 outperforms B = 2 and equalises
+B = 20, 500 despite containing signiﬁcantly more outdated
+examples in its queues. The best ﬁnal performance when
+imbalance is severe occurs when B = 100. This is also
+shown in Fig. 7e. For the case of extreme class imbalance
+i.e. CI = 0.1%, all AREBA versions (except when B = 2)
+perform similarly, although, B = 20 has a slight advantage.
+To sum up, the following important remarks can be made:
+• For mild class imbalance, the general trend is that the
+lower the value of the memory size B, the better AREBA
+performs. This is attributed to the fact that a smaller
+amount of outdated examples are contained in the queues.
+The optimal value of B depends on the dataset.
+• When severe imbalance exists, it appears to be the key
+problem rather than drift. Surprisingly, AREBA with large
+values of B has been shown to perform similarly or even
+better than AREBA with lower values. Interestingly, this
+is somewhat in contradiction to the previous point as the
+former contains more outdated examples in the queues.
+• The previous are useful guidelines to help with the
+selection of the memory size parameter. However, some
+experimentation is still necessary to obtain the best value
+of B. We discuss the role of B further in Section VIII.
+VII. COMPARATIVE STUDY
+A. Stationary data
+We describe our work on stationary synthetic data. Figs 8
+- 10 show the results for the Sine dataset with imbalance of
+CI = 10%, 1%, 0.1% respectively. For completeness, we also
+present the prequential recall and speciﬁcity. Based on the
+analysis in Section VI, we choose B = 20 for the Sine dataset.
+In Fig. 8a, the best performance is achieved by AREBA 20.
+The rest reach a similar performance with the exception of
+the Baseline. Both AREBA versions learn faster with OOB /
+OOB single being the second best. Noteworthy, the 20 classi-
+ﬁer ensemble (OOB) performs similarly to the single classiﬁer
+OOB single. While this may seem surprising at ﬁrst, it is in
+fact consistent with the results of their authors [38], where
+they have concluded that resampling, and not ensembling, is
+the reason behind the effectiveness of the approach.
+In Fig. 9a where severe imbalance exists the two AREBA
+versions signiﬁcantly outperform the rest. Under extreme
+imbalance (Fig. 10a) AREBA performs more than ten times
+better than the rest. AREBA’s effectiveness is attributed to the
+following. While all algorithms perform well on the majority
+class (Figs 9c and 10c), AREBA has a superior performance on
+the minority class (Figs 9b and 10b). This means that the rest
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+AREBA_20
+AREBA_2
+OOB
+OOB_single
+adaptive_cs
+sliding
+baseline
+(a) G-mean
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Recall
+(b) Acc+
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Specificity
+(c) Acc−
+Fig. 8. Comparative study on Sine (stationary) with mild imbalance 10%.
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+AREBA_20
+AREBA_2
+OOB
+OOB_single
+adaptive_cs
+sliding
+baseline
+(a) G-mean
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Recall
+(b) Acc+
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Specificity
+(c) Acc−
+Fig. 9. Comparative study on Sine (stationary) with severe imbalance 1%.
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+AREBA_20
+AREBA_2
+OOB
+OOB_single
+adaptive_cs
+sliding
+baseline
+(a) G-mean
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Recall
+(b) Acc+
+0
+1000 2000 3000 4000
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Specificity
+(c) Acc−
+Fig. 10. Comparative study on Sine (stationary) with extreme imbalance 0.1%.
+of the algorithms ﬁnd it difﬁcult to classify correctly positive
+examples. Recall that the G-mean is high when both Acc+
+and Acc−are high and when their difference is small.
+The reason for AREBA’s advantage on minority class ex-
+amples is due to the concept of maintaining separate and bal-
+anced queues for each class. Let us ﬁrst consider the incremen-
+tal learning algorithms Baseline, Adaptive CS, OOB single
+and OOB. These algorithms use only the most recent arriving
+example which they later discard. As a result, under severe or
+extreme imbalance, they don’t experience many minority class
+examples. Let us now consider Sliding which is a memory-
+based algorithm as it implements a single sliding window.
+Under severe or extreme imbalance, this method may still
+suffer from the same problem if only a small number of
+minority class examples are found in its sliding window.
+The problem can be alleviated with a larger window size,
+however, it wouldn’t be able to rapidly react to concept drift.
+In contrast, the proposed AREBA can afford to have a small
+window size and, at the same time, experience a sufﬁcient
+number of minority class examples. AREBA, like all methods,
+depends on the classiﬁer being able to forget old knowledge
+quickly enough to react to drift. Therefore, as discussed in
+Section VI-B, the optimal value of B is application-dependent
+and tuning is required. To sum up, these remarks are made:
+
+11
+(a) prior drift
+(b) likelihood drift (c) posterior drift
+Fig. 11. Comparative study on Sine with imbalance of 1% and different drift
+types. AREBA is robust to drift, can fully recover and signiﬁcantly outperforms
+other state-of-the-art methods as it had been the case before the drift occurred.
+• AREBA 20 outperforms all algorithms in all imbalance
+scenarios while AREBA 2 is the second best. Under
+extreme class imbalance, AREBA has been shown to
+perform ten times better than state-of-the-art algorithms.
+• Interestingly, resampling methods (AREBA, OOB single)
+seem to better handle online imbalance learning than cost-
+sensitive learning methods (Adaptive CS).
+• As the imbalance becomes severe, the performance of all
+algorithms declines signiﬁcantly. AREBA has been shown
+to be affected less seriously, thus being more robust to it.
+• Methods without a mechanism to handle class imbalance
+in online learning perform poorly (Baseline, Sliding).
+B. Nonstationary data
+We describe our work on nonstationary synthetic data. To
+examine each drift type independently, we devise the following
+experiments on the Sine dataset based on [3]. In all experi-
+ments, the imbalance is set to CI = 1% i.e. p(y = 1) = 0.01.
+A drift in prior probability p(y) occurs as shown in Eq (12):
+p(y = 1) = 0.01 −→0.99
+p(y = 0) = 0.99 −→0.01
+(12)
+A drift in likelihood p(x|y) occurs as shown in Eq (13):
+p(x1 < 0.6|y = 0) = 0.9 −→0.1
+p(x1 ≥0.6|y = 0) = 0.1 −→0.9
+(13)
+A posterior probability drift occurs as shown in Eq (10).
+Figures 11a - 11c show a comparative study on the Sine dataset
+with a prior, class-conditional and posterior probability drift
+respectively. Overall, the proposed AREBA 20 outperforms the
+rest in all cases while AREBA 2 is the second best.
+The ﬁrst point to note is about virtual drift; recall that this
+drift type does not alter the true decision boundary but it can
+affect the learnt one. Generally, the state-of-the-art (AREBA,
+OOB single, Adaptive CS) algorithms not only are robust to
+virtual drift, but an overall slight improvement is observed
+(Figures 11a and 11b). This is because more feature space is
+revealed to the algorithm after the drift occurs, for instance,
+in Eq (13) more examples with x1 ≥0.6 will be observed.
+The second point is about posterior drift. In this case the
+performance of all algorithms decline signiﬁcantly after the
+drift (Fig. 11c). Recall from Eq (10) that the way we deﬁned
+posterior drift is by performing a “concept swap”. Therefore,
+all algorithms should start re-learning the new concept.
+(a) prior drift
+(b) likelihood drift
+(c) posterior drift
+Fig. 12.
+Comparative study on the Sine dataset with class imbalance of
+CI = 1% and 10% noise in the class labels.
+The third point is about OOb single. It outperforms its
+ensemble version when drift is virtual (Figs. 11a and 11b).
+After a posterior drift occurs, OOB is signiﬁcantly better
+than OOB single but they obtain a similar ﬁnal performance.
+Again, this is in alignment with [38] as in a number of
+occasions, the single classiﬁer has outperformed its ensemble
+version. From now on, we will consider only OOB single. To
+sum up, the following important remarks can be made:
+• AREBA 20 outperforms all algorithms in all drift scenar-
+ios while AREBA 2 is the second best.
+• A drift in p(y|x) is the most severe type of data alteration
+and this clearly reﬂects on all algorithms’ performance.
+• Algorithms with a mechanism to address drift (e.g. Slid-
+ing) but without one to address imbalance perform poorly.
+• In settings where there is solely drift (no imbalance),
+AREBA B and Sliding signiﬁcantly outperform all al-
+gorithms; they are almost identical when W
+= 2B.
+AREBA 2 and Baseline jointly follow. Adaptive CS and
+OOB single are outperformed by the rest (the ﬁgures for
+these results are not included).
+C. Data with noisy class labels
+We study each algorithm under conditions where the class
+label (i.e. ground truth) is incorrectly provided. The study
+aims at emulating realistic scenarios that can be encountered
+in deployed settings. One such scenario is when an expert is
+unable to provide the label (violation of the label availability
+assumption). Another scenario is when the label can be pro-
+vided, but not always timely i.e. before the arrival of the next
+example (violation of the no veriﬁcation latency assumption).
+In these scenarios, an estimated label could be provided by an
+automated mechanism which may or may not be true.
+To model this behaviour, we specify a probability threshold
+by which the true label cannot be provided. The degree to
+which the aforementioned assumptions are violated in our
+experiments i.e. the probability threshold is 10%. Speciﬁcally,
+with a probability of 10% we revert the true class label of
+the arriving example, therefore, each algorithm is not always
+trained using the ground truth. We repeat the experiments of
+Figures 11a - 11c with the added noise and present the results
+in Figures 12a - 12c. Similar results for the other synthetic
+datasets were obtained and are included in the supplementary
+materials. These important remarks can be made:
+• In the presence of noise in the class labels, the perfor-
+mance of all algorithms declines substantially.
+
+12
+0
+200
+400
+600
+800
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+AREBA_50
+AREBA_2
+OOB_single
+adaptive_cs
+sliding
+baseline
+(a) Cervical Cancer
+(b) Fraud
+0
+200
+400
+600
+800
+Time Step
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+G-mean
+AREBA_20
+AREBA_2
+OOB_single
+adaptive_cs
+sliding
+baseline
+(c) Credit Score
+(d) MNIST
+(e) Forest Type
+Fig. 13. Comparative study on the real-world datasets. AREBA is the best (or joint best) performing algorithm.
+TABLE I
+FINAL PERFORMANCE (G-MEAN) ON THE REAL-WORLD DATASETS DISPLAYING THE MEAN AND STANDARD DEVIATION
+Algorithm
+Cervical Cancer
+Fraud
+Credit Score
+MNIST
+Forest Cover Type
+AREBA 20/50
+0.8555 (0.0104)
+0.8900 (0.0038)
+0.6746 (0.0052)
+0.9289 (0.0047)
+1.0000 (0.0000)
+AREBA 2
+0.8272 (0.0396)
+0.8985 (0.0000)
+0.6392 (0.0095)
+0.7771 (0.0174)
+1.0000 (0.0000)
+OOB single
+0.4246 (0.2842)
+0.8968 (0.0019)
+0.5645 (0.061)
+0.6388 (0.0313)
+1.0000 (0.0000)
+Adaptive CS
+0.7627 (0.0848)
+0.8564 (0.0000)
+0.6141 (0.0023)
+0.8051 (0.0252)
+1.0000 (0.0000)
+Sliding
+0.6499 (0.0383)
+0.8538 (0.0000)
+0.5851 (0.0024)
+0.2899 (0.0305)
+1.0000 (0.0000)
+Baseline
+0.4391 (0.0394)
+0.8233 (0.0000)
+0.4807 (0.0158)
+0.0592 (0.0737)
+1.0000 (0.0000)
+• AREBA 20 outperforms the rest in all drift scenarios.
+• Compared to AREBA 2, the performance gap is no longer
+big; as B gets large, more noisy examples are included in
+the queues. Interestingly, however, B = 2 does not yield
+the best results. Hence, smaller values of B are suggested
+but still some experimentation is necessary.
+• Interestingly, the performance of AREBA 20 in all drift
+scenarios with 10% noise and 1% (severe) imbalance
+is G-mean ≃0.6, which is close to the performance
+obtained by the proposed algorithm in the case of 0.1%
+(extreme) imbalance without drift (Figure 10a).
+D. Real-world data
+We describe now our work on real-world data. To examine
+the learning speed we present the learning curves in Fig-
+ures 13a - 13e. The ﬁnal mean performances are shown in
+Table I; the best performing algorithm based on ANOVA and
+its post-hoc tests (Section V-D) is shown in bold font which
+denotes statistical signiﬁcance over the others, and the standard
+deviation is shown in brackets. The tables with the p-values are
+found in the supplementary materials. Following the guidelines
+derived from our analysis in Section VI-A we use AREBA 20
+in three datasets and AREBA 50 in the other two.
+In Fig 13a, AREBA 50 achieves G-mean = 0.8 at t ≈
+350 while Adaptive CS obtains this score at t ≈650. The
+learning speed is of utmost importance as, in practise, this
+means Adaptive CS would observe about 300 more biopsies to
+equalise AREBA. In Fig 13c, AREBA 20 achieves G-mean =
+0.6 at t ≈50, while Adaptive CS obtains this score at t ≈450.
+In Fig 13e all algorithms equalise AREBA 20 at t ≈10000.
+In Fig 13b, AREBA and OOB single behave similarly.
+On Table I and Cervical Cancer, AREBA 20/50 is joint ﬁrst
+with AREBA 2 and outperforms the second Adaptive CS by
+more than 9%. In Credit Score, AREBA 20/50 outperforms
+the second AREBA 2 by 3.5% and the third Adaptive CS
+by 6%. In MNIST, AREBA 20/50 achieves a superior per-
+formance, outperforming the second Adaptive CS by more
+than 12% and the third AREBA 2 by more than 15%. In
+Fraud, AREBA 2 outperforms the rest but the improvement
+over AREBA 20/50 and OOB single is less than 1%. In
+Forest Cover Type, all algorithms obtain the same ﬁnal per-
+formance. Surprisingly, Adaptive CS performs better overall
+than OOB single while the opposite hold true in the synthetic
+datasets. To sum up, these important remarks can be made:
+• AREBA outperforms other algorithms in all real datasets.
+These are cases where it would have an impact in practise.
+• In regard to the choice of memory size B, the results
+are consistent with those observed in our studies with
+synthetic data. Speciﬁcally, AREBA 2 either performs
+similarly to AREBA 20 or closely but worse.
+VIII. DISCUSSION AND CONCLUSION
+We discuss below important aspects of AREBA, its advan-
+tages and limitations, and directions for future work.
+Dual nature. AREBA’s effectiveness is attributed to a
+few important characteristics. By maintaining separate and
+balanced queues for each class helps to address the imbalance
+problem. Propagating past examples in the most recent training
+set is viewed as a form of oversampling. The fact that examples
+are carried over a series of steps allows the classiﬁer to
+“remember” old concepts. Also, to address the drift challenge,
+the classiﬁer needs to also be able to “forget” old concepts.
+This is achieved by AREBA’s memory-based nature i.e. by
+bounding the length of queues, these are essentially behaving
+like sliding windows. Hence, AREBA can cope with both
+imbalance and drift. We have shown that the proposed synergy
+is seamless, and it signiﬁcantly outperforms algorithms that
+belong to resampling or memory-based methods solely, and
+
+13
+even algorithms that belong to other types e.g. cost-sensitive
+methods. Lastly, recall that no drift detector can perform
+satisfactory under any situation. When domain expertise can
+foresee the drift’s nature, AREBA can work in cooperation with
+change detection-based methods to complement each other.
+QBR vs AREBA. QBR was ﬁrst introduced in our prelimi-
+nary study [41] that ran experiments only on synthetic datasets,
+and examined only a limited range of imbalance rates and
+a single drift type. In this work, we conducted an extensive
+experimental work and stress tested QBR under conditions of
+severe imbalance and different drift types. We have identiﬁed,
+discussed and analysed QBR’s limitations and under which
+conditions these occur. It turns out that QBR’s limitations arise
+from the fact that the imbalance problem persists in the queues
+(as described with reference to Fig. 1). To overcome this, the
+paper proposes AREBA with two major design changes over
+QBR. Firstly, it allows each queue to be of size B (rather
+than
+B
+2 ). Secondly, the queues remain balanced throughout
+the time using a dynamic mechanism (adaptive rebalancing).
+These changes allow AREBA to be very effective when dealing
+with online learning tasks under drift and imbalance.
+Role of the memory size. B’s role is of great importance
+and goes beyond that of just controlling the maximum queue
+lengths. It controls the “level” of incremental learning. The
+smaller its value the closer to being incremental, speciﬁcally,
+when B = 2 AREBA becomes near-incremental. Finding a
+suitable value is dataset-speciﬁc and requires some trial-and-
+error. To reduce this tedious process, we have provided in
+Section VI-B some guidelines to help us determine B.
+Choice of classiﬁer. AREBA does not impose any re-
+strictions on the selection of the classiﬁer. Some classiﬁers,
+however, are more suitable than others for online learning. Our
+scope was on neural networks which have been shown to work
+well (e.g. [3], [26]). Hoeffding Trees have also been shown
+to work well (e.g. [24]). Future work will apply AREBA with
+trees to examine if the observed improvement can generalise.
+Veriﬁcation latency. The learning framework used is suit-
+able for human-in-the-loop learning and assumes that no veri-
+ﬁcation latency exists. Involving humans, however, may cause
+delays in receiving the labels. In practise, to avoid or reduce
+potential delays, would require mechanisms to collect labels
+in an automatic manner. We have shown in Section VII-C
+that AREBA maintains its dual nature beneﬁts and still outper-
+forms other state-of-the-art algorithms in conditions where the
+assumption is violated. Future work will relax this assumption
+and examine other paradigms, such as, active learning [51].
+To conclude, we introduced the novel Adaptive REBAlanc-
+ing (AREBA) algorithm to addresses the problem of class
+imbalance in nonstationary environments. We provided new
+interesting insights towards the joint problem of imbalance
+and concept drift. Our study compared AREBA to other four
+baseline and state-of-the-art algorithms and showed that it sig-
+niﬁcantly outperforms them in the vast majority of compared
+settings.
+ACKNOWLEDGMENT
+This work has been supported by the EU’s Horizon 2020
+research and innovation programme under grant agreements
+No 867433 (Fault-Learning) and No 739551 (KIOS CoE), and
+from the Republic of Cyprus through the Directorate General
+for European Programmes, Coordination and Development.
+REFERENCES
+[1] G. Ditzler, M. Roveri, C. Alippi, and R. Polikar, “Learning in non-
+stationary environments: A survey,” IEEE Computational Intelligence
+Magazine, vol. 10, no. 4, pp. 12–25, 2015.
+[2] H. He and E. A. Garcia, “Learning from imbalanced data,” IEEE
+Transactions on Knowledge and Data Engineering, no. 9, pp. 1263–
+1284, 2008.
+[3] S. Wang, L. L. Minku, and X. Yao, “A systematic study of online class
+imbalance learning with concept drift,” IEEE transactions on neural
+networks and learning systems, vol. 29, no. 10, pp. 4802–4821, 2018.
+[4] G. Ditzler and R. Polikar, “Incremental learning of concept drift from
+streaming imbalanced data,” IEEE Transactions on Knowledge and Data
+Engineering, vol. 25, no. 10, pp. 2283–2301, 2013.
+[5] E. Kyriakides and M. Polycarpou, Eds., Intelligent monitoring, control,
+and security of critical infrastructure systems. Springer, 2014, vol. 565.
+[6] A. Dal Pozzolo, O. Caelen, R. A. Johnson, and G. Bontempi, “Cal-
+ibrating probability with undersampling for unbalanced classiﬁcation,”
+in Computational Intelligence, 2015 IEEE Symposium Series on. IEEE,
+2015, pp. 159–166.
+[7] J. Gama, I. ˇZliobait˙e, A. Bifet, M. Pechenizkiy, and A. Bouchachia, “A
+survey on concept drift adaptation,” ACM Computing Surveys (CSUR),
+vol. 46, no. 4, p. 44, 2014.
+[8] K. Fernandes, J. S. Cardoso, and J. Fernandes, “Transfer learning with
+partial observability applied to cervical cancer screening,” in Iberian
+Conference on Pattern Recognition and Image Analysis. Springer, 2017,
+pp. 243–250.
+[9] G. I. Webb, R. Hyde, H. Cao, H. L. Nguyen, and F. Petitjean, “Charac-
+terizing concept drift,” Data Mining and Knowledge Discovery, vol. 30,
+no. 4, pp. 964–994, 2016.
+[10] B. Krawczyk, L. L. Minku, J. Gama, J. Stefanowski, and M. Wo´zniak,
+“Ensemble learning for data stream analysis: A survey,” Information
+Fusion, vol. 37, pp. 132–156, 2017.
+[11] G. Widmer and M. Kubat, “Learning in the presence of concept drift
+and hidden contexts,” Machine Learning, vol. 23, no. 1, pp. 69–101,
+1996.
+[12] M. M. Lazarescu, S. Venkatesh, and H. H. Bui, “Using multiple windows
+to track concept drift,” Intelligent Data Analysis, vol. 8, no. 1, pp. 29–59,
+2004.
+[13] R. Klinkenberg, “Learning drifting concepts: Example selection vs.
+example weighting,” Intelligent Data Analysis, vol. 8, no. 3, pp. 281–
+300, 2004.
+[14] E. S. Page, “Continuous inspection schemes,” Biometrika, vol. 41, no.
+1/2, pp. 100–115, 1954.
+[15] C. Alippi and M. Roveri, “Just-in-time adaptive classiﬁerspart i: De-
+tecting nonstationary changes,” IEEE Transactions on Neural Networks,
+vol. 19, no. 7, pp. 1145–1153, 2008.
+[16] ——, “Just-in-time adaptive classiﬁerspart ii: Designing the classiﬁer,”
+IEEE Transactions on Neural Networks, vol. 19, no. 12, pp. 2053–2064,
+2008.
+[17] A. Bifet and R. Gavalda, “Learning from time-changing data with
+adaptive windowing,” in Proceedings of the 2007 SIAM International
+Conference on Data Mining.
+SIAM, 2007, pp. 443–448.
+[18] C. Alippi, G. Boracchi, and M. Roveri, “Just-in-time classiﬁers for re-
+current concepts,” IEEE Transactions on Neural Networks and Learning
+Systems, vol. 24, no. 4, pp. 620–634, 2013.
+[19] D. Brzezinski and J. Stefanowski, “Ensemble classiﬁers for imbalanced
+and evolving data streams,” Series in Machine Perception and Artiﬁcial
+Intelligence, vol. 83, no. 1, pp. 44–68, 2018.
+[20] W. N. Street and Y. S. Kim, “A streaming ensemble algorithm (sea)
+for large-scale classiﬁcation,” in Proceedings of the 7th ACM SIGKDD
+International Conference on Knowledge Discovery and Data Mining.
+ACM, 2001, pp. 377–382.
+[21] R. Elwell and R. Polikar, “Incremental learning of concept drift in
+nonstationary environments,” IEEE Transactions on Neural Networks,
+vol. 22, no. 10, pp. 1517–1531, 2011.
+[22] L. L. Minku and X. Yao, “Ddd: A new ensemble approach for dealing
+with concept drift,” IEEE transactions on knowledge and data engineer-
+ing, vol. 24, no. 4, pp. 619–633, 2011.
+[23] N. C. Oza, “Online bagging and boosting,” in 2005 IEEE International
+Conference on Systems, Man and Cybernetics, vol. 3.
+Ieee, 2005, pp.
+2340–2345.
+
+14
+[24] D. Brzezinski and J. Stefanowski, “Reacting to different types of concept
+drift: The accuracy updated ensemble algorithm,” IEEE Transactions on
+Neural Networks and Learning Systems, vol. 25, no. 1, pp. 81–94, 2013.
+[25] ——, “Combining block-based and online methods in learning ensem-
+bles from concept drifting data streams,” Information Sciences, vol. 265,
+pp. 50–67, 2014.
+[26] J. Wang, P. Zhao, and S. C. H. Hoi, “Cost-sensitive online classiﬁcation,”
+IEEE Transactions on Knowledge and Data Engineering, vol. 26, no. 10,
+pp. 2425–2438, 2014.
+[27] S. Wang, L. L. Minku, and X. Yao, “A learning framework for online
+class imbalance learning,” in Computational Intelligence and Ensemble
+Learning (CIEL), 2013 IEEE Symposium on.
+IEEE, 2013, pp. 36–45.
+[28] A. Ghazikhani, R. Monseﬁ, and H. S. Yazdi, “Recursive least square
+perceptron model for non-stationary and imbalanced data stream classi-
+ﬁcation,” Evolving Systems, vol. 4, no. 2, pp. 119–131, 2013.
+[29] ——, “Ensemble of online neural networks for non-stationary and
+imbalanced data streams,” Neurocomputing, vol. 122, pp. 535–544,
+2013.
+[30] A. H. Zhou and X. Y. Liu, “Training cost-sensitive neural networks with
+methods addressing the class imbalance problem,” IEEE Transactions on
+Knowledge and Data Engineering, vol. 18, no. 1, pp. 63–77, 2006.
+[31] I. Tomek, “Two modiﬁcations of cnn,” IEEE Transactions on Systems,
+Man and Cybernetics, vol. 6, pp. 769–772, 1976.
+[32] N. V. Chawla, K. W. Bowyer, L. O. Hall, and W. P. Kegelmeyer, “Smote:
+synthetic minority over-sampling technique,” Journal of Artiﬁcial Intel-
+ligence Research, vol. 16, pp. 321–357, 2002.
+[33] G. Douzas and F. Bacao, “Effective data generation for imbalanced
+learning using conditional generative adversarial networks,” Expert
+Systems with applications, vol. 91, pp. 464–471, 2018.
+[34] J. Gao, B. Ding, W. Fan, J. Han, and S. Y. Philip, “Classifying
+data streams with skewed class distributions and concept drifts,” IEEE
+Internet Computing, vol. 12, no. 6, 2008.
+[35] S. Chen and H. He, “Sera: selectively recursive approach towards
+nonstationary imbalanced stream data mining,” in International Joint
+Conference on Neural Networks.
+IEEE, 2009, pp. 522–529.
+[36] ——, “Towards incremental learning of nonstationary imbalanced data
+stream: a multiple selectively recursive approach,” Evolving Systems,
+vol. 2, no. 1, pp. 35–50, 2011.
+[37] B. Mirza, Z. Lin, and N. Liu, “Ensemble of subset online sequential
+extreme learning machine for class imbalance and concept drift,” Neu-
+rocomputing, vol. 149, pp. 316–329, 2015.
+[38] S. Wang, L. L. Minku, and X. Yao, “Resampling-based ensemble
+methods for online class imbalance learning,” IEEE Transactions on
+Knowledge and Data Engineering, vol. 27, no. 5, pp. 1356–1368, 2015.
+[39] L. L. Minku, A. P. White, and X. Yao, “The impact of diversity on online
+ensemble learning in the presence of concept drift,” IEEE Transactions
+on Knowledge and Data Engineering, vol. 22, no. 5, pp. 730–742, 2010.
+[40] R. Barros and S. Santos, “A large-scale comparison of concept drift
+detectors,” Information Sciences, vol. 451, pp. 348–370, 2018.
+[41] K. Malialis, C. Panayiotou, and M. M. Polycarpou, “Queue-based resam-
+pling for online class imbalance learning,” in International Conference
+on Artiﬁcial Neural Networks (ICANN).
+Springer, 2018, pp. 498–507.
+[42] J. Gama, P. Medas, G. Castillo, and P. Rodrigues, “Learning with drift
+detection,” in Brazilian Symposium on Artiﬁcial Intelligence.
+Springer,
+2004, pp. 286–295.
+[43] H.
+Hofmann,
+“German
+credit
+data,”
+https://www.kaggle.com/uciml/german-credit/.
+[44] Y. LeCun, L. Bottou, Y. Bengio, and P. Haffner, “Gradient-based learning
+applied to document recognition,” Proceedings of the IEEE, vol. 86,
+no. 11, pp. 2278–2324, 1998.
+[45] J. A. Blackard and D. J. Dean, “Comparative accuracies of artiﬁcial neu-
+ral networks and discriminant analysis in predicting forest cover types
+from cartographic variables,” Computers and Electronics in Agriculture,
+vol. 24, no. 3, pp. 131–151, 1999.
+[46] K. He, X. Zhang, S. Ren, and J. Sun, “Delving deep into rectiﬁers:
+Surpassing human-level performance on imagenet classiﬁcation,” in
+Proceedings of the IEEE International Conference on Computer Vision,
+2015, pp. 1026–1034.
+[47] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimiza-
+tion,” in Proceedings of the 3rd International Conference on Learning
+Representations (ICLR).
+[48] A. L. Maas, A. Y. Hannun, and A. Y. Ng, “Rectiﬁer nonlinearities
+improve neural network acoustic models,” in Proceedings of the 30 th
+International Conference on Machine Learning, 2013.
+[49] M. Kubat, R. Holte, and S. Matwin, “Learning when negative examples
+abound,” in European Conference on Machine Learning.
+Springer,
+1997, pp. 146–153.
+[50] J. Gama, R. Sebasti˜ao, and P. P. Rodrigues, “On evaluating stream
+learning algorithms,” Machine Learning, vol. 90, no. 3, pp. 317–346,
+2013.
+[51] K. Malialis, C. G. Panayiotou, and M. M. Polycarpou, “Data-efﬁcient
+online classiﬁcation with siamese networks and active learning,” in IEEE
+WCCI International Joint Conference on Neural Networks, 2020.
+Kleanthis Malialis is a Marie Skodowska-Curie
+Widening Fellow in the KIOS Center of Excellence
+(KIOS CoE) at the University of Cyprus (UCY)
+interested in online machine learning. Previously,
+he was a Research Associate in the KIOS CoE.
+Prior joining UCY, Dr. Malialis was working at
+The Telegraph as a Data Scientist where his focus
+was on building predictive models using machine
+learning algorithms. He was a Research Associate in
+the Department of Computer Science at University
+College London (UCL), as part of an Innovate UK
+Knowledge Transfer Partnership between UCL and a data analytics start-up.
+He subsequently joined the start-up as a Data Scientist. He holds a PhD
+degree from the Department of Computer Science at the University of York,
+UK with a focus on multiagent systems and reinforcement learning. His PhD
+was funded by an EPSRC DTA Scholarship. He obtained his MEng degree
+in Computer Systems and Software Engineering from the same department.
+Christos G. Panayiotou has received a B.Sc. and
+a Ph.D. degree in Electrical and Computer Engi-
+neering from the University of Massachusetts at
+Amherst, in 1994 and 1999 respectively. He also
+received an MBA from the Isenberg School of
+Management, at the aforementioned university in
+1999. Currently he is a Professor at the Electrical
+and Computer Engineering Department at UCY and
+he serves as the Deputy Director of the KIOS CoE
+for which he is also a founding member. His re-
+search interests include distributed control systems,
+wireless, ad hoc and sensor networks, computer communication networks,
+quality of service (QoS) provisioning, optimization and control of discrete-
+event systems, resource allocation, simulation, transportation networks and
+manufacturing systems. He is a senior member of the IEEE and also a reviewer
+for various conferences and journals, and he has served in the organizing and
+program committees of various international conferences.
+Marios M. Polycarpou is a Professor of Electrical
+and Computer Engineering and the Director of the
+KIOS Research and Innovation Center of Excellence
+at the University of Cyprus. He received the B.A
+degree in Computer Science and the B.Sc. in Elec-
+trical Engineering, both from Rice University, USA
+in 1987, and the M.S. and Ph.D. degrees in Electrical
+Engineering from the University of Southern Cali-
+fornia, in 1989 and 1992 respectively. His teaching
+and research interests are in intelligent systems and
+networks, adaptive and cooperative control systems,
+computational intelligence, fault diagnosis and distributed agents. He has
+published more than 300 articles in refereed journals, edited books and
+refereed conference proceedings, and co-authored 7 books. He is also the
+holder of 6 patents. Prof. Polycarpou is a Fellow of IEEE and IFAC. He is
+the recipient of the 2016 IEEE Neural Networks Pioneer Award. He received
+with his co-authors the 2014 Best Paper Award for the journal Building and
+Environment (Elsevier). Prof. Polycarpou served as the President of the IEEE
+Computational Intelligence Society (2012-2013), and as the Editor-in-Chief
+of the IEEE Transactions on Neural Networks and Learning Systems (2004-
+2010). He is currently the President of the European Control Association
+(EUCA). He has participated in more than 60 research projects/grants, funded
+by several agencies and industry in Europe and the United States, including
+the prestigious European Research Council (ERC) Advanced Grant.

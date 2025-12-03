@@ -1,0 +1,2421 @@
+QUANTUM ERROR PROPAGATION
+Eldar Sultanow,
+Fation Selimllari,
+Siddhant Dutta, Barry D. Reese,
+Madjid Tehrani,
+and
+William J Buchanan
+Abstract. Data poisoning attacks on machine learning models [1] aim to manip-
+ulate the data used for model training such that the trained model behaves in the
+attacker’s favour. In classical models such as deep neural networks, large chains
+of dot products do indeed cause errors injected by an attacker to propagate or
+accumulate. But what about quantum models? We hypothesise that, in quantum
+machine learning, error propagation is limited for two reasons. The first is that
+data, which is encoded in quantum computing, is in terms of qubits that are con-
+fined to the Bloch sphere. Second, quantum information processing happens via
+the application of unitary operators, which preserve norms. Testing this hypoth-
+esis, we investigate how extensive error propagation and, thus, poisoning attacks
+affect quantum machine learning [2].
+1. Introduction
+Quantum machine learning (QML) involves the application of machine learning
+programs with quantum algorithms. This quantum processing then uses qubits and
+quantum operations to enhance computational speed and data storage and where
+a hybrid system can be used with both classical and quantum computing [3]. In
+general, QML [4] refers to the idea of utilizing quantum computing at various stages
+of the machine learning pipeline. Here, the expectation is that quantum advantages
+may lead to faster processing or better internal representations. However, our in-
+terest in this paper is in robustness, and the question of whether or not the fairly
+restricted algebraic structures that govern the world of quantum computing also offer
+advantages with respect to error mitigation.
+To begin with, we state our hypotheses and research question on error propaga-
+tion in quantum machine learning. Answering our research question will require a
+formalization of the problem with respect to the behaviour of qubits. In order to
+describe error propagation geometrically, we investigate how the successive rotation
+of a vector on the Bloch Sphere [5] can be mathematically formalized.
+Key words and phrases. Quantum, Machine Learning, Matrices, Error Propagation.
+arXiv:2410.05145v2  [quant-ph]  27 Jan 2025
+
+2
+E. SULTANOW ET AL.
+1.1. Hypotheses. Our two hypotheses are:
+H1: The propagation of data errors – discrepancies of the Euler angles [6] of qubits
+on the Bloch sphere [7] – is limited and therefore cannot grow indefinitely.
+H2: Periodically, errors increase and decrease back to zero. This periodic behaviour
+becomes more complicated the more and the stronger Euler angles are biased
+by an error.
+While these hypotheses may seem almost obvious, the following question is more
+difficult to answer:
+Q: How can the periodic nature of error growth and decline be described mathemat-
+ically (ideally in closed form) in order to allow for quantifying the effects of
+data poisoning in QML?
+Observing the above fact, we developed a new hypothesis to evaluate whether this
+property will be preserved in a quantum circuit, such as the ZZFeatureMap used in
+QSVM, as described below to evaluate the robustness of quantum machine learning
+(QML) against poisoning attacks.
+H0 : µQSVM-poisoned = µSVM-poisoned
+H1 : µQSVM-poisoned > µSVM-poisoned
+Where µQSVM-poisoned and µSVM-poisoned is the mean accuracies of QSVM and SVM
+under the poisoning scenario. We test if QSVM is significantly more robust.
+To get a gentle introduction to algebraic structures underlying the error propaga-
+tion theory, Appendix A explores single-qubit operations with the aim of providing
+a foundational framework for understanding the mathematical principles governing
+quantum noise.
+2. Poisoning attacks of QML
+Recent advancements in cloud-based quantum machine learning (QML) have brought
+unprecedented opportunities and unique challenges to the field of adversarial ma-
+chine learning. Classical Support Vector Machines (SVMs), as analyzed by Biggio
+et al. (2012) [8], have long been a target for poisoning attacks, where malicious
+data compromises model integrity, causing significant error rate increases. Extend-
+ing such concerns into the quantum domain, Franco et al. (2024) [9] underscore
+vulnerabilities in QML, such as fault injection and quantum noise exploitation, and
+highlight the potential of adversarial training and quantum differential privacy as
+countermeasures. Wendlinger et al. (2024) [10] further demonstrate the susceptibil-
+ity of quantum models to adversarial perturbations, emphasizing the necessity for
+robust regularization techniques. Meanwhile, Kundu and Ghosh (2024) [11] detail
+
+QUANTUM ERROR PROPAGATION
+3
+the security risks in hybrid QMLaaS frameworks, exposing threats to data integrity
+and system stability, and propose encryption and trusted execution environments
+as defences. Li et al. (2024) [12] introduce lower bounds for adversarial error rates
+in QML, providing valuable benchmarks for model robustness. Notably, the QUID
+attack by Kundu and Ghosh (2024) [13] achieves up to 90% accuracy degradation in
+QML models under label-flipping data poisoning, illustrating the severe consequences
+of adversarial attacks.
+Against this backdrop, the evaluation of Quantum Support Vector Machines (QSVMs)
+emerges as a critical research imperative. Yu and Zhou (2024) [14] address adver-
+sarial resilience in power system applications with QaTSA but focus predominantly
+on tailored quantum circuits. Similarly, Reers and Maussner (2024) [15] provide a
+broad comparative analysis of vulnerabilities in classical and quantum frameworks
+but leave gaps in QSVM-specific evaluations. Our study aims to fill this void, com-
+paring the high-impact QUID attacks [13] with the broader applicability of QSVMs
+in real-world scenarios.
+3. Experiment Setup
+In this experiment, we utilized Qiskit version 1.3.1, along with qiskit-machine-
+learning version 0.8.2 and qiskit-algorithms version 0.3.1 to implement and test
+quantum machine learning models and algorithmic simulations. The experiment was
+conducted on a Google Colab environment, leveraging a Python 3 Google Compute
+Engine backend. The computational resources included 273.66 compute units. The
+system provided 51 GB of RAM and a disk capacity of 225.8 GB.
+All the code for reproducing this experiment is publicly available (see notebook
+QSVM_SVM_Poisioning.ipynb on GitHub).
+4. Experiment Design for SVM vs. QSVM
+4.1. Problem Definition. We consider a binary classification task [16], where an
+adversary has a strong motivation to poison a QSVM algorithm deployed on cloud-
+based quantum machines:
+• Class 1: Cylinder
+• Class 2: Cone
+The radar cross-section (RCS) of an object is modelled as:
+RCS(r, h, θaz, θel) = (r · h)2
+λ2
+· cos(θaz) · cos(θel),
+with r, h the geometry parameters, λ the wavelength, and θaz, θel the angles. We
+generate synthetic data with Gaussian noise in angles.
+
+4
+E. SULTANOW ET AL.
+4.1.1. Objective. We aim to classify a given RCS profile as either a cylinder or a
+cone. We compare:
+(1) Classical SVM: Unpoisoned vs. Poisoned.
+(2) QSVM: Unpoisoned vs. Poisoned.
+We investigate whether the QSVM exhibits greater robustness to data poisoning
+than the classical SVM.
+4.1.2. assumption of adversarial access. The attack assumes that the adversary has
+partial access to the training data and can inject a fraction of poisoned samples (ϵ)
+while possessing knowledge of the model type (classical or quantum SVM), kernel
+functions, and data encoding schemes. For classical SVMs, the adversary exploits
+kernel-induced feature spaces, while for quantum SVMs (QSVMs), fidelity-based
+distances in the quantum Hilbert space are targeted. The attack presumes the avail-
+ability of sufficient computational resources to craft adversarial samples that distort
+the decision boundary, leveraging the reproducibility of model training. Addition-
+ally, the system is assumed to operate in a fault-tolerant quantum environment, and
+no robust defences, such as adversarial training, anomaly detection, or encryption,
+are assumed to be in place during the attack.
+4.2. Methodology.
+(1) Data Generation: Synthetic RCS data for both classes, creating training
+and test sets.
+(2) Feature Extraction: Flatten RCS profiles and apply PCA to reduce di-
+mensionality (e.g., to 10 components).
+(3) Normalization: Normalize PCA-reduced features to [0,1], especially for
+QSVM.
+(4) Models:
+• SVM: Classical SVM with a polynomial kernel on reduced features.
+• QSVM: Uses a fidelity-based quantum kernel (via a ZZFeatureMap and
+FidelityQuantumKernel).
+(5) QUID-Inspired Poisoning: Instead of simple additive perturbations, we
+reassign labels of a subset of training samples based on a QUID-inspired
+strategy:
+• For the SVM, compute distances in the kernel-induced feature space.
+• For the QSVM, compute fidelity-based distances between quantum states.
+The poisoned samples are assigned to the class that is, on average, the most
+distant.
+(6) Monte Carlo Runs: Repeat the experiment multiple times(here, 30 times)
+to get distributions of accuracies.
+
+QUANTUM ERROR PROPAGATION
+5
+(7) Statistical Testing: Perform a paired t-test on the difference in poisoned
+accuracies of QSVM and SVM. If p < 0.05, conclude QSVM is more robust.
+We chose the gray-box attack model presented in the paper QUID attack by Kundu
+and Ghosh (2024) [13] , because it aligns well with the practical constraints of cloud-
+based quantum computing environments. In these settings, adversaries realistically
+have access to the data encoding circuits and training datasets. Still, they are un-
+likely to obtain full control over the training process or the complete model details.
+This grey-box scenario captures a realistic threat vector where an adversary within
+the cloud provider or intercepting communication can exploit quantum-specific vul-
+nerabilities, such as manipulating encoded quantum states, without requiring access
+to the quantum hardware’s internal operations or gradients.
+On the other hand, the assumptions underlying the poisoning attack in the Trusted-
+AI/adversarial-robustness-toolbox [17] code for SVMs are less practical for real-world
+versions for quantum systems. The white-box model assumes complete access to the
+classifier, including its gradients, decision boundaries, and support vectors. Such
+access is rarely feasible in cloud-based quantum systems, where these details are
+abstracted away by the backend. Additionally, the need for iterative retraining in
+the SVM poisoning attack is computationally expensive and unrealistic for quantum
+systems, which are inherently resource-constrained. Therefore, adopting a grey-box
+model as in the QUID framework better reflects practical adversarial capabilities and
+aligns with the robustness challenges specific to the quantum domain.
+The code of this experiment is located in the notebook
+QSVM_SVM_Poisioning.ipynb on GitHub.
+5. New QUID-Based Label Poisoning: SVM vs. QSVM
+Inspired by the Algorithm 3 presented by Kundu and Ghosh (2024) [13], which
+we present in Appendix I (Algorithm 4), we introduce a novel class of QUID-based
+poisoning attacks(Algorithm 1 and 2). These attacks target both Support Vector
+Machines (SVMs) and Quantum Support Vector Machines (QSVMs). Additionally,
+in anticipation of conceptual requirements, we propose a recursive version of these
+attacks and prove the equivalence between the recursive and standard versions (see
+Appendix I-Algorithm 4 as the recursive version of Algorithm 1 and Algorithm 5 as
+the recursive version of Algorithm 2).
+
+6
+E. SULTANOW ET AL.
+Algorithm 1: QUID-style Label Poisoning for Classical SVM
+1 Require: Training data Dtr = {(xi, yi)}n
+i=1, Poison ratio ϵ, Kernel function
+k(x, x′), Distance metric d(·, ·). Ensure: Poisoned dataset with modified
+labels.
+2 Split Dtr into clean set Dc and poison set Dp with ratio ϵ;
+3 C ←unique({yi | (xi, yi) ∈Dtr}) // Set of unique classes.
+4 Φc ←{k(x, x′) | (x, y) ∈Dc} // Kernel-induced clean feature space.
+5 Φp ←{k(x, x′) | (x, y) ∈Dp} // Kernel-induced poison feature
+space.
+6 for ϕi ∈Φp do
+7
+Dcls ←{} // Initialize dictionary for class-wise distances.
+8
+for c ∈C do
+9
+Φ(c)
+c
+←{ϕ | ϕ ∈Φc, y = c} // Features of class c.
+10
+Dcls[c] ←
+1
+|Φ(c)
+c |
+P
+ϕ∈Φ(c)
+c d(ϕi, ϕ);
+11
+ynew
+i
+←arg maxc∈C Dcls[c] // Assign class with maximum distance.
+12 return Dc ∪{(xi, ynew
+i
+) | (xi, yi) ∈Dp};
+Algorithm 2: QUID-style Label Poisoning for QSVM
+1 Require: Training data Dtr = {(xi, yi)}n
+i=1, Poison ratio ϵ, Encoding
+circuit ϕ, Distance metric d(·, ·) for density matrices. Ensure: Poisoned
+dataset with modified labels.
+2 Split Dtr into clean set Dc and poison set Dp with ratio ϵ;
+3 C ←unique({yi | (xi, yi) ∈Dtr}) // Set of unique classes.
+4 ρc ←{ϕ(x) | (x, y) ∈Dc} // Encoded clean states.
+5 ρp ←{ϕ(x) | (x, y) ∈Dp} // Encoded poison states.
+6 for ρi ∈ρp do
+7
+Dcls ←{} // Initialize dictionary for class-wise distances.
+8
+for c ∈C do
+9
+ρ(c)
+c
+←{ρ | ρ ∈ρc, y = c} // States of class c.
+10
+Dcls[c] ←
+1
+|ρ(c)
+c |
+P
+ρ∈ρ(c)
+c d(ρi, ρ);
+11
+ynew
+i
+←arg maxc∈C Dcls[c] // Assign class with maximum distance.
+12 return Dc ∪{(xi, ynew
+i
+) | (xi, yi) ∈Dp};
+
+QUANTUM ERROR PROPAGATION
+7
+6. Results and Theoretical Insights from Experiment Design
+The results of the Monte Carlo experiments, summarized in Table 1, clearly demon-
+strate a significant robustness advantage of QSVM over SVM. While the SVM main-
+tained an accuracy of 50% under both clean and poisoned conditions, the QSVM
+achieved and sustained a perfect accuracy of 100%, even when exposed to adver-
+sarial poisoning. These findings highlight the inherent resilience of quantum-based
+models to adversarial manipulations in the evaluated scenario.
+Model
+Mean Accuracy (%)
+Standard Deviation (%)
+SVM
+50.0
+0.0
+SVM (Poisoned)
+49.0
+0.0
+QSVM
+100.0
+0.0
+QSVM (Poisoned)
+100.0
+0.0
+Table 1. Performance of SVM and QSVM under clean and poisoned
+data conditions with PCA=10.
+The robustness of QSVM can be attributed to its reliance on fidelity-based quan-
+tum kernels, which exploit the geometric properties of quantum states in Hilbert
+space. These properties make it challenging for an adversary to effectively manip-
+ulate the decision boundaries. In contrast, classical SVM relies on kernel-induced
+feature spaces, which are more susceptible to adversarial perturbations.
+A paired t-test was conducted to assess the statistical significance of the observed
+difference in robustness. The results (T-statistic: ∞, P-value: 0.000) strongly reject
+the null hypothesis (H0) that QSVM and SVM have equal robustness. This finding
+supports the alternative hypothesis (H1), indicating that QSVM is significantly more
+robust to poisoning attacks than SVM.
+6.1. Analysis of Empirical Results. The uniform performance of QSVM across
+clean and poisoned conditions suggests that quantum-enhanced models may offer
+inherent advantages in scenarios where data integrity cannot be guaranteed. This
+advantage stems from two key factors:
+(1) Fidelity-Based Kernels: QSVM uses fidelity as a similarity metric, which
+is inherently resistant to small perturbations in quantum states. This char-
+acteristic reduces the effectiveness of poisoning attacks.
+(2) Encoding Circuit Robustness: The use of quantum feature maps ensures
+that adversarial samples cannot easily align with decision boundaries in the
+Hilbert space.
+
+8
+E. SULTANOW ET AL.
+6.2. PCA and Simulated Qubits. While the results strongly favour QSVM, it is
+important to acknowledge certain limitations:
+• Quantum System Constraints: The experiments assume an idealized
+fault-tolerant quantum computing (FTQC) environment with 10 qubits. Ini-
+tially, the number of features in the dataset was 701, but dimensionality
+reduction using PCA was applied on both SVM and QSVM, reducing it to
+10 features. This reduction resulted in an accuracy of 50% for SVM but 100%
+for QSVM. To address this limitation and explore the impact of more qubits
+for QSVM and more features for SVM, we consider the maximum number of
+FTQC qubits that can be simulated using Qiskit Aer on Colab. Given the
+available 51 GB of RAM on Colab, the maximum number of qubits (n) that
+can be simulated using Qiskit Aer’s state vector method is determined by the
+memory requirement:
+Memory (bytes) = 16 · 2n,
+where 16 bytes are required per amplitude (8 bytes for the real part and 8
+bytes for the imaginary part).
+With 51 GB = 51 × 109 bytes, we solve:
+2n ≤51 × 109
+16
+≈3.19 × 109,
+n ≈log2(3.19 × 109) ≈31.9.
+Thus, in theory, Colab can simulate a maximum of 31 qubits, as simulating
+32 qubits would exceed the memory limit.
+We applied this change on SVM, and the following shows the result; as it does not
+improve the 50% accuracy, we did not redo the QSVM with a higher number of
+simulated qubits:
+Model
+Mean Accuracy (%)
+Standard Deviation (%)
+SVM
+50.0
+0.0
+SVM (Poisoned)
+47.0
+0.0
+Table 2. Performance of SVM and QSVM under clean and poisoned
+data conditions with PCA=31.
+
+QUANTUM ERROR PROPAGATION
+9
+7. Theoretical Framework for QSVM Resiliency Against
+QUID-Style Attacks
+7.1. QSVM is resilient to poisoning.
+Theorem 1 (Single-Qubit QML Resilience). Consider a single-qubit quantum model
+described by the state
+|ψ⟩= U(φ, θ, ψ) |ψ0⟩,
+where U(φ, θ, ψ) ∈SU(2) is a unitary rotation given by Equation (1) (see also
+Section A.1). Suppose an adversary injects a small perturbation (ϵx, ϵy, ϵz) into the
+Euler angles.
+Then, under repeated applications of U, the angular discrepancies
+∆az(t) and ∆el(t) (defined in Equation (7) and studied via Equations (8) and (10))
+remain strictly periodic and bounded over time. Consequently, the adversarial error
+cannot grow unboundedly, indicating that any single-qubit QML model is resilient to
+unbounded poisoning attacks.
+Proof (Outline). 1. Bloch-Sphere Representation. From Equation (3) (Section A.1),
+a single-qubit state can be viewed as Mq = ⃗q · ⃗σ, where ⃗q ∈R3 is the Bloch vector
+and ⃗σ = (σ1, σ2, σ3) are the Pauli matrices. Any operation U(φ, θ, ψ) ∈SU(2) (see
+Equation (1)) thus preserves norms and merely rotates ⃗q on the Bloch sphere.
+2. Error Injection. Let ϵx, ϵy, ϵz be small offsets to the Euler angles (φ, θ, ψ). Define
+the azimuthal and elevation discrepancies ∆az(t) and ∆el(t) after t repeated rota-
+tions, following Equations (7)–(8). Figure 1 illustrates these discrepancies over 200
+consecutive cycles, confirming periodic error patterns even with nonzero ϵy.
+3. Periodicity and Boundedness. Via the matrix-power formalism (Equations (9)–
+(10)), ∆az(t) and ∆el(t) reduce to trigonometric functions in
+p
+θ2 + (ϕ + ψ)2, yield-
+ing a definite period of 2π/√
+θ2+(ϕ+ψ)2. Tables 3–4 demonstrate numerically that these
+discrepancies never exceed π, and they oscillate between finite maxima and minima.
+4. Empirical Observation. Listings 8–9 show Python/Mathematica implementations
+confirming that the discrepancy functions stay strictly bounded (see also Figure 8).
+Thus, even under adversarial perturbations to a single-qubit’s rotation angles, no
+unbounded error growth is possible.
+Conclusion. Since ∆az(t) and ∆el(t) cycle through a bounded range rather than di-
+verging, single-qubit models exhibit inherent resilience against unbounded poisoning.
+This completes the proof.
+□
+Now, we prove by induction that if a QSVM with n qubits is resilient, then so is
+a QSVM with n + 1 qubits. Our argument leverages:
+• The factorization of (n+1)-qubit circuits into tensor products and additional
+gates;
+
+10
+E. SULTANOW ET AL.
+• A Lie-algebraic embedding u(2n) ,→u(2n+1);
+• Structural invariants (norm bounds, commutator properties) under partial-
+trace restrictions.
+These ideas collectively establish that resilience is preserved when we enlarge an
+n-qubit QSVM to (n + 1) qubits.
+7.1.1. Quantum Circuits and Lie Algebras.
+Definition 1 (Unitary Groups and Lie Algebras). For an n-qubit system, let U(2n)
+be the group of all 2n × 2n unitary matrices. Its Lie algebra is
+u(2n) = {H ∈C2n×2n | H† = −H}.
+Any gate G ∈U(2n) can be expressed as G = exp(iH) for some H ∈u(2n).
+Definition 2 (QSVM Resilience). A quantum Support Vector Machine (QSVM) with
+n qubits is said to be resilient to a specified class of poisoning attacks if, for every
+adversarially modified training dataset eD, the performance degradation (relative to
+the baseline dataset D) remains provably small or negligible.
+Denote by P(n) the proposition:
+P(n) : “An n-qubit QSVM is resilient to the specified data-poisoning attacks.”
+We proceed under the following assumptions:
+• Base Case: P(1) holds. That is, a single-qubit QSVM is provably resilient
+(as per Theorem 1).
+• Inductive Step (Goal): Show P(n) =⇒P(n + 1) for general n.
+7.1.2. Inductive Step: From n to n + 1 Qubits.
+Theorem 2 (Inductive Resilience Extension). Assume P(n) holds; i.e., every n-
+qubit QSVM is resilient to our specified poisoning attacks(Algorithm 2 or its recursive
+version, Algorithm 5). Then any (n + 1)-qubit QSVM, formed by suitably adding a
+qubit (and associated gates) to an n-qubit system, also remains resilient.
+Proof (Outline). We summarize the argument in four main steps;
+(1) Circuit Construction. An (n + 1)-qubit QSVM can typically be written
+as
+Un+1 = (Un ⊗I2) × V,
+where Un ∈U(2n) is the (assumed-resilient) n-qubit portion, tensored with
+an identity on the extra qubit, and V adds entangling gates or parameterized
+rotations on that new qubit.
+
+QUANTUM ERROR PROPAGATION
+11
+(2) Lie-Algebraic Embedding. Under the map
+ι : u(2n) −→u(2n+1),
+H 7→H ⊗I2,
+known invariants in u(2n) (e.g., commutators, norms) embed naturally into
+u(2n+1). Hence, any “robustness” property that depends on these invariants
+remains intact when lifting from n to n + 1 qubits.
+(3) Contradiction Argument. Suppose, for contradiction, that an (n + 1)-
+qubit QSVM is not resilient. Then, a poisoning strategy exists that severely
+degrades its performance. However, by partially tracing out (or otherwise
+fixing) the extra qubit, we obtain an effective n-qubit subsystem that would
+likewise be compromised. This contradicts P(n).
+(4) Conclusion. The contradiction forces us to conclude that the (n + 1)-qubit
+QSVM cannot be significantly corrupted by the same class of attacks. Thus,
+P(n+1) holds under the inductive hypothesis P(n), completing the extension.
+□
+7.2. Lie-Algebraic Embedding and Invariance. In quantum computing, a typ-
+ical QSVM circuit of depth m can be written as
+U =
+m
+Y
+j=1
+exp(iHj),
+Hj ∈u(2n).
+Moving from n qubits to n + 1 qubits naturally replaces u(2n) by u(2n+1). Crucially,
+there is an injective map
+ι : u(2n) →u(2n+1),
+H 7→H ⊗I2,
+which preserves skew-Hermiticity and, more generally, many operator-theoretic in-
+variants:
+Proposition 1. If H1, H2 ∈u(2n), then
+[ ι(H1), ι(H2)] = [ H1 ⊗I2, H2 ⊗I2] = [ H1, H2 ] ⊗I2.
+Hence, commutator-based invariants (and analogous spectral metrics) remain un-
+changed under ι(·).
+Proof (Outline). Observe that H1 ⊗I2 and H2 ⊗I2 commute exactly as H1 and H2
+do, with
+[ H1 ⊗I2, H2 ⊗I2 ] = (H1H2 −H2H1) ⊗(I2I2) = [ H1, H2 ] ⊗I2.
+Any operator norm or spectral decomposition used to characterize robustness thus
+carries over from H1, H2 in u(2n) to ι(H1), ι(H2) in u(2n+1) without alteration.
+□
+
+12
+E. SULTANOW ET AL.
+Remark 1. For poisoning attacks that exploit modifications of training data encod-
+ings in these unitaries, the key insight is: if the n-qubit component Un cannot be
+corrupted, then no additional gates on qubit (n+1) alone can override that resiliency.
+This extends directly from the existence of an n-qubit subcircuit whose properties
+remain intact, consistent with P(n).
+7.2.1. Subsystem Arguments and Partial Trace. Finally, many quantum ML proto-
+cols (including QSVMs) measure only a subset of qubits or a specific observable at
+the end of the circuit. If a hypothetical attack successfully poisoned an (n+1)-qubit
+QSVM, then restricting to n qubits (via partial trace over the additional qubit, or
+conceptually “ignoring” the new qubit’s effects) would lead to a breakdown in that
+sub-block. This contradicts P(n) by assumption, confirming resilience at (n + 1)
+qubits.
+7.2.2. Further improvements. A fruitful direction for further upgrades lies in system-
+atically tuning the parameters of the new QUID attacks across various QML models.
+First, varying the dimensionality of the data via different numbers of PCA compo-
+nents can illuminate how feature-space dimensionality impacts adversarial vulnera-
+bility and robustness. Second, exploring diverse levels of the poisoning ratio ϵ will
+clarify how heavily an adversary must perturb the training dataset to significantly
+degrade model performance. Third, adjusting kernel parameters (e.g., fidelity-based
+or polynomial kernels) will allow benchmarking of which kernel properties render
+QML systems more or less susceptible to attack. Beyond the standard QSVM, in-
+corporating attacks against Quantum Neural Networks, PegasusQSVM, Quantum
+Deep Learning frameworks, and Variational Quantum Classifiers (VQC) would pro-
+vide a broad comparison of the resilience of different quantum architectures. Finally,
+contributing these automated routines and analyses to the open-source [17] would
+both enrich the community’s repertoire of quantum-specific adversarial methods and
+foster transparent, collaborative development of robust defences and evaluations in
+QML.
+8. Conclusion and Outlook
+Error injection is a growing concern among practitioners and theorists in classical
+machine learning as models become ever more critical in organizational decision-
+making pipelines and as data topologies become increasingly complex.
+Classical
+models often exhibit a linear propagation of errors, which can be exploited in data
+poisoning attacks. By contrast, in our investigations, quantum systems—particularly
+
+QUANTUM ERROR PROPAGATION
+13
+those governed by the SU(2) framework and leveraging fidelity-based kernels—
+demonstrate notable resilience to error propagation. Our theoretical and empirical
+findings support the notion that errors in quantum machine learning models, when
+viewed through Euler angle discrepancies, do not grow unboundedly and, indeed,
+exhibit a tendency to rise and then fall periodically.
+In this paper, we introduce novel QUID-style poisoning attacks for classical SVMs
+and QSVMs. Our numerical experiments on synthetic radar cross-section data show
+that while classical SVMs degrade, the QSVM retains perfect accuracy under the
+same adversarial conditions. We hypothesize that this robustness is intimately tied
+to the intrinsic properties of quantum kernels.
+Furthermore, the Lie-algebraic perspective and inductive resilience arguments in-
+dicate that if single-qubit systems display bounded error propagation, then larger
+quantum systems (with n qubits) will also maintain resilience. This inductive exten-
+sion is rooted in the structure of u(2n) embeddings, partial-trace restrictions, and the
+compositional nature of quantum circuits. These observations lay the groundwork
+for a broader theoretical framework explaining why quantum machine learning archi-
+tectures can be more robust to poisoning attacks than their classical counterparts.
+Future Directions. While our results show promise, several important directions
+remain to be investigated:
+(1) Scaling to Larger Feature Spaces and More Qubits. Our work ex-
+amined a single synthetic use case and employed PCA to keep the feature
+dimension manageable for both classical SVM and QSVM. Exploring larger-
+scale datasets and simulating up to the maximum feasible qubit limit could
+validate whether the observed robustness generalizes.
+(2) Adversarial Parameter Sweeps. Varying the poisoning ratio ϵ, the fidelity-
+based quantum kernel properties, and different classical kernels could yield
+deeper insights into when quantum advantages hold and under what condi-
+tions they might erode.
+(3) Extending Attacks Beyond QSVM. Other quantum classifiers—such as
+Quantum Neural Networks, Variational Quantum Classifiers, and more ad-
+vanced hybrid QML frameworks—could exhibit different adversarial vulner-
+abilities. A broad comparative study would clarify which quantum architec-
+tures confer the strongest defences by design.
+(4) Integration with Quantum Error Correction. It remains an open ques-
+tion how classical and quantum error-correction protocols, when layered on
+top of these quantum models, might further mitigate adversarial effects.
+(5) Open-Source Tooling.
+Incorporating quantum-specific adversarial rou-
+tines into established libraries (e.g., the Adversarial Robustness Toolbox)
+
+14
+E. SULTANOW ET AL.
+could facilitate transparent benchmarks and standardization, advancing re-
+search on quantum-safe machine learning.
+In conclusion, this work underscores that leveraging quantum mechanical proper-
+ties—specifically the use of unitary transformations and fidelity-based kernels—can
+curb error propagation in ways distinct from classical models. Whether one views
+this from a geometry-of-angles standpoint or from a Lie-algebraic analysis, the cyclic
+growth and subsequent decay of errors appear deeply woven into the quantum compu-
+tational fabric. While our experiments represent only a first step in translating these
+error dynamics to real-world quantum machine learning applications, the findings
+point to an optimistic future where QML could serve as a more robust alternative
+in adversarial settings. The next wave of research—empirical and theoretical—will
+undoubtedly refine and extend these insights, fostering a deeper understanding of
+quantum resilience in adversarial machine learning.
+
+QUANTUM ERROR PROPAGATION
+15
+Appendix A. The algebra behind single qubit rotations
+The study of quantum error propagation is a fundamental aspect of quantum
+computing, particularly in the context of noisy intermediate-scale quantum (NISQ)
+devices. While the practical scenarios often involve complex multi-qubit interactions
+and noise propagation through entangled gates, starting with single-qubit rotations
+serves as a mathematically grounded and accessible first step.
+While some may critique this approach as overly simplistic—especially when ap-
+plied to advanced domains like quantum machine learning, where noise behaves
+differently due to entanglement and multi-qubit interactions – it is important to
+comprehend the basic mathematical principles.
+By focusing initially on single-qubit errors, we isolate key mathematical properties
+and develop tools that are extensible to more complex scenarios. This abstraction
+serves as a stepping stone, offering insights into the fundamental behaviour of quan-
+tum noise and laying the groundwork for analyzing more intricate cases, such as
+entanglement-based error propagation in gates like CNOT.
+Our work acknowledges the limitations of single-qubit models in representing real-
+world quantum systems. However, the following described methods provide an in-
+structive entry point, fostering a deeper algebraic understanding that is essential
+for tackling the challenges posed by multi-qubit entangled systems. We bridge the
+gap between foundational error analysis and the broader, more complex domain of
+quantum error propagation in practical quantum algorithms, including QML.
+A.1. Qubit rotations using SU(2). Rotations of a qubit on the Bloch sphere [18]
+can be described by the group SU(2) whose elements are special unitary complex
+2 × 2 matrices. The rotation is given by equation (1), see [19, p. 67]:
+(1)
+U(φ, θ, ψ) = e−i φ
+2 σ3e−i θ
+2 σ2e−i ψ
+2 σ3 =
+ 
+e−i φ+ψ
+2
+cos θ
+2
+−e−i φ−ψ
+2
+sin θ
+2
+ei φ−ψ
+2
+sin θ
+2
+ei φ+ψ
+2
+cos θ
+2
+!
+Here 0 ≤φ ≤2π, 0 ≤θ ≤π, 0 ≤ψ ≤4π are the Euler angles and σ1 = ( 0 1
+1 0 ),
+σ2 = ( 0 −i
+i
+0 ), σ3 = ( 1
+0
+0 −1 ) are the standard Pauli matrices.
+A qubit (on the Bloch sphere) can be expressed as a Cartesian vector
+(2)
+⃗q = (sin θel cos φaz, sin θel sin φaz, cos θel)
+where φaz is the azimuthal angle and θel is the elevation angle of the vector ⃗q [20, p. 3].
+Moreover, using the Pauli spin vector ⃗σ = (σ1, σ2, σ3), a qubit can also be expressed
+in matrix form given by equation (3), see [20, p. 3].
+
+16
+E. SULTANOW ET AL.
+Mq = ⃗q · ⃗σ = σ1 sin θel cos φaz + σ2 sin θel sin φaz + σ3 cos θel
+(3)
+=
+
+cos θel
+e−iφaz sin θel
+eiφaz sin θel
+−cos θel
+
+Using this representation, the rotation of a qubit by an angle θ about an arbitrary
+axis ˆn with |ˆn| = 1 is then given by
+Mq′ = Uˆn(θ) · Mq · U †
+ˆn(θ)
+(4)
+with
+Uˆn(θ) = e−i θ
+2 ˆn·⃗σ = σ0 cos θ
+2 −i(ˆn · ⃗σ) sin θ
+2
+(5)
+where σ0 = ( 1 0
+0 1 ) denotes the 2 × 2 identity matrix and (ˆn · ⃗σ)2 = σ0, see [20, p. 3].
+These fundamental formulas are already sufficient to implement SU(2) rotations of
+the qubits on a Bloch sphere. Code for a Python-based implementation is provided
+in Appendix D and discussed with reference to the above-given equations.
+A.2. Qubit rotations using the Euler Matrix. Rotating a qubit in its Carte-
+sian representation ⃗q ∈R3 by the Euler angles φ, θ, and ψ can be expressed as
+multiplication with the Euler matrix S(φ, θ, ψ), see [21, p. 141]. That is
+q′ = q · S(φ, θ, ψ)
+(6)
+S(φ, θ, ψ) =
+
+
+cos ψ cos θ cos φ −sin ψ sin φ
+cos ψ cos θ sin φ + sin ψ cos φ
+−cos ψ sin θ
+−sin ψ cos θ cos φ −cos ψ sin φ
+−sin ψ cos θ sin φ + cos ψ cos φ
+sin ψ sin θ
+sin θ cos φ
+sin θ sin φ
+cos θ
+
+
+=
+
+
+cos ψ
+sin ψ
+0
+−sin ψ
+cos ψ
+0
+0
+0
+1
+
+
+
+
+cos θ
+0
+−sin θ
+0
+1
+0
+sin θ
+0
+cos θ
+
+
+
+
+cos φ
+sin φ
+0
+−sin φ
+cos φ
+0
+0
+0
+1
+
+
+= S3(ψ)S2(θ)S1(φ)
+Code for a Python-based implementation of this approach is provided in Appen-
+dix E.
+
+QUANTUM ERROR PROPAGATION
+17
+Appendix B. Error Propagation in Matrix Multiplications
+Let f : R3 × R3 × R3 →R2 a function that takes two vectors ⃗v,⃗verr ∈R3 and the
+triple (φ, θ, ψ) ∈R3 of Euler angles as input and produces a real pair containing the
+two discrepancies, namely those between the azimuthal and the elevation angles of
+the vectors ⃗v,⃗verr in the spherical coordinate system
+(7)
+f(⃗v,⃗verr, (φ, θ, ψ)) = (∆az, ∆el)
+We rotate ⃗v and ⃗verr synchronously by the Euler angles (φ, θ, ψ) and obtain the
+rotated vectors ⃗w and ⃗werr. Given these rotated vectors, we determine the azimuth
+angular discrepancy ∆az and the elevation angular discrepancy ∆el as follows:
+∆az(⃗w, ⃗werr) = min
+n
+|φaz(⃗werr) −φaz(⃗w)|, 2π −|φaz(⃗werr) −φaz(⃗w)|
+o
+∆el(⃗w, ⃗werr) = min
+n
+|θel(⃗werr) −θel(⃗w)|, 2π −|θel(⃗werr) −θel(⃗w)|
+o
+For instance, when evaluating f on ⃗v = (1, 0, 0), ⃗verr = (0.98, 0, −0.19866933)∗
+and (φ, θ, ψ) = (π/100, π/100, π/100), we obtain results as shown in Figure 1. It plots the
+azimuthal difference (blue) and elevation difference (orange) between both vectors ⃗v
+and ⃗verr that are synchronously rotated 200 times by an angle of π/100.
+50
+100
+150
+200
+0.05
+0.10
+0.15
+0.20
+Figure 1. Curves of the error propagation (azimuth/blue and eleva-
+tion/orange) due to 200 qubit rotations by π/100. From the physics
+point of view, these rotations can be considered cycles.
+∗The vector ⃗verr results from the single rotation of vector ⃗v = (1, 0, 0) by the Euler angles
+(ϵx, ϵy, ϵz) = (0, 0.2, 0).
+
+18
+E. SULTANOW ET AL.
+There are two possibilities to generate curves as shown in Figure 1. They can first
+of all be obtained by applying the SU(2) rotation using equation (1) that yields the
+rotated vectors ⃗w = U(φ, θ, ψ) · (⃗v · ⃗σ) · U(φ, θ, ψ)† and ⃗werr = U(φ, θ, ψ) · (⃗verr · ⃗σ) ·
+U(φ, θ, ψ)†, see Listing 8 (Python) and Listing 9 (Mathematica).
+The second, more convenient way is to use the Euler matrix [22]. In this case
+we refer to equation (6) and obtain the rotated vectors by the matrix products
+⃗w = ⃗v · S(φ, θ, ψ) and ⃗werr = ⃗verr · S(φ, θ, ψ), see Listing 10 (Mathematica).
+The two functions that return the azimuthal and the elevation angle difference
+between both vectors ⃗v, ⃗verr that are synchronously, iteratively rotated t times by a
+step angle of 2π/s are:
+∆az(⃗v,⃗verr, t, s) = ∆az
+ ⃗v · S (2π/s, 2π/s, 2π/s)t ,⃗verr · S (2π/s, 2π/s, 2π/s)t
+(8)
+∆el(⃗v,⃗verr, t, s) = ∆el
+ ⃗v · S (2π/s, 2π/s, 2π/s)t ,⃗verr · S (2π/s, 2π/s, 2π/s)t
+The blue curve in Figure 1 is given by ∆az(⃗v,⃗verr, t, 200) and the orange curve by
+∆el(⃗v,⃗verr, t, 200) where t is iterated from 0 to 200. That is we rotate the vectors ⃗v,
+⃗verr by φ = θ = ψ = π/100, the new vectors resulting from this rotation we rotate
+again by π/100 and so forth – and this a total of 200 times (see Listing 10).
+For simplicity and to facilitate periodic behaviour analysis, we use equal values for
+all three Euler angles in our initial investigations. This choice allows us to focus on
+the overall pattern of error propagation without introducing additional complexity
+from different rotation rates around different axes. It provides a clear baseline for
+understanding error behaviour. Later in Section C, we explore cases with different
+Euler angles to find maximal error conditions.
+For this analysis, let us by convention, set the initial vector ⃗v = (1, 0, 0) and
+the rotated (manipulated) vector ⃗verr = ⃗v · S(ϵx, ϵy, ϵz) and parameterize both func-
+tions (8) with these angles and with the run variable t and the step variable s:
+∆az(ϵx, ϵy, ϵz, t, s), ∆el(ϵx, ϵy, ϵz, t, s). We can use those two functions to determine
+how both vectors ⃗v, ⃗verr differ in their azimuthal and elevation angles after t rotations
+each by 2π/s. The blue and orange curves do not change their shape if, for example,
+instead s = 200 we now set s = 100 and let t run from 0 to 100. The shape of both
+curves depends exclusively on the three angles ϵx, ϵy, ϵz.
+How do we determine a real function for the blue curve and for the orange curve,
+which takes only one variable t rather than the two variables s and t? For this, we
+generate a finite rotation SP around the angle t by executing infinitesimal rotations
+successively and calculate the following limit for a general case:
+
+QUANTUM ERROR PROPAGATION
+19
+(9)
+lim
+s→∞S
+ϕ
+s , θ
+s, ψ
+s
+s·t
+= lim
+s→∞S
+ϕ · t
+s , θ · t
+s , ψ · t
+s
+s
+= SP(t, ϕ, θ, ψ)
+=
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+cosh
+
+t ·
+p
+−θ2 −(ϕ + ψ)2
+
+−
+(ϕ+ψ)·sinh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+√
+−θ2−(ϕ+ψ)2
+θ·sinh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+√
+−θ2−(ϕ+ψ)2
+(ϕ+ψ)·sinh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+√
+−θ2−(ϕ+ψ)2
+θ2+(ϕ+ψ)2·cosh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+θ2+(ϕ+ψ)2
+−
+θ·(ϕ+ψ)·
+
+−1+cosh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+θ2+(ϕ+ψ)2
+−
+θ·sinh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+√
+−θ2−(ϕ+ψ)2
+−
+θ·(ϕ+ψ)·
+
+−1+cosh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+θ2+(ϕ+ψ)2
+(ϕ+ψ)2+θ2·cosh
+
+t·√
+−θ2−(ϕ+ψ)2
+
+θ2+(ϕ+ψ)2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+and for our case, the limit tends to be:
+lim
+s→∞S
+1
+s, 1
+s, 1
+s
+s·t
+= lim
+s→∞S
+ t
+s, t
+s, t
+s
+s
+= SP(t)
+(10)
+=
+
+
+
+
+
+cos
+ √
+5t
+
+−
+2 sin(
+√
+5t)
+√
+5
+sin(
+√
+5t)
+√
+5
+2 sin(
+√
+5t)
+√
+5
+1
+5
+ 4 cos
+ √
+5t
+
++ 1
+
+−2
+5
+ cos
+ √
+5t
+
+−1
+
+−
+sin(
+√
+5t)
+√
+5
+−2
+5
+ cos
+ √
+5t
+
+−1
+
+1
+5
+ cos
+ √
+5t
+
++ 4
+
+
+
+
+
+
+As a result, we get the following two functions, which (by setting again ϵx = 0,
+ϵy = 0.2, ϵz = 0) generate exactly the same blue and orange curve plotted with
+Figure 1 (Listing 11):
+∆az(ϵx, ϵy, ϵz, t) = ∆az
+ 1
+0
+0
+
+· SP(t),
+ 1
+0
+0
+
+· S(ϵx, ϵy, ϵz) · SP(t)
+
+(11)
+= ∆az (⃗v · SP(t),⃗verr · SP(t))
+∆el(ϵx, ϵy, ϵz, t) = ∆el
+ 1
+0
+0
+
+· SP(t),
+ 1
+0
+0
+
+· S(ϵx, ϵy, ϵz) · SP(t)
+
+= ∆el (⃗v · SP(t),⃗verr · SP(t))
+Let us consider rotations around infinitesimally small angles ∂t and represent these
+infinitesimal rotations as SP(∂t) = I + ∂t J, where I is the identity matrix and J
+the generator of the infinitesimal rotation:
+
+20
+E. SULTANOW ET AL.
+J = ∂SP(t)
+∂t
+
+t=0
+= lim
+t→0
+SP(t) −I
+t
+= S−1
+P
+∂SP
+∂t
+In reverse, we can express the finite rotation SP around the angle t as follows:
+SP(t) = lim
+s→∞SP
+ t
+s
+s
+= lim
+s→∞
+
+I + t
+sJ
+s
+= exp (tJ)
+In a general case, the generator turns out to be a traceless matrix [23]:
+J =
+
+
+0
+−ϕ −ψ
+θ
+ϕ + ψ
+0
+0
+−θ
+0
+0
+
+
+Along with that, the time period associated with the elevation error and azimuthal
+error can be expressed as:
+T =
+2π
+p
+θ2 + (ϕ + ψ)2
+In our case the generator is:
+J =
+
+
+0
+−2
+1
+2
+0
+0
+−1
+0
+0
+
+
+The eigenvalues of J in the general case tends to be 0 and ±i
+p
+θ2 + (ψ + ϕ)2 and
+for our case they are 0 and ±i
+√
+5. Let us consider the quadruple (M, G, E, Φ), where
+M is the phase space containing three-dimensional rotation matrices, G the group of
+real numbers (as a model for the progression of time), E is the subset E ⊆G × M,
+and Φ : E →M is an operation of the group G on M with Φ(0, x) = x for all x ∈M
+and Φ(s, Φ(t, x)) = Φ(s · t, x) for all x ∈M and for all s, t ∈G. Then (M, G, E, Φ)
+is a dynamical system and Φ is the flow on M, see [24, p. 131-140].
+Appendix C. Error propagation analysis
+In the following, we will describe the behaviour of the curves given by ∆az and
+∆el, including the periodicity and the minimum and maximum difference between
+the angles of the two simultaneously rotating vectors.
+
+QUANTUM ERROR PROPAGATION
+21
+C.1. Periodicity. The periodicity of both curves for the above case, namely the
+curves given by ∆az and ∆el, is always 2π/
+√
+5, no matter which angles ϵx, ϵy, ϵz we
+choose. We obtained this value by
+FunctionPeriod[elevationErrorSimplified[x, y, z, t], t] and
+FunctionPeriod[azimuthalErrorSimplified[x, y, z, t], t] .
+This can be proved by the equalities ∆az(ϵx, ϵy, ϵz, t) = ∆az(ϵx, ϵy, ϵz, t+ 2π/
+√
+5) and
+∆el(ϵx, ϵy, ϵz, t) = ∆el(ϵx, ϵy, ϵz, t + 2π/
+√
+5), referring to the equations (11).
+C.2. Maximum and minimum angular difference. To obtain the maximum
+and minimum that an elevation or azimuthal angle between both rotating vectors
+⃗v, ⃗
+verr can have, we perform a numerical search for the maximum and minimum
+values of the functions (11):
+1
+elevationErrorSimplified[errx_, erry_, errz_, t_] :=
+2
+angularErrorSimplified[{1, 0, 0}, {1, 0, 0} .
+3
+EulerMatrix[{errx, erry, errz}], t, 2];
+4
+5
+azimuthalErrorSimplified[errx_, erry_, errz_, t_] :=
+6
+angularErrorSimplified[{1, 0, 0}, {1, 0, 0} .
+7
+EulerMatrix[{errx, erry, errz}], t, 3];
+8
+9
+10
+NMaximize[{elevationErrorSimplified[x, y, z, t], 0 < x < 2 Pi && 0
+< y < 2 Pi && 0 < z < 2 Pi && 0 < t < 2 Pi}, {x, y, z, t}]
+,→
+11
+NMaximize[{azimuthalErrorSimplified[x, y, z, t], 0 < x < 2 Pi && 0
+< y < 2 Pi && 0 < z < 2 Pi && 0 < t < 2 Pi}, {x, y, z, t}]
+,→
+Listing 1. Calculate the maximum elevation and azimuthal difference
+between both rotating vectors ⃗v and ⃗verr (based on Listing 11)
+The maximum elevation difference between ⃗v and ⃗verr is 2.0344424161175363 which
+occur for ϵx = 5.77302981892348, ϵy = 4.3028173057175945, ϵz = 4.602388461805818,
+t = 3.511308418550631.
+Analogously we obtain the maximum azimuthal difference between both vectors
+which is π and occur for ϵx = 1.697427669696458, ϵy = 6.202505314481809, ϵz =
+1.4563517625363593, t = 3.952403209518636.
+The minimum elevation difference is ≈0 which occur for ϵx = 1.6952986881010703,
+ϵy = 1.546558501896838, ϵz = 4.608182273912689, t = 4.061805642653761.
+
+22
+E. SULTANOW ET AL.
+The minimum azimuthal difference between ⃗v and ⃗verr is ≈0 which occur for
+ϵx = 5.017163536971859, ϵy = 3.9579710903948024, ϵz = 1.7852930269424405, t =
+2.911162125823624.
+Azim./Elev. diff.(⃗v and ⃗verr)
+t
+ϵx
+ϵy
+ϵz
+*2.0344424161175363
+3.511308418550631
+5.77302981892348,
+4.3028173057175945,
+4.602388461805818
+**π
+3.952403209518636
+1.697427669696458,
+6.202505314481809,
+1.4563517625363593
++0
+4.061805642653761
+1.6952986881010703
+1.546558501896838
+4.608182273912689
+++ ≈0
+2.911162125823624
+5.017163536971859
+3.9579710903948024
+1.7852930269424405
+Table 3.
+* maximum elevation difference - ** maximum azimuthal difference
++ minimum elevation difference - ++ minimum azimuthal difference
+When we use the vector {0, 0, 1} instead of {1, 0, 0} in Listing 1, then the
+maximum and minimum values change as given in the following. The maximum
+elevation difference is π which occur for ϵx = 3.373959984091561, ϵy = π, ϵz =
+2.8479974737420557, t = 2π/
+√
+5.
+Analogously we obtain the maximum azimuthal difference between both vec-
+tors, which is π as well and occur for ϵx = 3.117350980755296, ϵy = π, ϵz =
+4.292091776219165, t = 4.555204697315162.
+The minimum elevation difference is ≈0 which occur for ϵx = 5.651168952220518,
+ϵy = 6.283102504046935, ϵz = 0.8902613576650594, t = 6.277761692229545.
+The minimum azimuthal difference between ⃗v and ⃗verr is ≈0 as well which occur
+for ϵx = 1.626524700226482, ϵy = 2π, ϵz = 0.18398822116968577, t = 6.252198460931593.
+Azim./Elev. diff.(⃗v and ⃗verr)
+t
+ϵx
+ϵy
+ϵz
+*π
+2π/
+√
+5
+3.373959984091561,
+π
+2.8479974737420557
+**π
+4.555204697315162
+3.117350980755296,
+π
+4.292091776219165
++ ≈0
+6.277761692229545
+5.651168952220518
+6.283102504046935
+0.8902613576650594
+++ ≈0
+6.252198460931593
+1.626524700226482
+2π
+0.18398822116968577
+Table 4.
+* maximum elevation difference - ** maximum azimuthal difference
++ minimum elevation difference - ++ minimum azimuthal difference
+C.3. Time-Averaged Error Analysis. While our previous analysis identified in-
+stantaneous maximum errors of π in azimuthal difference, this may not fully repre-
+sent the typical error experienced over time. A more comprehensive approach is to
+
+QUANTUM ERROR PROPAGATION
+23
+consider the time-averaged error over a complete period:
+(12)
+Eavg(ϵx, ϵy, ϵz) =
+√
+5
+2π
+Z 2π/
+√
+5
+0
+∆(ϵx, ϵy, ϵz, t)dt
+where δ can be either δaz or δel. Initial numerical evaluations suggest that time-
+averaged errors are lower than the instantaneous maxima found in Table. 3.
+C.4. Case-By-Case Analysis. Here, we conduct a detailed case-by-case analysis
+of error propagation examining various combinations of Euler angles. Each case as-
+sesses the maximum and minimum discrepancies in azimuthal and elevation angles,
+arising from comparisons between the vectors ⃗v and ⃗verr after undergoing synchro-
+nous rotations. The analysis provides insights into how angular discrepancies evolve
+according to the nature of the rotations. Importantly, the periodicity in error propa-
+gation remains consistently present across all cases, though the period of the curves
+varies depending on the specific Euler angle configurations. The case where all Euler
+angles are equal has been discussed previously and will not be revisited here.
+C.4.1. Case 1: Rational Ratios of Euler Angles. In this case, we explore scenarios
+where the Euler angles have rational ratios: specifically, a ratio of 1 : 2 : 3 for subcase
+1 and 3 : 2 : 1 for subcase 2, corresponding to ψ, θ, and ϕ. The maximum elevation
+error for subcase 1 is approximately 1.76818818822050, which is slightly lower than
+that of the previously discussed case. In contrast, for subcase 2, the elevation error
+increases to around 2.35590586664925, while the azimuthal errors for both subcases
+approach π. The minimal errors in both cases remain negligible. The period of the
+curves for subcase 1 is
+p
+2/13 · π, while for subcase 2, the period is
+√
+2 · π/3. The
+periodicity of error propagation is maintained with subtle variations in the error
+curves, as illustrated in the figure 2.
+C.4.2. Case 2: Two Equal Euler Angles with Rational Ratio. Here, we investigate the
+scenario where two Euler angles are equal, specifically in a 1 : 1 : 2 ratio for subcase
+1 and a 2 : 1 : 1 ratio for subcase 2, corresponding to ψ, θ, and ϕ. This introduces
+a rational ratio between the third angle in subcase 1 and the first angle in subcase
+2. The maximum elevation error for subcase 1 is approximately 1.57079632670986,
+while for subcase 2, it reaches around 2.35619448416057. The maximum azimuthal
+error remains at π, with minimal errors again approaching zero. The period of the
+curves for subcase 1 is
+p
+2/5·π, and for subcase 2, it is π/
+√
+2. This case shows that,
+even when two angles are synchronized, the periodic behaviour of error propagation
+persists, with adjustments in rotation angles as shown in the figure 3.
+
+24
+E. SULTANOW ET AL.
+1
+2
+3
+4
+5
+6
+0.5
+1.0
+1.5
+2.0
+1
+2
+3
+4
+5
+6
+2.7
+2.8
+2.9
+3.0
+3.1
+Figure 2. The left figure shows the Elevation Error plot, while the
+right shows the azimuthal error plot for Case 1, where Euler angles
+have a rational ratio relationship.
+1
+2
+3
+4
+5
+6
+0.5
+1.0
+1.5
+2.0
+1
+2
+3
+4
+5
+6
+2.85
+2.90
+2.95
+3.00
+3.05
+3.10
+3.15
+Figure 3. The left figure shows the Elevation Error plot, while the
+right shows the azimuthal error plot for Case 2, where Euler angles
+have a rational ratio relationship with two angles being the same.
+C.4.3. Case 3: Irrational Ratios of Euler Angles. In this scenario, we select the Euler
+angles as φ = π, θ = e, and ψ = 3, introducing irrational ratios among the angles.
+The maximum elevation error increases to approximately 2.07317454885058, while
+the maximum azimuthal error remains at π. Although the minimal errors are small,
+they are not negligible. The period of the curves in this case is 2π/
+p
+π2 + (e + 3)2.
+This case illustrates the influence of irrational ratios on error propagation, resulting
+in more complex periodic behaviour, as depicted in the figure 4.
+C.4.4. Case 4: Two Equal Euler Angles with Irrational Ratio. Finally, we examine a
+case where two Euler angles are equal, with the third angle being irrational. Specif-
+ically, we use 1 : 1 : π for subcase 1 and π : 1 : 1 for subcase 2. The maximum
+elevation error in subcase 1 is approximately 1.80771464098098, while in subcase 2,
+
+QUANTUM ERROR PROPAGATION
+25
+1
+2
+3
+4
+5
+6
+0.0
+0.5
+1.0
+1.5
+2.0
+1
+2
+3
+4
+5
+6
+2.5
+2.6
+2.7
+2.8
+2.9
+3.0
+3.1
+Figure 4. The left figure shows the Elevation Error plot, while the
+right shows the azimuthal error plot for Case 3, where Euler angles
+have an irrational ratio relationship.
+it reaches around 2.57468030909556. The maximum azimuthal error remains at π.
+The period of the curves for subcase 1 is 2π/
+p
+1 + (π + 1)2, while for subcase 2, it
+is 2π/
+√
+π2 + 4. The minimal errors are again close to zero, with periodic patterns
+remaining, though more complex due to the irrational component, as illustrated in
+Figure 5.
+1
+2
+3
+4
+5
+6
+0.5
+1.0
+1.5
+2.0
+2.5
+1
+2
+3
+4
+5
+6
+2.5
+2.6
+2.7
+2.8
+2.9
+3.0
+3.1
+Figure 5. The left figure shows the Elevation Error plot, while the
+right shows the azimuthal error plot for Case 4, where Euler angles
+have an irrational ratio relationship with two angles being the same.
+Appendix D. Implementation of SU(2) rotations using Python
+In the following, we present an implementation of SU(2) rotation of qubits on a
+Bloch sphere based on Python. In addition to several standard libraries, especially
+Qiskit, Matplotlib and SymPy are used (see entire notebook rotate_su2_qiskit_eldar-
+sultanow.ipynb on GitHub).
+
+26
+E. SULTANOW ET AL.
+The function cartesian_to_spherical in Listing 2 calculates the spherical co-
+ordinates (r, θel, φaz) for a given cartesian vector. In line with the convention as per
+ISO 80000-2, this function returns the same result as Wolfram’s function ToSpheri-
+calCoordinates.
+1
+def cartesian_to_spherical(vec):
+2
+x = np.real(vec[0])
+3
+y = np.real(vec[1])
+4
+z = np.real(vec[2])
+5
+hxy = np.hypot(x, y)
+6
+r = np.hypot(hxy, z)
+7
+θ = np.arctan2(hxy, z)
+8
+φ = np.arctan2(y, x)
+9
+return [r, θ, φ]
+Listing 2. Convert a vector from cartesian to spherical form
+A qubit Mq that is given in matrix form as per equation (3) can be converted to
+a cartesian vector ⃗q = (q1, q2, q3) using the equation (13), see [19, p. 79].
+⃗q · ⃗σ = 1
+2 ((q1 + iq2) (σ1 −iσ2) + (q1 −iq2) (σ1 + iσ2) + q3σ3)
+(13)
+=
+
+q3
+q1 −iq2
+q1 + iq2
+−q3
+
+We use this behaviour for implementing the conversion function in Listing 3.
+1
+def qubitmatrix_to_cartesian(M_q):
+2
+M_q = N(M_q)
+3
+q_1 = re((M_q[0,1] + M_q[1,0]) / 2)
+4
+q_2 = re((M_q[1,0] - M_q[0,1]) / (2*I))
+5
+q_3 = re(M_q[0,0])
+6
+return np.array([q_1, q_2, q_3], dtype=np.float64)
+Listing 3. Convert a qubit given in matrix form as per equation (3)
+to cartesian form
+
+QUANTUM ERROR PROPAGATION
+27
+1
+def rn_su2_euler(vec, rx, ry, rz):
+2
+spherical_vec = cartesian_to_spherical(vec)
+3
+θ = spherical_vec[1]
+4
+φ = spherical_vec[2]
+5
+6
+sx = msigma(1)
+7
+sy = msigma(2)
+8
+sz = msigma(3)
+9
+M_q = sin(θ)*cos(φ)*sx + sin(θ)*sin(φ)*sy + cos(θ)*sz
+10
+U_n = Matrix([[exp(-I*(rx+rz)/2)*cos(ry/2),
+-exp(-I*(rx-rz)/2)*sin(ry/2)], [exp(I*(rx-rz)/2)*sin(ry/2),
+exp(I*(rx+rz)/2)*cos(ry/2)]])
+,→
+,→
+11
+M_q_rotated = U_n*M_q*Dagger(U_n)
+12
+return M_q_rotated
+Listing 4. Rotate a qubit around Euler angles as per equation (1)
+Listing 5 applies the SU(2) rotation around Euler angles that is implemented by
+Listing 4 and plots different rotations against each other.
+
+28
+E. SULTANOW ET AL.
+1
+fig, ax = plt.subplots(figsize = [8, 12], nrows=3, ncols=2)
+2
+fig.patch.set_facecolor('white')
+3
+[axis.set_axis_off() for axis in ax.ravel()]
+4
+5
+rotations = [[0, 0, pi/8], [0, 0, -pi/8], [0, pi/8, 0], [0, -pi/8,
+0], [0, pi/8, pi/8], [0, -pi/8, -pi/8]]
+,→
+6
+start_vec = [1, 0, 0]
+7
+num_iterations = 8
+8
+for m, rotation in enumerate(rotations):
+9
+ax = fig.add_subplot(320+(m+1), axes_class = Axes3D)
+10
+rot_x = rotation[0]
+11
+rot_y = rotation[1]
+12
+rot_z = rotation[2]
+13
+_bloch = Bloch(axes=ax)
+14
+_bloch.vector_color = get_gradient_colors([0, 0, 1],
+num_iterations)
+,→
+15
+_bloch.vector_width = 1
+16
+sv = []
+17
+vec = start_vec
+18
+sv.append(vec)
+19
+for i in range(num_iterations):
+20
+M_q_rotated = rn_su2_euler(vec, rot_x, rot_y, rot_z)
+21
+vec = qubitmatrix_to_cartesian(M_q_rotated)
+22
+sv.append(vec)
+23
+24
+_bloch.add_vectors(sv)
+25
+_bloch.render()
+Listing 5. Various SU(2) rotations of the vector (1, 0, 0) around dif-
+ferent Euler angles
+The plots, which result from Listing 5 are depicted by Figure 6.
+
+QUANTUM ERROR PROPAGATION
+29
+Figure 6. Various rotations of the vector (1, 0, 0) graphically com-
+pared
+Figure 6 above shows various rotations of the vector (1, 0, 0) on the Bloch sphere.
+Each block sphere represents different sets of rotation operations applied to the
+vector, and the visual comparison helps to illustrate the behaviour of quantum states
+under these rotations. The rotations change the vector’s orientation on the sphere,
+revealing the effects of quantum gate operations.
+
+30
+E. SULTANOW ET AL.
+1
+def rn_su2(vec, rot_angle, n):
+2
+spherical_vec = cartesian_to_spherical(vec)
+3
+θ = spherical_vec[1]
+4
+φ = spherical_vec[2]
+5
+6
+sx = msigma(1)
+7
+sy = msigma(2)
+8
+sz = msigma(3)
+9
+M_q = sin(θ)*cos(φ)*sx + sin(θ)*sin(φ)*sy + cos(θ)*sz
+10
+U_n = eye(2)*cos(rot_angle/2)
+-I*(n[0]*sx+n[1]*sy+n[2]*sz)*sin(rot_angle/2)
+,→
+11
+M_q_rotated = U_n*M_q*Dagger(U_n)
+12
+return M_q_rotated
+Listing 6. Rotate a qubit around an axis as per equation (4)
+Rotating a qubit ⃗q = (1, 0, 0) around the axis ˆn = (1/
+√
+3, 1/
+√
+3, 1/
+√
+3) 16 times re-
+peatedly by an angle θ = π/8 leads to the resulting plots depicted by Figure 7.
+
+QUANTUM ERROR PROPAGATION
+31
+Figure 7. Plot of rotating the vector (1, 0, 0) around the axis
+(1/
+√
+3, 1/
+√
+3, 1/
+√
+3)
+Appendix E. Euler matrix-based rotations using Python
+Let us refer to the plots given in Figure 6 showing several rotations of the vector
+(1, 0, 0) around different Euler angles.
+The same plots can be generated by the
+following Listing 7 which rotates the vector (1, 0, 0) by utilizing the Euler matrix
+instead of a SU(2) matrix.
+
+32
+E. SULTANOW ET AL.
+1
+from sympy import rot_axis1
+2
+from sympy import rot_axis2
+3
+from sympy import rot_axis3
+4
+5
+fig, ax = plt.subplots(figsize = [8, 12], nrows=3, ncols=2)
+6
+fig.patch.set_facecolor('white')
+7
+[axis.set_axis_off() for axis in ax.ravel()]
+8
+9
+rotations = [[0, 0, pi/8], [0, 0, -pi/8], [0, pi/8, 0], [0, -pi/8,
+0], [0, pi/8, pi/8], [0, -pi/8, -pi/8]]
+,→
+10
+start_vec = [1, 0, 0]
+11
+num_iterations = 8
+12
+for m, rotation in enumerate(rotations):
+13
+ax = fig.add_subplot(320+(m+1), axes_class = Axes3D)
+14
+rot_x = rotation[0]
+15
+rot_y = rotation[1]
+16
+rot_z = rotation[2]
+17
+rot_mat = rot_axis3(rot_z)*rot_axis2(rot_y)*rot_axis1(rot_x)
+18
+_bloch = Bloch(axes=ax)
+19
+_bloch.vector_color = get_gradient_colors([0, 0, 1],
+num_iterations)
+,→
+20
+_bloch.vector_width = 1
+21
+sv = []
+22
+vec = Matrix(start_vec).T
+23
+sv.append(np.array(vec).astype(np.float64)[0])
+24
+for i in range(num_iterations):
+25
+vec = N(vec * rot_mat)
+26
+sv.append(np.array(vec).astype(np.float64)[0])
+27
+28
+_bloch.add_vectors(sv)
+29
+_bloch.render()
+Listing 7. Various rotations of the vector (1, 0, 0) around different
+Euler angles using Euler matrix
+
+QUANTUM ERROR PROPAGATION
+33
+Appendix F. Implementing SU(2) based error propagation using
+Python
+The Python code for error propagation analysis based on SU(2) rotations is
+provided in Listing 8, which is part of the Notebook rotate_su2_qiskit_eldar-
+sultanow.ipynb and uses the functions described in Appendix D.
+
+34
+E. SULTANOW ET AL.
+1
+rot_x = pi/100
+2
+rot_y = pi/100
+3
+rot_z = pi/100
+4
+num_iterations = 200
+5
+x = np.arange(0, num_iterations, 1, dtype=int)
+6
+start_vec = [1, 0, 0]
+7
+err = 0.2
+8
+vec = start_vec
+9
+vec_err = qubitmatrix_to_cartesian(rn_su2_euler(start_vec, 0, err,
+0))
+,→
+10
+φ_error_propagation_vec = np.zeros(shape=(num_iterations))
+11
+θ_error_propagation_vec = np.zeros(shape=(num_iterations))
+12
+13
+for i in range(num_iterations):
+14
+spherical = cartesian_to_spherical(vec)
+15
+spherical_err = cartesian_to_spherical(vec_err)
+16
+(θ_rotated, φ_rotated) = (spherical[1], spherical[2])
+17
+(θ_rotated_err, φ_rotated_err) = (spherical_err[1],
+spherical_err[2])
+,→
+18
+d_θ = abs(θ_rotated_err - θ_rotated)
+19
+d_φ = abs(φ_rotated_err - φ_rotated)
+20
+θ_error_propagation_vec[i] = min(d_θ, 2*pi-d_θ)
+21
+φ_error_propagation_vec[i] = min(d_φ, 2*pi-d_φ)
+22
+23
+M_q_rotated = rn_su2_euler(vec, rot_x, rot_y, rot_z)
+24
+M_q_rotated_err = rn_su2_euler(vec_err, rot_x, rot_y, rot_z)
+25
+vec = qubitmatrix_to_cartesian(M_q_rotated)
+26
+vec_err = qubitmatrix_to_cartesian(M_q_rotated_err)
+27
+28
+plt.plot(x, φ_error_propagation_vec, θ_error_propagation_vec)
+29
+plt.show()
+Listing
+8. Calculate
+error
+propagation
+using SU(2)
+rotations
+(Python)
+The resulting plot generated by Listing 8 is shown in Figure 8.
+
+QUANTUM ERROR PROPAGATION
+35
+Figure 8. Curves of the error propagation (azimuth/blue and eleva-
+tion/orange) due to 200 qubit rotations by π/100 drawn by Matplotlib
+via Listing 8
+Appendix G. Implementing SU(2) based error propagation using
+Mathematica
+This section contains the SU(2) rotation-based implementation of error propaga-
+tion analysis using Mathematica. Listing 9 contains a Mathematica Notebook for
+calculating and visualizing the error propagation due to 200 qubit rotations by π/100
+(see entire Notebook errorPropagation.nb on Github). The resulting plot is shown
+in Figure 1.
+
+36
+E. SULTANOW ET AL.
+1
+qubitmatrixToCartesian[Mq_] := (
+2
+q1 = Re[(Mq[[1, 2]] + Mq[[2, 1]])/2];
+3
+q2 = Re[(Mq[[2, 1]] - Mq[[1, 2]])/(2*I)];
+4
+q3 = Re[Mq[[1, 1]]];
+5
+Return[{q1, q2, q3}];
+6
+);
+7
+rnSU2euler[vec_, rx_, ry_, rz_] := (
+8
+sphericalVec = ToSphericalCoordinates[vec];
+9
+θ = sphericalVec[[2]];
+10
+φ = sphericalVec[[3]];
+11
+sx = PauliMatrix[1];
+12
+sy = PauliMatrix[2];
+13
+sz = PauliMatrix[3];
+14
+Mq = Sin[θ]*Cos[φ]*sx + Sin[θ]*Sin[φ]*sy +
+15
+Cos[θ]*sz;
+16
+Un = {{Exp[-I*(rx + rz)/2]*Cos[ry/2], -Exp[-I*(rx - rz)/2]*
+17
+Sin[ry/2]}, {Exp[I*(rx - rz)/2]*Sin[ry/2],
+18
+Exp[I*(rx + rz)/2]*Cos[ry/2]}};
+19
+Return [Un . Mq . ConjugateTranspose[Un]];
+20
+);
+21
+rotateVector[vec_, rx_, ry_, rz_] := (
+22
+Return[qubitmatrixToCartesian[rnSU2euler[vec, rx, ry, rz]]];
+23
+);
+24
+subtractAngles[a1_, a2_] := (
+25
+d = RealAbs[a1 - a2];
+26
+Return[Min[d, 2*Pi - d]];
+27
+);
+28
+errorPropagation[n_, vec_, vecError_, rx_, ry_, rz_] := (
+29
+v = NestList[rotateVector[#, rx, ry, rz] &, N@vec, n];
+30
+vErr = NestList[rotateVector[#, rx, ry, rz] &, N@vecError, n];
+31
+spherical = Map[ToSphericalCoordinates, v];
+32
+sphericalErr = Map[ToSphericalCoordinates, vErr];
+33
+{MapThread[subtractAngles, {sphericalErr[[All, 3]],
+spherical[[All, 3]]}],
+,→
+34
+MapThread[subtractAngles, {sphericalErr[[All, 2]],
+spherical[[All, 2]]}]}
+,→
+35
+);
+36
+ListLinePlot[
+37
+errorPropagation[200, {1, 0, 0},
+38
+N[rotateVector[{1, 0, 0}, 0, 0.2, 0]], Pi/100, Pi/100, Pi/100]]
+Listing 9. Calculate and plot error propagation using SU(2) rota-
+tions (Mathematica)
+
+QUANTUM ERROR PROPAGATION
+37
+Appendix H. Implementing Euler matrix-based error propagation
+using Mathematica
+This section contains the Euler matrix-based implementation of error propagation
+analysis using Mathematica. Listing 10 contains a Mathematica Notebook for calcu-
+lating and visualizing the error propagation due to 200 qubit rotations by π/100 (see
+entire Notebook errorPropagation.nb on Github). The resulting plot looks exactly
+the same as the one generated by Listing 9 shown in Figure 1.
+1
+angularError[vec_, vecError_, rx_, ry_, rz_, t_, i_] := (
+2
+sphericalVec =
+3
+ToSphericalCoordinates[
+4
+vec . MatrixPower[N[EulerMatrix[{rx, ry, rz}]], t]];
+5
+sphericalVecError =
+6
+ToSphericalCoordinates[
+7
+vecError . MatrixPower[N[EulerMatrix[{rx, ry, rz}]], t]];
+8
+Return[subtractAngles[sphericalVec[[i]],
+sphericalVecError[[i]]]];
+,→
+9
+);
+10
+elevationErrorPlot =
+11
+Plot[angularError[{1, 0, 0},
+12
+N[{1, 0, 0} . EulerMatrix[{0, 0.2, 0}]], Pi/100, Pi/100,
+Pi/100,
+,→
+13
+t, 2], {t, 0, 200}, PlotStyle -> Orange];
+14
+azimuthalErrorPlot =
+15
+Plot[angularError[{1, 0, 0},
+16
+N[{1, 0, 0} . EulerMatrix[{0, 0.2, 0}]], Pi/100, Pi/100,
+Pi/100,
+,→
+17
+t, 3], {t, 0, 200}];
+18
+Show[azimuthalErrorPlot, elevationErrorPlot, PlotRange -> All]
+Listing 10. Calculate and plot error propagation using Euler matrix
+(Mathematica)
+
+38
+E. SULTANOW ET AL.
+1
+SP[t_] := {{Cos[\[Sqrt]5 t], -((2 Sin[\[Sqrt]5 t])/(\[Sqrt]5)),
+2
+Sin[\[Sqrt]5 t]/(\[Sqrt]5)}, {(2 Sin[\[Sqrt]5 t])/(\[Sqrt]5),
+(1/5) (1 + 4 Cos[\[Sqrt]5 t]), -(2/5) (-1 +
+,→
+3
+Cos[\[Sqrt]5 t])}, {-(Sin[\[Sqrt]5 t]/(\[Sqrt]5)), -(2/5) (-1 +
+Cos[\[Sqrt]5 t]), (1/5) (4 + Cos[\[Sqrt]5 t])}};
+,→
+4
+angularErrorSimplified[vec_, vecError_, t_, i_] := (
+5
+sphericalVec = ToSphericalCoordinates[vec . SP[t]];
+6
+sphericalVecError = ToSphericalCoordinates[vecError . SP[t]];
+7
+Return[subtractAngles[sphericalVec[[i]],
+sphericalVecError[[i]]]];
+,→
+8
+);
+9
+elevationErrorPlotSimplified =
+10
+Plot[angularErrorSimplified[{1, 0, 0},
+11
+N[{1, 0, 0} . EulerMatrix[{0, 0.2, 0}]], t, 2], {t, 0, 2 Pi},
+12
+PlotStyle -> Orange];
+13
+azimuthalErrorPlotSimplified =
+14
+Plot[angularErrorSimplified[{1, 0, 0},
+15
+N[{1, 0, 0} . EulerMatrix[{0, 0.2, 0}]], t, 3], {t, 0, 2 Pi}];
+16
+Show[azimuthalErrorPlotSimplified, elevationErrorPlotSimplified,
+PlotRange -> All]
+,→
+Listing 11. Calculate and plot error propagation using the limit of
+Euler matrix power (Mathematica)
+
+QUANTUM ERROR PROPAGATION
+39
+Appendix I. Poisoning Algorithms
+For simplicity, we present the QNN poisoning algorithm [13] here. This algorithm
+is not used in the SVM or QSVM experiments in the main text but is included here
+for reference, as it inspired our new QUID-based poisoning methods.
+The recursive versions of Algorithms 1 and 2 provide an alternative way to demon-
+strate how induction can be used to prove QSVM resiliency against poisoning. Here,
+we present the recursive versions and their equivalency with normal version.
+Algorithm 3: Original QUID’s Label Poisoning Procedure for QNN
+1 Require: Training data Dtr = {(xi, yi)}n
+i=1, Poison ratio ϵ, Encoding
+circuit ϕ, Distance metric d(·, ·) for density matrices. Ensure: Poisoned
+dataset with modified labels.
+2 Split Dtr into clean set Dc and poison set Dp with ratio ϵ;
+3 C ←unique({yi | (xi, yi) ∈Dtr}) // Set of unique classes.
+4 ρc ←{ϕ(x) | (x, y) ∈Dc} // Encoded clean states.
+5 ρp ←{ϕ(x) | (x, y) ∈Dp} // Encoded poison states.
+6 for ρi ∈ρp do
+7
+Dcls ←{} // Initialize dictionary for class-wise distances.
+8
+for c ∈C do
+9
+ρ(c)
+c
+←{ρ | ρ ∈ρc, y = c} // States of class c.
+10
+Dcls[c] ←
+1
+|ρ(c)
+c |
+P
+ρ∈ρ(c)
+c d(ρi, ρ);
+11
+ynew
+i
+←arg maxc∈C Dcls[c] // Assign class with maximum distance.
+12 return Dc ∪{(xi, ynew
+i
+) | i ∈Dp};
+
+40
+E. SULTANOW ET AL.
+Algorithm 4: Recursive QUID-style Label Poisoning for Classical SVM
+1 Require: Training data Dtr = {(xi, yi)}n
+i=1, Poison ratio ϵ, Kernel function
+k(x, x′), Distance metric d(·, ·). Ensure: Poisoned dataset with modified
+labels.
+2 Split Dtr into clean set Dc and poison set Dp with ratio ϵ;
+3 C ←unique({yi | (xi, yi) ∈Dtr}) // Set of unique classes.
+4 Φc ←{k(x, x′) | (x, y) ∈Dc} // Kernel-induced clean feature space.
+5 Φp ←{k(x, x′) | (x, y) ∈Dp} // Kernel-induced poison feature
+space.
+6 if |Φp|≤1 then
+// Base case:
+no or single point to poison
+7
+return Dtr ;
+8 else
+// Recursive case
+9
+Let ϕcurr be the first element in Φp (corresponding to (xcurr, ycurr));
+10
+Dcls ←{} // Initialize dictionary for class-wise distances.
+11
+for c ∈C do
+12
+Φ(c)
+c
+←{ϕ | ϕ ∈Φc, y = c} // Features of class c.
+13
+Dcls[c] ←
+1
+|Φ(c)
+c |
+P
+ϕ∈Φ(c)
+c d(ϕcurr, ϕ);
+14
+ynew
+curr ←arg maxc∈C Dcls[c] // Assign class with maximum distance.
+15
+Update label of (xcurr, ycurr) in Dp to ynew
+curr;
+16
+Remove ϕcurr from Φp and the corresponding sample from Dp;
+17
+D′
+tr ←Dc ∪Dp // Updated dataset
+// Recursively poison the remaining points
+18
+D′′
+tr ←RecursiveQUIDSVM(D′
+tr, ϵ, k, d);
+19
+return D′′
+tr ;
+Theorem (Equivalence).
+Let QUIDSVM denote the original, non-recursive
+QUID-style Label Poisoning for Classical SVM (Algorithm 1). Let RecursiveQUIDSVM
+be its recursive version, as defined in Algorithm 4. For any training dataset Dtr, poi-
+son ratio ϵ, kernel function k(·, ·), and distance metric d(·, ·), both algorithms yield
+the same final set of label assignments. In other words,
+QUIDSVM(Dtr, ϵ, k, d) = RecursiveQUIDSVM(Dtr, ϵ, k, d).
+Proof. We prove the statement by induction on the size of the poison set.
+
+QUANTUM ERROR PROPAGATION
+41
+Notation. For a dataset Dtr, let
+Dc ⊆Dtr,
+Dp ⊆Dtr
+be the clean and poison partitions, respectively, after splitting with ratio ϵ. Define
+Φc = { k(x, x′) | (x, y) ∈Dc} and Φp = { k(x, x′) | (x, y) ∈Dp} as in Algorithm 1.
+Base Case: (|Φp|≤1). If there are zero or one points in Φp, the poisoning procedure
+performs at most one label flip.
+In both the non-recursive and recursive
+versions, that single flip (or no flip) is carried out identically. Hence, the
+result is trivially the same.
+Inductive Step: Assume the claim holds for any dataset whose poison set Φp has
+size k. Now consider a dataset with |Φp|= k + 1.
+(1) In the non-recursive Algorithm 1 (QUIDSVM), we have a loop:
+for
+ϕi ∈Φp
+{. . . }.
+That loop processes each ϕi in turn, computing the class-wise distances
+Dcls[c] and then assigning the new label arg maxc Dcls[c].
+(2) In the recursive version (RecursiveQUIDSVM), we pick the first point
+ϕcurr from Φp, perform the same distance-based label assignment, then
+remove ϕcurr from Φp. This reduces the poison set to size k. By the
+inductive hypothesis, calling
+RecursiveQUIDSVM(D′
+tr, ϵ, k, d)
+on the remaining k poison points yields exactly the same final set of label
+assignments as the non-recursive procedure would, once it had moved on
+from ϕcurr.
+Since the update step for ϕcurr is also identical in both algorithms (same
+arg max rule, same distances, etc.), the entire sequence of label flips (on
+all k + 1 points) ends up the same.
+Therefore, by induction, both algorithms produce the same final labelling
+whenever |Φp|= k + 1.
+Since both the base case and the inductive step are verified, the Equivalence The-
+orem holds for all possible sizes of the poison set.
+□
+
+42
+E. SULTANOW ET AL.
+Algorithm 5: Recursive QUID-style Label Poisoning for QSVM
+1 Require: Training data Dtr = {(xi, yi)}n
+i=1, Poison ratio ϵ, Encoding
+circuit ϕ, Distance metric d(·, ·) for density matrices. Ensure: Poisoned
+dataset with modified labels.
+2 Split Dtr into clean set Dc and poison set Dp with ratio ϵ;
+3 C ←unique({yi | (xi, yi) ∈Dtr}) // Set of unique classes.
+4 ρc ←{ϕ(x) | (x, y) ∈Dc} // Encoded clean states.
+5 ρp ←{ϕ(x) | (x, y) ∈Dp} // Encoded poison states.
+6 if |ρp|≤1 then
+// Base case:
+no or single point to poison
+7
+return Dtr ;
+8 else
+// Recursive case
+9
+Let ρcurr be the first element in ρp (corresponding to (xcurr, ycurr));
+10
+Dcls ←{} // Initialize dictionary for class-wise distances.
+11
+for c ∈C do
+12
+ρ(c)
+c
+←{ρ | ρ ∈ρc, y = c} // States of class c.
+13
+Dcls[c] ←
+1
+|ρ(c)
+c |
+P
+ρ∈ρ(c)
+c d(ρcurr, ρ);
+14
+ynew
+curr ←arg maxc∈C Dcls[c] // Assign class with maximum distance.
+15
+Update label of (xcurr, ycurr) in Dp to ynew
+curr;
+16
+Remove ρcurr from ρp and the corresponding sample from Dp;
+17
+D′
+tr ←Dc ∪Dp // Updated dataset
+// Recursively poison the remaining points
+18
+D′′
+tr ←RecursiveQUIDQSVM(D′
+tr, ϵ, ϕ, d);
+19
+return D′′
+tr ;
+Theorem (Equivalence for QSVM). Let QUIDQSVM be the original, non-
+recursive QUID-style Label Poisoning for QSVM (Algorithm 2). Let RecursiveQUIDQSVM
+be its recursive version, as defined in Algorithm 5. For any training dataset Dtr, poi-
+son ratio ϵ, encoding circuit ϕ, and distance metric d(·, ·) on density matrices, both
+algorithms yield the same final poisoned dataset. Symbolically,
+QUIDQSVM(Dtr, ϵ, ϕ, d) = RecursiveQUIDQSVM(Dtr, ϵ, ϕ, d).
+Proof. We proceed by induction on the size of the poison set.
+
+QUANTUM ERROR PROPAGATION
+43
+Notation. From the training set Dtr, let
+Dc ⊆Dtr,
+Dp ⊆Dtr
+be the clean and poison subsets after splitting with ratio ϵ. Define
+ρc = { ϕ(x) | (x, y) ∈Dc},
+ρp = { ϕ(x) | (x, y) ∈Dp},
+as in Algorithm 2.
+Base Case (|ρp|≤1): If ρp has size 0 or 1, then there are at most one or zero label re-
+assignments to perform. Both the QUIDQSVM and the RecursiveQUIDQSVM
+do the same update (or no update) in this scenario, producing the same final
+dataset. Thus, the claim holds trivially.
+Inductive Step: Suppose that for any dataset whose poison set has size k, both
+algorithms return identical label assignments. Consider a dataset for which
+|ρp|= k + 1.
+(1) Non-Recursive Algorithm 2(QUIDQSVM). It iterates over all states in
+ρp (say ρ1, ρ2, . . .), each time:
+Dcls[c] =
+1
+|ρ(c)
+c |
+X
+ρ∈ρ(c)
+c
+d(ρi, ρ)
+for each class c,
+ynew
+i
+= arg max
+c
+Dcls[c].
+Labels are updated one by one in a for-loop.
+(2) Recursive Algorithm 5 (RecursiveQUIDQSVM). It picks the first state
+ρcurr ∈ρp, computes the same distances {Dcls[c]}, and flips its label using
+the same arg max rule. Then it removes ρcurr from ρp, leaving a poison
+set of size k. By the inductive hypothesis, the recursive call on that
+reduced set yields the same final labelling as the non-recursive version
+would do for the remaining k points (after it, too, finishes flipping the
+label of ρcurr and moves on).
+Because the step for ρcurr is identical in both algorithms (the same dis-
+tance calculations and arg max), the entire sequence of (k +1) label flips
+is the same overall.
+Hence by induction, both algorithms produce an identical final labeling
+whenever |ρp|= k + 1.
+Since both the base case and the inductive step have been shown, the two algo-
+rithms are equivalent for all sizes of the poison set.
+□
+
+44
+E. SULTANOW ET AL.
+Appendix J. Glossary
+Term
+Definition
+Azimuthal Angle (φaz)
+In the Bloch sphere representation of a qubit, the azimuthal
+angle φaz is the angle between the projection of the vector
+⃗q onto the xy-plane and the positive x-axis. It ranges from
+0 to 2π. It is used to express the qubit in spherical coordi-
+nates.
+Elevation Angle (θel)
+In the Bloch sphere representation of a qubit, the elevation
+angle θel (also known as the polar angle) is the angle be-
+tween the vector ⃗q and the positive z-axis. It ranges from
+0 to π. It is used to express the qubit in spherical coordi-
+nates.
+Data Poisoning
+An attack on machine learning models where an adversary
+manipulates the training data to influence the behaviour of
+the trained model. In the context of the paper, it refers to
+injecting errors into quantum machine learning models to
+study how errors propagate.
+Error Propagation
+The process by which errors are introduced at one point in
+a computational process affects subsequent computations.
+The paper investigates how errors propagate in quantum
+machine learning, particularly in qubit rotations.
+Euler Matrix
+A rotation matrix constructed from Euler angles (φ, θ, ψ),
+representing a rotation in three-dimensional space. In the
+paper, it is used to rotate qubits in their Cartesian repre-
+sentation.
+Generator of Rotation
+(J)
+An operator or matrix that generates infinitesimal rota-
+tions. In the paper, J is used to express finite rotations as
+exponentials of J, considering infinitesimal rotations suc-
+cessively.
+Infinitesimal Rotation
+[25]
+A rotation by an infinitesimally small angle. In the paper,
+infinitesimal rotations are used to derive expressions for fi-
+nite rotations by taking the limit as the number of rotations
+approaches infinity.
+Norm-Preserving
+A property of a transformation that preserves the norm
+(length) of vectors it acts upon. In quantum computing,
+unitary operators are norm-preserving transformations.
+Periodicity
+The quality of a function or process that repeats at regular
+intervals. In the paper, error propagation functions exhibit
+periodic behaviour due to the properties of qubit rotations
+on the Bloch sphere.
+
+QUANTUM ERROR PROPAGATION
+45
+Term
+Definition
+Special Unitary Group
+SU(2) [26]
+The group of 2×2 unitary matrices with determinant 1. In
+the paper, SU(2) matrices are used to describe rotations of
+qubits on the Bloch sphere.
+Traceless Matrix [27]
+A square matrix whose trace (the sum of the diagonal ele-
+ments) is zero.
+Unitary Operators
+Operators that preserve inner products in a Hilbert space
+satisfy U †U = UU † = I, where U † is the conjugate trans-
+pose of U and I is the identity operator.
+
+46
+E. SULTANOW ET AL.
+References
+[1] Fahri Anıl Yerlikaya and Şerif Bahtiyar. Data poisoning attacks against machine learning
+algorithms. Expert Systems with Applications, 208:118101, 2022.
+[2] Sirui Lu, Lu-Ming Duan, and Dong-Ling Deng. Quantum adversarial machine learning. Phys-
+ical Review Research, 2(3):033212, 2020.
+[3] Jacob Biamonte, Peter Wittek, Nicola Pancotti, Patrick Rebentrost, Nathan Wiebe, and Seth
+Lloyd. Quantum machine learning. Nature, 549(7671):195–202, 2017.
+[4] Zainab Abohashima, Mohamed Elhosen, Essam H Houssein, and Waleed M Mohamed. Clas-
+sification with quantum machine learning: A survey. arXiv preprint arXiv:2006.12270, 2020.
+[5] Sandeep K Goyal, B Neethi Simon, Rajeev Singh, and Sudhavathani Simon. Geometry of
+the generalized bloch sphere for qutrits. Journal of Physics A: Mathematical and Theoretical,
+49(16):165203, 2016.
+[6] Todd Tilma and ECG Sudarshan. Generalized euler angle parametrization for su (n). Journal
+of Physics A: Mathematical and General, 35(48):10467, 2002.
+[7] Chu-Ryang Wie. Two-qubit bloch sphere. Physics, 2(3):383–396, 2020.
+[8] Battista Biggio, Blaine Nelson, and Pavel Laskov. Poisoning attacks against support vector
+machines, 2013.
+[9] Nicola Franco, Alona Sakhnenko, Leon Stolpmann, Daniel Thuerck, Fabian Petsch, Annika
+Rüll, and Jeanette Miriam Lorenz. Predominant aspects on security for quantum machine
+learning: Literature review, 2024.
+[10] Maximilian Wendlinger, Kilian Tscharke, and Pascal Debus. A comparative analysis of adver-
+sarial robustness for quantum and classical machine learning models, 2024.
+[11] Satwik Kundu and Swaroop Ghosh. Security concerns in quantum machine learning as a ser-
+vice, 2024.
+[12] Bacui Li, Tansu Alpcan, Chandra Thapa, and Udaya Parampalli. Computable model-
+independent bounds for adversarial quantum machine learning, 2024.
+[13] Satwik Kundu and Swaroop Ghosh. Adversarial poisoning attack on quantum machine learning
+models, 2024.
+[14] Sijia Yu and Yifan Zhou. Quantum adversarial machine learning for robust power system
+stability assessment. In 2024 IEEE Power & Energy Society General Meeting (PESGM), pages
+1–5, 2024.
+[15] Volker Reers and Marc Maußner. Comparative analysis of vulnerabilities in classical and quan-
+tum machine learning. In INFORMATIK 2024, pages 555–571. Gesellschaft für Informatik eV,
+2024.
+[16] MathWorks.
+Radar
+target
+classification
+using
+machine
+learn-
+ing
+and
+deep
+learning.
+https://uk.mathworks.com/help/radar/ug/
+radar-target-classification-using-machine-learning-and-deep-learning.html.
+Accessed 2024-12-28.
+[17] IBM
+Trusted
+AI
+Team.
+Adversarial
+robustness
+toolbox
+(art).
+https://github.com/
+Trusted-AI/adversarial-robustness-toolbox, 2024. Accessed: 2024-12-28.
+[18] Chu-Ryang Wie. Bloch sphere model for two-qubit pure states. arXiv preprint arXiv:1403.8069,
+2014.
+[19] Jean-Marie Normand. A Lie Group, Rotations in Quantum Mechanics. North-Holland, 1980.
+
+QUANTUM ERROR PROPAGATION
+47
+[20] Jeffrey Yepez. Lecture notes:
+Qubit representations and rotations. https://www.phys.
+hawaii.edu/~yepez/Spring2013/lectures/Lecture1_Qubits_Notes.pdf, 1 2013. Accessed
+2022-06-27.
+[21] George B. Arfken, Hans J. Weber, and Frank E. Harris. Mathematical Methods for Physicists:
+A Comprehensive Guide. Elsevier, 7 edition, 2013.
+[22] Yamilet Quintana, William Ramírez, and Alejandro Urieles. Euler matrices and their algebraic
+properties revisited. arXiv preprint arXiv:1811.01455, 2018.
+[23] Dariusz Chruściński, Ryohei Fujii, Gen Kimura, and Hiromichi Ohno. Constraints for the
+spectra of generators of quantum dynamical semigroups. Linear Algebra and its Applications,
+630:293–305, 2021.
+[24] Günther J. Wirsching. Gewöhnliche Differentialgleichungen: Eine Einführung mit Beispielen,
+Aufgaben und Musterlösungen. Teubner, 2006.
+[25] Lenka R`yparová and Josef Mikeš. Infinitesimal rotary transformation. Filomat, 33(4):1153–
+1157, 2019.
+[26] B Sethuraman and B Sury. A note on the special unitary group of a division algebra. Proceedings
+of the American Mathematical Society, 134(2):351–354, 2006.
+[27] M Isabel García-Planas and Tetiana Klymchuk. Differentiable families of traceless matrix
+triples. Revista de la Real Academia de Ciencias Exactas, Físicas y Naturales. Serie A.
+Matemáticas, 114(1):11, 2020.
+Eldar Sultanow, Capgemini, Bahnhofstraße 30, Nuremberg, Germany
+Email address: eldar.sultanow@capgemini.com
+Fation Selimllari, Hochschule Coburg, Friedrich-Streib-Str.
+2, Coburg, Ger-
+many
+Email address: fation@selimllari.de
+Siddhant Dutta, SVKM’s Dwarkadas J. Sanghvi College of Engineering, Bhak-
+tivedanta Swami Rd, Mumbai, India
+Email address: siddhantdutta1@gmail.com
+Barry D. Reese, Capgemini, Olaf Palme Stasse, Munich, Germany
+Email address: barry.d.reese@gmail.com
+Madjid Tehrani, The George Washington University, School of Engineering and
+Applied Science, Washington D.C., USA
+Email address: madjid_tehrani@gwu.edu
+William J Buchanan, Edinburgh Napier University, Edinburgh, UK
+Email address: b.buchanan@napier.ac.uk

@@ -1,0 +1,4329 @@
+Consistent Bayesian Spatial Domain Partitioning Using Predictive
+Spanning Tree Methods
+Kun Huang1 and Huiyan Sang2
+1Department of Statistics, Texas A&M University, College Station, US. Email:
+k-huang@tamu.edu
+2Department of Statistics, Texas A&M University, College Station, US. Email:
+huiyan@stat.tamu.edu
+Abstract
+Bayesian model-based spatial clustering methods are widely used for their flexibility in
+estimating latent clusters with an unknown number of clusters while accounting for spatial
+proximity. Many existing methods are designed for clustering finite spatial units, limiting their
+ability to make predictions, or may impose restrictive geometric constraints on the shapes of
+subregions. Furthermore, the posterior clustering consistency theory of spatial clustering models
+remains largely unexplored in the literature. In this study, we propose a Spatial Domain Random
+Partition Model (Spat-RPM) and demonstrate its application for spatially clustered regression,
+which extends spanning tree-based Bayesian spatial clustering by partitioning the spatial domain
+into disjoint blocks and using spanning tree cuts to induce contiguous domain partitions. Under
+an infill-domain asymptotic framework, we introduce a new distance metric to study the posterior
+concentration of domain partitions.
+We show that Spat-RPM achieves a consistent estimation
+of domain partitions, including the number of clusters, and derive posterior concentration rates
+for partition, parameter, and prediction. We also establish conditions on the hyperparameters of
+priors and the number of blocks, offering important practical guidance for hyperparameter selection.
+Finally, we examine the asymptotic properties of our model through simulation studies and apply
+it to Atlantic Ocean data.
+1
+arXiv:2508.08324v1  [stat.ME]  9 Aug 2025
+
+1
+Introduction
+Spatial clustering models
+[6, 10, 4, 31] are essential for identifying and characterizing spatial
+heterogeneity, enabling a deep understanding of spatial patterns and the underlying differences in
+physical, social, or biological driving factors. Bayesian spatial clustering models have gained great
+popularity due to their flexibility in modeling latent clustered variables within Bayesian hierarchical
+frameworks while accounting for spatial information. These models specify a prior distribution over
+the partition space and fit probabilistic models to the data to estimate underlying cluster memberships
+and other model parameters. One concrete example is the spatially clustered regression model (see
+[22, 33, 23, 48]), where the goal is to study the spatial heterogeneity in the latent relationship between
+covariates and spatial response. Let [{si, x(si), y(si)}n
+i=1 be the spatial data observed at locations
+s1, . . . , sn ∈D ⊂R2, where x(si) is d-dimensional covariate and y(si) is the response variable at si.
+Conditional on {x(si)}n
+i=1, we write the likelihood of {y(si)}n
+i=1 as Qn
+i=1 Pθ(si){y(si) | x(si)}, where
+Pθ(si){· | x(si)} is the conditional probability density function of y(si) with unknown parameter θ(si).
+To account for spatial heterogeneity, we assume θ(si) = θ(si′) if si and si′ belong to the same cluster,
+and θ(si) ̸= θ(si′) otherwise.
+Most existing Bayesian spatial clustering methods consider a finite random partition prior model
+to cluster the n observed locations into k0 disjoint sub-clusters [32, 37, 35, 17], but they cannot be used
+to predict cluster memberships, regression parameters, or responses at new locations. Alternatively,
+a domain partition model considers a random partition of the entire domain D into k0 disjoint sub-
+domains, say {Dl,0}k0
+l=1, such that ∪k0
+l=1Dl,0 = D, making it suitable for prediction tasks. Popular
+domain partition models include binary decision trees [7, 15], which recursively split the domain into
+non-overlapping hyper-rectangular regions, and Voronoi tessellation models [19, 18, 9], which partition
+the domain into convex polygons. However, these shape constraints might be too restrictive for some
+applications.
+While spatial clustering methods have been widely studied and applied, their theoretical
+development remains relatively limited.
+Existing theoretical work of spatially clustered regression
+model mostly focuses on showing that the posterior is a consistent estimate of the true regression
+parameter or data-generating density [27, 30], while the more relevant problem of clustering consistency
+has not been well studied due to its theoretical challenges. Many existing work on Bayesian posterior
+clustering (see, e.g., [16, 28, 46, 2]) consistency focuses on exchangeable random set partition
+models [13].
+Nevertheless, these exchangeable random partition priors differ fundamentally from
+those used in spatial clustering models, making some of the existing theoretical tools unsuitable for
+directly analyzing spatial clustering. Most recently, [47] establishes clustering consistency under a
+mixture model framework, assuming that the data are generated dependently from a disjoint union
+of component graphs.
+[33] establishes clustering consistency for spatial panel data assuming the
+2
+
+number of repeated measurements goes to infinity. However, in spatial statistics, it is more common
+and reasonable to assume either an infill-domain asymptotic or an increasing-domain asymptotic
+framework, where the number of spatial locations goes to infinity.
+We propose a spatial domain random partition model (Spat-RPM) in the context of spatially
+clustered regression for data [{si, x(si), y(si)}n
+i=1. The model extends the finite spanning tree prior
+[40, 26, 21] by modeling latent domain partition {Dl,0}k0
+l=1. In Spat-RPM, we first discretize the domain
+into small disjoint blocks. We construct spanning trees on blocks, based on which a contiguous domain
+partition is induced after removing some edges and assigning locations within the same block to the
+same cluster. We assign priors on spanning trees, the number of clusters, and the induced partitions.
+We design an efficient Bayesian inference algorithm to draw posterior samples of domain partitions
+and θ(·). We show in our numerical examples that Spat-RPM produces spatially contiguous clusters
+with more flexible shapes while enabling spatial predictions.
+The blocking technique in Spat-RPM reduces the infinite domain partition space to the finite
+blocking partition space, making the estimation practical. The blocking also enables Spat-RPM to
+handle larger-scale data by reducing the computational burden. Under a mild assumption on the
+Minkowski dimension of the true partition boundary set and the shape of each subregion, we study
+the approximation error between the blocking partition space and the true domain partition. In our
+theoretical analysis, we establish conditions on the asymptotic rate of the number of blocks, balancing
+the trade-off between approximation error and partition space dimensionality to achieve partition
+consistency.
+We conduct Bayesian posterior theoretical analysis for Spat-RPM, assuming an infill-domain
+asymptotic framework. We establish the domain partition consistency theory from the ground up.
+To study partition consistency, we formally define a valid distance metric for comparing two domain
+partitions. We show that under the defined metric, the posterior domain partition converges to the
+true partition, given certain conditions including a finite number of clusters, regularity constraints
+on the domain boundary, and rates of hyperparameters. The clustering consistency of the observed
+locations follows directly from the domain partition consistency result. We also show that the number
+of clusters can be consistently estimated. Since the blocking partition prior model involves spanning
+trees with a diverging number of nodes as n increases, we derive several original graph-theoretical
+results related to spanning trees to establish partition consistency, which may be of independent
+interest for future research. Furthermore, based on the partition consistency, we show the Bayesian
+posterior contraction rate of θ(·) and prediction error. To the best of our knowledge, our work is
+among the first to develop Bayesian spatial domain partitioning consistency under the spatial infill
+domain asymptotic framework.
+The rest of the paper is organized as follows. We introduce Spat-RPM in Section 2 and present
+theoretical results in Section 3. In Section 4, we conduct a numerical simulation on U-shape to examine
+3
+
+the asymptotic properties of Spat-RPM. In Section 5, we apply our model to real data to demonstrate
+results. Technical proofs are contained in Section 6 and Supplementary Material.
+2
+Methodology
+2.1
+Background of graphs and spanning trees
+We start by introducing some concepts and notations of graphs. Let V = {v1, . . . , vn∗} be n∗vertices
+and G = (V, E) be an undirected graph, where the edge set E is a subset of {(vi, vi′) : vi, vi′ ∈
+V, vi ̸= vi′}. We call a sequence of edges {(vi0, vi1), (vi1, vi2), . . . , (vit−1, vit)} ⊆E as a path of length
+t between vi0 and vit, if all {vij}t
+j=0 are distinct. A path is called a cycle if vi0 = vit and all other
+vertices are distinct. A subgraph (V0, E0), where V0 ⊆V and E0 ⊆E, is called a connected component
+of G if there is a path between any two vertices and there is no path between any vertex in V0 and
+any vertex in V \V0, the difference between V and V0. Given an undirected graph G = (V, E), a subset
+V0 ⊆V is a contiguous cluster if there exists a connected subgraph G0 = (V0, E0), where E0 ⊆E. We
+say π(V) = {V1, . . . , Vk} is a contiguous partition of V with respect to G, if Vj ⊆V is a contiguous
+cluster for j = 1, . . . , k, ∪k
+j=1Vj = V, Vj ∩Vj′ = ∅for j ̸= j′. For simplicity, we refer to contiguous
+partitions (clusters) simply as partitions (clusters) in the following context.
+A spanning tree of G is defined as a subgraph T = (V, ET ), where the edge set ET ⊆E has no
+cycle and connects all vertices. Hence, a spanning tree has n∗vertices and n∗−1 edges. See Figure 1
+for an example of a spanning tree of a lattice graph. A well-known property of the spanning tree is
+that we obtain k connected components of T , if k −1 edges are deleted from T . This property has
+motivated the development of hierarchical generative prior models of spatial clusters. These models
+begin with the construction of a spatial graph G, based on which a prior is defined over the spanning
+tree space of G. Conditional on the spanning tree, prior models are assumed for the number of clusters
+and a partition of the spanning tree. The likelihood of {y(si)}n
+i=1 can be derived afterward given the
+partition. Following this path, we describe below a domain partition prior model based on spanning
+trees.
+4
+
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+0.2
+0.4
+0.6
+0.8
+1
+0
+0.2
+0.4
+0.6
+0.8
+1
+Cluster
+1
+2
+3
+(a)
+(b)
+(c)
+Figure 1: Illustration of our partition model with K = 5. (a) Graph G = (V, E), where V is the set of
+blocks, and edges in E are denoted by the red lines between adjacent blocks. (b) One spanning tree
+obtained by cutting some edges of graph G in (a). (c) Domain partition π∗(D) induced by cutting
+two edges (dashed lines) of the spanning tree in (b). Each cluster (denoted by different colors) is a
+connected component. Locations within the same block have the same cluster membership.
+2.2
+A prior model for partitions
+Without loss of generality, we assume D = [0, 1]2. Note that our method and theoretical results can be
+easily extended to a more general domain that is homeomorphic to [0, 1]2 with the Euclidean metric
+and a bi-Lipschitz homeomorphism. We first select an integer K, and segment D into K2 disjoint
+blocks, say {Bm}K2
+m=1, where each block Bm is a K−1 × K−1 rectangle. We construct G = (V, E) as
+a mesh grid graph of blocks, where V = {Bm}K2
+m=1 and E is the set of edges connecting only adjacent
+blocks (see Figure 1(a) for the constructed G with K = 5). Given graph G, write ∆as the space
+of spanning trees induced from G. The following describes two popular approaches in the existing
+literature to assign priors on spanning trees.
+The first approach is the uniform spanning tree prior (UST, [1, 36, 40]), which assumes
+T ∝I(T ∈∆),
+(1)
+where I(·) is the indicator function. [3] establishes foundational principles for understanding UST.
+The second approach is the random minimum spanning tree prior (RST, [12, 8, 26]). Given graph G,
+RST assigns a weight we for ∀e ∈E with a uniform prior, and obtains the minimum spanning tree
+(MST), defined as the spanning tree with the minimal Σe∈ET we over all spanning trees induced from
+G, i.e.,
+T = MST({we}e∈E), we
+i.i.d.
+∼Unif(0, 1),
+(2)
+where Unif(·, ·) is the uniform distribution.
+Either of priors (1) and (2) can be used in our model. It has been shown in Proposition 7 of [26]
+that the MST algorithm (2) generates T with a strictly positive probability, for ∀T ∈∆. Thus, priors
+5
+
+(1) and (2) have the same spanning tree support (see Figure 1(b) for an example of obtaining T from
+G). Next, we assume the number of clusters k follows a truncated Poisson distribution with mean
+parameter λ:
+k ∼Poisson(λ) · I(1 ⩽k ⩽kmax),
+(3)
+where kmax is a pre-specified maximum number of clusters. Conditional on T and k, we assume a
+uniform distribution on all possible partitions induced by T :
+P{π(V)|k, T } ∝I {π(V) is induced from T and has k clusters} .
+(4)
+Note that π(V) is a partition of blocks. Conditional on π(V), the partition of D, say π∗(D), is obtained
+immediately by assigning locations within the same block to the same cluster. Note that we use the
+notation ·∗to emphasize that π∗(D) is induced from π(V). See Figure 1(c) for an example of obtaining
+π∗(D) from T .
+Let S = {si}n
+i=1 be the set of observed locations. Conditional on π∗(D), the partition of S, say
+π(S), is obtained immediately by assigning locations in S the same cluster memberships as in π∗(D).
+2.3
+The proposed Spat-RPM
+Let π∗(D) = {D∗
+1, . . . , D∗
+k} be the domain partition with k clusters. Given a cluster D∗
+j ∈π∗(D), let
+θj be the regression coefficient within it and write θ = {θj}k
+j=1. Conditional on π∗(D), we write our
+hierarchical model as
+θ | π∗(D), k, T , s, x ∼
+k
+Y
+j=1
+P(θj), and
+(5)
+y | π∗(D), k, T , s, x, θ ∼
+k
+Y
+j=1
+Y
+si∈D∗
+j
+Pθj{y(si) | x(si)},
+(6)
+where s = {si}n
+i=1, x = {x(si)}n
+i=1, y = {y(si)}n
+i=1 and P(θj) is the prior model we assume for the
+unknown parameter θj.
+2.4
+Prediction at new locations
+Following priors in Section 2.2 and the hierarchical model in Section 2.3, we obtain the posterior
+distribution of {θ, π∗(D)}, based on which we predict the distribution of the response variable y(s) |
+s, x(s) for a new location s and covariate x(s). Given {θ, π∗(D)}, write θ(s) = Pk
+j=1 θjI(s ∈D∗
+j) as the
+predicted regression coefficient at s. We predict the distribution of y(s) | s, x(s) by Pθ(s){· | x(s)}.
+2.5
+Bayesian Computations
+We use Markov chain Monte Carlo (MCMC) algorithm to draw samples from the posterior
+distribution P{π∗(D), k, T , θ | s, x, y}.
+Given π∗(D), we draw sample of θ from distribution
+6
+
+P{θ | π∗(D), k, T , s, x, y}.
+This step is standard if we take a conjugate prior of θ in (5), so we
+omit the details. To sample π∗(D), we analytically integrate θ out and sample from the collapsed
+conditional distribution of π∗(D), k, T | s, x, y. Borrowing ideas from [26], at each MCMC iteration,
+we propose one of four moves from the current state: birth, death, change, and hyper, with probabilities
+rb(k), rd(k), rc(k) and rh(k), respectively. For the birth move, we split one cluster in the current π∗(D)
+into two clusters by randomly removing an edge connecting two blocks in the same cluster in T . The
+Metropolis-Hastings (M-H) acceptance ratio is
+min
+
+1,
+λ
+k + 1 × rd(k + 1)
+rb(k)
+× P{y | π∗
+new(D), k + 1, T , s, x}
+P{y | π∗(D), k, T , s, x}
+
+,
+where π∗
+new(D) is the new partition after removing the edge, and P{y | π∗(D), k, T , s, x} is the
+integrated likelihood with θ marginalized out. We derive the closed form of P{y | π∗(D), k, T , s, x} in
+Equation (29) under a linear regression setting. For a death move, we randomly merge two adjacent
+clusters in π∗(D). Specifically, an edge in T that connects two distinct clusters in π∗(D) is selected
+uniformly, and the two clusters are then combined into a single cluster. The M-H acceptance ratio is
+computed by
+min
+
+1, k
+λ × rb(k −1)
+rd(k)
+× P{y | π∗
+new(D), k −1, T , s, x}
+P{y | π∗(D), k, T , s, x}
+
+.
+For a change move, we first perform a birth move, then a death move. The purpose of the change move
+is to encourage a better mixing of the sampler. The cluster number is unchanged after the change
+move.
+Finally, for a hyper move, we update the spanning tree T . For every edge e ∈E, we sample
+a weight we ∼Unif(0, 1/2), if e connects blocks within the same cluster, and we ∼Unif(1/2, 1)
+otherwise. Based on {we}e∈E, Prim’s MST algorithm [34] is used to construct a new spanning tree
+Tnew with a computational complexity of O(K2 log K). It has been shown that Tnew is guaranteed to
+induce current partition π∗(D) [39]. The M-H acceptance rate is 1. Note that when applying RST
+prior (2), this is an exact sampler [26]. When using UST prior (1), this is an approximated sampler
+used in [40].
+3
+Main result
+In this section, we introduce the theoretical result of the proposed Spat-RPM. Note that priors
+specified in Sections 2.2 and 2.3 assume a general likelihood Pθ(si){y(si) | x(si)}.
+For example,
+Pθ(si){y(si) | x(si)} can be a Poisson, Gaussian or multinomial distribution.
+In this section, to
+simplify the theoretical analysis, we focus on the Gaussian distribution case, where we write our
+model specifically as a linear regression form, based on which the theoretical analysis is conducted.
+7
+
+3.1
+Linear regression setting
+Under the linear regression setting, we write our model as
+y(si) = µ(si) + ϵ(si),
+(7)
+where µ(si) = xT (si)θ(si) is the regression mean of y(si), and {ϵ(si)}n
+i=1 are identically and
+independently distributed (i.i.d.) mean zero Gaussian noises. Based on model (7), we assume an
+independent conjugate Zellner’s g-prior on each θj. Let θ = {θj}k
+j=1. We modify models (5) and (6)
+as
+θ | π∗(D), k, T , s, x ∼
+k
+Y
+j=1
+PGaussian
+
+θj; 0, γnσ2
+ X
+si∈D∗
+j
+x(si)xT (si)
+†
+, and
+(8)
+y | π∗(D), k, T , s, x, θ ∼
+k
+Y
+j=1
+Y
+si∈D∗
+j
+PGaussian{y(si); xT (si)θj, σ2},
+(9)
+where PGaussian(·; a, Σ) denotes the probability density function of the Gaussian distribution with
+mean a and covariance Σ, γ > 0 is a hyperparameter controlling the prior variance, ·† denotes the
+pseudoinverse. σ2 is the variance of ϵ(si) which is often assumed unknown and assigned an inverse
+Gamma prior in practice. For simplicity, we assume σ2 is a fixed value and drop the notation σ2 in
+the left hand side of (8) and (9). However, we shall show that our theoretical results hold even when
+σ2 is not fixed at its true value.
+Under the linear regression setting, we predict the regression mean for a new observed location s
+and covariate x(s). Following notations in Section 2.4, we predict the regression mean by µ{s, x(s)} =
+xT (s)θ(s), for a given {θ, π∗(D)}.
+3.2
+Notations
+We introduce some notations in this section. Denote ∥· ∥2 and ∥· ∥∞as L2 norm and L∞norm,
+respectively. For two locations s1, s2, let d(s1, s2) = ∥s1 −s2∥2 be the Euclidean distance. For two
+spatial domains D1 and D2, we write d(D1, D2) = infs1∈D1,s2∈D2 d(s1, s2). For a constant δ > 0 and
+a spatial domain D, we define the δ-neighborhood of D as N(D, δ) = {s ∈R2 : d(s, D) ≤δ}. The
+notation |D| is used as two ways: if D is a spatial domain, |D| represents its area; if D is a set, |D|
+denotes its cardinality. Furthermore, for a spatial domain D, we denote ∥D∥as the number of observed
+locations within it.
+We use c and C to denote some constants independent of partitions π∗(D) (hence π(S)). The
+values of c and C may change from line to line.
+For two positive series an and bn, we say an ≫bn if an/bn →∞, and an ≪bn if an/bn →0. We
+write an ∼bn if there exist constants c, C > 0, such that c < an/bn < C, for all n ⩾1. We write
+an = O(bn), if there exits a constant c > 0, such that an/bn ⩽c for all n ⩾1. We write an = o(bn) if
+an ≪bn.
+8
+
+For a positive integer a, we use Ia to denote an a × a identity matrix. For a matrix A and a
+constant c, we say A > c, if λmin(A) > c, and A < c if λmax(A) < c, where λmin(A) and λmax(A) are
+the minimum and maximum eigenvalues of A, respectively.
+3.3
+Assumptions and main theorems
+Before stating our main theorems, we introduce the required assumptions.
+We first make an
+assumption on the distribution of the observed locations {si}n
+i=1.
+Assumption 1. The observed locations {si}n
+i=1 are i.i.d. on spatial domain D with a probability
+density function PD(·) satisfying 0 < infs∈D PD(s) ⩽sups∈D PD(s) < ∞.
+Assumption 1 is standard in spatial literature [45, 44]. Under Assumption 1, the observed locations
+are randomly scattered over spatial domain D.
+Recall that we assume D can be partitioned into k0 heterogeneous sub-domains {Dl,0}k0
+l=1. We
+define the partition boundary set of {Dl,0}k0
+l=1 as
+B = {s ∈D : there exist l ̸= l′, such that Dl,0 ∩N(s, δ) ̸= ∅, and Dl′,0 ∩N(s, δ) ̸= ∅hold for ∀δ > 0}.
+We make the following assumption on B and {Dl,0}k0
+l=1.
+Assumption 2. We assume the boundary set B and {Dl,0}k0
+l=1 satisfy
+2.1 B has a ν-covering number N(B, ν, ∥· ∥2) ⩽cν−1 for some constant c > 0.
+2.2 For a given l ∈{1, . . . , k0} and any two locations s, s′ ∈Dl,0, there exists a path connecting s
+and s′, say P(s, s′), such that P(s, s′) is contained in Dl,0 and
+d{P(s, s′), B} ⩾min{d(s, B), d(s′, B), C},
+(10)
+where C > 0 is some constant dependent on Dl,0.
+The covering number condition in Assumption 2.1 is the same as that in [43, 25]. Specifically, if
+the boundary set B is a curve with finite length, Assumption 2.1 is satisfied. Assumption 2.2 assumes
+each sub-domain Dl,0 to be connected. Equation (10) is a mild condition for the shape of Dl,0, and it
+is satisfied for some common shapes (e.g., finite union of regular polygons and circles).
+Under our model, the domain partition space consists of all partitions induced from the random
+minimum spanning tree model in Section 2.2, which may not include the true partition. There may
+exist some blocks intersecting with B and containing misclustered locations, as our model assigns the
+same cluster membership for locations within the same block. The following proposition is established
+under Assumption 2.
+9
+
+Proposition
+1. Under Assumption 2, there exists a contiguous domain partition π∗
+0(D)
+=
+{D∗
+1,0, . . . D∗
+k0,0} in our partition model space, such that
+|Wπ∗
+0| =
+k0
+X
+j=1
+|{Bm : Bm ⊆D∗
+j,0, Bm ⊊Dj,0}| ⩽cK
+(11)
+for some constant c, where Wπ∗
+0 = ∪k0
+j=1{Bm : Bm ⊆D∗
+j,0, Bm ⊊Dj,0} is the set of blocks containing
+misclustered locations.
+We defer the proof of Proposition 1 to Section S.4. Proposition 1 states that there exists a π∗
+0(D)
+in our model’s partition space, such that |Wπ∗
+0|, which is the number of blocks containing misclustered
+locations, is upper bounded by cK. In the following context, we refer to “approximation error” as the
+area of blocks in Wπ∗
+0. Note that each block’s area is K−2. By Proposition 1, the approximation error
+is bounded by K−2 × cK = O(K−1). Hence, the larger K, the smaller the approximation error.
+For the sub-domain Dl,0, l = 1, . . . , k0, let θl,0 be the corresponding true regression coefficient. We
+make following assumptions on {θl,0}k0
+l=1 and {x(si)}n
+i=1, respectively.
+Assumption 3. There exists a constant c, such that minl̸=l′ ∥θl,0 −θl′,0∥2 > c > 0.
+Assumption 4. Conditional on {si}n
+i=1, we assume {x(si)}n
+i=1 are independent d-dimensional
+bounded random variables. Furthermore, we assume that there exist constants c and C, such that
+0 < c < E{x(si)xT (si) | si} < C holds for 1 ⩽i ⩽n.
+Assumption 3 ensures sufficient separation between clusters for the identification of sub-domains
+{Dl,0}k0
+l=1. We consider a random covariate design, and Assumption 4 is to avoid the colinearity of
+covariates, and is similar to Assumption (A2) in [44]. The boundness conditions of the covariate x(si)
+and E{x(si)xT (si) | si} are standard in linear regression setting, see also Assumption (C1) in [26] and
+Assumption (A2) in [29].
+The next assumption is on the orders of hyperparameters, which provide important practical
+guidance for selecting K and λ in our prior model.
+Assumption 5. We assume the number of blocks hyperparameter K and the Poisson hyperparameter
+λ in (3) satisfy
+5.1 K ∼
+q
+n
+log1+αb(n) for some αb > 0.
+5.2 λ = o(1), and log(λ−1) ∼
+n
+logαp(n) for some 0 < αp < αb.
+Recall that after Proposition 1, we illustrate that a larger K indicates a smaller approximation
+error of π∗
+0(D). However, since the number of all the possible block partitions grows exponentially
+with K2, a larger K also increases the difficulty in obtaining the correct partition due to the curse of
+dimensionality. Thus, a trade-off analysis is necessary when choosing the value of K. Assumption 5.1
+10
+
+provides a rate condition for K, under which the partition consistency can be achieved while keeping
+the approximation error relatively small. Note that K should satisfy K ≤n1/2, otherwise, some blocks
+do not contain any observed locations. The order of K by Assumption 5.1 is marginally smaller than
+n1/2.
+A similar trade-off exists for the rate of λ.
+Since the model with a larger number of clusters
+provides enhanced flexibility for data fitting, the data likelihood typically prefers a larger number
+of clusters. To avoid such “overfitting”, the Poisson hyperparameter λ serves as a penalty for the
+number of clusters, which is the rationale of λ = o(1) in Assumption 5.2. On the other hand, the rate
+of λ going to zero must not be too rapid, otherwise, the number of clusters can be underestimated.
+Assumption 5.2 provides the rate condition for λ to obtain partition consistency.
+Recall that we use ∆to denote the space of spanning trees induced from G. The next assumption
+is on the priors of our model.
+Assumption 6. We make the following assumptions on the priors of our model.
+6.1 The true number of clusters k0 satisfies k0 ≤kmax, for kmax specified in (3).
+6.2 For π∗
+0(D) in Proposition 1, we assume
+sup
+T1∈∆,T2∈{T ∈∆:π∗
+0(D) can be induced from T }
+P(T1)
+P(T2) = O[exp{cK log(K)}]
+for some constant c.
+Assumption 6.1 ensures the true number of clusters is within our prior upper bound on k.
+Assumption 6.2 assumes that the spanning tree’s probability of inducing π∗
+0(D) is not excessively
+small. For the UST prior specified in (1), Assumption 6.2 is satisfied immediately since the prior ratio
+of any two spanning trees is 1.
+We next define a distance measure of two spatial domain partitions, say π1(D) = {D11, . . . , D1k1}
+and π2(D) = {D21, . . . , D2k2}, where k1 and k2 are their respective number of clusters. We define the
+“distance” between π1(D) and π2(D) as
+ϵ{π1(D), π2(D)} = 2 −|D|−1
+ k1
+X
+j=1
+max
+l∈{1,...,k2} |D1j ∩D2l| +
+k2
+X
+l=1
+max
+j∈{1,...,k1} |D1j ∩D2l|
+
+.
+(12)
+Similarly, for two partitions of S, say π1(S) = {S11, . . . , S1k1} and π2(S) = {S21, . . . , S2k2}, where k1
+and k2 are the number of clusters in each partition, respectively, we define the “distance” between
+π1(S) and π2(S) as
+ϵn{π1(S), π2(S)} = 2 −n−1
+ k1
+X
+j=1
+max
+l∈{1,...,k2} |S1j ∩S2l| +
+k2
+X
+l=1
+max
+j∈{1,...,k1} |S1j ∩S2l|
+
+.
+(13)
+We can consider ϵn(·, ·) as a discrete version of ϵ(·, ·). [41] first introduces the same distance measure
+as (13) (differing by a normalization term) for comparing two discrete set partitions. We extend ϵn(·, ·)
+11
+
+to ϵ(·, ·) in this paper for comparing two spatial domain partitions. The idea of ϵ(·, ·) (and ϵn(·, ·)) is
+based on set matching. For each sub-domain D1j in π1(D), we find a “best matched” sub-domain in
+π2(D), defined as the one sharing the largest intersection area with D1j. The corresponding intersection
+area is then computed by maxl∈{1,...,k2} |D1j ∩D2l|. If two partitions are close, the summation of the
+“best matched” areas (i.e., Pk1
+j=1 maxl∈{1,...,k2} |D1j ∩D2l|) is expected to be close to |D|, leading to
+a small ϵ(·, ·). The same rationale applies to Pk2
+l=1 maxj∈{1,...,k1} |D1j ∩D2l|. Through the definition,
+we can see ϵ(·, ·) takes values in [0, 2) and equals 0 when π1(D) = π2(D). The same property holds
+for ϵn(·, ·). Roughly speaking, we can consider ϵ{π1(D), π2(D)}/2 (ϵn{π1(S), π2(S)}/2) as the “mis-
+matched” percentage for π1(D) and π2(D) (π1(S) and π2(S)). Furthermore, we have the following
+result for ϵ(·, ·) and ϵn(·, ·).
+Proposition 2. ϵ(·, ·) and ϵn(·, ·) defined in (12) and (13) are distances, in the sense that they satisfy
+the axioms for a distance, i.e., non-negativity, the identity of indiscernibles, symmetry, and triangle
+inequality.
+We defer the proof of Proposition 2 to Section S.5. Denote {Sl,0 = {si ∈Dl,0 : 1 ⩽i ⩽n}}k0
+l=1 as
+the true partition of S. Write D = [{si, x(si), y(si)}n
+i=1 as the observed data. The following Theorem 1
+establishes the partition consistency of the posterior domain partition π∗(D) and the observed location
+partition π(S), with respect to distance ϵ(·, ·) and ϵn(·, ·), respectively.
+Theorem 1. Let α0 be a positive value. Under Assumptions 1, 2, 3, 4, 5 and 6, there exist some
+positive constants c1, c2 and c3 (which are dependent on α0), such that with probability tending to 1,
+we have
+P(|π∗(D)| = k0 | D) ⩾1 −c1 exp{−c2n1/2 logα0+(1+αb)/2(n)},
+(14)
+P(ϵ[π∗(D), {Dl,0}k0
+l=1] ⩽c3n−1/2 logα0+(1+αb)/2(n) | D) ⩾1 −c1 exp{−c2n1/2 logα0+(1+αb)/2(n)} (15)
+and
+P(ϵn[π(S), {Sl,0}k0
+l=1] ⩽c3n−1/2 logα0+(1+αb)/2(n) | D) ⩾1 −c1 exp{−c2n1/2 logα0+(1+αb)/2(n)}. (16)
+Theorem 1 states the partition consistency of our model: with probability tending to 1, the
+posterior partition achieves the correct cluster number, and ϵ[π∗(D), {Dl,0}k0
+l=1] and ϵn[π(S), {Sl,0}k0
+l=1]
+are of order n−1/2 logα0+(1+αb)/2(n) with a high probability. Since no existing literature on spatial
+domain partition consistency is available for a direct comparison with Theorem 1, we refer to a
+change point detection result in a one-dimensional space. If the spatial domain degenerates to one
+dimension, estimating a contiguous partition of it is equivalent to detecting change points in one-
+dimensional space. According to Theorem 3 in [11], the number of change points in a one-dimensional
+space can be consistently estimated, which aligns with Equation (14). However, Theorem 7 in [11]
+indicates that ϵn(·, ·) of one-dimensional change point detection result is of order log(n)/n, which
+12
+
+is smaller than our result. This difference arises because partitioning in a spatial domain involves
+a substantially larger partition space than the one-dimensional case, increasing the complexity of
+achieving partition consistency. See also [24] for a similar one-dimensional change point detection
+result under the Bayesian context.
+Recall that π∗
+0(D) = {D∗
+1,0, . . . , D∗
+k0,0} in Proposition 1. For a given π∗(D) = {D∗
+1, . . . , D∗
+k}, we
+write M(D∗
+j) = argmaxl∈{1,...,k0}|D∗
+j ∩D∗
+l,0| as the index of the sub-domain in {D∗
+l,0}k0
+l=1 with the largest
+intersection area with D∗
+j. D∗
+M(D∗
+j ),0 is considered as the “best matched” sub-domain in {D∗
+l,0}k0
+l=1 for
+D∗
+j. Thus, roughly speaking, we consider θM(D∗
+j ),0 as the “true” regression coefficient in D∗
+j. For a
+new observed location s and covariate x(s), write µ0{s, x(s)} = xT (s)θ0(s) as the true regression mean,
+where θ0(s) = Pk0
+l=1 θl,0I(s ∈Dl,0) is the true regression coefficient. Recall the definition of µ{s, x(s)}
+in Section 3.1. The following Theorem 2 states the posterior contraction rate of θ and the prediction
+error of µ{s, x(s)}.
+Theorem 2. Under Assumptions 1, 2, 3, 4, 5 and 6 and for the same α0 in Theorem 1, with probability
+tending to 1, we have
+P[{θM(D∗
+j ),0}k
+j=1 = {θl,0}k0
+l=1 | D] →1,
+(17)
+P{ max
+1⩽j⩽k ∥θj −θM(D∗
+j ),0∥2 > Mnn−1/2 logα0+(1+αb)/2(n) | D} →0,
+(18)
+P
+Z
+D
+∥θ(s) −θ0(s)∥2
+2P(s)ds > M′
+nn−1/2 logα0+(1+αb)/2(n) | D
+
+→0, and
+(19)
+P
+ZZ
+[µ{s, x(s)} −µ0{s, x(s)}]2P(s, x)dsdx > M′′
+nn−1/2 logα0+(1+αb)/2(n) | D
+
+→0
+(20)
+for any sequences Mn, M′
+n, M′′
+n →∞.
+Equation (17) states that with probability tending to 1, the set {θM(D∗
+j ),0}k
+j=1 is the same as the
+set {θl,0}k0
+l=1. Through the interpretation of θM(D∗
+j ),0, ∥θj −θM(D∗
+j ),0∥2 specified in (18) is considered
+as the distance between θj and its “true” value.
+From Equation (18), the posterior contraction
+rate of θj is of the order n−1/2 logα0+(1+αb)/2(n), which is slightly slower than the classic parametric
+contraction rate n−1/2. This is non-trivial, as it indicates that the unknown spatial partition caused by
+spatial heterogeneity impacts the posterior contraction rate of θj solely at the order of some power of
+log(n). Equations (19) - (20) provide the posterior predictive contraction rates of θ(s) and µ{s, x(s)},
+respectively. The rate given by (20) is the same as that in Corollary 6 of [26] (if ignoring logarithmic
+terms), who considers the posterior contraction rate for the regression mean at {si}n
+i=1.
+4
+Simulation studies
+In this section, we conduct simulation studies to assess the asymptotic property of the proposed Spat-
+RPM model and make a comparison with the Bayesian spatially clustered varying coefficient (BSCC)
+model proposed in [26]. We generate data in a U-shape domain as shown in Figure 2(a). The U-shape
+13
+
+domain is partitioned into three sub-domains, {Dl,0}3
+l=1, as indicated by different colors in Figure 2(a):
+D1,0 is the upper arm, D2,0 is the lower arm, and D3,0 is the middle circle. Let n be the sample size,
+the data is generated by
+y(si) = xT (si)θ(si) + ϵ(si), 1 ⩽i ⩽n,
+where x(si) = {x1(si), x2(si)}T is a two dimensional vector, with x1(si) ≡1 and {x2(si)}n
+i=1
+being i.i.d. Unif(−1, 1), θ(si) = θ1,0, θ2,0 and θ3,0, for si ∈D1,0, D2,0 and D3,0, respectively,
+θ1,0 = (0, 1)T , θ2,0 = (1, 0)T , θ3,0 = (2, −1)T , and {ϵ(si)}n
+i=1 are i.i.d. Gaussian noise with mean 0
+and variance 9. The sampling locations {si}n
+i=1 are uniformly distributed within the U-shape.
+(a)
+(b)
+(c)
+Figure 2: (a) U-shape domain with {Dl,0}3
+l=1 represented by different colors.
+(b) One randomly
+chosen posterior partition sample with different colors representing different clusters. (c) The spatial
+distribution of absolute prediction errors. The darker the color, the larger the absolute prediction
+error.
+Given an integer K, to construct graph G, we start from a mesh grid graph of K2 square blocks
+with side length K−1 in [0, 1]2. Then we remove blocks from the graph without observed locations. We
+set kmax = 5, and noise variance σ2 = 1. Note that the noise variance we set is different from the true
+variance (which is 9). We will see from the result in Section 4.1 that this noise variance misspecification
+doesn’t affect the partition consistency of our model, which aligns with our theoretical result.
+We obtain posterior samples following strategies in Section 2.5. We run 20000 MCMC iterations
+with a burn-in period 5000 and a thinning parameter 5.
+Finally, we obtain posterior samples
+{ks, π∗
+s, {θs,j}ks
+j=1}M
+s=1, where M = 3000, and ks, π∗
+s, {θs,j}ks
+j=1 are the posterior cluster number, domain
+partition and regression coefficients, respectively, at the s-th MCMC sample. The asymptotic analysis
+and comparison with the BSCC model are conducted in Sections 4.1 and 4.2, respectively.
+4.1
+Asymptotic analysis
+To investigate the asymptotic property of our model, we compare the posterior samples with
+n = (100, 500, 1000, 2000, 3000, 4000).
+We select the number of blocks hyperparameter K and
+14
+
+Poisson hyperparameter λ following Assumption 5, i.e., K = cbn1/2 log−(1+αb)/2(n) and log(λ−1) =
+cpn log−αp(n) with cb = 5, αb = 1, cp = 0.1 and αp = 0.5.
+Figure 3(a) shows boxplots of {ks}M
+s=1 under different sample sizes n. We can see that when n is
+small, the number of clusters is overestimated. However, when n is larger than 2000, the posterior
+number of clusters concentrates at the true value. This aligns with Equation (14) in Theorem 1.
+100
+500
+1000
+2000
+3000
+4000
+3.0
+3.5
+4.0
+4.5
+5.0
+n
+Number of clusters
+100
+500
+1000
+2000
+3000
+4000
+0.4
+0.6
+0.8
+1.0
+1.2
+n
+Normalized cluster error
+100
+500
+1000
+2000
+3000
+4000
+0
+10
+20
+30
+40
+n
+Normalized error of θ
+(a) Boxplots of {ks}M
+s=1
+(b) Boxplots of {en,s,1}M
+s=1
+(c) Boxplots of {en,s,2}M
+s=1
+2000
+3000
+4000
+0.5
+1.0
+1.5
+2.0
+2.5
+n
+Normalized error of θ
+100
+500
+1000
+2000
+3000
+4000
+0
+5
+10
+15
+20
+25
+30
+n
+Normalized error of µ
+2000
+3000
+4000
+0.5
+0.7
+0.9
+1.1
+n
+Normalized error of µ
+(d) Zoomed-in of (c)
+(e) Boxplots of {en,s,3}M
+s=1
+(f) Zoomed-in of (e)
+Figure 3: Fitting results under different sample sizes n
+Next, we evaluate the asymptotic property of other metrics. For a given n and the corresponding
+posterior samples {ks, π∗
+s, {θs,j}ks
+j=1}M
+s=1, we compute the following normalized errors according to
+Theorems 1 and 2:
+en,s,1 = n1/2ϵ[π∗
+s, {Dl,0}3
+l=1]
+logα0+(1+αb)/2(n)
+, and en,s,2 = n1/2 max1⩽j⩽ks ∥θs,j −θMs,j,0∥2
+logα0+(1+αb)/2(n)
+,
+where α0 = 0.1, Ms,j is the index of the sub-domain in {Dl,0}3
+l=1 with the largest intersection area
+with the j-th cluster, at the s-th MCMC sample. To study the prediction error of our model, we
+randomly generate 5000 locations uniformly distributed in the U-shape domain, and the corresponding
+covariates. Following the procedure described in Section 3.1, we write µs as the prediction vector of
+15
+
+the regression mean at the sampled 5000 locations, given a posterior sample [ks, π∗
+s, {θs,j}ks
+j=1]. Let µ0
+be the true value of µs. We define the normalized prediction error as
+en,s,3 = n1/2 × 5000−1∥µs −µ0∥2
+2
+logα0+(1+αb)/2(n)
+.
+According to Theorems 1 and 2, the above three normalized errors are bounded by constants with
+a high probability when n is large. Figures 3(b) - 3(f) show boxplots of {en,s,1}M
+s=1, {en,s,2}M
+s=1, and
+{en,s,3}M
+s=1 under different n. We can see that the three normalized errors first decrease fast as n
+increases, then stay stable when n is larger than 2000, which is consistent with our theory. When n
+is small, large normalized errors may result from the misspecification of σ2 and having few locations
+within each block.
+Specifically, we focus on posterior samples when n = 4000 to illustrate the effectiveness of our
+model. Figures 2(b) - (c) show a randomly chosen posterior sample of the partition and the spatial
+distribution of the absolute prediction errors, computed as the absolute value of entries in µs−µ0. We
+can see that the posterior partition result recovers the true partition well, except for some locations near
+boundaries as expected. The values of {θs,j}3
+j=1 under this partition are θs,1 = (0.022, 1.068)T , θs,2 =
+(0.915, −0.095)T and θs,3 = (1.969, −0.874)T , close to the true values. We can also see from Figure 2(c)
+that the absolute prediction errors are relatively small, except for those “wrongly” clustered locations
+near boundaries.
+4.2
+Comparison with the BSCC model
+We compare the performance of our model with BSCC in [26] in this section. One key difference
+between these two models is that BSCC doesn’t use the blocking technique and only provides clustering
+of the observed locations. We conduct the comparison for n = 4000 and repeat the simulation for 100
+times. For each repeat, we fit BSCC and our model to the same simulated data, respectively. The
+hyperparameters in our model are chosen in the same way as in Section 4.1, and we use the default
+hyperparameter setting for the BSCC model as specified in [26]. We compare the posterior number of
+clusters, mean absolute error (MAE), and continuous ranked probability scores (CRPS, [14]) for the
+regression mean prediction, and computing time between two models.
+Figures 4(a) - (b) show the posterior cluster number comparison between the two models. We can
+see from Figures 4(a) - (b) that the number of clusters in our model concentrates at the true value for
+all MCMC samples and repeats. On the contrary, BSCC tends to overestimate the number of clusters
+according to Figure 4(a). Figure 4(b) shows that for BSCC, the posterior probability of the correct
+cluster number is smaller than 0.2 in most of repeats. The result indicates that our model shows
+significant improvement in terms of estimating the number of clusters, attributable to the blocking
+technique and hyperparameter selection guidelines in Assumption 5.
+Since the prediction method of a new location is not provided in [26], we compare prediction errors
+16
+
+Spat−RPM
+BSCC
+Number of clusters
+1
+3
+5
+7
+9
+13
+Spat−RPM
+BSCC
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Probability of correct k
+−0.08
+−0.04
+0.00
+0.04
+Difference of CRPS
+−0.12
+−0.08
+−0.04
+0.00
+Difference of MAE
+(a)
+(b)
+(c)
+(d)
+Figure 4: (a) Boxplots of the posterior number of clusters for different MCMC samples, from one
+randomly selected repeat. (b) Boxplots of the posterior probability of correct cluster number. 100
+repeats are taken. (c) Boxplot of {CRPSr,1 −CRPSr,2}100
+r=1. (d) Boxplot of {MAEr,1 −MAEr,2}100
+r=1
+.
+of the observed locations. Let µ be the vector of the regression mean of the observed locations. Denote
+µr,s,1 and µr,s,2 as the predictions of µ based on the s-th posterior sample from the r-th simulation
+repeat for our model and BSCC, respectively. We compute CRPS values for two models at r-th repeat,
+say CRPSr,1 and CRPSr,2, based on {µr,s,1}M
+s=1 and {µr,s,2}M
+s=1, respectively. We also compute two
+models’ MAE as
+MAEr,1 = n−1M−1
+M
+X
+s=1
+(µr,s,1 −µr,0)
+
+1, and MAEr,2 = n−1M−1
+M
+X
+s=1
+(µr,s,2 −µr,0)
+
+1,
+where ∥·∥1 is L1 norm and µr,0 is the true value. We compute the difference of CRPS (MAE) between
+two models as CRPSr,1 −CRPSr,2 (MAEr,1 −MAEr,2) and the results are shown in Figures 4(c) - (d).
+By definition, a negative difference indicates that our model performs better. From Figures 4(c)
+and (d), we observe that more than half of the simulation repeats show a negative CRPS difference,
+while nearly all repeats show a negative MAE difference. To further evaluate this, we perform a one-
+sample t-test to determine whether the mean difference is significantly negative. For CRPS (MAE),
+the t-test yields a mean difference of −0.00875 (−0.03) with a p-value < 0.001 (< 0.001). These results
+demonstrate that our model achieves higher prediction accuracy than BSCC, likely due to the more
+accurate partition estimation.
+Finally, we compare the computing times for MCMC sampling of the posterior distribution between
+the two models. Using the “microbenchmark” package in R, we obtain the average computing time
+over 10 runs of the MCMC procedure. The average computing times for our and BSCC models are
+15 seconds and 52 seconds, respectively. This demonstrates a significant reduction in computing time,
+which is attributed to the reduced partition space achieved through the blocking technique.
+17
+
+5
+Real data analysis
+In this section, we apply Spat-RPM to study the temperature-salinity (T-S) relationship of seawater
+in the Atlantic Ocean.
+The study aims to identify the Antarctic Intermediate Water (AAIW),
+characterized by a negative T-S relationship [38]. The data on temperature and salinity is obtained
+from National Oceanographic Data Center (https://www.nodc.noaa.gov/OC5/woa13/), and the
+detailed data description can be found in [26]. The n = 1936 observed locations are shown in Figure
+5(a).
+0.0
+0.1
+0.2
+0.3
+0.4
+−0.50
+−0.45
+−0.40
+−0.35
+−0.30
+−0.25
+Sh
+Sv
+34.0
+34.5
+35.0
+35.5
+36.0
+y
+(34.66 , 0.03)
+(33.57 , 0.12)
+(34.03 , −0.05)
+(34.68 , −0.11)
+0.4
+0.3
+0.2
+0.1
+0
+−0.50 −0.45 −0.40 −0.35 −0.30 −0.25
+Sh
+Sv
+Cluster
+1
+2
+3
+4
+(a)
+(b)
+(c)
+Figure 5: (a) The observed locations in salinity data. (b) Partition result from our model. Four
+clusters are obtained and represented by different colors. The number annotations within clusters are
+the corresponding posterior sample of {θ(si)}n
+i=1. AAIW is identified as the area of clusters 1 and 4.
+(c) The point identified by BSCC with negative θ2(si) (hence as AAIW).
+Let si = (sh,i, sv,i) be the location of the i-th observation. Write y(si) as the salinity at si and
+x(si) = (1, Temp(si))T , where Temp(si) is the temperature at si. We model the T-S relationship
+as y(si) = xT (si)θ(si) + ϵ(si), where θ(si) = (θ1(si), θ2(si))T is the unknown piecewise constant
+regression coefficient and ϵ(si) is a Gaussian noise.
+We apply our model described in Section 2. We use the sample variance of {y(si)}n
+i=1 as the value
+of σ2 in our model. We use the same values of γ and kmax as in simulation studies, as well as the
+same formulas to select hyperparameters K and λ, i.e., K = cbn1/2 log−(1+αb)/2(n) and log(λ−1) =
+cpn log−αp(n) with αb = 1 and αp = 0.5. To decide the values of cb and cp, we adopt Watanabe-Akaike
+information criterion (WAIC, [42]) and select (cb, cp) ∈(1, 3, 5, 7) × (0.01, 0.1, 0.5) as the values that
+minimize WAIC. We use MCMC to sample from the posterior distribution of partitions and {θ(si)}n
+i=1.
+The number of MCMC iterations, the burn-in period, and thinning parameter are the same as in the
+simulation setting. We use the “salso” package in R [5] to obtain a point estimation of the partition
+from posterior samples, which is shown in Figure 5(b). We display the partition result obtained from
+the BSCC model by [26] in Figure 5(c) for comparison.
+As shown in Figures 5(b) - (c), among the four clusters identified by our model, two clusters
+18
+
+(clusters 1 and 4) have negative θ2(si). Thus, the AAIW identified by our model corresponds to the
+areas of clusters 1 and 4. Compared to Figure 5(c), we can see that the majority of the AAIW region
+is the same for both models, while our model includes some areas with Sh > −0.3 as part of the
+AAIW. Specifically, we observe that clusters 1 and 4 correspond to shallow water and deep water
+areas, respectively. It is reasonable to observe some differences in the T-S relationship between these
+two areas.
+Although the AAIW identified by Spat-RPM and BSCC is consistent, these two models have
+fundamental differences. The BSCC model conducts partitioning exclusively at the observed locations,
+restricting its ability to identify the cluster memberships of unobserved locations. Moreover, due to the
+lack of partition consistency, AAIW in the BSCC model is estimated by checking signs of posterior
+samples {θ2(si)}n
+i=1, which may be inconsistent with the partition result.
+In contrast, our model
+identifies the AAIW directly from the posterior domain partition, offering a simpler and more natural
+interpretation.
+6
+Proof
+6.1
+Additional notations and definitions
+Throughout the proof, in general, subscripts i, (j, l), m denote the index for locations, clusters in a
+partition, and blocks, respectively. k is used as the number of clusters, and k0 is the true number of
+clusters.
+To simplify notations, we use π∗(π) as the shorthand of π∗(D) (π(S)). For two block partitions
+π∗
+1 and π∗
+2, we write π∗
+1 ∩π∗
+2 as the intersection partition, such that two locations are within the same
+cluster if and only if they are within the same cluster by both π∗
+1 and π∗
+2. We say a block Bm is a
+“boundary block” if Bm intersects with the boundary set B. Let Ξ∗= {π∗: P(π∗) > 0} be the space
+of partitions under priors in Section 2.2, and we write ˜Ξ∗= {π∗: π∗= π∗
+1 ∩π∗
+2 for some π∗
+1, π∗
+2 ∈Ξ∗}.
+It is easy to see that Ξ∗⊆˜Ξ∗. Recall the contiguous partition π∗
+0 in Propsition 1. Under Assumption
+6, we have π∗
+0 ∈Ξ∗.
+For two domain partitions π1(D) = {D11, . . . , D1k1} and π2(D) = {D21, . . . , D2k2} with k1
+and k2 denoting the number of clusters, we decompose ϵ{π1(D), π2(D)} = ϵ1{π1(D), π2(D)} +
+ϵ2{π1(D), π2(D)}, where
+ϵ1{π1(D), π2(D)} = 1 −|D|−1
+ k1
+X
+j=1
+max
+l∈{1,...,k2} |D1j ∩D2l|
+
+, and
+(21)
+ϵ2{π1(D), π2(D)} = 1 −|D|−1
+ k2
+X
+l=1
+max
+j∈{1,...,k1} |D1j ∩D2l|
+
+.
+(22)
+Table 1 summarizes main notations used throughout the proof.
+19
+
+Table 1: Commonly used notations throughout the proof
+Notation
+Meaning
+π∗= {D∗
+1, . . . , D∗
+k}
+Shorthand of π∗(D), which is a domain partition under our model
+π = {S1, . . . , Sk}
+Shorthand of π(S), which is a partition of {si}n
+i=1 and can be induced from π∗
+{Dl,0}k0
+l=1
+True domain partition
+{Sl,0}k0
+l=1
+True partition of {si}n
+i=1
+π∗
+0 = {D∗
+1,0, . . . , D∗
+k0,0}
+Domain partition defined in Proposition 1
+M(D∗
+j)
+argmaxl∈{1,...,k0}|D∗
+j ∩D∗
+l,0|
+6.2
+Proof framework
+For a given π∗, we decompose ϵ[π∗, {Dl,0}k0
+l=1] as
+ϵ[π∗, {Dl,0}k0
+l=1]
+Triangle inequality of ϵ(·, ·)
+⩽
+ϵ(π∗, π∗
+0) + ϵ[π∗
+0, {Dl,0}k0
+l=1].
+(23)
+According to Proposition 1, it is easy to see that ϵ[π∗
+0, {Dl,0}k0
+l=1] ⩽cK × K−2 = cK−1 Assumption 5
+∼
+n−1/2 log(1+αb)/2(n).
+To study ϵ[π∗, {Dl,0}k0
+l=1], it then remains to study ϵ(π∗, π∗
+0) = ϵ1(π∗, π∗
+0) +
+ϵ2(π∗, π∗
+0). We will focus on the bound of ϵ1(π∗, π∗
+0), from which the bound of ϵ2(π∗, π∗
+0) can be derived
+similarly. Note that by definition, ϵ1(π∗, π∗
+0)K2 takes only integer values, and 0 ⩽ϵ1(π∗, π∗
+0)K2 ⩽K2.
+Recall the definition of M(D∗
+j) after Theorem 1. Based on {M(D∗
+j)}|π∗|
+j=1 and the number of clusters,
+we divide the prior block partition space, Ξ∗, into five categories:
+Π∗
+1 = {π∗∈Ξ∗: |π∗| < k0}, Π∗
+2 = {π∗∈Ξ∗: |π∗| > k0},
+Π∗
+3 =
+n
+π∗∈Ξ∗: |π∗| = k0 and {M(D∗
+j)}|π∗|
+j=1 ⊊{1, . . . , k0}
+o
+,
+Π∗
+4 = ∪K2
+q=⌊K logα0(n)⌋Π∗
+ϵ,q, and Π∗
+5 = ∪⌊K logα0(n)⌋−1
+q=0
+Π∗
+ϵ,q, where
+Π∗
+ϵ,q =
+n
+π∗∈Ξ∗: |π∗| = k0, {M(D∗
+j)}|π∗|
+j=1 = {1, . . . , k0} and ϵ1(π∗, π∗
+0)K2 = q
+o
+and ⌊a⌋denotes the largest integer less than or equal to a. Both Π∗
+1 and Π∗
+3 are sets of “underfitted”
+partitions, in the sense that |{M(D∗
+j)}|π∗|
+j=1| < k0 for π∗∈Π∗
+1 ∪Π∗
+3.
+Π∗
+2 is the set of “overfitted”
+partitions, in the sense that |π∗| > k0 for π∗∈Π∗
+2. Π∗
+4 is the set of partitions with relatively large
+ϵ1(π∗, π∗
+0), although having the correct number of clusters. Π∗
+5 is the set of “good” partitions, in the
+sense that the number of clusters is correct and ϵ1(π∗, π∗
+0) is small.
+ϵ1(π∗, π∗
+0) takes different values when π∗belongs to different categories. We will study the posterior
+probability of π∗in Π∗
+1, Π∗
+2, Π∗
+3, Π∗
+4 and Π∗
+5 respectively, based on which we derive the posterior
+distribution of ϵ1(π∗, π∗
+0). To study the posterior distribution of π∗, we first write out P(π∗|D)
+P(π∗
+0|D). Given
+a partition π∗, by Bayesian rule, we have
+P(π∗| D)
+∝
+X
+T
+P(π∗, x, s, y, T ) ∝
+X
+T
+P(y | π∗, x, s)P(T )P(π∗| T ).
+20
+
+We then write the posterior ratio P(π∗|D)
+P(π∗
+0|D) as
+P
+T P(y | π∗, x, s)P(T )P(π∗| T )
+P
+T P(y | π∗
+0, x, s)P(T )P(π∗
+0 | T )
+Assumption 6
+⩽
+c exp{cK log(K)}P(y | π∗, x, s) P
+T P(π∗| T )
+P(y | π∗
+0, x, s) P
+T P(π∗
+0 | T )
+=c exp{cK log(K)}P(y | π∗, x, s)
+P(y | π∗
+0, x, s) ×
+P
+T P(π∗| T )I(T can induce π∗)
+P
+T P(π∗
+0 | T )I(T can induce π∗
+0)
+(i)
+=c exp{cK log(K)}P(y | π∗, x, s)λ|π∗|
+P(y | π∗
+0, x, s)λ|π∗
+0| × |π∗
+0|!
+|π∗|!
+
+
+
+K2 −1
+|π∗
+0| −1
+
+
+
+
+
+
+K2 −1
+|π∗| −1
+
+
+
+|{T : T can induce π∗}|
+|{T : T can induce π∗
+0}|,
+(24)
+where (i) uses Equations (3) and (4).
+From Equation (24), we can see that
+P(y|π∗,x,s)λ|π∗|
+P(y|π∗
+0,x,s)λ|π∗
+0| and
+|{T :T can induce π∗}|
+|{T :T can induce π∗
+0}| play essential roles in P(π∗|D)
+P(π∗
+0|D).
+To study P(y|π∗,x,s)λ|π∗|
+P(y|π∗
+0,x,s)λ|π∗
+0| , we first define two events, say An and En, and show that P(An ∩En) →1.
+The definition of An and En are deferred to Section 6.3. Conditional on events An ∩En, we give the
+bound of P(y|π∗,x,s)λ|π∗|
+P(y|π∗
+0,x,s)λ|π∗
+0| by the following proposition.
+Proposition 3. Under events An ∩En and Assumptions 1, 2, 3, 4, 5 and 6, there exists a constant
+c, such that
+P(y | π∗, x, s)λ|π∗|
+P(y | π∗
+0, x, s)λ|π∗
+0| ⩽
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+exp(−cn), if π∗∈Π∗
+1
+exp{−cn log−αp(n)}, if π∗∈Π∗
+2
+exp(−cn), if π∗∈Π∗
+3
+exp{−cϵ1(π∗, π∗
+0)K2 log1+αb(n)}, if π∗∈Π∗
+4,
+,
+where α0 is defined in Theorem 1.
+We defer the proof of Proposition 3 to Section S.6. We can see that the ratio bounds for partitions
+in Π∗
+1 and Π∗
+3 share the same rate, since they are both sets of “underfitted” partitions. As discussed
+after Assumption 5, we control the overfitted probability by Poisson hyperparameter λ. Hence, there
+is a term αp (which controls the order of λ) in the ratio bound for the “overfitted” π∗∈Π∗
+2. For
+π∗∈Π∗
+4, we can see that the larger ϵ1(π∗, π∗
+0), the smaller P(y|π∗,x,s)λ|π∗|
+P(y|π∗
+0,x,s)λ|π∗
+0| . However, for π∗∈∪K
+q=0Π∗
+ϵ,q,
+a subset of Π∗
+5, it is not necessary that P(y|π∗,x,s)λ|π∗|
+P(y|π∗
+0,x,s)λ|π∗
+0| converges to 0. The reason is caused by the
+“approximation error” between π∗
+0 and the true partition {Dl,0}k0
+l=1. More details are in the proof in
+Section S.6. The next proposition gives a bound of |{T :T can induce π∗}|
+|{T :T can induce π∗
+0}|.
+Proposition 4. Under our model and Assumption 2, there exists a constant C > 0, such that
+|{T : T can induce π∗}|
+|{T : T can induce π∗
+0}| ⩽exp{CK log(K)}
+holds for all π∗∈Ξ∗.
+21
+
+We defer the proof of Proposition 4 to Section S.7. Proposition 4 shows that for a K × K mesh
+grid graph, the ratio of the numbers of spanning trees inducing two partitions is upper bounded by
+exp{CK log(K)}, with our assumptions. Although this is a result of the mesh grid graph, it is worth
+mentioning that it has the potential to be extended to a more general graph, with some higher-level
+assumptions on graphs. This upper bound provides a reference potentially useful for studying other
+spanning-tree-based approaches.
+The remaining proof consists of several parts. In Section 6.3, we detail the definitions of events
+An and En. In Sections 6.4 and 6.5, making use of Propositions 1 - 4, we prove Theorems 1 and 2,
+respectively. Other proofs are deferred to the Supplementary Material. In Section S.1, we introduce
+some basic lemmas regarding distribution and probability inequalities, which are useful for theoretical
+analysis. Sections S.2 and S.3 prove P(An) →1 and P(En) →1, respectively, under our assumptions.
+In Sections S.4 - S.7, we give the proof of Propositions 1 - 4, respectively.
+6.3
+Definition of An and En
+Recall that we use {Bm}K2
+m=1 to denote blocks and ∥Bm∥to denote the number of locations in the
+m-th block. We define An = A1n ∩A2n as events with respect to s and x, where
+A1n =
+n
+c < min1⩽m⩽K2 ∥Bm∥
+log1+αb(n)
+⩽max1⩽m⩽K2 ∥Bm∥
+log1+αb(n)
+< C
+o
+, and
+(25)
+A2n =
+n
+0 < c < ∥Bm∥−1
+X
+si∈Bm
+x(si)xT (si) < C < ∞, m = 1, 2, . . . , K2o
+(26)
+for some constants c, C > 0 to be determined later. We have the following result.
+Lemma 1. Under Assumptions 1, 4 and 5, there exist constants c, C > 0, such that P(An) →1.
+Proof. The proof is deferred to Section S.2.
+In what follows, we assume the constants c and C in (25) - (26) are chosen such that P(An) →1.
+Under An, we can replace the pseudoinverse notation in (8) with inverse. For the simplicity of proof,
+we take the value of γ in (8) to be 1, and it is trivial to extend the proof to the case for any fixed
+γ > 0. For a given π∗(and π = {S1, . . . , Sk} induced from π∗), following priors given by (8) and (9),
+and after replacing the pseudoinverse notation with inverse, we have
+θ | π∗, k, T , s, x ∼
+k
+Y
+j=1
+PGaussian{θj; 0, nσ2(xT
+j xj)−1}, and
+(27)
+y | π∗, k, T , s, x, θ ∼
+k
+Y
+j=1
+PGaussian(yj; xjθj, σ2I|Sj|),
+(28)
+where xj is a |Sj|×d design matrix of covariates in Sj, and yj = {y(si) : si ∈Sj}. Following Equations
+(27) and (28), yj | π∗, k, T , s, x ∼Gaussian[0, σ2{nxj(xT
+j xj)−1xT
+j + I|Sj|}]. We can thus write
+P(y | π∗, x, s)
+=
+P(y | π∗, k, T , s, x) =
+k
+Y
+j=1
+PGaussian[yj; 0, σ2{nϕj + I|Sj|}]
+22
+
+=
+(2πσ2)−n/2 exp
+ 
+−yT y
+2σ2
+!
+(n + 1)−kd/2 exp
+
+n
+2σ2(n + 1)yT ϕπ∗y
+
+,
+(29)
+where ϕj = xj(xT
+j xj)−1xT
+j is a projection matrix, ϕπ∗= P T
+π∗diag(ϕ1, . . . ϕk)P π∗, and P π∗ia a
+permutation matrix such that P π∗y = (yT
+1 , . . . , yT
+k )T .
+Recall the definitions of ˜Ξ∗and ∩in Section 6.1. Let σ2
+0 be the true variance of ϵ(si). We define
+En = E1n ∩E2n ∩E3n ∩E4n as events with respect to ϵ, where
+E1n = { sup
+π∗∈˜Ξ∗ϵT ϕπ∗ϵ ⩽5σ2
+0K2 log(n)},
+(30)
+E2n = [ϵT (ϕπ∗∩π∗
+0 + ϕπ∗)ϵ ⩽2σ2
+0{1 + ϵ1(π∗, π∗
+0)K2} log1+αb/2(n), ∀π∗∈Π∗
+4 ∪Π∗
+5],
+(31)
+E3n =
+n
+sup
+1⩽m⩽K2
+
+X
+si∈Bm
+x(si)ϵ(si)
+
+2 ⩽C log(2+αb)/2(n)
+o
+, and
+(32)
+E4n =
+n
+sup
+1⩽l⩽k0
+
+X
+si∈D∗
+l,0
+x(si)ϵ(si)
+
+2 ⩽n1/2 logα0(n)
+o
+(33)
+for α0 in Theorem 1 and some constant C > 0 to be determined later. We have the following result.
+Lemma 2. Under our model and Assumptions 4 and 5, there exists a constant C > 0, such that
+P(En) →1.
+Proof. The proof is deferred to Section S.3
+In what follows, we assume that the constant C in (32) are chosen such that P(En) →1. Combining
+Lemmas 1 and 2, we conclude that under Assumptions 1, 4 and 5, P(An∩En) →1. In the later context,
+probabilities are considered while conditional on the events An ∩En by default.
+6.4
+Proof of Theroem 1
+Recall that we partition Ξ∗= Π∗
+1 ∪Π∗
+2 ∪Π∗
+3 ∪Π∗
+4 ∪Π∗
+5. We first study the probability of π∗belonging
+to Π∗
+1, Π∗
+2, Π∗
+3 and Π∗
+4, which is given by the following lemma.
+Lemma 3. Under events An ∩En and Assumptions 1, 2, 3, 4, 5 and 6, there exists a constant c, such
+that
+P(π∗∈Π∗
+1 ∪Π∗
+2 ∪Π∗
+3 | D) ⩽c exp{−cn log−αp(n)}, and
+(34)
+P (π∗∈Π∗
+4 | D) ⩽c exp{−cn1/2 logα0+(1+αb)/2(n)}.
+(35)
+Proof. Recall the expression of P(π∗|D)
+P(π∗
+0|D) in (24). In Proposition 4, we give a bound of |{T :T can induce π∗}|
+|{T :T can induce π∗
+0}|.
+Combining with the fact that |π∗
+0|!
+|π∗|!
+
+
+
+n −1
+|π∗
+0| −1
+
+
+
+
+
+
+n −1
+|π∗| −1
+
+
+
+−1
+⩽cnkmax−1, we have
+P(π∗| D)
+P(π∗
+0 | D) ⩽cP(y | π∗, x, s)λ|π∗|
+P(y | π∗
+0, x, s)λ|π∗
+0| nkmax−1 × exp{CK log(K)}.
+(36)
+23
+
+Next, under events An ∩En, we will make use of Proposition 3 to bound P(π∗∈Π∗
+1 ∪Π∗
+2 ∪Π∗
+3 | D),
+and P (π∗∈Π∗
+4 | D), respectively.
+Proof of (34):
+Under events An ∩En, according to Proposition 3, for π∗∈Π∗
+1 ∪Π∗
+2 ∪Π∗
+3, we have P(y|π∗,x,s)λ|π∗|
+P(y|π∗
+0,x,s)λ|π∗
+0| ⩽
+exp{−cn log−αp(n)}, thus, we write P(π∗∈Π∗
+1 ∪Π∗
+2 ∪Π∗
+3 | D) as
+X
+π∗∈Π∗
+1∪Π∗
+2∪Π∗
+3
+P(π∗| D)
+Equation (36)
+⩽
+X
+π∗∈Π∗
+1∪Π∗
+2∪Π∗
+3
+c exp{−cn log−αp(n) + CK log(K)}nkmax−1
+(i)
+⩽
+c exp{−cn log−αp(n) + CK2}
+Assumption 5
+⩽
+c exp{−cn log−αp(n)},
+where (i) uses the fact that the maximum number of partitions is no larger than kK2
+max. The proof of
+(34) is completed.
+Proof of (35):
+Under events An ∩En, according to Proposition 3, for π∗∈Π∗
+4, we have
+P(y|π∗,x,s)λ|π∗|
+P(y|π∗
+0,x,s)λ|π∗
+0| ⩽
+exp{−cϵ1(π∗, π∗
+0)K2 log1+αb(n)}. Thus, we have
+P (π∗∈Π∗
+4 | D) =
+PK2
+q=⌊K logα0(n)⌋
+P
+π∗∈Π∗ϵ,q P(π∗| D)
+Equation (36)
+⩽
+PK2
+q=⌊K logα0(n)⌋
+P
+π∗∈Π∗ϵ,q c exp{−cq log1+αb(n) + CK log(K)}nkmax−1
+(i)
+⩽
+PK2
+q=⌊K logα0(n)⌋
+P
+π∗∈Π∗ϵ,q c exp{−cq log1+αb(n)}nkmax−1
+(ii)
+⩽
+PK2
+q=⌊K logα0(n)⌋c exp{−cq log1+αb(n) + Cq log(K)}nkmax−1
+Assumption 5
+⩽
+PK2
+q=⌊K logα0(n)⌋c exp{−cq log1+αb(n)}nkmax−1
+(iii)
+⩽
+cnkmax−1 exp{−cK logα0+1+αb(n)} ⩽c exp{−cn1/2 logα0+(1+αb)/2(n)},
+where (i) uses the fact that
+K log(K)
+q log1+αb(n) = o(1) for q ⩾⌊K logα0(n)⌋, (ii) uses the fact that |Π∗
+ϵ,q| ⩽
+c exp{Cq log(K)}, and (iii) uses the property of summation of an geometric sequence. The proof of
+(35) is completed.
+Following Lemma 3, we conclude that under events An ∩En,
+P(π∗∈Π∗
+5) ⩾1 −c exp{−cn1/2 logα0+(1+αb)/2(n)}.
+(37)
+We next derive some property for π∗∈Π∗
+5.
+Lemma 4. For ∀π∗= {D∗
+j}k0
+j=1 ∈Π∗
+5, there exists a uniform constant c, such that
+min
+1⩽j⩽k0 |D∗
+j ∩D∗
+M(D∗
+j ),0| ⩾c.
+(38)
+Furthermore, for l = 1, . . . , k0, let
+j1(l) = argumentj∈{1,...,k0}{M(D∗
+j) = l}, and
+(39)
+j2(l)= argmaxj∈{1,...,k0}|D∗
+j ∩D∗
+l,0|.
+(40)
+We conclude j1(l) ≡j2(l).
+24
+
+Proof. Firstly,
+from
+the
+definition
+of
+Π∗
+ϵ,q,
+we
+have
+ϵ1(π∗, π∗
+0)
+⩽
+K logα0(n) × K−2
+∼
+n−1/2 logα0+(1+αb)/2(n) for ∀π∗∈Π∗
+5.
+After simple algebra, we can rewrite ϵ1(π∗, π∗
+0) defined in
+(21) as
+ϵ1(π∗, π∗
+0)
+=
+|D|−1
+ k0
+X
+l=1
+|D∗
+l,0| −
+k0
+X
+j=1
+|D∗
+j ∩D∗
+M(D∗
+j ),0|
+
+=
+|D|−1
+ k0
+X
+j=1
+{|D∗
+M(D∗
+j ),0| −|D∗
+j ∩D∗
+M(D∗
+j ),0|}
+
+⩽cn−1/2 logα0+(1+αb)/2(n),
+(41)
+where we use the fact that |π∗| = k0 and {M(D∗
+j)}|π∗|
+j=1 = {1, . . . , k0} (since π∗∈Π∗
+5). On the other
+hand, note that minl∈{1,...,k0}|D∗
+l,0| ⩾c, we conclude that min1⩽j⩽k0 |D∗
+j ∩D∗
+M(D∗
+j ),0| ⩾c for some
+constant c following (41).
+Next, note that for a given l, if j1(l) ̸= j2(l), we have
+D∗
+j2(l) ∩D∗
+M(D∗
+j2(l)),0
+ ⩾|D∗
+j2(l) ∩D∗
+l,0| ⩾|D∗
+j1(l) ∩D∗
+l,0| ⩾c,
+and M(D∗
+j2(l)) ̸= l since M(D∗
+j1(l)) = l and j1(l) ̸= j2(l). Thus,
+ϵ1(π∗, π∗
+0) ⩾|D|−1 min
+D∗
+j2(l) ∩D∗
+M(D∗
+j2(l)),0
+, |D∗
+j2(l) ∩D∗
+l,0|
+	 ⩾c,
+which is contradictory to (41). We thus conclude j1(l) ≡j2(l). The lemma is proved.
+We next give the proof of Theorem 1.
+Proof.
+Proof of (14): Following the definition of Π∗
+5 and Equation (37), together with the fact that
+P(An ∩En) →1, we obtain (14) immediately.
+Proof of (15): Recall the decomposition (23) of ϵ[π∗, {Dl,0}k0
+l=1]. Proposition 1 has shown that
+ϵ[π∗
+0, {Dl,0}k0
+l=1] ⩽cn−1/2 log(1+αb)/2(n). We next show that under events An ∩En, for π∗∈Π∗
+5, we
+have ϵ(π∗, π∗
+0) ⩽cn−1/2logα0+(1+αb)/2(n) for some constant c, which leads to (15) together with the
+result in (37).
+Firstly, for π∗∈Π∗
+5, it is easy to see ϵ1(π∗, π∗
+0) ⩽K logα0(n) × K−2 ∼n−1/2 logα0+(1+αb)/2(n). It
+thus suffices to bound ϵ2(π∗, π∗
+0). We write
+ϵ2(π∗, π∗
+0)
+=
+|D|−1
+ k0
+X
+l=1
+|D∗
+l,0| −
+k0
+X
+l=1
+|D∗
+j2(l) ∩D∗
+l,0|
+
+Lemma 4
+=
+|D|−1
+ k0
+X
+l=1
+|D∗
+l,0| −
+k0
+X
+l=1
+|D∗
+j1(l) ∩D∗
+l,0|
+
+= ϵ1(π∗, π∗
+0) ⩽cn−1/2 logα0+(1+αb)/2(n).(42)
+Combining (41) - (42), we conclude ϵ(π∗, π∗
+0) ⩽cn−1/2logα0+(1+αb)/2(n) for some constant c and
+Equation (15) is proved.
+Proof of (16): Denote π0 as the partition of {si}n
+i=1 induced by π∗
+0. Recall that we write {Sl,0}k0
+l=1
+as the true partition of {si}n
+i=1. We decompose ϵn[π, {Sl,0}k0
+l=1] ⩽ϵn(π, π0) + ϵn[π0, {Sl,0}k0
+l=1]. Under
+An ∩En, it is easy to see that
+ϵn[π0, {Sl,0}k0
+l=1] ⩽cK × log1+αb(n)n−1 ⩽cn−1/2 log(1+αb)/2(n), and
+25
+
+ϵn(π, π0) ⩽cϵ(π∗, π∗
+0)K2 log1+αb(n)n−1 Equation (42)
+⩽
+cn−1/2logα0+(1+αb)/2(n)
+for π∗∈Π∗
+5. (16) is thus proved following (37).
+6.5
+Proof of Theorem 2
+Note that Equation (17) is obtained immediately from Equation (37). We thus focus on the proof of
+Equations (18)-(20) in this section. We first prove (18), based on which (19) and (20) can be obtained.
+6.5.1
+Proof of Equation (18)
+To begin with, write
+Ωn = {θ = {θj}k
+j=1 : max
+1⩽j⩽k ∥θj −θM(D∗
+j ),0∥2 ⩽Mnn−1/2 logα0+(1+αb)/2(n)},
+for Mn in Theorem 2. To prove (18), it suffices to show that with probability tending to 1, we have
+P(θ ∈Ωc
+n | D)
+P(θ ∈Ωn | D) →0.
+(43)
+We write out the ratio above as
+P(θ ∈Ωc
+n | D)
+P(θ ∈Ωn | D)
+=
+P
+π∗∈Π∗
+5 P(θ ∈Ωc
+n, π∗| D) + P
+π∗∈Π∗c
+5 P(θ ∈Ωc
+n, π∗| D)
+P
+π∗∈Π∗
+5 P(θ ∈Ωn, π∗| D) + P
+π∗∈Π∗c
+5 P(θ ∈Ωn, π∗| D)
+⩽
+P
+π∗∈Π∗
+5 P(θ ∈Ωc
+n, π∗| D) + P(π∗∈Π∗c
+5 | D)
+P
+π∗∈Π∗
+5 P(θ ∈Ωn, π∗| D)
+.
+(44)
+In the proof of Theorem 1, we have already shown that under events An ∩En, P(π∗∈Π∗c
+5 | D) →0.
+To prove (43), it thus suffices to show that under An ∩En, we have
+sup
+π∗∈Π∗
+5
+P(θ ∈Ωc
+n, π∗| D)
+P(θ ∈Ωn, π∗| D) →0.
+(45)
+Recall that we use PGaussian(·; µ, Σ) to denote the density function of the Gaussian variable with mean
+µ and covariance Σ. For a partition π∗(and π induced by π∗) we write yj = {y(si) : si ∈Sj} and xj
+as the |Sj| × d design matrix for covariates in the j-th cluster Sj ∈π. We have following lemmas.
+Lemma 5. Given π∗∈Π∗
+5 and under events An ∩En, we have
+P(θ ∈Ωc
+n, π∗| D)
+P(θ ∈Ωn, π∗| D) =
+R
+θ∈Ωcn
+nQk0
+j=1 PGaussian(θj; ¯θj, Σj)
+o
+dθ
+1 −
+R
+θ∈Ωcn
+nQk0
+j=1 PGaussian(θj; ¯θj, Σj)
+o
+dθ
+,
+where ¯θj =
+n
+n+1(xT
+j xj)−1xT
+j yj, and Σj = nσ2
+n+1(xT
+j xj)−1.
+Proof. By the Bayesian rule, we have
+P(θ ∈Ωc
+n, π∗| D)
+P(θ ∈Ωn, π∗| D) =
+R
+θ∈Ωcn P(θ | π∗, x, s)P(y | θ, π∗, x, s)dθ
+R
+θ∈Ωn P(θ | π∗, x, s)P(y | θ, π∗, x, s)dθ.
+(46)
+26
+
+Since π∗∈Π∗
+5, we have |π∗| = k0. Following priors (27) - (28), we have
+P(θ | π∗, x, s)P(y | θ, π∗, x, s) ∝
+k0
+Y
+j=1
+PGaussian(θj; ¯θj, Σj),
+where ∝means we do not care about those constants independent of θ, since they are contained in
+both numerator and denominator of (46) and can be canceled out. Note that Qk0
+j=1 PGaussian(θj; ¯θj, Σj)
+is a probability density function of a multivariate Gaussian variable, we can thus write (46) as
+P(θ ∈Ωc
+n, π∗| D)
+P(θ ∈Ωn, π∗| D)
+=
+R
+θ∈Ωcn
+nQk0
+j=1 PGaussian(θj; ¯θj, Σj)
+o
+dθ
+R
+θ∈Ωn
+nQk0
+j=1 PGaussian(θj; ¯θj, Σj)
+o
+dθ
+,
+which proves the lemma.
+The next lemma studies the property of ¯θj −θM(D∗
+j ),0.
+Lemma 6. Under An ∩En and Assumption 4, we have
+sup
+π∗∈Π∗
+5
+sup
+1⩽j⩽k
+∥¯θj −θM(D∗
+j ),0∥2 ⩽cM1/2
+n
+n−1/2 logα0+(1+αb)/2(n)
+for some constant c.
+Proof. For a given π∗= {D∗
+j}k0
+j=1 ∈Π∗
+5, let µj,0 = E(yj | sj, xj) and ϵj = {ϵ(si)}si∈D∗
+j . We write
+¯θj −θM(D∗
+j ),0
+=
+n
+n + 1(xT
+j xj)−1xT
+j (µj,0 + ϵj) −θM(D∗
+j ),0 = I1 + I2 + I3, where
+I1 =
+n
+n + 1(xT
+j xj)−1xT
+j (µj,0 −xjθM(D∗
+j ),0),
+I2 = −
+1
+n + 1θM(D∗
+j ),0, and I3 =
+n
+n + 1(xT
+j xj)−1xT
+j ϵj.
+For I1, note that for π induced by π∗
+∈Π∗
+5, we have shown in the proof of Theorem
+1 that ϵn[π, {Sl,0}k0
+l=1] ⩽c3n−1/2 logα0+(1+αb)/2(n), hence (µj,0 −xjθM(D∗
+j ),0) has no more than
+c3n1/2 logα0+(1+αb)/2(n) non-zero elements.
+On the other hand, by event An and Equation (38),
+we have (xT
+j xj)−1 ⩽cn−1. Together with the boundness assumption on x(si) in Assumption 4, we
+have
+sup
+π∗∈Π∗
+5
+sup
+1⩽j⩽k
+∥I1∥2 ⩽cn−1 × n1/2 logα0+(1+αb)/2(n) = cn−1/2 logα0+(1+αb)/2(n).
+It is easy to see that supπ∗∈Π∗
+5 sup1⩽j⩽k ∥I2∥2 ⩽cn−1/2 logα0+(1+αb)/2(n). It thus remains to bound I3.
+We further decompose n+1
+n I3 = (xT
+j xj)−1(I31 + I32 + I33), where
+I31 =
+X
+si∈D∗
+M(D∗
+j ),0
+x(si)ϵ(si),
+I32 =
+X
+si∈D∗
+j \D∗
+M(D∗
+j ),0
+x(si)ϵ(si), and I33 =
+X
+si∈D∗
+M(D∗
+j ),0\D∗
+j
+x(si)ϵ(si).
+27
+
+From E4n in (33), we have
+sup
+π∗∈Π∗
+5
+sup
+1⩽j⩽k
+∥(xT
+j xj)−1I31∥2 ⩽cn−1 sup
+1⩽j⩽k
+
+X
+si∈D∗
+M(D∗
+j ),0
+x(si)ϵ(si)
+
+2 ⩽cn−1/2 logα0(n).
+Since π∗∈Π∗
+5, the number of blocks in D∗
+j \ D∗
+M(D∗
+j ),0 is smaller than ⌊K logα0(n)⌋. Combining the
+result given by An and E3n, we have
+sup
+π∗∈Π∗
+5
+sup
+1⩽j⩽k
+∥(xT
+j xj)−1I32∥2 ⩽cn−1 × ⌊K logα0(n)⌋log(2+αb)/2(n) ⩽cn−1/2 logα0+1/2(n).
+Similarly, it can be shown that supπ∗∈Π∗
+5 sup1⩽j⩽k ∥(xT
+j xj)−1I33∥2 ⩽cn−1/2 logα0+1/2(n). Putting the
+result together, the lemma is proved.
+We next prove (18).
+Proof. By the result of Lemmas 5 and 6, to prove inequality (45), it suffices to show that
+under events An ∩En, supπ∗∈Π∗
+5
+R
+θ∈Ωcn
+nQk0
+j=1 PGaussian(θj; ¯θj, Σj)
+o
+dθ
+→
+0.
+Let {Zj}k0
+j=1 be
+independent random variables with probability density function PGaussian(·; ¯θj, Σj), we compute
+supπ∗∈Π∗
+5
+R
+θ∈Ωcn
+nQk0
+j=1 PGaussian(θj; ¯θj, Σj)
+o
+dθ as
+sup
+π∗∈Π∗
+5
+P{ max
+1⩽j⩽k0 ∥Zj −θM(D∗
+j ),0∥2 > Mnn−1/2 logα0+(1+αb)/2(n)}
+Lemma 6
+⩽
+sup
+π∗∈Π∗
+5
+ k0
+X
+j=1
+P
+
+∥Zj −¯θj∥2 > Mnn−1/2 logα0+(1+αb)/2(n)
+2
+
+.
+On the other hand, under An, we have λmax(Σj) = nσ2
+n+1λmax{(xT
+j xj)−1} ⩽
+cnσ2
+(n+1)|Sj| for some constant
+c. Applying Lemma S.5, we have
+k0
+X
+j=1
+P
+
+∥Zj −¯θj∥2 > Mnn−1/2 logα0+(1+αb)/2(n)
+2
+
+⩽
+k0
+X
+j=1
+2
+√
+2c1/2σd3/2n
+π1/2(n + 1)1/2|Sj|1/2Mn logα0+(1+αb)/2(n)
+exp
+
+−M2
+n log2α0+(1+αb)(n)(n + 1)|Sj|
+8cdn2σ2
+
+Since π∗∈Π∗
+5, from (38), there exists a constant C > 0, such that |Sj| > Cn holds for all π∗∈Π∗
+5
+and 1 ⩽j ⩽k0. Thus, the right hand side of inequality is bounded by a π∗-independent series going
+to 0. Putting results together, (18) is proved.
+6.5.2
+Proof of Equation (19)
+Proof. Take Mn in Ωn to be log1/2(n), we write
+Ω′
+n = {θ = {θj}k
+j=1 : max
+1⩽j⩽k ∥θj −θM(D∗
+j ),0∥2 ⩽n−1/2 logα0+1+αb/2(n)}.
+Note that we have already shown that P(π∗∈Π∗
+5 | D) →1, and P(θ ∈Ω′
+n | D) →1. Together with
+Assumption 1, it thus suffices to show that
+P
+Z
+D
+∥θ(s) −θ0(s)∥2
+2ds > M′
+nn−1/2 logα0+(1+αb)/2(n) | D, π∗∈Π∗
+5, θ ∈Ω′
+n
+
+→0.
+28
+
+Given a π∗∈Π∗
+5 and θ ∈Ω′
+n, we next write (recall j1(l) and j2(l) in (39) - (40))
+θ(s) −θ0(s)
+=
+k0
+X
+j=1
+θjI(s ∈D∗
+j) −
+k0
+X
+l=1
+θ0(s)I(s ∈Dl,0)
+=
+k0
+X
+l=1
+{θj1(l)I(s ∈D∗
+j1(l)) −θl,0I(s ∈Dl,0)} = I1(s) + I2(s), where
+I1(s) =
+k0
+X
+l=1
+{(θj1(l) −θl,0)I(s ∈D∗
+j1(l))}, and I2(s) =
+k0
+X
+l=1
+θl,0{I(s ∈D∗
+j1(l)) −I(s ∈Dl,0)}.
+Since θ ∈Ω′
+n, we have
+sup
+s∈D
+∥I1(s)∥2 ⩽k0 max
+1⩽j⩽k0 ∥θj −θM(D∗
+j ),0∥2 ⩽cn−1/2 logα0+1+αb/2(n).
+(47)
+On the other hand,
+Z
+D
+∥I2(s)∥2
+2ds
+⩽
+k0
+k0
+X
+l=1
+Z
+D
+∥θl,0{I(s ∈D∗
+j1(l)) −I(s ∈Dl,0)}∥2
+2ds
+=
+k0
+k0
+X
+l=1
+∥θl,0∥2
+2{|D∗
+j1(l)\Dl,0| + |Dl,0\D∗
+j1(l)|}
+=
+k0
+k0
+X
+l=1
+∥θl,0∥2
+2{|D∗
+j1(l)\Dl,0| + |Dl,0\D∗
+j2(l)|} ⩽cn−1/2 logα0+(1+αb)/2(n),
+(48)
+where the last inequality is from (42). Combining result of (47) - (48), we conclude
+P
+nR
+D ∥θ(s) −θ0(s)∥2
+2ds > M′
+nn−1/2 logα0+(1+αb)/2(n) | D, π∗∈Π∗
+5, θ ∈Ω′
+n
+o
+⩽
+P
+n
+2
+R
+D ∥I1(s)∥2
+2ds + 2
+R
+D ∥I2(s)∥2
+2ds > M′
+nn−1/2 logα0+(1+αb)/2(n) | D, π∗∈Π∗
+5, θ ∈Ω′
+n
+o
+,
+which converges to 0 according to (47) - (48). Equation (19) is proved.
+6.5.3
+Proof of Equation (20)
+Proof. Under Assumption 4, x(s) is bounded.
+Together with Equation (19), Equation (20) is
+established immediately.
+29
+
+Supplementary Material for “Consistent Bayesian Spatial Domain Partitioning
+Using Predictive Spanning Tree Methods”
+This supplement contains all the remaining proofs for theorems in the main paper.
+S.1
+Preliminary lemmas
+Lemma S.1. (Bernstein’s inequality) Let X1, . . . , Xn be independent zero-mean real-valued random
+variables and let Sn = Pn
+i=1 Xi. If there exists a constant c > 0, such that Cramer’s condition
+E|Xi|k ⩽ck−2k!EX2
+i < ∞, i = 1, 2, . . . , n; k = 3, 4, . . . .
+(S.1)
+holds, then
+P(|Sn| ⩾t) ⩽2 exp
+ 
+−
+t2
+4 Pn
+i=1 EX2
+i + 2ct
+!
+, t > 0.
+Lemma S.2. (Lemma 1 of [20]) Let χ2
+r be a chi-square distribution with a degree of freedom r. The
+following concentration inequalities hold for any x > 0:
+P
+
+χ2
+r > r + 2x + 2√rx
+
+≤exp(−x),
+and
+P
+
+χ2
+r < r −2√rx
+
+≤exp(−x).
+From Lemma S.2, we can see that for x > r, we have
+P(χ2
+r > 5x) ⩽P
+
+χ2
+r > r + 2x + 2√rx
+
+≤exp(−x).
+(S.2)
+Lemma S.3. The binomial coefficient satisfies
+n
+k
+k
+⩽
+
+
+
+n
+k
+
+
+⩽
+en
+k
+k
+and
+k
+X
+i=0
+
+
+
+n
+i
+
+
+⩽(n + 1)k
+for k=0,...,n.
+Proof. The proof is trivial and omitted.
+Lemma S.4. For a real symmetric matrix A satisfying A2 = A and a standard Gaussian random
+vector e, we have
+eT Ae ∼χ2
+r,
+where r is the number of positive eigenvalues of A.
+S1
+
+Proof. The proof is trivial by performing eigen-decomposition of A and noting that the eigenvalues
+of A equal either 0 or 1.
+Lemma S.5. Denote Z as a d-dimensional Gaussian random variable with mean 0 and positive
+definite covariance Σ. For any t > 0, we have
+P(∥Z∥2 > t) ⩽
+r 2
+πd3/2λ1/2
+max(Σ)t−1 exp
+(
+−
+t2
+2dλmax(Σ)
+)
+.
+Proof. First, for a 1-dimensional Gaussian variable Z ∼Gaussian(0, 1), we have
+P(|Z| > t)
+=
+P(Z > t) + P(Z < t)
+=
+2
+√
+2π
+Z +∞
+t
+exp
+
+−1
+2z2
+
+dz ⩽
+r 2
+π
+Z +∞
+t
+z
+t exp
+
+−1
+2z2
+
+dz
+=
+t−1
+r 2
+π exp
+ 
+−t2
+2
+!
+.
+(S.3)
+Next, for d ⩾1, we write ˜Z = Σ−1/2Z = ( ˜Z1, . . . , ˜Zd)T . It is easy to see that ˜Z ∼Gaussian(0, Id).
+Note that ∥Z∥2 = ∥Σ1/2 ˜Z∥2 ⩽λ1/2
+max(Σ)∥˜Z∥2, we thus have
+P(∥Z∥2 > t)
+⩽
+P{∥˜Z∥2 > λ−1/2
+max (Σ)t}
+⩽
+d
+X
+i=1
+P{| ˜Zi| > d−1/2λ−1/2
+max (Σ)t}
+Equation ( S.3)
+⩽
+r 2
+πd3/2λ1/2
+max(Σ)t−1 exp
+(
+−
+t2
+2dλmax(Σ)
+)
+.
+S.2
+Proof of Lemma 1
+To prove Lemma 1, we will show that under Assumptions 1, 4 and 5, P(A1n) →0, and P(A2n) →0
+for some constants c, C > 0. The proofs are given by Lemmas S.6 and S.7, respectively.
+Lemma S.6. Under Assumptions 1 and 5, there exit positive constants c and C, such that for A1n
+defined in (25), we have P(A1n) →0.
+Proof. We prove the last inequality in (25), and the first inequality is similar. Given a block Bm,
+denote δm,i as the binary variable indicating whether si is within Bm or not. We can see that
+∥Bm∥=
+n
+X
+i=1
+δm,i.
+Under Assumption 1, {δm,i}n
+i=1 is a series of i.i.d. binary random variable with success probability
+pm =
+R
+Bm PD(s)ds. It is easy to see that c = 1 satisfies condition (S.1) in Lemma S.1 for random
+S2
+
+variables {δm,i−pm}n
+i=1, and E(δm,i−pm)2 = pm(1−pm). Thus, by taking t = a1
+p
+npm(1 −pm) log(n)
+in Lemma S.1, where a1 is a constant to be determined later, we have
+P
+
+|∥Bm∥−npm| ⩾a1
+q
+npm(1 −pm) log(n)
+
+⩽
+2 exp
+
+
+
+
+
+
+
+−
+a2
+1 log(n)
+4 + 2a1
+r
+log(n)
+npm(1−pm)
+
+
+
+
+
+
+
+.
+Next, from Assumptions 1 and 5, we can see
+inf
+1⩽m⩽K2 pm ∼
+sup
+1⩽m⩽K2 pm ∼K−2 ∼n−1 log1+αb(n),
+leading to
+sup
+1⩽m⩽K2
+q
+npm(1 −pm) log(n) ∼log1+αb/2(n).
+Thus, for a given a1, we can then find an a2, such that a2 log1+αb(n)−npm > a1
+p
+npm(1 −pm) log(n),
+m = 1, 2, . . . , K2. Therefore,
+P
+(
+max1⩽m⩽K2 ∥Bm∥
+log1+αb(n)
+⩾a2
+)
+⩽
+K2
+X
+m=1
+P
+(
+∥Bm∥
+log1+αb(n) ⩾a2
+)
+⩽
+K2
+X
+m=1
+P{|∥Bm∥−npm| ⩾a2 log1+αb(n) −npm}
+⩽
+K2
+X
+m=1
+P
+
+|∥Bm∥−npm| ⩾a1
+q
+npm(1 −pm) log(n)
+
+⩽
+2K2 exp
+
+
+
+
+
+
+
+−
+a2
+1 log(n)
+4 + 2a1
+r
+log(n)
+npm(1−pm)
+
+
+
+
+
+
+
+.
+On the other hand, using the fact that
+log(n)
+npm(1−pm)
+=
+o(1), we can find a a1, such that
+2K2 exp
+
+
+−
+a2
+1 log(n)
+4+2a1
+q
+log(n)
+npm(1−pm)
+
+
+< n−1 holds when n is large.
+Thus, the last inequality of (25) is
+proved. The proof of the first inequality of (25) is similar and is thus omitted.
+Conditional on A1n, we have the following result.
+Lemma S.7. Under Assumptions 1, 4 and 5, there exists a constant C > 0, such that
+P
+
+
+
+sup
+1⩽m⩽K2 ∥∥Bm∥−1
+X
+si∈Bm
+[x(si)xT (si) −E{x(si)xT (si) | si}]∥∞⩽C log−αb/2(n) | A1n
+
+
+→1.
+Proof. Let xp(si) be the p-th entry of x(si). Since the dimension of x(si) is finite, it suffices to show
+that there exists Cpp′ > 0, such that
+P
+
+
+
+sup
+1⩽m⩽K2 |∥Bm∥−1
+X
+si∈Bm
+[xp(si)xp′(si) −E{xp(si)xp′(si) | si}]| ⩽Cpp′ log−αb/2(n) | A1n
+
+
+→1
+for ∀p, p′ = 1, 2, . . . , d. Assumption 4 entails that Cramer’s condition (S.1) holds for xp(s1)xp′(s1), we
+can thus apply Lemma S.1 and obtain
+P
+n
+sup1⩽m⩽K2 |∥Bm∥−1 P
+si∈Bm[xp(si)xp′(si) −E{xp(si)xp′(si) | si}]| > Cpp′ log−αb/2(n) | A1n
+o
+S3
+
+⩽
+PK2
+m=1 P
+n
+|∥Bm∥−1 P
+si∈Bm[xp(si)xp′(si) −E{xp(si)xp′(si) | si}]| > Cpp′ log−αb/2(n) | A1n
+o
+Lemma S.1
+⩽
+2 PK2
+m=1 exp
+"
+−
+∥Bm∥C2
+pp′ log−αb(n)
+4∥Bm∥−1 P
+si∈Bm E{x2p(si)x2
+p′(si)|si}+2cCpp′ log−αb/2(n)
+#
+Under A1n
+⩽
+2K2 exp
+"
+−
+cC2
+pp′ log(n)
+4∥Bm∥−1 P
+si∈Bm E{x2p(si)x2
+p′(si)|si}+2cCpp′ log−αb/2(n)
+#
+.
+Since K2 ∼
+n
+log1+αb(n) according to Assumption 5, we can find a Cpp′ > 0, such that the the above
+inequality is smaller than n−1 = o(1). Iterating over p and p′, the lemma is proved.
+Together with Assumption 4, an immediate result from Lemma S.7 is that there exist constants
+c, C > 0, such that P(A2n) →1, for A2n defined in (26). Combining the results, Lemma 1 is proved.
+S.3
+Proof of Lemma 2
+To prove Lemma 2, we will show that under our model and Assumption 5, P(E1n) →0, P(E2n) →0,
+P(E3n) →0 and P(E4n) →0, for some constants c, C > 0. The proofs are given by Lemmas S.8, S.9,
+S.10 and S.11, respectively.
+Lemma S.8. Under our model, we have P(E1n) →0 for E1n defined in (30).
+Proof. It is easy to see that ϕπ∗is a real symmetric matrix with ϕ2
+π∗= ϕπ∗, and the number of
+positive eigenvalues of ϕπ∗is smaller than kmaxd. Thus, by applying Lemma S.4, σ−2
+0 ϵT ϕπ∗ϵ follows
+a chi-square distribution with degree of freedom no larger than k2
+maxd. Applying Equation (S.2), we
+have
+P{ sup
+π∗∈Ξ∗ϵT ϕπ∗ϵ > 5σ2
+0K2 log(n)}
+⩽
+X
+π∗∈˜Ξ∗
+P{ϵT ϕπ∗ϵ > 5σ2
+0K2 log(n)}
+⩽
+X
+π∗∈˜Ξ∗
+k2
+maxd
+X
+r=1
+P{χ2
+r > 5K2 log(n)}
+Equation (S.2)
+⩽
+c|˜Ξ∗| exp{−K2 log(n)}.
+(i)
+⩽
+c exp{2K2 log(kmax) −K2 log(n)} →0,
+where (i) uses the fact that any π∗∈˜Ξ∗contains at most k2
+max clusters, hence |˜Ξ∗| ⩽k2K2
+max. The
+lemma is proved.
+Lemma S.9. Under our model and Assumption 5, we have P(E2n) →1, for E2n defined in (31).
+Proof. It suffices to show that
+P[ϵT ϕπ∗∩π∗
+0ϵ ⩽σ2
+0{1 + ϵ1(π∗, π∗
+0)K2} log1+αb/2(n), ∀π∗∈Π∗
+4 ∪Π∗
+5] →1,
+(S.4)
+and
+P[ϵT ϕπ∗ϵ ⩽σ2
+0{1 + ϵ1(π∗, π∗
+0)K2} log1+αb/2(n), ∀π∗∈Π∗
+4 ∪Π∗
+5] →1.
+(S.5)
+S4
+
+We give proof of Equation (S.4), and the proof of Equation (S.5) is similar. Following similar arguments
+in Lemma S.8, σ−2
+0 ϵT ϕπ∗∩π∗
+0ϵ follows a chi-square distribution with degree of freedom smaller than
+k2
+0d. Thus,
+P[ϵT ϕπ∗∩π∗
+0ϵ > σ2
+0{1 + ϵ1(π∗, π∗
+0)K2} log1+αb/2(n), ∃π∗∈Π∗
+4 ∪Π∗
+5]
+⩽
+P
+π∗∈Π∗
+4∪Π∗
+5 P[ϵT ϕπ∗∩π∗
+0ϵ > σ2
+0{1 + ϵ1(π∗, π∗
+0)K2} log1+αb/2(n)]
+⩽
+PK2
+q=0
+P
+π∗∈Π∗ϵ,q P[ϵT ϕπ∗∩π∗
+0ϵ > σ2
+0(1 + q) log1+αb/2(n)]
+Equation (S.2)
+⩽
+PK2
+q=0
+P
+π∗∈Π∗ϵ,q c exp{−C(1 + q) log1+αb/2(n)}
+(i)
+⩽
+PK2
+q=0 c exp{cq log(K) −C(1 + q) log1+αb/2(n)},
+where (i) uses the fact that
+|Π∗
+ϵ,q| ⩽
+
+
+
+K2
+q
+
+
+kq
+max
+Lemma S.3
+⩽
+eK2qkq
+max.
+Note that Assumption 5 entails that log(K) = O{log(n)}, thus
+P[ϵT ϕπ∗∩π∗
+0ϵ > σ2
+0{1 + ϵ1(π∗, π∗
+0)K2} log1+αb/2(n), ∃π∗∈Π∗
+4 ∪Π∗
+5]
+⩽
+exp{−C log1+αb/2(n)} PK2
+q=0 c exp{−Cq log1+αb/2(n)}
+⩽
+c exp{−C log1+αb/2(n)} →0.
+Equation (S.4) is thus proved. The proof of Equation (S.5) is omitted.
+Lemma S.10. Under our model and Assumptions 4 and 5, there exists a constant C > 0, such that
+for E3n defined in (32), we have P(E3n) →1.
+Proof. Let xp(si) be the p-th entry of x(si). Since the dimension of x(si) is finite, it suffices to show
+that
+P
+
+
+
+sup
+1⩽m⩽K2
+
+X
+si∈Bm
+xp(si)ϵ(si)
+
+⩽C log(2+αb)/2(n)
+
+
+→1
+Note that
+P
+n
+sup1⩽m⩽K2
+
+P
+si∈Bm xp(si)ϵ(si)
+ ⩽C log(2+αb)/2(n)
+o
+⩾
+P
+n
+sup1⩽m⩽K2
+P
+si∈Bm xp(si)ϵ(si)
+ ⩽C log(2+αb)/2(n) | An
+o
+P(An).
+Since we have shown that P(An) →1 in Lemma 1, it suffices to show that
+P
+
+
+
+sup
+1⩽m⩽K2
+
+X
+si∈Bm
+xp(si)ϵ(si)
+
+⩽C log(2+αb)/2(n) | An
+
+
+P(An) →1.
+We write
+P
+
+
+
+sup
+1⩽m⩽K2
+
+X
+si∈Bm
+xp(si)ϵ(si)
+
+> C log(2+αb)/2(n) | An
+
+
+
+S5
+
+⩽
+K2
+X
+m=1
+P
+
+
+
+
+X
+si∈Bm
+xp(si)ϵ(si)
+
+> C log(2+αb)/2(n) | An
+
+
+
+(i)
+⩽
+K2 × 2 exp
+(
+−
+C2 log(2+αb)(n)
+4c log1+αb(n) + 2cC log(2+αb)/2(n)
+)
+Assumption (5)
+⩽
+cn
+log1+αb(n) × exp
+(
+−
+C2 log(2+αb)(n)
+4c log1+αb(n) + 2cC log(2+αb)/2(n)
+)
+,
+where we apply Lemma S.1 in (i). Taking C = 4√c, we can see the right-hand side of inequality goes
+to 0. The lemma is proved.
+Lemma S.11. Under our model and Assumptions 4 and 5, we have P(E4n) →1, for E4n defined in
+(33).
+Proof. Since the dimension of x(si) and k0 is finite, the proof is trivial by applying Lemma S.1.
+Combining the results of Lemmas S.8 - S.11, we finish the proof of Lemma 2.
+S.4
+Proof of Proposition 1
+Recall that in our model, the domain partition π∗is induced from the partition of blocks V = {Bm}K2
+m=1.
+In Section 2.2, the partition of blocks is induced from the mesh grid graph G = {V, E}. Thus, to
+prove Proposition 1, it suffices to show that there exists a contiguous partition of V, say π0(V) =
+{V1,0, . . . , Vk0,0}, such that
+k0
+X
+j=1
+|{Bm : Bm ∈Vj,0, Bm ⊊Dj,0}| ⩽cK.
+(S.6)
+The proof is given as follows.
+Proof. We conduct the proof by constructing π0(V). Recall the definition of “boundary block” in
+Section 6.1. Let B be the set of boundary blocks. For each block Bm ∈B, we write Neighbour(Bm)
+as the set of blocks surrounding Bm (see Figure S.1 for an illustration). Define set
+b = {Bm : there exists a Bm′ ∈B, such that Bm ∈Neighbour(Bm′)} ∪B
+as the set of blocks that are “near” boundary set B. We use Bc and bc to denote complements of B
+and b, respectively. We will first construct a partition π1 = {V1
+1, . . . V1
+k0} for blocks in Bc. Then we
+filter π1 to obtain a partition of a subset of blocks in Bc, say π2 = {V2
+1, . . . V2
+k0}. After filtration, we
+will show that each V2
+j is connected under the mesh grid G. We then construct π0(V) by extending π2
+to a partition of all blocks. Finally, we verify that π0(V) is a contiguous partition and (S.6) is satisfied
+under π0(V).
+S6
+
+∗
+∗
+∗
+∗
+Bm
+∗
+∗
+∗
+∗
+Figure S.1: Illustration of Neighbour(Bm). Blocks in Neighbour(Bm) are denoted by ∗.
+To begin with, note that for a given block Bm ∈Bc, it is fully containd in some sub-domain of
+{Dl,0}k0
+l=1. We construct π1 = {V1
+1, . . . V1
+k0} as
+V1
+j = {Bm ∈Bc : Bm ⊆Dj,0}, 1 ⩽j ⩽k0.
+For a given j and two blocks Bm, Bm′ ∈{V1
+j ∩bc} ⊆{V1
+j ∩Bc}, through the definition of bc, we can
+see the center points of Bm and Bm′, say cm and cm′, satisfy
+d(cm, B) ⩾1.5K−1, and d(cm′, B) ⩾1.5K−1.
+According to Assumption 2, there exists a path P(cm, cm′), such that
+d{P(cm, cm′), B} ⩾1.5K−1.
+Since each block is a K−1 ×K−1 rectangle, the distance of any two points within one block is no larger
+than
+√
+2K−1. We thus conclude that for any block Bm′′ intersecting with P(cm, cm′), we have
+Bm′′ ∈V1
+j ∩Bc.
+Hence, there exists a path from cmto cm′ and intersects with only blocks in V1
+j ∩Bc. Together with
+the fact that {V1
+j ∩bc} ⊆{V1
+j ∩Bc}, we conclude that for each 1 ⩽j ⩽k0, there exists a connected
+component of V1
+j ∩Bc, say V2
+j , such that {V1
+j ∩bc} ⊆V2
+j .
+We then obtain our second partition
+π2 = {V2
+1, . . . , V2
+k0}.
+Now that π2 is partition of subset of {Bm}K2
+m=1. We next expand V2
+j to Vj,0, such that Vj,0 ⊇V2
+j ,
+and {V1,0, . . . , Vk0,0} is a partition of all the blocks {Bm}k0
+m=1. Since the mesh grid G and each V2
+j are
+connected, it is easy to see that there exists an expansion of {V2
+1, . . . , V2
+k0}, say {V1,0, . . . , Vk0,0}, such
+that {V1,0, . . . , Vk0,0} is a contiguous partition. On the other hand, we have
+k0
+X
+j=1
+|{Bm : Bm ∈Vj,0, Bm ⊊Dj,0}|
+⩽
+| ∪k0
+j=1 {Vj,0 \ V2
+j }| ⩽|{∪k0
+j=1V2
+j }c|
+(i)
+⩽
+|b|
+(ii)
+⩽9|B|
+(iii)
+⩽cK,
+where (i) uses the fact that {V1
+j ∩bc} ⊆V2
+j , (ii) uses |Neighbour(Bm) ∪Bm| ⩽9, and (iii) uses the
+fact that |B| ⩽cK from Assumption (2). Equation (S.6) is thus established and the proposition if
+proved.
+S7
+
+S.5
+Proof of Proposition 2
+We give the proof for ϵ(·, ·) in this section. The proof of ϵn(·, ·) is similar and thus omitted. Note that
+the proof of non-negativity, identity of indiscernibles and symmetry axioms are trivial, we thus only
+show the triangle inequality.
+Recall that for two domain partition π1(D) and π2(D), we decompose ϵ{π1(D), π2(D)} =
+ϵ1{π1(D), π2(D)} + ϵ2{π1(D), π2(D)}, where ϵ1{π1(D), π2(D)} and ϵ2{π1(D), π2(D)} are defined in
+(21) and (22), respectively. It is easy to see that ϵ1{π1(D), π2(D)} = ϵ2{π2(D), π1(D)}. Thus, to
+obtain the triangle inequality for ϵ(·, ·), it suffices to show the triangle inequality for ϵ1(·, ·). Before
+that, we first study some properties of ϵ1(·, ·).
+Lemma S.12. For any domain partitions π1(D) = {D11, . . . , D1k1}, π2(D) = {D21, . . . , D2k2} and
+π3(D) = {D31, . . . , D3k3}, where k1, k2 and k3 are the number of clusters in π1(D), π2(D) and π3(D),
+respectively, we have
+ϵ1{π1(D), π2(D)} −ϵ1{eπ(D), π2(D)} ⩾0,
+(S.7)
+where eπ(D) = π1(D) ∩π3(D) = { ˜D1, . . . ˜D˜k}, with ˜k denoting the corresponding number of clusters.
+Furthermore, we have
+ϵ1{π1(D), π3(D)} −ϵ1{eπ(D), π3(D)} ⩾ϵ1{π1(D), π2(D)} −ϵ1{eπ(D), π2(D)}.
+(S.8)
+Proof. Following (21), we have
+ϵ1{π1(D), π2(D)} = 1 −|D|−1
+k1
+X
+j=1
+max
+l∈{1,...,k2} |D1j ∩D2l|,
+and
+ϵ1{eπ(D), π2(D)} = 1 −|D|−1
+˜k
+X
+j=1
+max
+l∈{1,...,k2} | ˜Dj ∩D2l|.
+Since ˜π(D) is nested in π1(D), for each j = 1, . . . , k1, there exists an index set I(j), such that
+∪j′∈I(j) ˜Dj′ = D1j. Thus, we write
+ϵ1{π1(D), π2(D)}−ϵ1{eπ(D), π2(D)} = |D|−1
+k1
+X
+j=1
+
+
+
+
+
+X
+j′∈I(j)
+max
+l∈{1,...,k2} | ˜Dj′ ∩D2l|
+
+
+−
+max
+l∈{1,...,k2} |D1j ∩D2l|
+
+,
+(S.9)
+from which it is easy to see that ϵ1{π1(D), π2(D)} −ϵ1{eπ(D), π2(D)}
+⩾|D|−1
+k1
+X
+j=1
+
+
+
+
+
+max
+l∈{1,...,k2}
+X
+j′∈I(j)
+| ˜Dj′ ∩D2l|
+
+
+−
+max
+l∈{1,...,k2} |D1j ∩D2l|
+
+= 0.
+(S.10)
+Equation (S.7) is thus proved.
+Next, substituting π2(D) in (S.9) with π3(D), we have
+ϵ1{π1(D), π3(D)}−ϵ1{eπ(D), π3(D)} = |D|−1
+k1
+X
+j=1
+
+
+
+
+
+X
+j′∈I(j)
+max
+l∈{1,...,k3} | ˜Dj′ ∩D3l|
+
+
+−
+max
+l∈{1,...,k3} |D1j ∩D3l|
+
+
+(S.11)
+S8
+
+for the same I(j) as define above. Since eπ(D) = π1(D) ∩π3(D), we can see that maxl∈{1,...,k3} | ˜Dj′ ∩
+D3l| = | ˜Dj′|. Thus, we rewrite (S.11) as
+ϵ1{π1(D), π3(D)} −ϵ1{eπ(D), π3(D)} = |D|−1
+k1
+X
+j=1
+
+
+
+
+
+X
+j′∈I(j)
+| ˜Dj′|
+
+
+−
+max
+l∈{1,...,k3} |D1j ∩D3l|
+
+.
+(S.12)
+On the other hand, let ˜j′(j) = argmaxj′∈I(j)| ˜Dj′|, we can see that maxl∈{1,...,k3} |D1j ∩D3l| = | ˜D˜j′(j)|.
+Thus, we rewrite (S.12) and (S.9) as
+ϵ1{π1(D), π3(D)} −ϵ1{eπ(D), π3(D)} = |D|−1
+k1
+X
+j=1
+
+
+
+
+
+X
+j′∈I(j)\˜j′(j)
+| ˜Dj′|
+
+
+
+
+,
+and
+ϵ1{π1(D), π2(D)} −ϵ1{eπ(D), π2(D)}
+=
+|D|−1
+k1
+X
+j=1
+
+
+
+
+
+X
+j′∈I(j)\˜j′(j)
+max
+l∈{1,...,k2} | ˜Dj′ ∩D2l|
+
+
+
+
+
++|D|−1
+k1
+X
+j=1
+{
+max
+l∈{1,...,k2} | ˜D˜j′(j)l ∩D2l| −
+max
+l∈{1,...,k2} |D1j ∩D2l|}
+(i)
+⩽
+|D|−1
+k1
+X
+j=1
+
+
+
+
+
+X
+j′∈I(j)\˜j′(j)
+max
+l∈{1,...,k2} | ˜Dj′ ∩D2l|
+
+
+
+
+,
+where (i) is because ˜D˜j′(j) ⊆D1j.
+Note that | ˜Dj′| ⩾maxl∈{1,...,k2} | ˜Dj′ ∩D2l|, Equation (S.8) is
+proved.
+Making use of Lemma S.12, we prove the triangle inequality for ϵ1(·, ·) as follows.
+Proof. For any domain partitions π1(D), π2(D) and π3(D), let eπ(D) = π1(D) ∩π3(D). We have
+ϵ1{π1(D), π3(D)}
+=
+ϵ1{π1(D), π3(D)} −ϵ1{eπ(D), π3(D)}
+Equation (S.8)
+⩾
+ϵ1{π1(D), π2(D)} −ϵ1{eπ(D), π2(D)}
+(i)
+⩾
+ϵ1{π1(D), π2(D)} −ϵ1 {π3(D), π2(D)} ,
+where (i) is due to ϵ1{eπ(D), π2(D)} ⩽ϵ1 {π3(D), π2(D)} from Equation (S.7). The triangle inequality
+for ϵ1(·, ·) is thus proved.
+Combining the result above, the proposition is proved.
+S.6
+Proof of Proposition 3
+This section gives proof of Proposition 3. We first give some technical lemmas. Write µ0 = E(y | s, x)
+as the true regression mean.
+Lemma S.13. Under the event An and Assumptions 2 and 5, there exists a constant c, such that
+∥(ϕπ∗
+0 −In)µ0∥2
+2 ⩽cn1/2 log(1+αb)/2(n).
+S9
+
+Proof. Recall the definition of P π∗under (29), let Xπ∗
+0 = P T
+π∗
+0diag(x1, . . . , xk0). We can see that
+ϕπ∗
+0µ0 = Xπ∗
+0 bθ,
+where
+bθ = argminθ∈Rk0d∥Xπ∗
+0θ −µ0∥2
+2.
+From (11), for θ0 = (θT
+1,0, . . . , θT
+k0,0)T , where {θl,0}k0
+l=1 are the true values of {θl}k0
+l=1, we can see
+∥Xπ∗
+0θ0 −µ0∥2
+2 ⩽CK × log1+αb(n) ⩽Cn1/2 log(1+αb)/2(n)
+under An. Therefore, we conclude
+∥(ϕπ∗
+0 −In)µ0∥2
+2 ⩽∥Xπ∗
+0θ0 −µ0∥2
+2 ⩽Cn1/2 log(1+αb)/2(n),
+which proves the lemma.
+Recall that we write π∗
+0 = {D∗
+l,0}k0
+l=1 and M(D∗
+j) = argmaxl∈{1,...,k0}|D∗
+j ∩D∗
+l,0| as the index of the
+sub-domain in {D∗
+l,0}k0
+l=1 with the largest intersection area with D∗
+j. After simple algebra, it can be
+shown that ϵ1(π∗, π∗
+0) defined in (21) can be re-written as
+ϵ1(π∗, π∗
+0) =
+k
+X
+j=1
+
+
+
+
+
+X
+l∈{1,...,k0}\M(D∗
+j )
+|D∗
+j ∩D∗
+l,0|
+
+
+
+
+
+,
+where we use the fact |D| = 1 since D = [0, 1]2. Note that the number of summation terms is no larger
+than k0kmax, we conclude that
+max
+1⩽j⩽k
+max
+l∈{1,...,k0}\M(D∗
+j ) |D∗
+j ∩D∗
+l,0| ⩾ϵ1(π∗, π∗
+0)
+k0kmax
+.
+(S.13)
+Recall the definition of α0 in Theorem 1. The next lemma gives a lower bound of ∥(In −ϕπ∗)µ0∥2
+2
+by using (S.13).
+Lemma S.14. Under the event An and Assumption 3, there exists a uniform constant c > 0, such
+that
+∥(In −ϕπ∗)µ0∥2
+2 ⩾cϵ1(π∗, π∗
+0)K2 log1+αb(n)
+holds for all π∗∈Ξ∗with ϵ1(π∗, π∗
+0)K2 ⩾⌊K logα0(n)⌋.
+Proof. From the definition of ϵ1(π∗, π∗
+0) and (S.13), we can see that there exists a cluster D∗
+j ∈π∗,
+such that D∗
+j contains ⌊ϵ1(π∗,π∗
+0)
+k0kmax K2⌋blocks in D∗
+l,0, and another ⌊ϵ1(π∗,π∗
+0)
+k0kmax K2⌋blocks in D∗
+l′,0, for some
+l ̸= l′. Recall the definition of Wπ∗
+0 in Proposition 1. Since |Wπ∗
+0| ⩽cK, there exists another constant
+c, such that for π∗∈Ξ∗with ϵ1(π∗, π∗
+0)K2 ⩾⌊K logα0(n)⌋, D∗
+j contains cϵ1(π∗, π∗
+0)K2 blocks fully
+contained in Dl,0, and another cϵ1(π∗, π∗
+0)K2 blocks fully contained in Dl′,0, for some l ̸= l′. We denote
+these two sets of blocks as S1 and S2, respectively. Accordingly, we write X1 and X2 as the design
+S10
+
+matrix constructed from S1 and S2, respectively, X = (XT
+1 , XT
+2 )T , and n1 and n2 as the number of
+locations in S1 and S2, respectively. Under An, we can see that there exits a constant c, such that
+min{n1, n2} ⩾cϵ1(π∗, π∗
+0)K2 × log1+αb(n). Without loss of generality, we assume n1 ⩾n2.
+We write µ0 | S1 as the sub-vector of µ0 containing only the locations within S1, and write µ0 | S2
+and µ0 | S1∪S2 similarly. Since S1 and S2 belong to two different Dl,0 and Dl′,0, we can write θ1 = θl,0
+and θ2 = θl′,0 with ∥θ1 −θ2∥⩾c (Assumption 3) and
+µ0 | S1 = X1θ1, and µ0 | S2 = X2θ2.
+On the other hand, since locations in S1 and S2 belong to the same cluster under π∗, there exists a
+common θ, such that (ϕπ∗µ0) | S1 ∪S2 = Xθ. Thus,
+∥(In −ϕπ∗)µ0∥2
+2
+⩾
+∥{(In −ϕπ∗)µ0} | S1 ∪S2∥2
+2
+=
+∥X1θ1 −X1θ∥2
+2 + ∥X2θ2 −X2θ∥2
+2
+=
+(θ1 −θ)T XT
+1 X1(θ1 −θ) + (θ2 −θ)T XT
+2 X2(θ2 −θ)
+(i)
+⩾
+cn1∥θ1 −θ∥2
+2 + cn2∥θ2 −θ∥2
+2
+⩾
+cn2{∥θ1 −θ∥2
+2 + ∥θ2 −θ∥2
+2} ⩾cn2∥θ1 −θ2∥2
+2 ⩾cϵ1(π∗, π∗
+0)K2 × log1+αb(n),
+where (i) uses the fact that under event An, XT
+1 X1 ⩾cn1 and XT
+2 X2 ⩾cn2. From the derivation,
+we can see the constant c in the last inequality doesn’t depend on π∗. The lemma is thus proved.
+Next, under events An ∩En, we give the proof of Proposition 3 as follows.
+Proof. We first consider cases when π∗∈Π∗
+1 ∪Π∗
+2 ∪Π∗
+3. Following Equation (29), we have
+P(y | π∗, x, s)λ|π∗|
+P(y | π∗
+0, x, s)λ|π∗
+0| = exp
+"
+(|π∗
+0| −|π∗|)
+
+log(λ−1) + d log(n + 1)
+2
+
++
+nyT (ϕπ∗−ϕπ∗
+0)y
+2σ2(n + 1)
+.
+#
+(S.14)
+Write ˜π∗= π∗∩π∗
+0, we bound yT (ϕπ∗−ϕπ∗
+0)y by
+yT (ϕπ∗−ϕπ∗
+0)y
+=
+yT (ϕ˜π∗−ϕπ∗
+0)y + yT (ϕπ∗−ϕ˜π∗)y
+(i)
+=
+∥(ϕ˜π∗−ϕπ∗
+0)y∥2
+2 −∥(ϕ˜π∗−ϕπ∗)y∥2
+2
+⩽
+2∥(ϕ˜π∗−ϕπ∗
+0)µ0∥2
+2 + 2∥(ϕ˜π∗−ϕπ∗
+0)ϵ∥2
+2 −∥(ϕ˜π∗−ϕπ∗)y∥2
+2
+(ii)
+⩽
+8∥(In −ϕπ∗
+0)µ0∥2
+2 + 4∥ϕ˜π∗ϵ∥2 + 4∥ϕπ∗
+0ϵ∥2
+2 −∥(ϕ˜π∗−ϕπ∗)y∥2
+2
+(iii)
+⩽
+cn1/2 log(1+αb)/2(n) + CK2 log(n) −∥(ϕ˜π∗−ϕπ∗)y∥2
+2,
+(iv)
+⩽
+cn1/2 log(1+αb)/2(n) + Cn log−αb(n) −∥(ϕ˜π∗−ϕπ∗)y∥2
+2
+⩽
+cn log−αb(n) −∥(ϕ˜π∗−ϕπ∗)y∥2
+2,
+(S.15)
+where (i) uses the fact that (ϕ˜π∗−ϕπ∗
+0)2 = ϕ˜π∗−ϕπ∗
+0 and (ϕ˜π∗−ϕπ∗)2 = ϕ˜π∗−ϕπ∗since ˜π∗in
+nested in π∗and π∗
+0, (ii) is because
+∥(ϕ˜π∗−ϕπ∗
+0)µ0∥2
+2 ⩽2∥(ϕ˜π∗−In)µ0∥2
+2 + 2∥(In −ϕπ∗
+0)µ0∥2
+2 ⩽4∥(In −ϕπ∗
+0)µ0∥2
+2,
+S11
+
+(iii) uses result from Lemma S.13 and E1n, and (iv) uses Assumption 5.
+We next discuss π∗∈
+Π∗
+1, Π∗
+2 and Π∗
+3, respectively.
+Cases when π∗∈Π∗
+1:
+Since each block has an area K−2, we can see for each Dl,0, l = 1, . . . , k0, the number of blocks
+intersecting with it is larger than cK2 for some constant c. Since |Wπ∗
+0| ⩽cK and K →∞, we
+conclude that the number of blocks within each D∗
+l,0, l = 1, . . . , k0 is larger than cK2. Similarly, it
+is easy to derive that the number of blocks within each D∗
+l,0, l = 1, . . . , k0 is smaller than CK2 for
+another constant C.
+Based on the above result, we can see that there exists a constant c, such that ϵ1(π∗, π∗
+0)K2 > cK2
+holds for π∗∈Π∗
+1. Since Assumption 5 guarantees that K2 ≫K logα0(n), we can apply Lemma S.14
+and obtain
+∥(In −ϕπ∗)µ0∥2
+2 ⩾cn, ∀π∗∈Π∗
+1.
+(S.16)
+Next, applying Equation (S.15), we have
+yT (ϕπ∗−ϕπ∗
+0)y
+⩽
+cn log−αb(n) −∥(ϕ˜π∗−ϕπ∗)y∥2
+2
+⩽
+cn log−αb(n) −{∥(ϕ˜π∗−ϕπ∗)µ0∥2 −∥(ϕ˜π∗−ϕπ∗)ϵ∥2}2.
+Note that
+∥(ϕ˜π∗−ϕπ∗)µ0∥2
+⩾
+∥(In −ϕπ∗)µ0∥2 −∥(ϕ˜π∗−In)µ0∥2
+(i)
+⩾
+cn1/2 −Cn1/4 log(1+αb)/4(n) ⩾cn1/2,
+(S.17)
+where (i) uses Equation (S.16) and Lemma S.13. Besides, under E1n, we have
+∥(ϕ˜π∗−ϕπ∗)ϵ∥2 ⩽2
+√
+5σ0K log1/2(n) ∼n1/2 log−αb/2(n).
+(S.18)
+Putting the result together, we conclude
+yT (ϕπ∗−ϕπ∗
+0)y
+⩽
+cn log−αb(n) −cn ⩽−cn.
+Plugging the result into Equation (S.14), we have
+P(y | π∗, x, s)λ|π∗|
+P(y | π∗
+0, x, s)λ|π∗
+0|
+⩽
+exp
+
+(|π∗
+0| −|π∗|)
+
+log(λ−1) + d log(n + 1)
+2
+
+−cn
+
+Assumption 5
+⩽
+exp[ck0n log−αp(n) −cn] ⩽exp(−cn).
+Cases when π∗∈Π∗
+2:
+From Equation (S.15), we can see that
+yT (ϕπ∗−ϕπ∗
+0)y ⩽cn log−αb(n).
+Thus, together with Assumption 5, we have
+P(y | π∗, x, s)λ|π∗|
+P(y | π∗
+0, x, s)λ|π∗
+0|
+⩽
+exp
+
+−
+
+log(λ−1) + d log(n + 1)
+2
+
++ cn log−αb(n)
+
+S12
+
+⩽
+exp[−cn log−αp(n) + cn log−αb(n)]
+Assumption 5
+⩽
+exp[−cn log−αp(n)].
+Cases when π∗∈Π∗
+3:
+Using the similar arguments as the cases of Π∗
+1, it is easy to see that there exists a constant c,
+such that ϵ1(π∗, π∗
+0) > cK2 holds for any π∗∈Π∗
+3. The proof is then similar to the cases of Π∗
+1 and is
+omitted.
+Next, we discuss cases when π∗∈Π∗
+4. Write ˜π∗= π∗∩π∗
+0, following the same arguments in (S.15),
+we have
+yT (ϕπ∗−ϕπ∗
+0)y
+⩽
+8∥(In −ϕπ∗
+0)µ0∥2
+2 + 4∥ϕ˜π∗ϵ∥2 + 4∥ϕπ∗
+0ϵ∥2
+2 −∥(ϕ˜π∗−ϕπ∗)y∥2
+2
+(i)
+⩽
+cn1/2 log(1+αb)/2(n) + 16σ2
+0{1 + ϵ1(π∗, π∗
+0)K2} log1+αb/2(n) −∥(ϕ˜π∗−ϕπ∗)y∥2
+2
+⩽
+c{n1/2 + ϵ1(π∗, π∗
+0)K2} log(1+αb)/2(n) −{∥(ϕ˜π∗−ϕπ∗)µ0∥2 −∥(ϕ˜π∗−ϕπ∗)ϵ∥}2,
+where (i) uses Lemma S.13 and E2n. On the other hand, from Lemmas S.13 and S.14, we can see
+∥(ϕ˜π∗−ϕπ∗)µ0∥2
+⩾
+∥(In −ϕπ∗)µ0∥2 −∥(ϕ˜π∗
+0 −In)µ0∥2
+⩾
+cϵ1/2
+1
+(π∗, π∗
+0)K log(1+αb)/2(n) −Cn1/4 log(1+αb)/4(n),
+and
+∥(ϕ˜π∗−ϕπ∗)ϵ∥2 ⩽∥ϕ˜π∗ϵ∥2 + ∥ϕπ∗ϵ∥2 ⩽cϵ1/2
+1
+(π∗, π∗
+0)K log1/2+αb/4(n)
+under E2n. Since π∗∈Π∗
+4 and K ∼n1/2 log−(1+αb)/2(n) from Assumption 5, we have
+ϵ1/2
+1
+(π∗, π∗
+0)K log(1+αb)/2(n) ≫Cn1/4 log(1+αb)/4(n) + ϵ1/2
+1
+(π∗, π∗
+0)K log1/2+αb/4(n),
+leading to
+{∥(ϕ˜π∗−ϕπ∗)µ0∥2 −∥(ϕ˜π∗−ϕπ∗)ϵ∥2}2 ⩾cϵ1(π∗, π∗
+0)K2 log(1+αb)(n).
+Combining the result, we obtain
+yT (ϕπ∗−ϕπ∗
+0)y
+⩽
+c{n1/2 + ϵ1(π∗, π∗
+0)K2} log(1+αb)/2(n) −cϵ1(π∗, π∗
+0)K2 log(1+αb)(n)
+(ii)
+⩽
+−cϵ1(π∗, π∗
+0)K2 log(1+αb)(n),
+where (ii) uses the fact that ϵ1(π∗, π∗
+0)K2 ⩾⌊K logα0(n)⌋∼n1/2 logα0−(1+αb)/2(n).
+Plugging this
+result into Equation (S.14), we have
+P(y | π∗, x, s)λ|π∗|
+P(y | π∗
+0, x, s)λ|π∗
+0|
+=
+exp
+(nyT (ϕπ∗−ϕπ∗
+0)y
+2σ2(n + 1)
+)
+⩽exp{−cϵ1(π∗, π∗
+0)K2 log1+αb(n)}.
+Combining the result, the proposition is proved.
+S.7
+Graph results and theory
+This section derives some general graph results and gives proof of Proposition 4. Section S.7.1 provides
+a general result on the number of spanning trees, given a graph G. Section S.7.2 applies result of Section
+S.7.1 to our model setting to prove Proposition 4.
+S13
+
+S.7.1
+General result of graph
+The result in this section is a general graph result, which is independent of our model. For generality,
+we take some new notations, which may be different from the main paper. Let G = (V0, E) be a spatial
+graph, where V0 is a vertex set, and the edge set E is a subset of {(vi, vi′) : vi, vi′ ∈V, vi ̸= vi′}. We
+say a vertex set V ⊆V0 is connected under G, if there exists a path from v1 to v2 with all the vertexes
+in path contained in V, for any two vertexes v1, v2 ∈V. Based on graph G, we define the distance of
+two vertexes v1, v2 ∈V0 as
+dG(v1, v2) =
+min
+P∈PG(v1,v2) |P|,
+where PG(v1, v2) is the set containing all paths from v1 to v2 under graph G. For two vertex sets V1
+and V2, we define their distance as
+dG(V1, V2) =
+min
+v1∈V1,v2∈V2 dG(v1, v2).
+Given a connected set V ⊆V0, we write S(V) as the set of spanning trees of V under G. For a general
+vertex set V (which is not necessary to be connected), it is easy to see that there exists a unique
+decomposition V = ∪jVj, such that each Vj is connected, and dG(Vj, Vj′) > 1 for j ̸= j′. Based on the
+decomposition, we define an operator of V, say H(V), as H(V) = Q
+j H(Vj), where H(Vj) = |S(Vj)|.
+For a set of m disjoint vertex sets {Vj}m
+j=1, we write b({Vj}m
+j=1) = Pm
+j=1
+Pm
+j′=1 I(j′ > j)b({Vj, Vj′}),
+where b({Vj, Vj′}) is the number of edges (under graph G) connecting Vj and Vj′.
+Figure S.2: One graph example. In this example, the graph G is a 5 × 5 mesh grid. We denote V1,
+V2 and V3 by vertexes with red, blue and gray colors, respectively. We can see {Vj}3
+j=1 are three
+connected vertex sets and dG(V1, V2) = 1, dG(V1, V3) = 2 and dG(V2, V3) = 1.
+According to the
+definition, b({Vj}3
+j=1) = b({V1, V2})+b({V1, V3})+b({V2, V3}), where b({V1, V2}) = 6, b({V1, V3}) = 0
+and b({V2, V3}) = 7 since the number of edges connecting {V1, V2}, {V1, V3} and {V2, V3} are 6, 0 and
+7, respectively.
+Note that H(V) defined above is the number of spanning trees of V, if V is connected. We will
+study the property of H(·), because H(·) has a close relationship with the number of spanning trees
+inducing a particular partition. We have the following lemma.
+S14
+
+Lemma S.15. Let V1 and V2 be two connected vertex sets, and V1 ∩V2 = ∅. Write V = V1 ∪V2, we
+have
+H(V1)H(V2) ⩽H(V) ⩽H(V1)H(V2) × exp[b({V1, V2}){log(|V1|) + log(|V2|) + log(2)}].
+Proof. If dG(V1, V2) > 1, it is easy to see that b({V1, V2}) = 0 and H(V) = H(V1)H(V2) by the
+definition. The inequality holds immediately. We next consider the case when dG(V1, V2) = 1, hence
+V is also connected and S(V) is well defined.
+If dG(V1, V2) = 1, there exists a pair (s1, s2), with s1 ∈V1, s2 ∈V2, such that s1 is connected to s2
+by an edge e ∈E. For any T1 ∈S(V1), T2 ∈S(V2), we can thus construct a spanning tree, say T (T1, T2)
+by connecting T1 and T2 with e. It is easy to see that T (T1, T2) ∈S(V) and T (T1, T2) ̸= T (T ′
+1, T ′
+2) if
+(T1, T2) ̸= (T ′
+1, T ′
+2). Thus, we have H(V1)H(V2) = |S(V1)||S(V2)| ⩽|S(V)| = H(V).
+We next prove the second inequality. For any spanning tree T ∈S(V), we split it by removing all
+the edges connecting (s1, s2), where s1 ∈V1 and s2 ∈V2. We can see that the number of removed
+edges is smaller than b({V1, V2}). After the removal, we will obtain some “sub” spanning trees, the
+vertexes of which are either subset of V1 or subset of V2. Write ˜Si(T ) as the set of “sub” spanning
+trees obtained from T with vertexes belonging to Vi, i = 1, 2. Let A = {{ ˜S1(T ), ˜S2(T )} : T ∈S(V)}
+be the space of { ˜S1(T ), ˜S2(T )}. We can see that each T ∈S(V) corresponds to an element a ∈A.
+We will then bound H(V) = |S(V)| as
+H(V)
+⩽
+|A| × max
+a∈A [|{T ∈S(V) : T can induce a }|]
+⩽
+|{ ˜S1(T ) : T ∈S(V)}| × |{ ˜S2(T ) : T ∈S(V)}| × max
+a∈A [|{T ∈S(V) : T can induce a}|].
+Since Vi is connected, we can always add some edges between those sub spanning trees in ˜Si(T ) to
+join them into a spanning tree consisting all the vertexes of Vi. Thus,
+˜Si(T ) ∈{“sub” spanning trees obtained after cutting no more than b{V1, V2} edges from Ti ∈S(Vi)}.
+Together with Lemma S.3, we hence conclude that
+|{ ˜Si(T ) : T ∈S(V)}|
+⩽
+H(Vi) ×
+b({V1,V2})
+X
+j=0
+
+
+
+|Vi| −1
+j
+
+
+
+⩽
+H(Vi) × exp{b({V1, V2}) log(|Vi|)}.
+On the other hand, note that if T can induce a ∈A, T can be converted back by adding back those
+removed edges from a. Since the number of removed edges is no more than b(V1, V2), we conclude
+that
+max
+a∈A |{T ∈S(V) : T can induce a}| ⩽2b({V1,V2}) = exp{log(2)b({V1, V2})}.
+Putting the result together, the lemma is proved.
+The following lemma extends Lemma S.15 to a more general case.
+S15
+
+Lemma S.16. Let {Vi}m
+i=1 be m connected vertex sets, with Vm ∩Vm′ = ∅if m ̸= m′. Write V =
+∪m
+i=1Vi, we have
+m
+Y
+i=1
+H(Vi) ⩽H(V) ⩽
+( m
+Y
+i=1
+H(Vi)
+)
+× exp
+"
+b({Vi}m
+i=1)
+(
+2 log
+ m
+X
+i=1
+|Vi|
+!
++ log(2)
+)#
+.
+(S.19)
+Proof. We will prove the lemma by induction. It is easy to see that inequality holds for m = 1.
+Besides, from Lemma S.15, we can see that the inequality holds for m = 2. Next, we prove that if
+(S.19) holds for m = m0 ⩾2, it also holds for m = m0 + 1. Let {Vi}m0+1
+i=1
+be m0 + 1 connected vertex
+sets with Vm ∩Vm′ = ∅if m ̸= m′. We discuss the following two cases of Vm0+1:
+If min1⩽i⩽m0{dG(Vi, Vm0+1)} > 1:
+From the definition of H(·), we can see
+H(V) = H(Vm0+1)H(∪m0
+i=1Vi).
+We can thus apply Equation (S.19) to H(∪m0
+i=1Vi), obtaining
+H(V) = H(Vm0+1)H(∪m0
+i=1Vi) ⩾
+m0+1
+Y
+i=1
+H(Vi),
+and
+H(V)
+=
+H(Vm0+1)H(∪m0
+i=1Vi)
+⩽
+(m0+1
+Y
+i=1
+H(Vi)
+)
+× exp
+"
+b({Vi}m0
+i=1)
+(
+log(2) + 2 log
+ m0
+X
+i=1
+|Vi|
+!)#
+⩽
+(m0+1
+Y
+i=1
+H(Vi)
+)
+× exp
+"
+b({Vi}m0+1
+i=1
+)
+(
+log(2) + 2 log
+ m0+1
+X
+i=1
+|Vi|
+!)#
+.
+The inequality is thus proved.
+If min1⩽i⩽m0{dG(Vi, Vm0+1)} = 1:
+Without loss of generality, we assume dG(Vm0, Vm0+1) = 1. Write ˜V = Vm0 ∪Vm0+1, we can see
+that ˜V is connected. So we can view V as a union of m0 connected vertex sets, i.e., V = {∪m0−1
+i=1
+Vi}∪˜V.
+By applying (S.19) to H(V) = H({∪m0−1
+i=1
+Vi} ∪˜V), we have
+H(V) ⩾
+(m0−1
+Y
+i=1
+H(Vi)
+)
+H(˜V)
+(i)
+⩾
+(m0+1
+Y
+i=1
+H(Vi)
+)
+where in (i) we apply Equation (S.19) to H(˜V) = H(Vm0 ∪Vm0+1). On the other hand, Equation
+(S.19) also entails that
+H(V)
+⩽
+(m0−1
+Y
+i=1
+H(Vi)
+)
+H(˜V) × exp
+"
+b({V1, . . . , Vm0−1, ˜V})
+(
+log(2) + 2 log
+ m0−1
+X
+i=1
+|Vi| + |˜V|
+!)#
+(ii)
+⩽
+(m0+1
+Y
+i=1
+H(Vi)
+)
+× exp[b({Vm0, Vm0+1}){log(2) + 2 log(|˜V|)}]
+× exp
+"
+b({V1, . . . , Vm0−1, ˜V})
+(
+log(2) + 2 log
+ m0−1
+X
+i=1
+|Vi| + |˜V|
+!)#
+S16
+
+⩽
+(m0+1
+Y
+i=1
+H(Vi)
+)
+× exp
+"
+b({Vi}m0+1
+i=1
+)
+(
+log(2) + 2 log
+ m0+1
+X
+i=1
+|Vi|
+!)#
+,
+where in (ii) we apply Equation (S.19) to H(˜V) = H(Vm0 ∪Vm0+1). Thus, by induction, the lemma
+is proved.
+We furthermore extend Lemma S.16 to the following general result, where we do not require each
+Vi to be connected.
+Lemma S.17. Let {Vi}m
+i=1 be m vertex sets, with Vm ∩Vm′ = ∅if m ̸= m′. Write V = ∪m
+i=1Vi, we
+have
+m
+Y
+i=1
+H(Vi) ⩽H(V) ⩽
+( m
+Y
+i=1
+H(Vi)
+)
+× exp
+"
+b({Vi}m
+i=1)
+(
+2 log
+ m
+X
+i=1
+|Vi|
+!
++ log(2)
+)#
+.
+(S.20)
+Proof. We first perform decomposition on Vi such that Vi = ∪ni
+j=1Vij, where dG(Vij, Vij′) > 1 if j ̸= j′
+holds for all i = 1, . . . , m, each Vij is connected, and ni is the number of connected vertex sets for Vi.
+By the definition of H(·), we have
+m
+Y
+i=1
+H(Vi)
+=
+m
+Y
+i=1
+ni
+Y
+j=1
+H(Vij).
+On the other hand, note that V = ∪m
+i=1∪ni
+j=1Vij is a union of connected vertex sets {Vij}, after applying
+Lemma S.16, we have
+m
+Y
+i=1
+ni
+Y
+j=1
+H(Vij) ⩽
+H(V),
+and
+H(V)
+⩽
+m
+Y
+i=1
+ni
+Y
+j=1
+H(Vij) × exp
+"
+b({Vij}m,ni
+i=1,j=1)
+(
+log(2) + 2 log
+ m
+X
+i=1
+|Vi|
+!)#
+(i)
+=
+m
+Y
+i=1
+H(Vi) × exp
+"
+b({Vi}m
+i=1)
+(
+log(2) + 2 log
+ m
+X
+i=1
+|Vi|
+!)#
+,
+where the equality (i) uses the fact that dG(Vij, Vij′) > 1 if j ̸= j′. Combining the result above, the
+lemma is proved.
+S.7.2
+Proof of Proposition 4
+Recall that in our model, the domain partition π∗is induced from the contiguous partition of blocks
+V = {Bm}K2
+m=1, say π(V) = {V1, . . . , Vk}. In Section S.4, we have shown that π∗
+0 in Proposition 1 is
+induced from π0(V) = {V1,0, . . . , Vk0,0}. We give the proof of Proposition 4 as follows.
+Proof. Based on results in Section S.7.1, we have
+|{T : T can induce π∗}|
+S17
+
+(i)
+⩽
+
+
+
+k
+Y
+j=1
+H(Vj)
+
+
+×
+
+
+
+2(K −1)2
+k −1
+
+
+=
+
+
+k
+Y
+j=1
+H {∪k0
+l=1(Vj ∩Vl,0)}
+
+×
+
+
+
+2(K −1)2
+k −1
+
+
+
+(Lemma S.17)
+⩽
+
+
+k
+Y
+j=1
+
+
+
+
+
+k0
+Y
+l=1
+H{(Vj ∩Vl,0)}
+
+× exp(b[{(Vj ∩Vl,0)}k0
+l=1] × {4 log(K) + log(2)})
+
+
+
+
+×
+
+
+
+2(K −1)2
+k −1
+
+
+
+(ii)
+⩽
+
+
+k
+Y
+j=1
+
+
+
+
+
+k0
+Y
+l=1
+H{(Vj ∩Vl,0)}
+
+× exp{cK log(K)}
+
+
+
+
+×
+
+
+
+2(K −1)2
+k −1
+
+
+
+=
+
+
+k0
+Y
+l=1
+
+
+k
+Y
+j=1
+H{(Vj ∩Vl,0)}
+
+
+
+× exp{cK log(K)} ×
+
+
+
+2(K −1)2
+k −1
+
+
+
+(Lemma S.17)
+⩽
+
+
+k0
+Y
+l=1
+[H{∪k
+j=1(Vj ∩Vl,0)}]
+
+× exp{cK log(K)} ×
+
+
+
+2(K −1)2
+k −1
+
+
+
+(iii)
+⩽
+|{T : T can induce π∗
+0}| × exp{cK log(K)} ×
+
+
+
+2(K −1)2
+k −1
+
+
+.
+For inequality (i), we use the fact that each Vj is connected, thus H(Vj) is the number of spanning
+trees of Vj. 2(K −1)2 is the total number of graph edges, and
+
+
+
+2(K −1)2
+k −1
+
+
+is the number of
+possible ways of cutting edges of T ∈{T : T can induce π∗} to obtain π∗. For inequality (ii), we use
+the fact that b[{Vj ∩Vl,0, Vj ∩Vl′,0}] ⩽cK according to (S.6). For inequality (iii), we use the fact that
+∪k
+j=1(Vj ∩Vl,0) is connected since π∗
+0 is contiguous.
+Thus, for any partition π∗∈Ξ∗, we obtain
+|{T : T can induce π∗}|
+|{T : T can induce π∗
+0}| ⩽exp{cK log(K)} ×
+
+
+
+2(K −1)2
+k −1
+
+
+⩽exp{CK log(K)}.
+(S.21)
+S18
+
+References
+[1] Aldous, D. J. (1990). The random walk construction of uniform spanning trees and uniform labelled
+trees. SIAM Journal on Discrete Mathematics, 3(4):450–465.
+[2] Ascolani, F., Lijoi, A., Rebaudo, G., and Zanella, G. (2023). Clustering consistency with dirichlet
+process mixtures. Biometrika, 110(2):551–558.
+[3] Burton, R. and Pemantle, R. (1993). Local characteristics, entropy and limit theorems for spanning
+trees and domino tilings via transfer-impedances. Annals of Probability, 21(3):1329–1371.
+[4] Cadez, I. V., Gaffney, S., and Smyth, P. (2000). A general probabilistic framework for clustering
+individuals and objects. In Proceedings of the Sixth ACM SIGKDD International Conference on
+Knowledge Discovery and Data Mining, pages 140–149.
+[5] Dahl, D. B., Johnson, D. J., and M¨uller, P. (2022).
+Search algorithms and loss functions for
+bayesian clustering. Journal of Computational and Graphical Statistics, 31(4):1189–1201.
+[6] Dasgupta, A. and Raftery, A. E. (1998). Detecting features in spatial point processes with clutter
+via model-based clustering. Journal of the American Statistical Association, 93(441):294–302.
+[7] Denison, D. G., Mallick, B. K., and Smith, A. F. (1998). A bayesian cart algorithm. Biometrika,
+85(2):363–377.
+[8] Dobrin, R. and Duxbury, P. (2001).
+Minimum spanning trees on random networks.
+Physical
+Review Letters, 86(22):5076.
+[9] Feng, W., Lim, C. Y., Maiti, T., and Zhang, Z. (2016). Spatial regression and estimation of disease
+risks: A clustering-based approach. Statistical Analysis and Data Mining: The ASA Data Science
+Journal, 9(6):417–434.
+[10] Fraley, C. and Raftery, A. E. (2002). Model-based clustering, discriminant analysis, and density
+estimation. Journal of the American Statistical Association, 97(458):611–631.
+[11] Frick, K., Munk, A., and Sieling, H. (2014). Multiscale change point inference. Journal of the
+Royal Statistical Society Series B: Statistical Methodology, 76(3):495–580.
+[12] Frieze, A. M. (1985). On the value of a random minimum spanning tree problem. Discrete Applied
+Mathematics, 10(1):47–56.
+[13] Gnedin, A. and Pitman, J. (2006). Exchangeable gibbs partitions and stirling triangles. Journal
+of Mathematical Sciences, 138:5674–5685.
+S19
+
+[14] Gneiting, T. and Raftery, A. E. (2007). Strictly proper scoring rules, prediction, and estimation.
+Journal of the American Statistical Association, 102(477):359–378.
+[15] Gramacy, R. B. and Lee, H. K. H. (2008).
+Bayesian treed gaussian process models with an
+application to computer modeling. Journal of the American Statistical Association, 103(483):1119–
+1130.
+[16] Guha, A., Ho, N., and Nguyen, X. (2021).
+On posterior contraction of parameters and
+interpretability in bayesian mixture modeling. Bernoulli, 27(4):2159–2188.
+[17] Hu, G., Geng, J., Xue, Y., and Sang, H. (2023). Bayesian spatial homogeneity pursuit of functional
+data: an application to the us income distribution. Bayesian Analysis, 18(2):579–605.
+[18] Kim, H.-M., Mallick, B. K., and Holmes, C. C. (2005). Analyzing nonstationary spatial data using
+piecewise gaussian processes. Journal of the American Statistical Association, 100(470):653–668.
+[19] Knorr-Held, L. and Raßer, G. (2000). Bayesian detection of clusters and discontinuities in disease
+maps. Biometrics, 56(1):13–21.
+[20] Laurent, B. and Massart, P. (2000). Adaptive estimation of a quadratic functional by model
+selection. Annals of Statistics, pages 1302–1338.
+[21] Lee, C., Luo, Z. T., and Sang, H. (2021). T-loho: A bayesian regularization model for structured
+sparsity and smoothness on graphs. Advances in Neural Information Processing Systems, 34:598–
+609.
+[22] Lee, J., Gangnon, R. E., and Zhu, J. (2017). Cluster detection of spatial regression coefficients.
+Statistics in Medicine, 36(7):1118–1133.
+[23] Li, F. and Sang, H. (2019). Spatial homogeneity pursuit of regression coefficients for large datasets.
+Journal of the American Statistical Association, 114(527):1050–1062.
+[24] Lian, H. (2010). Posterior convergence and model estimation in Bayesian change-point problems.
+Electronic Journal of Statistics, 4(none):239–253.
+[25] Luo, Z. T., Sang, H., and Mallick, B. (2021a). Bast: Bayesian additive regression spanning trees
+for complex constrained domain. Advances in Neural Information Processing Systems, 34:90–102.
+[26] Luo, Z. T., Sang, H., and Mallick, B. (2021b). A Bayesian contiguous partitioning method for
+learning clustered latent variables. Journal of Machine Learning Research, 22(37):1–52.
+[27] Luo, Z. T., Sang, H., and Mallick, B. (2023). A nonstationary soft partitioned gaussian process
+model via random spanning trees. Journal of the American Statistical Association, 119:2105–2116.
+S20
+
+[28] Miller, J. W. and Harrison, M. T. (2018).
+Mixture models with a prior on the number of
+components. Journal of the American Statistical Association, 113(521):340–356.
+[29] Mu, J., Wang, G., and Wang, L. (2020). Spatial autoregressive partially linear varying coefficient
+models. Journal of Nonparametric Statistics, 32(2):428–451.
+[30] Nguyen, X. (2013). Convergence of latent mixing measures in finite and infinite mixture models.
+Annals of Statistics, 41(1):370–400.
+[31] Paci, L. and Finazzi, F. (2018).
+Dynamic model-based clustering for spatio-temporal data.
+Statistics and Computing, 28:359–374.
+[32] Page, G. L. and Quintana, F. A. (2016). Spatial product partition models. Bayesian Analysis,
+11(1):265–298.
+[33] Pan, T., Hu, G., and Shen, W. (2023). Identifying latent groups in spatial panel data using a
+markov random field constrained product partition model. Statistica Sinica, 30:2281–2304.
+[34] Prim, R. C. (1957). Shortest connection networks and some generalizations. The Bell System
+Technical Journal, 36(6):1389–1401.
+[35] Quintana, F. A., M¨uller, P., Jara, A., and MacEachern, S. N. (2022). The dependent dirichlet
+process and related models. Statistical Science, 37(1):24–41.
+[36] Schramm, O. (2000). Scaling limits of loop-erased random walks and uniform spanning trees.
+Israel Journal of Mathematics, 118(1):221–288.
+[37] Sugasawa, S. and Murakami, D. (2021).
+Spatially clustered regression.
+Spatial Statistics,
+44:100525.
+[38] Talley, L. (2011). Descriptive physical oceanography: an introduction. Academic Press.
+[39] Teixeira, L. V., Assuncao, R. M., and Loschi, R. H. (2015). A generative spatial clustering model
+for random data through spanning trees. In 2015 IEEE International Conference on Data Mining,
+pages 997–1002. IEEE.
+[40] Teixeira, L. V., Assun¸c˜ao, R. M., and Loschi, R. H. (2019). Bayesian space-time partitioning by
+sampling and pruning spanning trees. Journal of Machine Learning Research, 20:1–35.
+[41] Van Dongen, S. (2000). Performance criteria for graph clustering and markov cluster experiments.
+Report-Information Systems, (12):1–36.
+[42] Watanabe, S. and Opper, M. (2010). Asymptotic equivalence of bayes cross validation and widely
+applicable information criterion in singular learning theory. Journal of Machine Learning Research,
+11:3571–3594.
+S21
+
+[43] Willett, R., Nowak, R., and Castro, R. (2005). Faster rates in regression via active learning.
+Advances in Neural Information Processing Systems, 18.
+[44] Yu, S., Wang, G., and Wang, L. (2024).
+Distributed heterogeneity learning for generalized
+partially linear models with spatially varying coefficients.
+Journal of the American Statistical
+Association, 0(0):1–15.
+[45] Yu, S., Wang, G., Wang, L., Liu, C., and Yang, L. (2020). Estimation and inference for generalized
+geoadditive models. Journal of the American Statistical Association, 115:761–774.
+[46] Zeng, C., Miller, J. W., and Duan, L. L. (2023). Consistent model-based clustering using the
+quasi-bernoulli stick-breaking process. Journal of Machine Learning Research, 24(153):1–32.
+[47] Zheng, Y., Duan, L. L., and Roy, A. (2024). Consistency of graphical model-based clustering:
+robust clustering using bayesian spanning forest. arXiv preprint arXiv:2409.19129.
+[48] Zhong, Y., Sang, H., Cook, S. J., and Kellstedt, P. M. (2023). Sparse spatially clustered coefficient
+model via adaptive regularization. Computational Statistics & Data Analysis, 177:107581.
+S22

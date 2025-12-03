@@ -1,0 +1,289 @@
+arXiv:0711.4883v1  [stat.AP]  30 Nov 2007
+Comparison of Spline with Kriging in an
+Epidemiological Problem
+Roshanak Alimohammadi
+Department of Mathematics,
+Alzahra University,
+Tehran, Iran.
+Abstract
+There are various methods to analyze diﬀerent kinds of data sets. Spatial
+data is deﬁned when data is dependent on each other based on their respective
+locations. Spline and Kriging are two methods for interpolating and predicting
+spatial data. Under certain conditions, these methods are equivalent, but in
+practice they show diﬀerent behaviors.
+Amount of data can be observed only at some positions that are chosen
+as positions of sample points, therefore, prediction of data values in other
+positions is important. In this paper, the link between Spline and Kriging
+methods is described, then for an epidemiological two dimensional real data
+set, data is observed in geological longitude and in latitude dimensions, and
+behavior of these methods are investigated. Comparison of these performances
+show that for this data set, Kriging method has a better performance than
+Spline method.
+Key Words: Spatial data, Spline, Kriging.
+1
+Introduction
+To analyze every kind of data, a model of data structure can be considered. In
+spatial data analysis, a random ﬁeld {Z(t), t ∈D ⊂Rd} is applied for spatial data
+modeling, where t is the site of desired location and D is an index set. For each t,
+the random ﬁeld Z (t) can be decomposed as
+Z(t) = µ(t) + δ(t)
+(1)
+where µ(t) is the trend of random ﬁeld and δ(t) is a zero mean random ﬁeld. In
+spatial statistics, there are many methods for predicting the value of random ﬁeld at
+a given spatial site, say t0, using observations Z = (Z(t1), . . . , Z(tn))′ of the random
+ﬁeld Z(.) at n spatial sites t = (t1, . . . , tn). One of the methods, named Kriging, is
+the best unbiased predictor which has diﬀerent kinds such as Ordinary and Universal
+Krigings. In ordinary kriging, the trend term in relation (1) is ﬁxed and in universal
+kriging µ(t) is a function of t (cressie (1993)).
+1
+
+Spline is another method for spatial data prediction which minimizes penalized
+sum of squares criterion. For more details about Splines can refer to Green and
+Silverman (1994), Hart (2005) and Hardle (2006).
+Some authors studied the link between Spline and Kriging, as two prediction
+methods. Theoretical link between these methods is studied by Kent and Mardia
+(1994) and the applied link for some data sets is investigated by Hutchinson and
+Gessler (1994) and Lasslet (1994).
+In this paper these methods are applied for
+predicting values of data with two dimensional positions. This data set relates to
+taberculosis infection prevalence in some cities of Iran which observed in geological
+longitude and in latitude dimensions. A brief review of Kriging and Spline methods
+are given respectively in sections 2 and 3, and in section 4 these methods are applied
+for predicting rate of taberculosis infection prevalence, and performances of the
+methods are compared. Finally results and conclusions are given in section 5 and
+the better method to predict values of taberculosis infection prevalence is determined
+based on the data.
+2
+Kriging
+In Universal Kriging, the trend term in relation (1) is an unknown linear combination
+of known functions fj(.) with unknown coeﬃcients βj, that is
+µ(t) = ΣP +1
+j=1 βj−1fj−1(t)
+where β = (β0, ..., βp)′ ∈Rp+1, is an unknown vector of parameters. Furthermore,
+data Z can be written as
+Z = Xβ + δ
+where X is an n × (p + 1) matrix whose (i,j)th element is fj−1(ti).
+It is desired to predict Z(t0) linearly from data Z, that is
+ˆZ(t0) = λ′Z,
+λ′X = x′
+(2)
+which is uniformly unbiased (E[ ˆZ(t0)] = E[Z(t0)]), and minimizes the mean squares
+error term σ2
+e = E[( ˆZ(t0) −Z(t0))2] over λ = (λ1, ..., λn).
+Assumption λ′X = x′ in equation (2) is equivalent to uniformly unbiased con-
+dition, where x = (f0(t0), ..., fn(t0))′. Then the optimal value of λ in relation (2)
+is
+λ′ = [C + X(X′Σ−1X)−1(x −X′Σ−1C)]′ Σ−1
+(3)
+where C = (c(t0 −t1), ..., c(t0 −tn))′ and Σ is an n × n matrix with (i, j)th element
+c(ti −tj). The Kriging variance can be written as
+σ2(t0) = c(0) −C′Σ−1C + (x −X′Σ−1C)′(X′Σ−1X)−1(x −X′Σ−1C)
+(4)
+When p = 0 and f0(t) = 1, universal kriging reduce to ordinary kriging.
+2
+
+In universal kriging, the optimal value of λ (equation (3)) can be written as
+λU = Σ−1
+U CU where λU = (λ1, ..., λn, −m0, ..., −mp)′ and mis are lagrange multipliers
+that insure λ′X = x′ and CU = (c(t0 −t1), ...c(t0 −tn), 1, f1(t0), ..., fp(t0))′. Then
+kriging predictor at t0 is
+ˆZ(t0) = Z′
+UΣ−1
+U CU = V ′
+UCU
+(5)
+where VU = Σ−1
+U ZU , ZU = (Z(t1), ..., Z(tn), 0, ..., 0)′ which is an (n+p+1)×1 vector.
+In equation (5) by writing V ′
+U = (V ′
+1, V ′
+2) so that V1 is n × 1 and V2 is (p + 1) × 1,
+then VU = Σ−1
+U ZU =
+
+Σ
+X
+X′
+O
+−1 
+Z
+0
+
+=
+
+V1
+V2
+
+or
+
+Σ
+X
+X′
+o
+ 
+V1
+V2
+
+=
+
+Z
+0
+
+and dual kriging equations is obtained as
+
+ΣV1 + XV2 = Z
+X′V1 = 0
+(6)
+By solving this system and replacing in relation (2), predictor of Z(t0) can be written
+as
+ˆZ(t0) = V ′
+1C + V ′
+2x
+3
+Spline
+Data Z of random ﬁeld Z(.) is given at locations {ti ∈D ⊂Rd, d > 1}. Consider
+the problem of estimating unknown function g in the model
+Zi = g(ti) + ei,
+i = 1, ..., n
+(7)
+To ﬁt g properly, penalized sum of squares criterion is deﬁned as
+S(g, λ) = Σn
+i=1(Zi −g(ti))2 + αJd
+r+1(g)
+(8)
+where α > 0 is smoothing parameter. A function ˆg which minimizes penalized sum
+of squares criterion is called Spline. The second term in equation (8) is
+Jd
+r+1(g)
+=
+Z
+|∇r+1g(t)|2dt
+=
+Σ|m|=r+1
+r + 1
+m
+ Z
+(
+∂r+1g(t)
+∂t[1]m[1], . . . , ∂t[d]m[d] )2dt
+where ∇r+1 is (r + 1)-fold iterated gradient of g, t = (t[1], . . . , t[d]),
+Jd
+r+1(g) = Σ|m|=r+1
+r + 1
+m
+ Z
+(
+∂r+1g(t)
+∂t[1]m[1], . . . , ∂t[d]m[d] )2dt
+where m = (m[1], . . . , m[d]) and |m| = m[1] + · · · + m[d].
+For d = 2, a function ˆg which minimizes penalized sum of squares (8) is called
+Thin Plate spline. To determine a proper value of α can refer to Gu (2002), Hart
+(2005) and Hardle (2006).
+3
+
+Now ﬁnding dual equations for spline in case d=2 is considered (because dimen-
+sion of our data is d=2.) Smoothing Spline of degree 2 is
+ˆZ(t0) = a0 + a1x0 + a2y0 + Σn
+i=1bie(t0 −ti)
+(9)
+where
+e(h) = ||h||2 log(||h||2)/16π
+In relation (9), a = (a0, a1, a2)′ and b = (b1, . . . , bn)′ solve
+
+Kαb + Xa = Z
+X′b = 0
+(10)
+where Kα = K + nαI is an n × n matrix with (i, j)th elementary e(ti −tj), X is an
+n × 3 matrix with ith row (1, xi, yi), ti = (xi, yi)′ and 0 ≤α ≤∞is the smoothing
+parameter.
+4
+Application of Spline and Kriging to Prediction
+Dual equations (6) and (10) show that the form of these equations for universal
+kriging and spline are the same, just generalized covariance in Spline is used instead
+of covariogram.
+In kriging method, when the second order stationary condition
+does not satisﬁed or anyway the IRFk’s is used, generalized covariances are applied.
+Therefore dual equations of kriging and spline methods are equal. Consequently
+methods of kriging and spline are similar (theoretically), but they can be diﬀerent
+practically. In the next section these two methods are compared in an epidemiolog-
+ical problem.
+4.1
+Data Set and Practical Comparison
+Here data of taberculosis infection prevalence in the cities of Iran on the year 1999
+is considered. The random ﬁeld is nonstationary and data has a trend, therefore
+data is detrended by median polishing. To estimate covariogram, Classic estimator
+is applied and Gaussian model is chosen as the best model of covariogram for this
+data set.
+To compare the methods performances, a criterion should be considered. Cross
+validation is a popular means of assessing statistical estimation and prediction. If
+the variogram model described adequately spatial dependencies implicit in data set,
+then predicted value ˆZ(t0) should be close to the true value Z(t0). Ideally additional
+observations on Z (.) to check this, or initially some of the data might set aside to
+validate spatial predictor. More likely, all of the data are used to ﬁt the variogram,
+build the spatial predictor, and there is no possibility of taking more observations.
+In this case the cross validation approach can be used. Let 2γ(h, ˆθ) be the ﬁtted
+variogram model (obtained from the data); now delete a datum Z(tj) and predict it
+with
+ˆ
+Z−j(tj) [based on 2γ(h, ˆθ) variogram estimator and the data Z without Z(tj)].
+4
+
+Its associated mean - square prediction error is σ2
+−j(tj) which depends on the ﬁtted
+variogram model.
+The closeness of prediction values to the true values can be characterized as the
+standardized Mean Square error of Prediction
+MSP = [1/n(Σn
+i=1
+Z(tj) −ˆZ−j(tj)
+σ−j(tj)
+)2]1/2.
+In this paper, spline and kriging methods is compared by this criterion and the
+better method which has smaller MSP is determined. For this data set, gaussian
+model with nugget eﬀect equal to 39.8 is the best covariogram model to kriging
+prediction. In spline method the smoothing parameter should be determined and
+for this data set, the best value which minimizes penalized sum of squares criterion
+equals α = 208.6601.
+Cross validation criterion is applied to compare the methods.
+Programs for
+computations is written in R and SPLUS environments for the two dimensional
+data set.
+Cross validation criterion in kriging method is equal to 0.0239 and in
+spline method, it is equal to 0.0461.
+Consequently, kriging method has a better performance than spline for this data
+set. This result can be reasonable because in spline usually a special generalized
+covariance function is used but in kriging this function is characterized based on the
+data. Therefore for some data sets, kriging method could have better performance
+than spline.
+5
+Conclusion
+Under certain conditions kriging and spline methods are equivalent, but in prac-
+tice there are diﬀerences between these methods. For instance in spline usually a
+particular generalized covariance function is used but in kriging, this function is
+determined based on data, therefore it is expected that kriging has a better per-
+formance in some situations. In this paper these methods are applied to predict
+rate of taberculosis infection prevalence which is a noticeable problem in medicine.
+The data has measured at two dimensional sites and computations are carried out
+in R and SPLUS environments. For the data set, computations show that kriging
+method has a better performance than spline. Consequently application of Kriging
+can be a preferable method of prediction.
+References
+[1] Cressie, N. (1993), ”Statistics for Spatial Data”, New York, John Weily.
+[2] Green, P. J. and Silverman, B. W. (1994). ”Nonparametric Regression and
+Generalized Linear Models.”,London , Chapman and Hall.
+5
+
+[3] Gu, Ch. (2002), ”Smoothing Spline Anova Models”, Springer, UK.
+[4] Hardle, W. (2006), ”Smoothing Techniques:
+With Implementation in S
+(Springer Series in Statistics)”, Springer, UK.
+[5] Hart, J. D. (2005), ”Nonparametric Smoothing and Lack-Of-Fit Tests (Springer
+Series in Statistics)”, Springer, UK.
+[6] Hutchinson, M. f. and Gessler, F. R. (1994), ”Splines - More Than Just a
+Smooth Interpolator, Geoderma, 62, 45-67.
+[7] Kent, J. T. and Mardia, K. V. (1994). ”The Link Between Kriging and Thin-
+Plate Splines”, University of Leeds, U.K. , Department of Statistics.
+[8] Laslett, G. M. (1994), ”Kriging and Splines: An Emprical Comparision of Their
+Performance in Some Applications”, American Statistical Association., Vol. 89,
+No. 426, 391-400.
+6

@@ -1,0 +1,1569 @@
+arXiv:1311.2485v2  [quant-ph]  1 Dec 2013
+Continuous-time quantum error correction∗
+Ognyan Oreshkov
+QuIC, Ecole Polytechnique, CP 165, Universit´e Libre de Bruxelles, 1050 Brussels, Belgium.
+Continuous-time quantum error correction (CTQEC) is an approach to protecting quantum in-
+formation from noise in which both the noise and the error correcting operations are treated as
+processes that are continuous in time. This chapter investigates CTQEC based on continuous weak
+measurements and feedback from the point of view of the subsystem principle, which states that
+protected quantum information is contained in a subsystem of the Hilbert space. We study how to
+approach the problem of constructing CTQEC protocols by looking at the evolution of the state
+of the system in an encoded basis in which the subsystem containing the protected information is
+explicit. This point of view allows us to reduce the problem to that of protecting a known state,
+and to design CTQEC procedures from protocols for the protection of a single qubit. We show how
+previously studied CTQEC schemes with both direct and indirect feedback can be obtained from
+strategies for the protection of a single qubit via weak measurements and weak unitary operations.
+We also review results on the performance of CTQEC with direct feedback in cases of Markovian
+and non-Markovian decoherence, where we have shown that due to the existence of a Zeno regime in
+non-Markovian dynamics, the performance of CTQEC can exhibit a quadratic improvement if the
+time resolution of the weak error-correcting operations is high enough to reveal the non-Markovian
+character of the noise process.
+I.
+INTRODUCTION
+In the standard theory of quantum error correction, both the noise and the error-correcting operations are rep-
+resented by discrete transformations. If B(H) denotes the space of bounded operators over a Hilbert space H, and
+HS is the (ﬁnite-dimensional) Hilbert space of the controlled system, we say that the code subsystem HA in the
+decomposition
+HS = HA ⊗HB ⊕K
+(1)
+is correctable under the completely positive trace-preserving (CPTP) noise map E : B(HS) →B(HS), if there exists
+a CPTP error-correcting map R : B(HS) →B(HS), such that
+TrB{(PAB ◦R ◦E)(σ)} = TrB{σ},
+(2)
+for all σ ∈B(HS), σ = PAB(σ) ,
+where PAB(·) denotes the superoperator projector on B(HA ⊗HB).
+This formalism is fundamental for the understanding of preserved information under CPTP dynamics, but it
+depicts an idealized version of the error-correction process. It represents both the noise and the error-correcting
+operations as discrete CPTP maps, and assumes that error correction is applied after the noise. Such a picture is
+a good approximation for the case when we are concerned with error correction at a single instant via an operation
+which is fast on the time scale of the noise, or in the case of repeated error correction with fast operations in a
+regime where the accumulation of uncorrectable errors can be ignored. In general, however, a full error-correcting
+operation takes a ﬁnite time interval during which the noise process is on. Furthermore, even if we assume that
+error-correcting operations are instantaneous, deviations from perfect correctability between repeated corrections are
+unavoidable in any real situation. Thus in the case of non-Markovian dynamics, the system may develop correlations
+with the environment and the eﬀective error maps between successive corrections need not be completely positive.
+Therefore, a complete description must take into account the continuous nature of both the decoherence and the
+error-correction processes. Situations in which both these processes are regarded as continuous in time are the subject
+of continuous-time quantum error correction (CTQEC).
+The ﬁrst CTQEC model was proposed by Paz and Zurek (PZ) [20] as a method of studying the performance of
+repeated error correction with fast operations in the presence of Markovian decoherence. Rather than describing
+∗A chapter in the book Quantum Error Correction, edited by Daniel A. Lidar and Todd A. Brun, (Cambridge University Press, 2013),
+http://www.cambridge.org/us/academic/subjects/physics/quantum-physics-quantum-information-and-quantum-computation/quantum-error-correct
+
+2
+the overall evolution as a continuous decoherence process interrupted by instantaneous error-correcting operations
+at discrete intervals, the authors proposed to model the error-correcting procedure as a continuous quantum-jump
+process, which allows a description of the evolution of the system in terms of a continuous master equation in the
+Lindblad form [13]. In this model, the inﬁnitesimal error-correcting transformation that the density matrix of the
+controlled system undergoes during a time step dt is
+ρ →(1 −κdt)ρ + κdtR(ρ),
+(3)
+where R(ρ) is the completely positive trace-preserving (CPTP) map describing a full error-correcting operation, and
+κ is the error-correction rate. The full error-correcting operation R(ρ) can be thought of as consisting of a syndrome
+detection, followed (if necessary) by a unitary operation conditioned on the syndrome. The master equation describing
+the evolution of a system subject to Markovian decoherence plus error correction is then
+dρ
+dt = L(ρ) + κJ (ρ),
+(4)
+where L(ρ) is the Lindblad generator describing the noise process, and
+J (ρ) = R(ρ) −ρ
+(5)
+is the quantum-jump error-correction generator. The Lindblad generator has the form
+L(ρ) = −i[H, ρ] + 1
+2
+X
+j
+λj(2LjρL†
+j −L†
+jLjρ −ρL†
+jLj),
+(6)
+where H is a system Hamiltonian and the {Lj} are suitably normalized Lindblad operators describing diﬀerent error
+channels with decoherence rates λj. For example, the Lindbladian
+L(ρ) =
+X
+j
+λj(XjρXj −ρ),
+(7)
+where Xj denotes a local bit-ﬂip operator acting the jth qubit, describes independent Markovian bit-ﬂip errors.
+The quantum-jump model can be viewed as a smoothed version of the discrete scenario of repeated error correction,
+in which instantaneous full error-correcting operations are applied at random times with rate κ. It can also be looked
+upon as arising from a continuous sequence of inﬁnitesimal CPTP maps of the type (3). In practice, such a weak map
+is never truly inﬁnitesimal, but rather has the form
+ρ →(1 −ǫ2)ρ + ǫ2R(ρ),
+(8)
+where ǫ ≪1 is a small but ﬁnite parameter, and the weak operation takes a small but ﬁnite time τc. For times t much
+greater than τc, the weak error-correcting map (8) is well approximated by the inﬁnitesimal form (3), where the rate
+of error correction is
+κ = ǫ2/τc.
+(9)
+A weak map of the form (8) could be implemented, for example, by a weak coupling between the system and an
+ancilla via an appropriate Hamiltonian, followed by discarding of the ancilla. The continuous process in such a case
+corresponds to coupling the system to a stream of fresh ancillas which continuously pump out the entropy accumulated
+due to correctable errors. A closely related scenario, where the ancilla is continuously cooled in order to reset it to its
+initial state, was studied by Sarovar and Milburn in Ref. [23]. Another possible implementation of the above scheme
+is via weak measurements and weak unitary operations, as we will see in this chapter.
+If the set of errors {Lj} are correctable by the code, the eﬀect of the described CTQEC procedure is to slow
+down the rate at which information is lost, and in the limit of inﬁnite error-correction rate (strong error-correcting
+operations applied continuously often) the state of the system freezes and is protected from errors at all times [20].
+The eﬀect of freezing can be understood by noticing that the transformation arising from decoherence during a short
+time step ∆t, is
+ρ →ρ + L(ρ)∆t + O(∆t2),
+(10)
+i.e., the weight of correctable errors emerging during this time interval is proportional to ∆t, whereas uncorrectable
+errors (higher-order terms) are of order O(∆t2).
+Thus, if errors are constantly corrected, in the limit ∆t →0
+uncorrectable errors cannot accumulate and the evolution stops.
+
+3
+The idea of using continuous weak operations for error correction was developed further by Ahn, Doherty and
+Landahl (ADL) who proposed a scheme for CTQEC based on continuous measurements of the error syndromes and
+feedback operations conditioned on the measurement record [7]. A continuous measurement is one resulting from
+the continuous application of weak measurements, i.e., measurements whose outcomes change the state by a small
+amount [2, 3, 25, 26, 32, 35–37]. As shown in Refs. [25, 26], weak measurements can be used to generate any quantum
+operation and therefore provide a natural tool for approaching the problem of error correction in continuous time. In
+the ADL scheme, the evolution of the density matrix of the system subject to Markovian noise with Lindbladian L
+and continuous-time quantum error correction is described by the stochastic diﬀerential equation
+dρ(t) = L(ρ(t))dt + κ
+4
+X
+l
+D[Ml](ρ(t))dt +
+√κ
+2
+X
+l
+F[Ml](ρ(t))dWl(t)
+−i
+X
+r
+λr(ρ(t))[Hr, ρ(t)]dt,
+(11)
+where D[A](ρ) = AρA† −1
+2(A†Aρ + ρA†A), F[A](ρ) = Aρ + ρA† −ρTr[Aρ + ρA†], Ml are the stabilizer generators
+of the code, Wl are Wiener processes (see Sec. (IV A)), and Hr are correcting Hamiltonians that are turned on with
+strength λr(ρ) dependent on the state of the system. Note that the encoded information is in principle unknown,
+but the feedback is not conditioned on properties of the state related to the encoded information. Thus in order to
+estimate the state of the system at the present moment for the purpose of applying feedback, one can assume that
+the encoded state was initially the maximally mixed state. The parameters λr(ρ) are chosen so as to maximize the
+instantaneous increase of the code-space ﬁdelity, and are given by λr(ρ) = λsgnTr([Πc, Hr]ρ), where λ is the maximum
+strength of the control Hamiltonians and Πc is the projector on the code subspace. (Here the code is assumed to be
+a standard stabilizer code.)
+Following the ADL scheme, a number of variations of this approach were proposed (see, e.g., Refs. [5, 8, 24]). All
+these schemes are to a large extent heuristic, and their workings are not thoroughly understood. The diﬃculty in
+rigorously motivating the construction of error-correction protocols based on weak measurements and feedback is that
+stochastic evolutions are generally too complicated to study analytically. This is further complicated by the large
+dimension of the Hilbert space of all qubits participating in the code (note that even the problem of controlling a single
+qubit generally requires numerical treatment [21]). However, numerical simulations have shown that these schemes
+often lead to a better performance in the presence of continuous noise than the application of strong operations at
+ﬁnite time intervals. Therefore, the use of continuous measurements and feedback seems to oﬀer a promising tool for
+decoherence control.
+In this chapter, we will try to understand CTQEC and how to approach the problem of constructing CTQEC
+protocols by looking at the evolution of the state of the system in an encoded basis in which the subsystem containing
+the protected information is explicit. We will see that this point of view reduces the problem to that of protecting a
+known state, and allows for designing CTQEC procedures from protocols for the protection of a single qubit. We will
+show how the PZ quantum-jump model and the ADL and similar schemes with indirect feedback can be obtained
+from strategies for the protection of a single qubit based on weak measurements and weak unitary operations. We
+will also study the performance of CTQEC of the quantum-jump type in the case of Markovian and non-Markovian
+decoherence. We will show that due to the existence of a Zeno regime in non-Markovian dynamics, the performance
+of CTQEC can exhibit a quadratic improvement if the time resolution of the weak error-correcting operations is
+suﬃciently high to reveal the non-Markovian character of the noise process.
+II.
+CTQEC IN AN ENCODED BASIS
+As discussed in Chapter 6, correctable information is always contained in subsystems of the system’s Hilbert space
+[10, 29].
+This means, in particular, that if the information initially encoded in the subsystem HA in Eq. (1) is
+correctable after the noise map E, it is unitarily recoverable [9], i.e., there exists a unitary map U(·) = U(·)U †,
+U ∈B(HS), such that
+U ◦E(ρ ⊗τ) = ρ ⊗τ ′,
+τ ′ ∈B(HB′),
+(12)
+for all ρ ∈B(HA), τ ∈B(HB),
+where the subsystem HB′ can be diﬀerent from HB. Complete correction generally requires an additional CPTP map
+that transforms the operators on HB′ into operators on HB. As shown in Ref. [28], Eq. (12) is equivalent to the
+condition that the Kraus operators Mα of E satisfy
+MαP AB = U †IA ⊗CB→B′
+α
+, CB→B′
+α
+: HB →HB′, ∀α.
+(13)
+
+4
+Observe that if a particular set of error operators {Mi} is correctable by the code, that is, if any CPTP map whose
+Kraus operators are linear combinations of {Mi} is correctable, then there is a common recovery unitary U for all
+such CPTP maps. Note also that if the identity is among the correctable errors for which the code is designed (this
+is the case, in particular, for all stabilizer codes), from condition (13) it follows that the unitary U must leave the
+subsystem HA in HA ⊗HB invariant up to a transformation of the co-subsystem, HB →H ˜
+B (dimH ˜
+B = dimHB).
+This means that if we change the basis by the unitary map U, the eﬀect of the error operators M ′
+α = UMαU † in the
+new basis is
+M ′
+αP A ˜
+B = UMαP ABU † = IA ⊗C
+˜
+B→B′
+α
+, C
+˜
+B→B′
+α
+: H
+˜
+B →HB′, ∀α,
+(14)
+i.e., the errors leave the code subsystem invariant up to a transformation of the co-subsystem. A method of obtaining
+U can be found in Ref. [9].
+In what follows, we will imagine for concreteness the case of an [[n, 1, r, d]] operator stabilizer code. This is a code
+that encodes 1 qubit into n, has r gauge qubits, and has distance d. In the encoded basis deﬁned above, the Hilbert
+space of all n qubits can be written as
+HS = HA ⊗
+n−r−1
+O
+i=1
+Hs
+i ⊗
+r
+O
+j=1
+Hg
+j,
+(15)
+where HA is a subsystem which corresponds to the logical qubit, Hs
+i are the subsystems of the syndrome qubits, and
+Hg
+j are the subsystems of the gauge qubits. Up to a redeﬁnition of the basis of the syndrome qubits, we can assume
+that the subspace HA ⊗HB in Eq. (1) corresponds to
+HA ⊗HB = HA ⊗
+n−r−1
+O
+i=1
+|0⟩s
+i ⊗
+r
+O
+j=1
+Hg
+j .
+(16)
+We will refer to this subspace loosely as the code space, since this is where the state of the system is initialized, but
+we must keep in mind that the information of interest is contained in the tensor factor HA in Eq. (15). If each of the
+syndrome qubits is initialized in the state |0⟩, any correctable error will leave the subsystem HA invariant and will
+only aﬀect the co-subsystem, most generally transforming density operators on Nn−r−1
+i=1
+|0⟩s
+i ⊗Nr
+j=1 Hg
+j into density
+operators on Nn−r−1
+i=1
+Hs
+i ⊗Nr
+j=1 Hg
+j . In this basis, an error-correcting operation is simply a map on the syndrome
+qubits, which returns them to the state |00...0⟩. In the language of stabilizer codes, a measurement of the syndrome is
+a measurement of the state of all syndrome qubits in the {|0⟩, |1⟩} basis, and a correcting operation is any operation
+that eﬀectively realizes a bit ﬂip to those qubits which are in the state |1⟩.
+If the syndrome qubits are not properly initialized (as for example, after the occurrence of an error), a subsequent
+error generally would not leave the code subsystem invariant. Most generally, after a system subject to decoherence
+and error correction evolves for a given time t, the state of the system becomes
+ρS(t) = α(t)ρAg(t) ⊗
+n−r−1
+O
+i=1
+|0⟩⟨0|s
+i + (1 −α(t))eρAgs(t) + cross terms.
+(17)
+Here ρAg(t) is a density matrix on the Hilbert space HA ⊗Nr
+j=1 Hg
+j , eρAgs(t) is a density matrix with support on the
+orthogonal complement e
+H of the code space (HA ⊗Nn−r−1
+i=1
+|0⟩s
+i
+Nr
+j=1 Hg
+j ⊕e
+H = HS), α(t) ∈[0, 1] is the code-space
+ﬁdelity, and “cross terms” refers to linear combinations of terms of the form |ψi⟩⟨eφj| and |eφj⟩⟨ψi|, where {|ψi⟩} is an
+orthonormal basis of HA ⊗Nn−r−1
+i=1
+|0⟩s
+i ⊗Nr
+j=1 Hg
+j and {|eφi⟩} is an orthonormal basis of e
+H. The density matrix of
+the logical subsystem is ρA(t) = α(t)Trg(ρAg(t)) + (1 −α(t))Trgs(eρAgs(t)), where Trg denotes partial tracing over the
+gauge qubits and Trgs denotes partial tracing over the gauge qubits and the syndrome qubits. This density matrix
+is a transformed version of the state initially encoded in the code subsystem, where the transformation is the result
+of accumulation of uncorrectable errors. (Note that any transformation inside the subsystem HA in Eq. (15) is by
+deﬁnition uncorrectable.)
+Let us see how the density matrix ρA changes as a result of the action of the generator of noise during a time step
+∆t. Since by assumption the action of the noise generator leaves the code subsystem invariant up to a transformation
+of the co-subsystem, its eﬀect on the term αρAg(t) ⊗Nn−r−1
+i=1
+|0⟩⟨0|s
+i in Eq.(17) during a time step ∆t does not give
+rise to a non-trivial change in ρA(t), but only to a decrease in the code-space ﬁdelity,
+α(t) →α(t) −γ(t)α(t)∆t + O(∆t2),
+(18)
+
+5
+where γ(t) ≥0 is a parameter which depends on the characteristics of the noise process, such as the rates of diﬀerent
+errors, and possibly on the current density matrix of the gauge qubits inside the code space, TrA(ρAg(t)).
+Note
+that if the noise is non-Markovian, the leading-order correction to α(t) due to the action of the noise on αρAg(t) ⊗
+Nn−r−1
+i=1
+|0⟩⟨0|s
+i is O(∆t2), i.e., γ(t) = 0 (see Sec. V B). The only way errors can arise inside the subsystem HA is by
+the action of the noise mechanism on the other terms in Eq. (17). The weight of the second term is (1 −α(t)), and
+during a single time step the noise generator can give rise to a change in ρA(t)
+ρA(t) →ρA(t) + δρA(t),
+(19)
+where
+∥δρA(t) ∥≤B(1 −α(t))∆t + O(∆t2), B ≥0.
+(20)
+The constant B depends on the rate of the noise process, its characteristics and the characteristics of the code. From
+the positivity of the density matrix ρS one can show that the coeﬃcients in front of the cross terms |ψi⟩⟨eφj| and
+|eφj⟩⟨ψi| are at most
+p
+α(1 −α) in magnitude, and therefore the change that can result in ρA due to the action of the
+noise generator on the third term in Eq.(17) is limited by
+∥δρA(t) ∥≤C
+p
+α(1 −α(t))∆t + O(∆t2),
+(21)
+where C ≥0 is another constant dependent on the characteristics of the noise and the code. Thus we see that the
+rate of change of the density matrix ρA is upper bounded as follows:
+∥dρA
+dt
+∥≤B(1 −α(t)) + C
+p
+α(1 −α(t)).
+(22)
+In other words, if we manage to keep (1 −α(t)) small, we will suppress the rate of accumulation of uncorrectable
+errors. The goal of continuous-time quantum error correction can thus be understood as that of keeping the state of
+every syndrome qubit close to the state |0⟩.
+Notice that a strong error-correcting operation in this basis can be realized by bringing each of the syndrome qubits
+to the state |0⟩independently. Therefore, the problem of implementing a strong error-correcting operation in terms of
+weak operations can be reduced to the problem of implementing the corresponding single-qubit operations via weak
+single-qubit operations. Of course, this is not the most general way of realizing collective initialization of the syndrome
+qubits, but it is appealing because it reduces the task to that of addressing several independent qubits individually.
+We will see, however, that the performance can be enhanced if instead of addressing each of the syndrome qubits
+individually, we address each syndrome which can be associated with a qubit subspace in the space of the syndrome
+qubits. This will be discussed in the next section. Here we note that the operations in the original basis can be
+obtained by applying the inverse of the basis transformation to the operations in the encoded basis.
+To get an idea of what the transformation between bases looks like, let us consider as an example the three-qubit
+bit-ﬂip code with stabilizer generated by {IZZ, ZZI}. This code has logical codewords |0L⟩= |000⟩and |1L⟩= |111⟩
+and even though it only corrects bit-ﬂip errors and does not have gauge qubits, it captures all the characteristics of
+non-trivial codes which are pertinent to our discussion. It can be veriﬁed that a correcting unitary for this code is
+U = UcCX1,2CX1,3, where
+Uc = X1 ⊗|11⟩⟨11|23 + I1 ⊗(I2 ⊗I3 −|11⟩⟨11|23),
+(23)
+and CXi,j denotes the “controlled not” with qubit i being the control and qubit j the target. This unitary transforms
+the single-qubit bit-ﬂip error operators as
+XII →I ⊗(|00⟩⟨11| + |11⟩⟨00|) + X ⊗(|01⟩⟨10| + |10⟩⟨01|),
+IXI →I ⊗X ⊗|0⟩⟨0| + X ⊗X ⊗|1⟩⟨1|,
+IIX →I ⊗|0⟩⟨0| ⊗X + X ⊗|1⟩⟨1| ⊗X.
+(24)
+In this basis, when the second and third qubits are in the state |0⟩, the error operators leave the state of the ﬁrst
+qubit invariant. Going back to the original basis is achieved by applying the basis transformation backwards, i.e., by
+applying the unitary CX1,3CX1,2Uc.
+
+6
+III.
+QUANTUM-JUMP CTQEC WITH WEAK MEASUREMENTS
+A.
+The single-qubit problem
+In this section we will show how to implement the PZ quantum-jump error-correction scheme (Eq. (3)) using weak
+measurements in the encoded basis. We start with the problem of protecting a single qubit in the state |0⟩from noise
+using weak measurements. The state |0⟩can be thought of as a trivial stabilizer code with stabilizer generated by
+Z. We will ﬁrst consider the case of Markovian bit-ﬂip decoherence, since this model is simple and provides a good
+intuition. Later, we will extend the result to general noise models.
+A Markovian bit-ﬂip process is described by the master equation
+dρ(t)
+dt
+= γ(XρX −ρ).
+(25)
+where γ is the bit-ﬂip rate. The general solution to this equation is
+ρ(t) = 1 + e−2γt
+2
+ρ(0) + 1 −e−2γt
+2
+Xρ(0)X.
+(26)
+If the system starts in the state |0⟩⟨0|, without error correction it will decay down the Z-axis towards the maximally
+mixed state.
+In the language of stabilizer codes, an error-correcting operation for this code consists of a measurement of the
+stabilizer generator Z followed by a unitary correction. If the result is |1⟩, we apply a bit-ﬂip operation X, and if the
+result is |0⟩, we do nothing. The completely positive map corresponding to this strong error-correcting operation is
+R(ρ) = X|1⟩⟨1|ρ|1⟩⟨1|X + |0⟩⟨0|ρ|0⟩⟨0| = |0⟩⟨1|ρ|1⟩⟨0| + |0⟩⟨0|ρ|0⟩⟨0|.
+(27)
+One heuristic approach to making the above procedure continuous is to consider weak measurements of the stabilizer
+generator Z and weak rotations around the X-axis of the Bloch sphere conditioned on the measurement record. This
+is exactly the approach considered in the feedback procedures of the ADL type, and we will discuss it in Sec. IV A.
+Observe that the transformation (27) can also be written as
+R(ρ) = |0⟩⟨+|ρ|+⟩⟨0| + |0⟩⟨−|ρ|−⟩⟨0| =
+ZW|+⟩⟨+|ρ|+⟩⟨+|WZ + XW|−⟩⟨−|ρ|−⟩⟨−|WX,
+(28)
+where |±⟩= (|0⟩± |1⟩)/
+√
+2 and W is the Hadamard gate. Therefore the same error-correcting operation can be
+implemented as a measurement in the {|+⟩, |−⟩} basis (measurement of the operator X), followed by a unitary
+conditioned on the outcome: if the outcome is |+⟩, we apply ZW; if the outcome is |−⟩, we apply XW. This choice
+of unitaries is not unique—for example, we could apply just W instead of ZW after outcome |+⟩. But this particular
+choice has a convenient geometric interpretation—the unitary ZW corresponds to a rotation around the Y -axis by an
+angle π/2, ZW = ei π
+2
+Y
+2 , and XW corresponds to a rotation around the same axis by an angle −π/2, ZW = e−i π
+2
+Y
+2 .
+A weak version of the above error-correcting operation can be constructed by taking the corresponding weak
+measurement of the operator X, followed by a weak rotation around the Y -axis, whose direction is conditioned on
+the outcome:
+ρ →I + iǫ′Y
+p
+1 + ǫ′2
+r
+I + ǫX
+2
+ρ
+r
+I + ǫX
+2
+I −iǫ′Y
+p
+1 + ǫ′2 +
++ I −iǫ′Y
+p
+1 + ǫ′2
+r
+I −ǫX
+2
+ρ
+r
+I −ǫX
+2
+I + iǫ′Y
+p
+1 + ǫ′2 .
+(29)
+Here ǫ and ǫ′ are small parameters. Note that the fact that we describe the net result of the transformation by a
+CPTP map means that after we apply feedback, we discard information about the outcome of the measurement, or
+rather, we do not condition any future operations on that information and therefore the transformation of the average
+density matrix during a single time step is given by Eq. (29). Such a scheme is said to be based on direct feedback,
+i.e., the feedback Hamiltonian depends only on the outcome of the most recent measurement, which does not require
+information processing of the measurement record. Generally, discarding information leads to suboptimal protocols,
+and we will discuss the possibility of improving that scheme in Sec. IV A.
+From the symmetry of the map (29) it can be seen that if the map is applied to a state which lies on the Z-axis, it
+will keep the state on the Z-axis. Whether the state will move towards |0⟩⟨0| or towards |1⟩⟨1|, depends on the relation
+
+7
+between ǫ and ǫ′. Since our goal is to protect the state from drifting away from |0⟩⟨0| due to bit-ﬂip decoherence, for
+now we will assume that the state lies on the Z-axis in the northern hemisphere. We would like, if possible, to choose
+the relation between the parameters ǫ and ǫ′ in such a way that the eﬀect of this map on any state on the Z-axis to
+be to move that state towards |0⟩⟨0|.
+In order to calculate the eﬀect of this map on a given state, it is convenient to write the state in the {|+⟩, |−⟩}
+basis. For a state on the Z-axis, ρ = α|0⟩⟨0| + (1 −α)|1⟩⟨1|, we have
+ρ = 1
+2|+⟩⟨+| + 1
+2|−⟩⟨−| + (2α −1)
+1
+2|+⟩⟨−| + 1
+2|−⟩⟨+|
+
+.
+(30)
+For the action of our map on the state (30) we obtain:
+ρ →1
+2|+⟩⟨+| + 1
+2|−⟩⟨−|
++(1 −ǫ′2)
+√
+1 −ǫ2(2α −1) + 2ǫǫ′
+1 + ǫ′2
+1
+2|+⟩⟨−| + 1
+2|−⟩⟨+|
+
+.
+(31)
+Thus we can think that upon this transformation the parameter α transforms to α′, where
+2α′ −1 = (1 −ǫ′2)
+√
+1 −ǫ2(2α −1) + 2ǫǫ′
+1 + ǫ′2
+.
+(32)
+If it is possible to choose the relation between ǫ and ǫ′ in such a way that α′ ≥α for every 0 ≤α ≤1, then clearly
+the state must remain invariant when α = 1. Imposing this requirement, we obtain
+ǫ =
+2ǫ′
+1 + ǫ′2 ,
+(33)
+or equivalently
+ǫ′ = 1 −
+√
+1 −ǫ2
+ǫ
+.
+(34)
+Substituting back in (32), we can express
+α′ −α =
+4ǫ′2
+(1 + ǫ′2)2 (1 −α) ≥0.
+(35)
+We see that the coeﬃcient α (which is the ﬁdelity of the state with |0⟩⟨0|) indeed increases after every application of
+our weak completely positive map. The amount by which it increases for ﬁxed ǫ′ depends on α and becomes smaller
+as α approaches 1.
+Since we will be taking the limit ǫ →0, we can write Eq. (34) as
+ǫ′ = ǫ
+2 + O(ǫ3).
+(36)
+If we deﬁne the relation between the time step τc and ǫ as in Eq. (9), for the eﬀect of the CPTP map (29) on an
+arbitrary state of the form ρ = α|0⟩⟨0| + β|0⟩⟨1| + β∗|1⟩⟨0| + (1 −α)|1⟩⟨1|, α ∈R, β ∈C, we obtain
+α →α + (1 −α)κτc,
+(37)
+β →√1 −κτcβ = β −1
+2κβτc + O(τc2).
+(38)
+This is exactly the map (8) for R(ρ) given by Eq. (27).
+We see that for an inﬁnitesimal time step dt, the eﬀect of the noise is to decrease α(t) by the amount λ(2α(t)−1)dt
+and that of the correcting operation is to increase it by κ(1 −α(t))dt. Combining both eﬀects, we obtain the net
+master equation that describes the evolution of the qubit subject to Markovian bit-ﬂip errors and the quantum-jump
+error-correction scheme:
+dα(t)
+dt
+= −(κ + 2λ)α(t) + (κ + λ).
+(39)
+
+8
+The solution is
+α(t) = (1 −α∗)e−(κ+2λ)t + α∗,
+(40)
+where
+α∗= 1 −
+1
+2 + r,
+(41)
+and r = κ/λ is the ratio between the rate of error correction and the rate of decoherence. We see that the ﬁdelity
+decays, but it is conﬁned above its asymptotic value α∗which can be made arbitrarily close to 1 for suﬃciently large
+r.
+Finally, let us show that this procedure works for any kind of decoherence where the state need not remain on
+the Z-axis at all times. From Eq. (38) we see that the eﬀect of a single application of the map to a general state
+is to transfer a small portion of the |1⟩⟨1|-component to |0⟩⟨0|, and to decrease the magnitude of the oﬀ-diagonal
+components by multiplying them by √1 −κτc. If there is noise, the most general negative eﬀect of a single step of
+the noise process is to increase the magnitude of β and decrease α. For a realistic physical map, the amounts by
+which these components change during a time step ∆t should tend to zero when ∆t →0. Since ultimately any noise
+process is driven by a Hamiltonian acting on the system and its environment, this means that for small ∆t, each of
+these amounts can be upper-bounded by γmax∆t, where γmax is some ﬁnite positive number. Therefore, if the system
+is simultaneously subject to decoherence and error correction, |β| and (1 −α) will not increase above certain values
+for which the single-step eﬀects of decoherence and error-correction exactly cancel each other. We can upper-bound
+these quantities by
+(1 −α)max = γmax
+κ
+,
+(42)
+|β|max = 2γmax
+κ
+.
+(43)
+This means that the state can be kept arbitrarily close to |0⟩⟨0| for suﬃciently high rates of error correction κ. In
+Sec. V we will see that if the noise is non-Markovian, (1 −α)max scales as
+1
+κ2 for large κ!
+We remark that one way of implementing the weak measurement of the X operator used in this scheme, is by
+coupling the system qubit to an ancilla qubit prepared in the state |+⟩⟨+| for a short time, via the Hamiltonian
+HX = −X ⊗Y where X acts on the system qubit and Y acts on the ancilla, followed by a measurement of the ancilla
+in the {|0⟩, |1⟩} basis (the latter can be destructive). It can be veriﬁed that if we ﬁrst apply the unitary transformation
+UX(ǫ) = exp i ǫ
+2X ⊗Y followed by a measurement of the ancilla, up to second order in ǫ the resulting measurement
+on the system is
+ρ →
+q
+I±ǫX
+2
+ρ
+q
+I±ǫX
+2
+p±
+,
+(44)
+with probabilities p± = 1
+2(1 ± ǫTr(Xρ)). Since we are interested in the limit where ǫ →0, only the lowest-order
+nontrivial contributions to the error-correcting CPTP map are important, and they are of order ǫ2.
+B.
+General codes
+How do we extend this approach to general codes? As we mentioned earlier, one way is to simply apply the described
+operation to each of the syndrome qubits in the encoded basis. According to the argument in the previous subsection,
+no matter what the exact form of the noise process on the syndrome qubits is, this scheme will keep each of them close
+to the state |0⟩⟨0| within some distance that can be made arbitrarily small for suﬃciently large error-correction rates.
+This in turn would ensure that the code-space ﬁdelity is close to 1, which would suppress the rate of accumulation of
+uncorrectable errors as argued in Sec. II. This approach is particularly attractive because of its conceptual simplicity
+and the fact that it involves operations only on each of the syndrome qubits whose number n−r−1 is smaller than the
+number of diﬀerent nontrivial correctable errors which can be up to 2n−r−1 −1. Furthermore, it is obvious that the
+operations on the diﬀerent qubits commute and therefore can be applied simultaneously. However, it is not diﬃcult
+to see that even though the equivalent inﬁnitesimal map has the form (3), the eﬀective R(ρ) is not equal to the error
+correcting map for this code, where the latter acts as
+R(ρs) =
+n−r−1
+O
+i=1
+|0⟩⟨0|s
+i
+(45)
+
+9
+for any state ρs of all syndrome qubits. This is because, if we apply error correction separately on the diﬀerent qubits,
+up to ﬁrst order in dt only those terms in which there is one qubit in the state |1⟩and all the rest are in the state
+|0⟩(such as, e.g., |10...0⟩⟨10...0|) will get mapped to |00...0⟩⟨00...0|. The full error-correcting map, however, maps all
+states to the state |00...0⟩⟨00...0| and therefore it is more powerful. Is there a way to construct the full map based on
+the single-qubit operations described in the previous subsection?
+It turns out that the answer is yes. The idea is to associate an abstract qubit to each non-trivial error syndrome in
+the code as follows. As was mentioned earlier, each syndrome corresponds to a state of the syndrome qubits of the form
+|ν1ν2...νn−r−1⟩, where νi can be either 0 or 1. Let us label these diﬀerent syndrome states by |is⟩, is = 0, ..., 2n−r−1−1,
+with |0s⟩= |00...0⟩being the trivial syndrome corresponding to “no error”. The density matrix of the entire system
+can then be written
+ρS = α(t)ρAg(t) ⊗|0s⟩⟨0s| +
+X
+is≥1
+βis eρAg
+is (t) ⊗|is⟩⟨is|
++
+X
+is̸=js
+σAg
+isjs(t) ⊗|is⟩⟨js|,
+(46)
+where eρAg
+is (t) are density matrices on HA ⊗Nr
+j=1 Hg
+j , βis ≥0 are the weights of the state inside the diﬀerent error
+subspaces, and σAg
+isjs(t) are operators on HA ⊗Nr
+j=1 Hg
+j.
+To each nontrivial syndrome we can associate a qubit subspace of the space of all syndrome qubits, which is spanned
+by the state |0s⟩and the state |is⟩corresponding to that syndrome. Let us take for concreteness one of these qubits—
+the subspace spanned by |0s⟩and |1s⟩. If we apply the single-qubit operations described in the previous subsection to
+this subspace while acting trivially on its orthogonal complement, the eﬀect of the resulting operation on the terms
+β1s eρAg
+1s (t) ⊗|1s⟩⟨1s| + σAg
+0s1s(t) ⊗|0s⟩⟨1s| + σAg
+1s0s(t) ⊗|1s⟩⟨0s| in Eq. (46) will be the same as that of the quantum-jump
+error correcting map (3) with R(ρ) given by Eq. (45). At the same time, the eﬀect on the rest of the terms will be
+trivial. Therefore, if we apply the analogous operation to each of the qubit subspaces spanned by |is⟩and |0s⟩, we
+will eﬀectively realize the desired quantum-jump error correcting map.
+Observe that all these single-qubit maps commute and so do the generators they give rise to in the corresponding
+continuous quantum-jump equation.
+If we think of the resulting processes as being driven by the action of the
+quantum-jump generators, then it is obvious that all of them can be implemented simultaneously. However, if we
+think of each of these maps as resulting from weak measurements and weak unitary operations as described in the
+previous subsection, the measurements and unitaries do not commute. For example, the X operator for the jth
+s qubit
+has the form Xjs = |js⟩⟨0s|+ |0s⟩⟨js|, and therefore [Xis, Xjs] = |is⟩⟨js|−|js⟩⟨is|. This means that the measurements
+of the X operators cannot be implemented simultaneously on all qubits. The same holds for the rotations around
+the Y -axes. Does this mean that we have to apply the diﬀerent operations in series? This would require the ability
+to precisely turn on and oﬀ, on a very short time scale, the couplings to the external ﬁelds needed for the diﬀerent
+measurements, which does not correspond to a continuous measurement.
+It turns out that alternating the diﬀerent couplings is not needed—the same couplings that one would use for
+implementing the weak measurements on the individual qubits can be turned on simultaneously, and so can the
+feedback Hamiltonians that one would use depending on the outcomes of the diﬀerent measurements. This is because
+all extra terms that arise from the fact that the operations on the diﬀerent qubits do not commute, cancel out when
+we average over the outcomes. We outline how this can be veriﬁed using the implementation of the weak measurement
+via a qubit ancilla described at the end of Sec. III A. For each of the qubits corresponding to diﬀerent syndromes,
+we will need to turn on a diﬀerent Hamiltonian that couples that qubit to a separate ancilla initially prepared in the
+state |+⟩. Let us label the ancilla corresponding to the jsth qubit also by js. If we turn on all of these Hamiltonians
+simultaneously, the overall Hamiltonian is
+Hmeas = −
+X
+js
+Xjs ⊗Y a
+js,
+(47)
+where the Y a
+js act on the diﬀerent ancilla systems but the Xjs do not act on diﬀerent systems and do not commute.
+Imagine that this Hamiltonian acts for time ǫ
+2, i.e., it gives rise to the unitary U = exp( iǫ
+2
+P
+js Xjs ⊗Y a
+js). At this
+point we can measure projectively each of the ancillas in the {|0⟩, |1⟩} basis and turn on the corresponding single-qubit
+correction Hamiltonians ξjsYjs where ξjs = ±1 is the sign of the Hamiltonian which depends on the outcome of the
+measurement, and Yjs = i|js⟩⟨0s| −i|0s⟩⟨js|. The overall feedback Hamiltonian is
+Hfb =
+X
+js
+ξjsYjs.
+(48)
+
+10
+One can verify that up to second order in ǫ, the resulting operation after averaging over the outcomes is exactly equal
+to the quantum jump operation (3) with R(ρ) given by Eq. (45). The easiest way to see this is to observe that all
+unwanted terms in the resulting density matrix are proportional to ξisξjs, is ̸= js, and therefore when we sum over
+all diﬀerent outcomes, these terms disappear.
+To get an idea of what the weak measurements and feedback unitaries mean in the original basis, let us look again
+at the three-qubit bit-ﬂip code. Observe that the syndrome states |i⟩s in the encoded basis are |1s⟩= |10⟩, |2s⟩= |01⟩,
+|3s⟩= |11⟩, i.e., the three abstract qubits corresponding to these syndromes have X and Y operators
+X1s = I ⊗(|10⟩⟨00| + |00⟩⟨10| + |01⟩⟨01| + |11⟩⟨11|),
+X2s = I ⊗(|01⟩⟨00| + |00⟩⟨01| + |10⟩⟨10| + |11⟩⟨11|),
+X3s = I ⊗(|11⟩⟨00| + |00⟩⟨11| + |01⟩⟨01| + |10⟩⟨10|),
+(49)
+Y1s = I ⊗(i|10⟩⟨00| −i|00⟩⟨10| + |01⟩⟨01| + |11⟩⟨11|),
+Y2s = I ⊗(i|01⟩⟨00| −i|00⟩⟨01| + |10⟩⟨10| + |11⟩⟨11|),
+Y3s = I ⊗(i|11⟩⟨00| −i|00⟩⟨11| + |01⟩⟨01| + |10⟩⟨10|).
+(50)
+By applying the inverse basis transformation CX1,3CX1,2Uc with Uc given by Eq. (23), we obtain these operators in
+the original basis:
+X′
+1s = 1
+2ZXZ + 1
+2IXI + 1
+2III −1
+2ZIZ,
+X′
+2s = 1
+2ZZX + 1
+2IIX + 1
+2III −1
+2ZZI,
+X′
+3s = 1
+2XZZ + 1
+2XII + 1
+2III −1
+2IZZ,
+(51)
+Y ′
+1s = 1
+2ZY I + 1
+2IY Z + 1
+2III −1
+2ZIZ,
+Y ′
+2s = 1
+2IZY + 1
+2ZIY + 1
+2III −1
+2ZZI,
+Y ′
+3s = 1
+2Y ZI + 1
+2Y IZ + 1
+2III −1
+2IZZ.
+(52)
+We see that implementing the PZ scheme using weak measurements and unitary operations requires the ability to
+apply Hamiltonians which are complicated sums of diﬀerent elements of the Pauli group. We will postpone the analysis
+of the performance of that scheme in the presence of decoherence until Sec. V. We now turn to look at alternative
+methods for protecting a single qubit from noise using weak measurements, and their corresponding generalizations
+to multi-qubit codes.
+IV.
+SCHEMES WITH INDIRECT FEEDBACK
+A.
+The single-qubit problem
+We already mentioned that another way of “continuization” of the discrete single-qubit error-correcting map (27)
+is to apply continuous measurements of the stabilizer generator Z and rotations around the X-axis conditioned on
+the measurement record. A continuous measurement of the operator Z can be achieved by an inﬁnite repetition of a
+weak measurement with measurement operators
+M Z
+±(ǫ) =
+r
+I ± tanh(ǫ)Z
+2
+.
+(53)
+The evolution of the state of the system under such observation can be described by a random walk along a curve
+parameterized by x ∈R. The state at any moment during the procedure can be written in the form
+ρ(x) =
+M Z(x)ρ(0)M Z(x)
+Tr(M Z(x)ρ(0)M Z(x))
+(54)
+
+11
+for some value of x, where M Z(x) =
+p
+(I + tanh(x)Z)/2 and ρ(0) is the initial state. After every application of
+the weak measurement M Z
+±(ǫ), the parameter x changes to x ± ǫ depending on the outcome. The two projective
+measurement outcomes of the strong measurement of Z correspond to x = ±∞. The procedure is continued until
+|x| ≥X for some X which is suﬃciently large that M Z(X) ≈|0⟩⟨0| and M Z(−X) ≈|1⟩⟨1| to any desired precision
+[25].
+In the limit when ǫ →0, the evolution of the state of the system can be described by a continuous stochastic
+diﬀerential equation. We can introduce a time step δt and a rate
+κ = ǫ2/δt.
+(55)
+Then we can deﬁne a mean-zero increment δW as follows:
+δW = (δx −M[δx])/√κ,
+(56)
+where δx = ±ǫ and M[δx] is the mean of δx,
+M[δx] = ǫ(p+(x) −p−(x)).
+(57)
+Here p±(x) are the probabilities for the two outcomes of the weak measurement M Z
+±(ǫ) at the point x,
+p±(x) = 1
+2(1 ± ǫ⟨Z⟩x),
+(58)
+with ⟨Z⟩x = Tr(Zρ(x)). Note that M[(δW)2] = δt + O(δt2).
+Expanding the change of the state under the measurement M Z
+±(ǫ) up to second order in δW, and taking the limit
+δW →0 while keeping the rate κ ﬁxed, it can be shown that the evolution of the state of the system subject to such
+a continuous observation is described by the following stochastic diﬀerential equation:
+dρ(t) = κ
+4 D[Z](ρ(t))dt +
+√κ
+2 F[Z](ρ(t))dW(t).
+(59)
+Here dW(t) is a Wiener increment, i.e., a mean-zero normally distributed random variable with variance dt. The
+evolution of the parameter x is given by
+dx(t) = κ⟨Z⟩tdt + √κdW(t),
+(60)
+where ⟨Z⟩t = Tr(Zρ(t)). From x(t) one can deﬁne the average measurement current as the mean of dx(t)/dt,
+Iave
+x
+(t) = κ⟨Z⟩t.
+(61)
+If we apply no error correction to our qubit (initially in the state |0⟩⟨0|), under bit-ﬂip decoherence its state will drift
+down the Z-axis of the Bloch sphere towards the center of the sphere (the maximally mixed state). According to the
+scheme proposed in Ref. [7], at a given moment we apply a weak measurement of the stabilizer Z and a weak rotation
+around the X-axis, which depends on the state of the system at that moment. In the simpliﬁed version of that scheme
+in Ref. [24], the feedback is condition only on an estimate of the average measurement current. If at a given moment
+the state is somewhere along the Z-axis, i.e., ρ = α|0⟩⟨0| + (1 −α)|1⟩⟨1|, 0 ≤α ≤1, the eﬀect of a weak measurement
+would be to move the state slightly up or down along the axis depending on the outcome. It is easy to see that the
+result of such a measurement does not change the value of α on average, because M Z
++(ǫ)ρM Z
++(ǫ)+M Z
+−(ǫ)ρM Z
+−(ǫ) = ρ.
+One is then led to ask whether including feedback could improve the average ﬁdelity. The answer depends on whether
+the state lies in the northern or the southern hemisphere of the Bloch sphere. If the state lies on the Z-axis in
+the northern hemisphere, it is not possible to improve its ﬁdelity by feedback. Assuming that the measurement is
+suﬃciently weak so that the negative outcome M Z
+−(ǫ)ρM Z
+−(ǫ)/Tr(M Z
+−(ǫ)ρM Z
+−(ǫ)) is still in the northern hemisphere,
+no unitary operation can bring any of the two outcomes closer to the north pole since unitary operations preserve the
+distance from the center. On the contrary, a unitary rotation around the X-axis would move both outcomes away
+from the Z-axis and therefore away from the target.
+In the ADL scheme there is no risk for the feedback to decrease the ﬁdelity with the target state because the
+feedback is conditioned on the current state and always tends to increase the ﬁdelity with the code space; if the
+state lies on the Z-axis in the northern hemisphere, no rotation would be applied. However, during initial times that
+scheme would not be helpful for increasing the average value of α either, because a weak measurement keeps the
+state on the Z-axis in the northern hemisphere. If we go to the continuous limit, ǫ →0, the Wiener parameter is
+normally distributed and during an inﬁnitesimal time step the state may enter the southern hemisphere, but with a
+
+12
+negligible probability. Thus during initial times, the scheme would not be helpful with respect to the average ﬁdelity,
+and only after the probability for the state to enter the southern hemisphere becomes signiﬁcant will it start to have
+an eﬀect. This intuition is conﬁrmed by the numerical simulations of a generalization of this protocol to multi-qubit
+codes presented in Ref. [7].
+In the scheme in Ref. [24], the feedback is not conditioned on the state but on an estimate of the average measurement
+current (61). The idea is that by ﬁltering the noisy measurement data obtained during some short time interval before
+a given moment t, we can try to obtain an estimate of the average change of x(t) with time at that moment, i.e.,
+an estimate of ⟨Z⟩t. But clearly such an estimate cannot be precise, because it would mean that we could measure
+the expectation value of an observable almost without disturbing the state. Therefore, any such estimate inevitably
+carries imprecision. For example, it could be that the state of the system is |0⟩⟨0| but we obtain a sequence of negative
+outcomes which give rise to the eﬀective measurement operator M Z(x) =
+p
+I + tanh(x)Z with x < 0. This can occur
+with ﬁnite probability and it would suggest that the state lies in the southern hemisphere, while the state will remain
+|0⟩⟨0| under this measurement. In such a case, this scheme would apply a rotation which would take the state away
+from the target state, i.e., during short initial times this scheme could have a negative eﬀect. Nevertheless, as time
+progresses, more and more trajectories enter the southern hemisphere and the scheme may lead to an improvement of
+the average ﬁdelity with the target state at later times. Indeed, numerical simulations have conﬁrmed the eﬃciency
+of this scheme and its generalization to multi-qubit codes in certain parameter regimes [24].
+We point out that the two general strategies for the protection of a qubit that we considered—the one involving
+continuous measurement of the X operator and direct feedback (the quantum-jump scheme), and the one involving
+continuous measurements of the Z operator and indirect feedback (the ADL and similar schemes)—strongly resemble
+two optimal protocols for the puriﬁcation of a qubit discussed in Refs. [21] and [15]. In Ref. [21] it was shown that
+the fastest increase on average of the purity of a single qubit using weak measurements is achieved if the qubit is
+measured in a basis perpendicular to the axis in the Bloch sphere that connects the current state with the center of
+the sphere. If we assume that we can apply fast unitary rotations on the time scale of the measurements, the fastest
+preparation of a qubit in the state |0⟩⟨0| can be achieved by measuring the state in the eigenbasis of X, and after
+every weak measurement apply a rotation around the Y -axis that brings this state to the Z-axis. This is almost the
+same as the quantum-jump scheme, except that we did not assume that we can apply an arbitrarily strong and precise
+rotation that brings each outcome on the Z-axis, but only a rotation which would bring the state to the north pole
+if it was there before the measurement.
+In Ref. [21], on the other hand, it was shown that if we are interested in the average time that it would take to purify
+the qubit to a certain degree, we have to measure it along the axis that connects it with the center of the Bloch sphere.
+Again, if we assume that we can apply arbitrarily fast rotations, the optimal average time for preparing a qubit in the
+state |0⟩⟨0| with some precision can be achieved if we measure the qubit in the eigenbasis of Z and whenever the qubit
+enters the southern hemisphere, apply rotations around the X-axis that bring it to the northern half of the Z-axis.
+The diﬀerence of the ADL scheme from this approach is again that the ADL scheme does not assume inﬁnitely fast
+and precise rotations. Thus we see that the two competitive error-correction schemes we discussed can be regarded
+as originating from two optimal protocols for the preparation of a qubit in a known state—one that optimizes the
+average ﬁdelity with the target state, and another that optimizes the average time to reach the target state.
+Of course, this does not mean that the two schemes we described are optimal for the resources they use.
+In
+the quantum jump scheme, for example, we discard information about the outcome of the measurement after every
+feedback operation. If we keep this information and estimate the current state, we can in principal improve the
+performance of the scheme. Let us say that the state is somewhere far from the Z-axis. Since each of the outcomes
+of the weak measurement change the state by a small amount, after either outcome we will have to apply rotations
+in the same direction in order to bring the state closer to the Z-axis. If we do not keep track of the actual state,
+however, we would apply rotations in opposite directions after the two diﬀerent outcomes. But it turns out that the
+improvement we can gain by keeping track of the actual states is small. It can be veriﬁed that even if we assume that
+we are able to apply inﬁnitely fast and precise rotations, i.e., that we can bring the state on the Z-axis after every
+weak measurement outcome, if the measurement strength is ﬁxed, the correction to the quantity (1 −αM
+∗) (Eq. (41))
+we can obtain is of order O((1 −αM
+∗)2). But as we argued in Sec. II and will discuss further in Sec. V, this is the
+quantity that is responsible for the eﬀective decrease of the error rate in a general code. In that sense, the performance
+of the quantum-jump scheme is very close to optimal when (1−αM
+∗) is small, even though the scheme requires no side
+information processing. Note, however, that we assumed that at the level of a single weak operation we can ensure
+a particular relation between the measurement strength and the strength of the correcting rotation—Eq. (36). If we
+cannot apply a suﬃciently strong rotation to keep the state |0⟩⟨0| invariant, the equilibrium ﬁdelity with the target
+state α∗would be lower.
+
+13
+B.
+Generalizations to multi-qubit codes
+A natural extension of the single-qubit schemes with indirect feedback to non-trivial codes can be obtained simply
+by applying these schemes to the syndrome qubits in the encoded basis with the purpose of keeping each of them close
+to the state |0⟩⟨0|. It is not hard to see that the operators Zs
+i on the gauge qubits in the encoded basis are actually
+the stabilizer generators for the code. For example, by applying the inverse of the basis transformation for the bit-ﬂip
+code described in Sec. II, one can see that the operators IA ⊗Zs
+1 ⊗Is
+2 and IA ⊗Is
+1 ⊗Zs
+2 correspond to the generators
+ZZI and ZIZ, respectively.
+The Hamiltonians Xs
+i needed for the feedback, however, do not have simple forms in the original basis. In particular,
+for the bit-ﬂip code, the operators IA ⊗Xs
+1 ⊗Is
+2 and IA ⊗Is
+1 ⊗Xs
+2 correspond to 1
+2XIX + 1
+2Y IY + 1
+2ZXZ + 1
+2IXI and
+1
+2XXI + 1
+2Y Y I + 1
+2ZZX + 1
+2IIX, respectively. The models considered in Refs. [5, 7, 24] also measure continuously
+the stabilizer generators of the code, but the feedback Hamiltonians are assumed to be single-qubit operators in
+the original basis.
+However, note that in the general formulation of the ADL scheme—Eq. (11)—the correcting
+Hamiltonians Hr are not speciﬁed, and in that sense the possibility we discuss here can be regarded as a special case
+of the ADL scheme.
+In the case of the bit-ﬂip code, the authors in Refs. [7, 24] take the correcting Hamiltonians to be XII, IXI and
+IIX. This choice is motivated one hand by its analogy with the strong version of the error-correcting operation for
+this code, and on the other by its simplicity. In the encoded basis, however, these operators are correlated and act
+on subsystem HA as well. More precisely, XII, IXI and IIX are equal to 1
+2IXX −1
+2IY Y + 1
+2XXX + 1
+2XY Y ,
+1
+2IXZ + 1
+2IXI + 1
+2XXI −1
+2XXZ, and 1
+2IZX + 1
+2IIX + 1
+2XIX −1
+2XZX, respectively. Naturally, since the code
+is designed to correct single-qubit bit ﬂips, these operators leave the factor HA in the code space HA ⊗|0⟩s
+1 ⊗|0⟩s
+2
+invariant by deﬁnition. A similar property holds for codes that can correct arbitrary single-qubit errors. But these
+operators can introduce errors to the code subsystem through their non-trivial action on the orthogonal complement
+of the code space. In particular, imagine that the system undergoes just a single perfectly correctable error, say, a
+single bit ﬂip. Then a strong error correcting operation must be able to correct it. But if we apply a continuous
+scheme in which the correcting Hamiltonians act non-trivially on the complement of the code space, this scheme
+would generally apply non-trivial transformations to the subsystem HA in the error subspace, which are by deﬁnition
+uncorrectable. (Note that this cannot occur with a scheme which uses operations acting locally on the syndrome
+qubits.) Nevertheless, in the case of continuous decoherence where uncorrectable errors inevitably arise, this property
+is not of crucial signiﬁcance. As we argued earlier, the way CTQEC works is by keeping the weight outside the code
+space small, which suppresses the eﬀective accumulation of uncorrectable errors. As long as the scheme is able to keep
+that weight small, it will still have an eﬀect according to our earlier arguments. Indeed, numerical simulations show
+that with the use of single-qubit feedback Hamiltonians one can achieve a signiﬁcant improvement of the codeword
+ﬁdelity with respect to that of an unprotected qubit and outperform the approach of single-shot error correction in
+various regimes. For details about the numerical results, we refer the reader to Refs. [5, 7, 24].
+V.
+QUANTUM JUMPS FOR MARKOVIAN AND NON-MARKOVIAN NOISE
+In this section we will look at the performance of the quantum-jump scheme in the cases of Markovian and non-
+Markovian decoherence. We will consider the bit-ﬂip code in the case of simple noise models for which the evolution
+is exactly solvable. The conclusions we obtain, however, hold for general codes and noise models.
+A.
+Markovian decoherence
+The model described by Eq. (4) represents the noise as driven by a Lindblad generator, which is valid under the
+Markovian assumption of bath correlation times that are much shorter than any characteristic time scale of the system
+[17]. In the case of protecting a single qubit from Markovian bit-ﬂip decoherence, we already found the solution for this
+model—Eq. (40). We saw that the equilibrium ﬁdelity to which the qubit decays scales as 1/κ for large error-correction
+rates κ.
+For the bit-ﬂip code, we will assume that all qubits decohere through identical independent bit-ﬂip channels, i.e.,
+L(ρ) is of the form (7) with λ1 = λ2 = λ3 = λ. Then one can verify that the density matrix at any moment can be
+written
+ρ(t) = a(t)ρ(0) + b(t)ρ1 + c(t)ρ2 + d(t)ρ3,
+(62)
+
+14
+where
+ρ1 = 1
+3(X1ρ(0)X1 + X2ρ(0)X2 + X3ρ(0)X3),
+ρ2 = 1
+3(X1X2ρ(0)X1X2 + X2X3ρ(0)X2X3 + X1X3ρ(0)X1X3),
+ρ3 = X1X2X3ρ(0)X1X2X3,
+(63)
+are equally-weighted mixtures of single-qubit, two-qubit and three-qubit errors on the original state.
+The evolution of the system subject to decoherence plus error correction is described by the following system of
+ﬁrst-order linear diﬀerential equations:
+da(t)
+dt
+= −3λa(t) + (λ + κ)b(t),
+db(t)
+dt
+= 3λa(t) −(3λ + κ)b(t) + 2λc(t),
+dc(t)
+dt
+= 2λb(t) −(3λ + κ)c(t) + 3λd(t),
+dd(t)
+dt
+= (λ + κ)c(t) −3λd(t).
+(64)
+The exact solution was found in [20] and we will not present it here. We only note that for the initial conditions
+a(0) = 1, b(0) = c(0) = d(0) = 0, the exact solution for the weight outside the code space is
+b(t) + c(t) =
+3
+4 + r (1 −e−(4+r)γt),
+(65)
+where r = κ/λ. We see that similarly to what we obtained for the single-qubit code, the weight outside the code space
+quickly decays to its asymptotic value
+3
+4+r which scales as 1/r. But note that this value is roughly three times greater
+than that for the single-qubit model. This corresponds to the fact that there are three single-qubit channels. More
+precisely, it can be veriﬁed that if for a given κ the uncorrected weight by the single-qubit scheme is small, then the
+uncorrected weight by a multi-qubit code using the same κ and the same kind of decoherence for each qubit, scales
+approximately linearly with the number of qubits. Similarly, the ratio r required to preserve a given overlap with the
+code space scales linearly with the number of qubits in the code.
+The most important diﬀerence from the single-qubit model is that in this model there are non-correctable errors
+that cause a decay of the state inside the code space. Due to the ﬁniteness of the resources employed by our scheme,
+there always remains a ﬁnite portion of the state outside the code space, which gives rise to non-correctable three-qubit
+errors. To understand how the state decays inside the code space, one can ignore terms of the order of the weight
+outside the code space in the exact solution. The result is
+a(t) ≈1 + e−6
+r 2γt
+2
+,
+b(t) ≈0,
+c(t) ≈0,
+d(t) ≈1 −e−6
+r 2γt
+2
+.
+(66)
+Comparing with the expression for the ﬁdelity of a single decaying qubit without error correction which can be seen
+from (40) for κ = 0, we see that the encoded qubit decays roughly as if subject to bit-ﬂip decoherence with rate 6
+rγ.
+Therefore, for large r this error-correction scheme can reduce the rate of decoherence approximately r
+6 times. In the
+limit r →∞, it leads to perfect protection of the state for all times.
+B.
+Non-Markovian decoherence
+1.
+The Zeno eﬀect. Error correction versus error prevention
+The eﬀect of freezing of the evolution in the limit of inﬁnite error-correction rate bears a strong similarity to the
+quantum Zeno eﬀect [6], where frequent measurements slow down the evolution of a system and freeze the state in the
+limit where they are applied continuously. The Zeno eﬀect arises when the system and its environment are initially
+decoupled and they undergo a Hamiltonian-driven evolution, which leads to a quadratic change with time of the state
+during the initial moments [16] (the so-called Zeno regime). Let the initial state of the system plus the bath be
+
+15
+ρSB(0) = |0⟩⟨0|S ⊗ρB(0). For small times, the ﬁdelity α = Tr{(|0⟩⟨0|S ⊗IB)ρSB(t)} of the system’s density matrix
+with the initial state can be approximated as
+α(t) = 1 −Ct2 + O(t3).
+(67)
+In terms of the Hamiltonian HSB acting on the entire system, the coeﬃcient C is
+C = Tr{(HSB)2|0⟩⟨0|S ⊗ρB(0)}
+−Tr{HSB|0⟩⟨0|S ⊗IBHSB|0⟩⟨0|S ⊗ρB(0)}.
+(68)
+According to (67), if after a time step ∆t the state is measured in an orthogonal basis which involves the initial state,
+the probability for not projecting it on the initial state is of order O(∆t2). Thus if the state is continuously measured
+(∆t →0), this prevents the system from evolving.
+It has been proposed to utilize the quantum Zeno eﬀect in schemes for error prevention [1, 22, 34], in which an
+unknown encoded state is protected from errors simply by frequent measurements that keep it inside the code space.
+From the point of view of the encoded basis, this approach can be understood as measuring the operators Zs
+i which
+prevents the syndrome qubits from leaving the state |00...0⟩. The approach is similar to error correction, in that
+the errors for which the code is designed send a codeword to a space orthogonal to the code space. The diﬀerence
+is that the subsystem containing the protected information generally does not remain invariant under the errors,
+since the procedure does not involve correction of errors but only their prevention. In [22] it was shown that with
+this approach it is possible to use codes of smaller redundancy than those needed for error correction and a four-
+qubit encoding of a qubit was proposed, which is capable of preventing arbitrary independent errors arising from
+Hamiltonian interactions. The workings of this approach are based on the existence of a Zeno regime, and fail if we
+assume Markovian decoherence for all times. This is because the errors emerging during a time step dt in a Markovian
+model are proportional to dt and they accumulate with time if not corrected.
+By the above observations, error correction can achieve results in noise regimes where error prevention fails. Of
+course, this advantage is at the expense of a more complicated procedure—in addition to the measurements that
+constitute error prevention, error correction involves correcting unitaries, and in general is based on codes with higher
+redundancy. At the same time, we see that in the Zeno regime it is possible to reduce decoherence using weaker
+resources than those needed for Markovian noise. This suggests that in this regime error correction may exhibit
+higher performance than it does for Markovian decoherence. In many situations of practical signiﬁcance, the memory
+of the environment cannot be neglected, and the evolution is highly non-Markovian [14, 17, 18, 33]. Furthermore,
+no evolution is strictly Markovian and for a system initially decoupled from its environment a Zeno regime is always
+present, short though it may be [16]. Therefore, if the time resolution of error-correcting operations is high enough
+so that they “see” the Zeno regime, this could give rise to diﬀerent behavior.
+One important diﬀerence between Markovian and non-Markovian noise is that, in the latter case, the error correction
+and the eﬀective noise on the reduced density matrix of the system cannot be treated as independent processes. One
+could derive an equation for the eﬀective evolution of the system alone subject to interaction with the environment,
+such as the Nakajima-Zwanzig [30, 31] or the time-convolutionless (TCL) [11, 12] master equations, but the generator
+of transformations at a given moment in general will depend (implicitly or explicitly) on the entire history up to this
+moment. Therefore, adding error correction can aﬀect the eﬀective error model nontrivially. This means that in order
+to describe the evolution of a system subject to non-Markovian decoherence and error correction, one either has to
+derive an equation for the eﬀective evolution taking into account error correction from the very beginning, or one
+has to look at the evolution of the entire system including the bath, where the error generator and the generator of
+error correction can be considered independent. In the latter case, for suﬃciently small τc, the evolution of the entire
+system including the bath can be described by
+dρ
+dt = −i[H, ρ(t)] + κJ (ρ),
+(69)
+where ρ is the density matrix of the system plus the bath, H is the total Hamiltonian, and the error-correction
+generator J acts locally on the encoded system. We will consider a description in terms of Eq. (69) for a suﬃciently
+simple bath model which allows us to ﬁnd a solution for the evolution of the entire system. To gain understanding of
+how the scheme works, we will again look at the single-qubit model ﬁrst.
+2.
+The single-qubit code
+We choose the simple scenario of a system coupled to a single bath qubit via the Hamiltonian
+H = γX ⊗X,
+(70)
+
+16
+where γ is the coupling strength. This can be a good approximation for situations in which the coupling to a single
+spin from the bath dominates over other interactions [14].
+We assume that the bath qubit is initially in the maximally mixed state, which can be thought of as an equilibrium
+state at high temperature. From (69) one can verify that if the system is initially in the state |0⟩, the state of the
+system plus the bath at any moment will have the form
+ρ(t) = (α(t)|0⟩⟨0| + (1 −α(t))|1⟩⟨1|) ⊗I
+2 −β(t)Y ⊗X
+2 .
+(71)
+In the tensor product, the ﬁrst operator belongs to the Hilbert space of the system and the second to the Hilbert
+space of the bath. We have α(t) ∈[0, 1], and |β(t)| ≤
+p
+α(t)(1 −α(t)), β(t) ∈R. The reduced density matrix of the
+system has the same form as the one for the Markovian case. The part proportional to β(t) can be thought of as a
+“hidden” part, which nevertheless plays an important role in the error-creation process, since errors can be thought
+of as being transferred to the “visible” part from the “hidden” part (and vice versa). This can be seen from the fact
+that during an inﬁnitesimal time step dt, the Hamiltonian changes the parameters α and β as follows:
+α →α −2βγdt,
+β →β + (2α −1)γdt.
+(72)
+The eﬀect of an inﬁnitesimal error-correcting operation is
+α →α + (1 −α)κdt,
+β →β −βκdt.
+(73)
+Note that the “hidden” part is also being acted upon. Putting it all together, we get the system of equations
+dα(t)
+dt
+= κ(1 −α(t)) −2γβ(t),
+dβ(t)
+dt
+= γ(2α −1) −κβ(t).
+(74)
+The solution for the ﬁdelity α(t) is
+α(t) = 2γ2 + κ2
+4γ2 + κ2 + e−κt
+
+κγ
+4γ2 + κ2 sin 2γt +
+2γ2
+4γ2 + κ2 cos 2γt
+
+.
+(75)
+We see that as time increases, the ﬁdelity stabilizes at the value
+αNM
+∗
+= 2 + R2
+4 + R2 = 1 −
+2
+4 + R2 ,
+(76)
+where R = κ/γ is the ratio between the error-correction rate and the coupling strength. Fig. 1 shows the ﬁdelity as
+a function of the dimensionless parameter γt for three diﬀerent values of R. For error-correction rates comparable to
+the coupling strength (R = 1), the ﬁdelity undergoes a few partial recurrences before it stabilizes close to αNM
+∗
+. For
+larger R = 2, however, the oscillations are already heavily damped and for R = 5 the ﬁdelity seems conﬁned above
+αNM
+∗
+. As R increases, the evolution becomes closer to a decay like the one in the Markovian case.
+A remarkable diﬀerence, however, is that the asymptotic weight outside the code space (1 −αNM
+∗
+) decreases with
+κ as 1/κ2, whereas in the Markovian case the same quantity decreases as 1/κ. The asymptotic value can be obtained
+as an equilibrium point at which the inﬁnitesimal weight ﬂowing out of the code space during a time step dt is equal
+to the weight ﬂowing into it. The latter corresponds to vanishing right-hand sides in equations (39) and (74). In
+Sec. V C we will see that the diﬀerence in that quantity for the two diﬀerent types of decoherence arises from the
+diﬀerence in the corresponding evolutions during initial times.
+3.
+The three-qubit bit-ﬂip code
+We will consider a model where each qubit independently undergoes the same kind of non-Markovian decoherence as
+the one we studied for the single-qubit code. Here the system we look at consists of six qubits—three for the codeword
+
+17
+1
+2
+3
+4
+Γt
+0.4
+0.6
+0.7
+0.8
+0.9
+1
+Α
+R=5
+R=2
+R=1
+Figure 1: Fidelity of the single-qubit code with continuous bit-ﬂip errors and correction, as a function of dimensionless time
+γt, for three diﬀerent values of the ratio R = κ/γ.
+and three for the environment. We assume that all system qubits are coupled to their corresponding environment
+qubits with the same coupling strength, i.e., the Hamiltonian is
+H = γ
+3
+X
+i=1
+XS
+i ⊗XB
+i ,
+(77)
+where the operators XS act on the system qubits and XB act on the corresponding bath qubits which are initially in
+the maximally mixed state. The subscripts label on which particular qubit they act. Obviously, the types of eﬀective
+single-qubit errors on the density matrix of the system that can result from this Hamiltonian at any time, CP or not,
+will have operator elements which are linear combinations of the identity and XS. According to the error-correction
+conditions for non-CP maps obtained in Ref. [4], these errors are correctable by the code. Considering the form of
+the Hamiltonian (77) and the error-correcting map, one can see that the density matrix of the entire system at any
+moment is a linear combination of terms of the type
+̺lmn,pqr ≡Xl
+1Xm
+2 Xn
+3 ρ(0)Xp
+1Xq
+2Xr
+3 ⊗Xl+p
+1
+2
+⊗Xm+q
+2
+2
+⊗Xn+r
+3
+2
+.
+(78)
+Here the ﬁrst term in the tensor product refers to the Hilbert space of the system, and the following three refer to the
+Hilbert spaces of the bath qubits that couple to the ﬁrst, the second and the third qubits from the code respectively.
+The power indices l, m, n, p, q, r take values 0 and 1 in all possible combinations, and X1 = X, X0 = X2 = I. (Note
+that ̺lmn,pqr should not be mistaken with the components of the density matrix in the computational basis.) More
+precisely, we can write the density matrix in the form
+ρ(t) =
+X
+l,m,n,p,q,r
+(−i)l+m+n(i)p+q+rClmn,pqr(t) × ̺lmn,pqr,
+(79)
+where the coeﬃcients Clmn,pqr(t) are real. The coeﬃcient C000,000 is less than or equal to the codeword ﬁdelity (with
+equality when ρ(0) = |¯0⟩⟨¯0| or ρ(0) = |¯1⟩⟨¯1|). Since the scheme aims at protecting an unknown codeword, we will be
+interested in its performance in the worst case and we will assume that the codeword ﬁdelity is C000,000.
+The exact equations for the coeﬃcients Clmn,pqr(t) and their solutions were obtained in Ref. [27]. Here we will
+present an approximation which can be obtained by perturbation theory for γδt ≪1 ≪κδt [27]. The approximate
+system of equation reads
+dC000,000
+dt
+= 24
+R2 γC111,000,
+dC111,000
+dt
+= −12
+R2 γ(2C000,000 −1).
+(80)
+
+18
+Comparing with (72), we see that the encoded qubit undergoes approximately the same type of evolution as that of
+a single qubit without error correction, but the coupling constant is eﬀectively decreased R2/12 times. The solution
+of (80) yields for the codeword ﬁdelity
+C000,000(t) = 1 + cos( 24
+R2 γt)
+2
+.
+(81)
+This solution is valid only with precision O( 1
+R) for times γt ≪R3. If one carries out the perturbation to fourth order
+in γ, one obtains the approximate equations
+dC000,000
+dt
+= 24
+R2 γC111,000 −72
+R3 γ(2C000,000 −1),
+dC111,000
+dt
+= −12
+R2 γ(2C000,000 −1) −144
+R3 γC111,000,
+(82)
+which yield for the ﬁdelity
+C000,000(t) = 1 + e−144
+R3 γt cos( 24
+R2 γt)
+2
+.
+(83)
+We see that in addition to the eﬀective error process which is of the same type as that of a single qubit, there is
+an extra Markovian bit-ﬂip process with rate
+72
+R3 γ. This Markovian behavior is due to the Markovian character of
+our error-correcting procedure which, at this level of approximation, is responsible for the direct transfer of weight
+between ̺000,000 and ̺111,111, and between ̺111,000 and ̺000,111. The exponential factor explicitly reveals the range
+of applicability of solution (81)—with precision O( 1
+R), it is valid only for times γt of up to order R2. For times of
+the order of R3, the decay becomes signiﬁcant and cannot be neglected. The exponential factor may also play an
+important role for short times of up to order R, where its contribution is bigger than that of the cosine. But in
+the latter regime the diﬀerence between the cosine and the exponent is of order O( 1
+R2 ), which is negligible for the
+precision that we consider.
+Fig. 2 presents the exact solution for the codeword ﬁdelity C000,000(t) as a function of the dimensionless parameter
+γt for R = 100. For very short times after the beginning (γt ∼0.1), one can see a fast but small in magnitude decay
+(Fig.3). The maximum magnitude of this quickly decaying term obviously decreases with R, since in the limit of
+R →∞the ﬁdelity should remain constantly equal to 1.
+500
+1000
+1500
+2000
+2500
+3000 Γ t
+0.2
+0.4
+0.6
+0.8
+1
+C000,000
+Figure 2: Long-time behavior of three-qubit system with bit-ﬂip noise and continuous error correction. The ratio of correction
+rate to decoherence rate is R = κ/γ = 100.
+We see that in the limit R →∞, the evolution approaches an oscillation with an angular frequency
+24
+R2 γ. This is
+the same type of evolution as that of a single qubit interacting with its environment, but the coupling constant is
+eﬀectively reduced R2/12 times. While the coupling constant can serve to characterize the decoherence process in
+this particular case, such a description is not valid in general. As a general measure of the eﬀect of noise one can use
+the instantaneous rate of decrease of the codeword ﬁdelity Fcw (in our case Fcw = C000,000):
+Λ(Fcw(t)) = −dFcw(t)
+dt
+.
+(84)
+
+19
+0.1
+0.2
+0.3
+0.4 Γ t
+0.9994
+0.9995
+0.9996
+0.9997
+0.9998
+0.9999
+1
+C000,000
+Figure 3: Short-time behavior of three-qubit system with bit-ﬂip noise and continuous error correction. The ratio of correction
+rate to decoherence rate is R = κ/γ = 100.
+This quantity does not coincide with the decoherence rate in the Markovian case (which can be deﬁned naturally from
+the Lindblad equation), but it is a good estimate of the rate of loss of ﬁdelity and can be used for any decoherence
+model. We will refer to it simply as an error rate. Since the goal of error correction is to preserve the codeword
+ﬁdelity, the quantity (84) is a useful indicator of the performance of a given scheme. Note that Λ(Fcw) is a function of
+the codeword ﬁdelity and therefore it makes sense to use it for a comparison between diﬀerent cases only for identical
+values of Fcw. For our example, the fact that the coupling constant is eﬀectively reduced approximately R2/12 times
+implies that the error rate for a given value of Fcw is also reduced R2/12 times. Similarly, the reduction of λ by the
+factor r/6 in the Markovian case implies a reduction of Λ by the same factor. We see that the eﬀective reduction of
+the error rate increases quadratically as κ2 in the non-Markovian case, whereas it increases only linearly as κ in the
+Markovian case.
+C.
+The role of the Zeno regime
+The eﬀective continuous evolution (80) is derived under the assumption γδt ≪1 ≪κδt. The ﬁrst inequality implies
+that δt can be considered within the Zeno time scale of the system’s evolution without error correction. On the other
+hand, from the relation between κ and τc in (9) we see that τc ≪δt. Therefore, the time for implementing a weak
+error-correcting operation has to be suﬃciently small so that on the Zeno time scale the error-correction procedure can
+be described approximately as a continuous Markovian process. This suggests a way of understanding the quadratic
+enhancement in the non-Markovian case based on the properties of the Zeno regime.
+Let us consider again the single-qubit code from Sec. V B 2, but this time let the error model be any Hamiltonian-
+driven process. We assume that the qubit is initially in the state |0⟩⟨0|, i.e., the state of the system including the bath
+has the form ρ(0) = |0⟩⟨0| ⊗ρB(0). For times smaller than the Zeno time δtZ, the evolution of the ﬁdelity without
+error correction can be described by (67). Equation (67) naturally deﬁnes the Zeno regime in terms of α itself:
+α ≥αZ ≡1 −Cδt2
+Z.
+(85)
+For a single time step ∆t ≪δtZ, the change in the ﬁdelity is
+α →α −2
+√
+C
+√
+1 −α∆t + O(∆t2).
+(86)
+On the other hand, the eﬀect of error correction during time ∆t is
+α →α + κ(1 −α)∆t + O(∆t2),
+(87)
+i.e., it tends to oppose the eﬀect of decoherence. If both processes happen simultaneously, the eﬀect of decoherence
+will still be of the form (86), but the coeﬃcient C may vary with time. This is because the presence of error-correction
+opposes the decrease of the ﬁdelity, and consequently can lead to an increase in the time for which the ﬁdelity remains
+
+20
+within the Zeno range. If this time is suﬃciently long, the state of the environment could change signiﬁcantly under
+the action of the Hamiltonian, thus giving rise to a diﬀerent value for C in (86) according to (68). Note that the
+strength of the Hamiltonian puts a limit on C, and therefore this constant can vary only within a certain range. The
+equilibrium ﬁdelity αNM
+∗
+that we obtained for the error model in Sec. V B 2 can be thought of as the point at which
+the eﬀects of error and error correction cancel out. For a general model, where the coeﬃcient C may vary with time,
+this leads to a quasi-stationary equilibrium. From (86) and (87), one obtains the equilibrium ﬁdelity
+αNM
+∗
+≈1 −4C
+κ2 .
+(88)
+In agreement to the result in Sec. V B 2, the equilibrium ﬁdelity diﬀers from 1 by a quantity proportional to 1/κ2. If one
+assumes a Markovian error model, for short times the ﬁdelity changes linearly with time which leads to 1−αM
+∗∝1/κ.
+Thus the diﬀerence can be attributed to the existence of a Zeno regime in the non-Markovian case.
+This argument readily generalizes to the case of non-trivial codes if we look at the picture in the encoded basis.
+There each syndrome qubit undergoes a Zeno-type evolution and so do the abstract qubits associated with each error
+syndrome. Then using only the properties of the Zeno behavior as we did above, we can conclude that the weight
+outside the code space will be kept at a quasi-stationary value of order 1/κ2. As we argued in Sec. II, this in turn
+would lead to an eﬀective decrease of the uncorrectable error rate at least by a factor proportional to 1/κ2.
+Finally, let us make a remark about the resources needed to achieve the eﬀect of quadratic reduction of the error
+rate. As it was pointed out, there are two conditions involved—one concerns the magnitude of the error-correction
+rate, the other concerns the time resolution of the weak error-correcting operations. Both of these quantities should
+be suﬃciently large. There is, however, an interplay between the two, which involves the strength of the interaction
+required to implement the weak error correcting map (8). Let us imagine that the weak map is implemented by
+making the system interact weakly with an ancilla in a given state, after which the ancilla is discarded. The error
+correction procedure consists of a sequence of such interactions and can be thought of as a cooling process. If the
+time for which a single ancilla interacts with the system is τc, one can verify that the parameter ε in (8) would be
+proportional to g2τ 2
+c , where g is the coupling strength between the system and the ancilla. From (9) we then obtain
+that
+κ ∝g2τc.
+(89)
+The two parameters that can be controlled are the interaction time and the interaction strength, and they determine
+the error-correction rate. Thus, if g is kept constant, a decrease in the interaction time τc leads to a proportional
+decrease in κ which may be undesirable. Therefore, in order to achieve a good working regime, one generally may
+need to adjust both τc and g. But in some situations decreasing τc alone can prove advantageous, since this may
+lead to a time resolution that reveals the non-Markovian character of an error model that was previously treated as
+Markovian. Then the quadratic enhancement of the performance as a function of κ may compensate the decrease in
+κ, thus leading to a seemingly paradoxical result—better performance with a lower error-correction rate.
+VI.
+OUTLOOK
+In this chapter we saw that the subsystem principle can be useful for understanding various aspects of the workings
+of CTQEC and its performance under diﬀerent noise models, as well as for the design of CTQEC protocols using
+protocols for the protection of a known state. However, further research is needed to understand how to construct
+optimal CTQEC protocols. In the case of the quantum-jump model, the code-space ﬁdelity reaches a quasi-equilibrium
+value which can be used to estimate the performance of the scheme.
+It would be interesting to see whether an
+analogue of the equilibrium ﬁdelity exists for schemes with indirect feedback. This could prove useful since stochastic
+evolutions are generally too complicated for analytical treatment. The equilibrium code-space ﬁdelity can be useful
+also in assessing the performance of CTQEC under non-Markovian decoherence, where the description of the evolution
+of a system subject to CTQEC can be diﬃcult due to the large number of environment degrees of freedom.
+We discussed two main methods for obtaining CTQEC protocols from protocols for the protection of a single
+qubit: one based on the application of single-qubit protocols to the separate syndrome qubits, and another based on
+the application of single-qubit protocols to qubit subspaces associated with the diﬀerent syndromes. An interesting
+question is whether the performance of CTQEC protocols obtained by these methods can be related to the performance
+of the underlying single-qubit protocols. A diﬃculty in the case of indirect feedback is that the noise in the encoded
+basis is correlated, and the eﬀective noise on a given qubit can depend on the outcomes of the measurements on the
+rest of the qubits.
+Another interesting direction for future investigation is to explore CTQEC for speciﬁc physical models and limita-
+tions of the control parameters (for a recent work, see Ref. [19]). We saw that applying single-qubit schemes to the
+
+21
+syndrome qubits in the encoded basis generally requires multi-qubit operations in the original basis, but numerical
+simulations show that single-qubit feedback Hamiltonians in the original basis are also eﬃcient. It would be interest-
+ing to see whether it is possible to construct eﬃcient CTQEC protocols for non-trivial codes assuming only one- and
+two-qubit Hamiltonians. The ability to apply CTQEC with Hamiltonians of limited locality would be important for
+the scalability of this approach.
+So far, CTQEC has been considered only as a method of protecting quantum memory. A natural next step is
+to combine this approach with universal quantum computation. An important question in this respect is whether
+CTQEC can be made fault tolerant. In the theory of quantum fault tolerance, logical operations and error correction
+are implemented mainly in terms of transversal operations between physical qubits from diﬀerent blocks, where the
+basic operations are assumed to be discrete. Is something similar possible for CTQEC? One way of approaching this
+problem could be to look for fault-tolerant implementations of a universal set of weak operations using only weak
+transversal unitary operations and projective ancilla measurements.
+Undoubtedly, the area of CTQEC oﬀers a variety of interesting problems for future investigation. As quantum
+operations with limited strength or limited rate are likely to be the tools available in many quantum computing
+architectures in the near term, developing further the approach to protecting quantum information from noise via
+continuous-time feedback seems a promising direction for research.
+Acknowledgments
+O.O. acknowledges the support of the European Commission under the Marie Curie Intra-European Fellowship
+Programme (PIEF-GA-2010-273119). This research was supported in part by the Spanish MICINN (Consolider-
+Ingenio QOIT).
+[1] A. Barenco, A. Berthiaume, D. Deutsch, A. Eckert, R. Jozsa and C. Macchiavello. Stabilization of quantum computations
+by symmetrization. SIAM Journal on Computing, 26:1541, 1997.
+[2] A. J. Leggett. Comment on “How the result of a measurement of a component of the spin of a spin-(1/2 particle can turn
+out to be 100”. Phys. Rev. Lett., 62:2325, 1989.
+[3] A. Peres. Quantum measurements with postselection. Phys. Rev. Lett., 62:2326, 1989.
+[4] A. Shabani and D. A. Lidar. Linear quantum error correction. e-print arXiv:0708.1953.
+[5] B. A. Chase, A. J. Landahl, and J. M. Geremia. Eﬃcient feedback controllers for continuous-time quantum error correction.
+Phys. Rev. A., 77:032304, 2008.
+[6] B. Mishra and E.C.G Sudarshan. The Zeno’s paradox in quantum theory. J. Math. Phys., 18:756, 1997.
+[7] C. Ahn, A. C. Doherty, and A. J. Landahl. Continuous quantum error correction via quantum feedback control. Phys.
+Rev. A., 65:042301, 2002.
+[8] C. Ahn, H. W. Wiseman, and G. J. Milburn. Quantum error correction for continuously detected errors. Phys. Rev. A.,
+67:052310, 2003.
+[9] D. W. Kribs, R. W. Spekkens. Quantum error correcting subsystems are unitarily recoverable subsystems. Phys. Rev. A,
+74:042329, 2006.
+[10] E. Knill. Protected realizations of quantum infromation. Phys. Rev. A, 74:042301, 2006.
+[11] F. Shibata and T. Arimitsu. Expansion formulas in nonequilibrium statistical mechanics. J. Phys. Soc. Jpn., 49:891, 1980.
+[12] F. Shibata, Y. Takahashi, and N. Hashitsume. A generalized stochastic liouville equation. Non-Markovian versus memo-
+ryless master equations. J. Stat. Phys., 17:171, 1977.
+[13] G. Lindblad. On the generators of quantum dynamical semigroups. Comm. Math. Phys., 48:119, 1976.
+[14] H. Krovi, O. Oreshkov, M. Ryazanov, and D. A. Lidar. Non-Markovian dynamics of a qubit coupled to an Ising spin bath.
+Phys. Rev. A, 76:052117, 2007.
+[15] H. M. Wiseman and J. F. Ralph. Reconsidering Rapid Qubit Puriﬁcation by Feedback. New J. Phys., 8:90, 2006.
+[16] H. Nakazato, M. Namiki and S. Pascazio. Temporal behavior of quantum mechanical systems. Int. J. Mod. Phys. B,
+10:247, 1996.
+[17] H.-P. Breuer and F. Petruccione. The Theory of Open Quantum Systems. Oxford University Press, Oxford, UK, 2002.
+[18] H.-P. Breuer, D. Burgarth and F. Petruccione.
+Non-Markovian dynamics in a spin star system: Exact solution and
+approximation techniques. Phys. Rev. B, 70:045323, 2004.
+[19] J. Kerckhoﬀ, L. Bouten, A. Silberfarb, and H. Mabuchi. Physical model of continuous two-qubit parity measurement in a
+cavity-QED network. e-print arXiv:0812:1246.
+[20] J. P. Paz and W. H. Zurek. Continuous error correction. Proc. R. Soc. London, Ser. A, 454:355, 1998.
+[21] K. Jacobs. Optimal feedback control for the rapid preparation of a single qubit. Proc. of SPIE, 5468:355, 2004.
+[22] L. Vaidman, L. Goldenberg, and S. Wiesner. Error prevention scheme with four particles . Phys. Rev. A, 54, 1996.
+[23] M. Sarovar and G. J. Milburn. Continuous quantum error correction by cooling . Phys. Rev. A., 72:012306, 2005.
+
+22
+[24] M. Sarovar, C. Ahn, K. Jacobs, and G. J. Milburn. A practical scheme for error control using feedback. Phys. Rev. A.,
+69:052324, 2004.
+[25] O. Oreshkov. Topics in quantum information and the theory of open quantum systems. Ph.D. thesis, University of Southern
+California, 2008, e-print arXiv:0812.4682.
+[26] O. Oreshkov and T. A. Brun. Weak measurements are universal. Phys. Rev. Lett., 95:110409, 2005.
+[27] O. Oreshkov and T. A. Brun.
+Continuous quantum error correction for non-Markovian decoherence.
+Phys. Rev. A,
+76:022318, 2007.
+[28] O. Oreshkov, D. A. Lidar, and T. A. Brun. Operator quantum error correction for continuous dynamics. Phys. Rev. A,
+78:022333, 2008.
+[29] R. Blume-Kohout, H. K. Ng, D. Poulin, and L. Viola. Constructing qubits in physical systems. Phys. Rev. Lett., 100:030501,
+2008.
+[30] R. Zwanzig. Ensemble method in the theory of irreversibility. J. Chem. Phys., 33:1338, 1960.
+[31] S. Nakajima. On Quantum Theory of Transport Phenomena Steady Diﬀusion . Prog. Theor. Phys., 20:948, 1958.
+[32] T. A. Brun. A simple model of quantum trajectories . Am. J. Phys., 70:719, 2002.
+[33] T. Quang, M. Woldeyohannes, S. John, and G. S. Agarwal. Coherent control of spontaneous emission near a photonic
+band edge: a single-atom optical memory device. Phys. Rev. Lett., 79:5238, 1997.
+[34] W. H. Zurek. Reversibility and stability of information processing systems. Phys. Rev. Lett., 53:391, 1984.
+[35] Y. Aharonov and L. Vaidman. Aharonov and Vaidman reply. Phys. Rev. Lett., 62:2327, 1989.
+[36] Y. Aharonov and L. Vaidman. Properties of a quantum system during the time interval between two measurements. Phys.
+Rev. A, 41:11, 1990.
+[37] Y. Aharonov, D.Z. Albert, and L. Vaidman. How the result of a measurement of a component of the spin of a spin-1/2
+particle can turn out to be 100. Phys. Rev. Lett., 60:1351, 1988.
