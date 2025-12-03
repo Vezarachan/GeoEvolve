@@ -249,8 +249,12 @@ outputs_*/
 
 github_temp/
 
-geoevolve_storage_*/
+geoevolve_storage*/
 
 geoevolve_logs/
 
 geo_knowledge/
+
+uv.lock
+
+
