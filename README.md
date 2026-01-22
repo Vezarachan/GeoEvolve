@@ -1,5 +1,3 @@
-from unicodedata import category
-
 # GeoEvolve
 > GeoEvolve aims to accelerate geospatial model discovery by the power of large language models.
 

@@ -18,13 +18,16 @@ dependencies = [
     "langchain-core>=1.1.0",
     "langchain-openai>=1.1.0",
     "langgraph>=1.0.4",
+    "mgwr>=2.2.1",
     "more-itertools>=10.8.0",
     "openevolve>=0.2.22",
+    "pandas-stubs~=2.3.3",
     "pymupdf>=1.26.6",
     "requests>=2.32.5",
     "ruamel-yaml>=0.18.16",
     "tqdm>=4.67.1",
     "wikipedia-api>=0.8.1",
+    "xgboost>=3.1.2",
 ]
 
 [build-system]
